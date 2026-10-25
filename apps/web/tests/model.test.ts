@@ -116,3 +116,14 @@ describe('2D slices', () => {
     }
   });
 });
+
+describe('formatMove', () => {
+  it('formats board moves, promotions and drops in Japanese', async () => {
+    const { formatMove } = await import('../src/game/model');
+    expect(formatMove('577567')).toBe('5七VII→5六VII');
+    expect(formatMove('533523+')).toBe('5三III→5二III成');
+    expect(formatMove('P*565')).toBe('歩打 5六V');
+    expect(formatMove('R*111')).toBe('飛打 1一I');
+    expect(() => formatMove('bad')).toThrow();
+  });
+});

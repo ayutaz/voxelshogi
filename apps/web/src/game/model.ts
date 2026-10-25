@@ -119,3 +119,12 @@ export function sliceGrid(s: Slice): number[][] {
   }
   return rows;
 }
+
+const HAND_LABELS: Record<HandKind, string> = { P: '歩', L: '香', N: '桂', S: '銀', G: '金', B: '角', R: '飛' };
+
+/** Human-readable move: `5七VII→5六VII`, `…成`, or `歩打 5六V`. */
+export function formatMove(s: string): string {
+  const m = parseMove(s);
+  if (m.drop) return `${HAND_LABELS[m.drop]}打 ${displaySquare(m.to)}`;
+  return `${displaySquare(m.from!)}→${displaySquare(m.to)}${m.promote ? '成' : ''}`;
+}
