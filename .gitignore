@@ -33,6 +33,8 @@ __pycache__/
 .env.*
 !.env.example
 .dev.vars
+# Project-local Cloudflare CLI login (scripts/cf.sh)
+/.cloudflare-cli/
 *.pem
 # OS / editors
 .DS_Store

@@ -45,6 +45,11 @@ pnpm test          # Vitest（実 WASM を Node で読み込む）
 pnpm typecheck
 pnpm vite build && pnpm e2e   # Playwright（ローカルはインストール済み Chrome、CI は PW_CHANNEL='' で Chromium）
 pnpm dev
+
+# 公開サイト
+scripts/cf.sh whoami                                        # 個人アカウントであることを確認
+scripts/cf.sh deploy                                        # apps/web/dist を手動デプロイ
+E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サイトに E2E を実行
 ```
 
 ## 決定事項（ユーザー確認済み）
@@ -54,6 +59,7 @@ pnpm dev
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
 - ルールは将棋ったー三次元将棋の 10/17 改定後版。未記載の終局条件は将棋ったーの既定を継承する。
 - 公開 URL はまず workers.dev を使う。デプロイは GitHub Actions から行う（Cloudflare 側の Git 連携は使わない）。理由は `docs/DEPLOYMENT.md` を参照。
+- Cloudflare は、ユーザーの個人アカウント（ka1357amnbpdr@gmail.com）を使う。このマシンの wrangler はグローバルには別アカウントでログインしているため、**必ず `scripts/cf.sh`（プロジェクト専用ログイン）経由で wrangler を使う**。素の `wrangler` は使わない（`apps/web` の `pnpm run deploy` も `scripts/cf.sh` を経由する。`pnpm deploy` は pnpm の組み込みコマンドなので使わない）。
 - 将棋ったーの公開棋譜による互換性検証は、ローカルでのみ行う（棋譜はコミットしない）。
 
 ## 現在の進捗と次の作業
@@ -64,7 +70,7 @@ pnpm dev
   - Phase 0: 調査と設計
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
 - 進行中
-  - Phase 2: Web ゲーム Alpha。ゴールのうち、残りは Cloudflare Secrets の登録（ユーザー作業）と公開 URL でのスモークテスト
+  - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開済み。残りは `CLOUDFLARE_API_TOKEN` の登録（ユーザー作業）と、CI からの自動デプロイの確認
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
   1. M1: 探索AI（Rust）
   2. M2: Web で AI と対局 → Phase 2 完了

@@ -5,7 +5,7 @@
 9×9×9（729マス・372枚）の三次元将棋を題材にした、再現可能な三次元将棋AI研究プラットフォームです（開発中）。
 
 - Rust製ルールエンジン（WebAssembly / Python から共通利用）
-- ブラウザで遊べる VoxelShogi Arena（Cloudflare 公開予定）
+- ブラウザで遊べる VoxelShogi Arena — **https://voxelshogi.yousan-apps.workers.dev** （Alpha 版）
 - エンジンによる合成データセット / Transformer Policy-Value モデル（Hugging Face 公開予定）
 
 ルールは [将棋ったー「三次元将棋」](https://shogitter.com/rule/三次元将棋)（2026-10-17 改定版）に準拠します。詳細は [docs/RULESET.md](docs/RULESET.md) を参照してください。
@@ -16,7 +16,7 @@
 |---|---|---|
 | 0 | 調査と設計 | ✅ |
 | 1 | Rust ルールエンジン | ✅ |
-| 2 | Web ゲーム Alpha | 🟡 ローカルで動作。公開準備中 |
+| 2 | Web ゲーム Alpha | 🟡 公開済み。CI からの自動デプロイを準備中 |
 | 3〜7 | データセット、Transformer、自己対局、研究比較、正式公開 | ⬜ |
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。

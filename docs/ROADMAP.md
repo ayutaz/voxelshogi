@@ -109,9 +109,10 @@
 | ブラウザでゲームが遊べる | ✅ | 人間 vs 人間、人間 vs ランダムAI、AI vs AI 観戦 |
 | ローカルで動作確認できる | ✅ | `pnpm dev`、Playwright E2E 5件（実ブラウザ） |
 | Cloudflare にデプロイできる構成がある | ✅ | `wrangler.jsonc`（Static Assets）、CI の deploy ジョブ（ADR-008, 009） |
-| 実際の公開に必要な認証・承認を使用する | ⬜ | Cloudflare Secrets の登録待ち（ユーザー作業、`docs/DEPLOYMENT.md`） |
+| 実際の公開に必要な認証・承認を使用する | ✅ | ユーザーの承認のもと、個人アカウントへのプロジェクト専用ログインで https://voxelshogi.yousan-apps.workers.dev に公開（2026-10-25） |
 | （追加）CI で全テストが通る | ✅ | Public 化後の GitHub Actions で rust・web（E2E を含む）が成功（2026-10-25） |
-| （追加）公開 URL でスモークテストが通る | ⬜ | Secrets 登録後 |
+| （追加）公開 URL でスモークテストが通る | ✅ | 公開 URL に対して E2E 5件が成功（`E2E_BASE_URL`） |
+| （追加）main への push で CI から自動デプロイされる | ⬜ | `CLOUDFLARE_API_TOKEN` の登録待ち（ユーザー作業、`docs/DEPLOYMENT.md`）。Account ID と Subdomain は登録済み |
 
 **作業**
 
@@ -131,7 +132,7 @@
 
 **残りの作業**（上の2項目がゴール。それ以外は Phase 7 までに行う改善）
 
-- Cloudflare の Secrets 登録（ユーザー作業）と、公開後のスモークテスト ← ゴール
+- `CLOUDFLARE_API_TOKEN` の登録（ユーザー作業）と、CI からの自動デプロイの確認 ← ゴール
 - JS バンドル（1.17MB）の分割
 - 探索AI（Normal 難易度）と、AI 推論の Web Worker 化（Phase 3 の探索AIを流用）
 - 事前生成した棋譜の再生モード、棋譜共有用 URL、モバイルでの表示調整（Phase 7）
@@ -298,7 +299,7 @@ Phase 5〜7 は、M6 で実測する学習速度から費用を見積もり直�
   - 探索AIを WASM に追加し、Web Worker で動かす（AI の思考中も画面は止まらない）
   - 難易度を Easy（ランダム）と Normal（探索）にする
   - JS バンドルを分割して、初回の読み込みを軽くする
-  - Secrets の登録後に自動デプロイし、公開 URL でスモークテストをする
+  - `CLOUDFLARE_API_TOKEN` の登録後、CI から自動デプロイされることを確認する（手動デプロイと公開 URL での E2E は 2026-10-25 に済み）
 - **テスト**（E2E）: AI が合法手で応答する。思考中も画面を操作できる。
 
 ### M3: ブラウザでのモデル推論の検証（Phase 4 の先行作業）
@@ -346,7 +347,7 @@ Phase 5〜7 は、M6 で実測する学習速度から費用を見積もり直�
 
 | 時期 | 内容 | 状態 |
 |---|---|---|
-| M2 まで（Phase 2 の完了に必須） | Cloudflare の `workers.dev` サブドメインを確認し、API トークンを作り、`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`、変数 `WORKERS_SUBDOMAIN` を登録する。手順は `docs/DEPLOYMENT.md`。トークンが会話に残らないよう、ご自身のターミナルで `gh secret set` を実行する。`production` 環境は作成済み | ⬜ |
+| M2 まで（Phase 2 の完了に必須） | 個人アカウントのダッシュボードで API トークンを作り、`CLOUDFLARE_API_TOKEN` を登録する（手順は `docs/DEPLOYMENT.md`）。トークンが会話に残らないよう、ご自身のターミナルで実行する。Account ID・Subdomain・`production` 環境・手動デプロイは済み | ⬜ |
 | M3 まで | ディスクの空きを 20GB 以上にする（2026-10-25 時点で約9GB） | ⬜ |
 | M4 で公開する前 | データセットとモデルのライセンスを決める（提案: データセットは CC-BY-4.0、モデルは Apache-2.0） | ⬜ |
 | M4 で公開する前 | Hugging Face への公開方法を決める（提案: 最初はローカルの `ayousanz` ログインから手動で公開する。CI から公開する場合は `HF_TOKEN` を登録する） | ⬜ |
