@@ -153,7 +153,7 @@ jobs:
   deploy:
     name: Deploy to Cloudflare
     needs: [gate]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.gate.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
