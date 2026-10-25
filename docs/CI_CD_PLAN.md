@@ -18,7 +18,8 @@
 | 品質計測 | [Quality 40168054255](https://github.com/ayutaz/voxelshogi/actions/runs/40168054255) の Rust/Web カバレッジと既知の9変異が成功、各レポートを保存済み。全体変異ジョブはこの実行では省略 |
 | production 認証 | 新規 API トークンとアカウント ID を environment Secrets に直接登録し、本番公開で使用済み。成功確認後、旧 repository Secrets の2件を削除し、repository 側は空、production 側の2件は保持と API で確認 |
 | main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
-| 残り | 全体変異調査の生き残り分類、隔離した成果物での復旧訓練、PR 保護の実動作検証。M0 全体は未完了、M1 は未着手 |
+| PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) で通常 CI・Security・Quality measurements の起動を確認。必須チェック未完了時の通常 squash merge は、7チェック未成功・CodeQL 結果待ちのルール違反として HTTP 405 で拒否された。PR は未マージ |
+| 残り | 全体変異調査の生き残り分類、隔離した成果物での復旧訓練、正常な PR の取り込み・fork PR の検証。M0 全体は未完了、M1 は未着手 |
 
 人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
 
@@ -57,7 +58,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 監査・3言語解析・更新 PR・報告経路を確認済み。fork PR の実行検証が残る |
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 CI 計測・既知の9変異が成功。全体調査の生き残り分類が残る |
 | M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 本番 SHA・公開 E2E・環境 Secrets 移行済み。復旧訓練が残る |
-| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | 🟡 保護設定済み、作業ブランチの PR で検証する |
+| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | 🟡 保護設定・未完了チェックの merge 拒否を確認。正常系・fork 検証は PR で追跡 |
 
 ### M0-1 CI の再現性と静的検査
 
@@ -110,7 +111,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 - 必須 Gate には lint・Rust・MSRV・WASM/Web/E2E・依存監査を含め、dependency-review も PR では必須とする。CodeQL 3種類と Rust/Web カバレッジ・既知変異の3種類を、別の必須チェックとして追加する。docs のみでも全7チェックを実行する。全体変異調査と本番 deploy は PR の必須チェックに含めない。
 - `CONTRIBUTING.md` と PR テンプレートに、TDD、独立した期待値、変異テスト、ローカル確認コマンド、ドキュメント更新、AI が作った差分も確認することを記載する。`CLAUDE.md` の手順も PR 運用へ変更する。
 
-**検証**: 検証用 PR の必須テストを一時的に失敗させ、merge が許可されないことを API/UI で確認する。修正後にチェックが成功し、自己承認なしで取り込めることを確認する。fork/Dependabot PR に本番 secrets が渡らず、deploy も起動しないことを確認する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
+**検証**: Gate の単体テストで failure・cancelled・skipped・欠落を拒否することを確認し、GitHub では必須チェックが未完了の PR の通常 merge を拒否することを確認する。壊したテストを push して検証する方法は使わない。正常系では全チェックが成功して取り込み可能になることと、自己承認なしで取り込めることを確認する。fork/Dependabot PR に本番 secrets が渡らず、deploy も起動しないことを確認する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
 
 ## 定常運用
 
@@ -209,6 +210,7 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 
 - 品質計測 run `40168054255` の保存レポートを再取得し、Rust core 行カバレッジ94.27%（1432 / 1519）、Web 単体35.37%（127 / 359）を確認した。これは同 run のコミット `69e2904` の値で、未計測の後続変更まで保証するものではない。
 - 人間同士の対局モードを削除した `0e29eb4` では、Vitest 33件・E2E 6件と公開 E2E が成功した。Rust は86件、CI 制御用テストは20件。画面は人間先手・人間後手の AI 対局と AI 観戦のみ（ADR-012）。
-- 作業前のブランチ作成と PR を必須化する（ユーザー指定）。`AGENTS.md`、`CONTRIBUTING.md`、PR テンプレートを追加し、`.github/main-ruleset.json` を GitHub に適用した。PR 品質計測と保護の実動作は同じ作業ブランチの PR で確認する。
+- 作業前のブランチ作成と PR を必須化した（ユーザー指定）。`AGENTS.md`、`CONTRIBUTING.md`、PR テンプレートを追加し、`.github/main-ruleset.json` を GitHub に適用した。API の有効ルールが定義中の全フィールドと一致することも確認した。
+- [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
 
-次は M0-5 の PR 検証、M0-3 の全体変異調査の残件分類、M0-4 の隔離成果物による復旧訓練を行う。fork PR を実際に作成した検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。
+次は M0-5 の正常な PR の取り込みと fork 経路の検証、M0-3 の全体変異調査の残件分類、M0-4 の隔離成果物による復旧訓練を行う。fork PR を実際に作成した検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。

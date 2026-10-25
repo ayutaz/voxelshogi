@@ -5,7 +5,7 @@
 1. `git status` で既存の変更を確認する。main から新しい作業を始める場合は `git switch main`、`git pull --ff-only` の後、**変更前に** `git switch -c <種別>/<作業名>` を実行する。
 2. 作業ブランチで変更・検証・commit を行い、`git push -u origin HEAD` で公開する。既存の変更を混ぜず、履歴の書き換えや force push は行わない。
 3. main 向けの PR を作り、目的、変更後の動作、検証結果、残る制約を記載する。AI が作成した差分も内容を確認する。
-4. 必須チェックがすべて成功し、最新 main に対する検証が済んでから通常の merge を行う。main が進んだら `git fetch origin` と `git merge origin/main` で取り込み、再検証する。
+4. 必須チェックがすべて成功し、最新 main に対する検証が済んでから GitHub の squash merge を行う（リポジトリで許可された取り込み方式）。main が進んだら `git fetch origin` と `git merge origin/main` で取り込み、再検証する。
 
 main は PR 必須、force push・削除禁止、bypass なし。他者承認の必須数は0。チェックの失敗・中断・欠落を、保護の解除や管理者権限で回避しない。設定の正は `.github/main-ruleset.json`、確認記録は [CI_CD_PLAN.md](docs/CI_CD_PLAN.md)。
 
