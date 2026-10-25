@@ -78,6 +78,8 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 
 追加範囲で `Board::Debug` の空出力、`Square::from_index` の上限729を許してしまう変異、`Square::offset` のz方向の符号反転、`Square` のDebug/Displayを空にする計5変異を発見した。`geometry_contracts.rs` に盤面・座標表示、明示的な座標インデックス、各軸の加算と全6境界の3テストを追加し、全5変異をコピー上で検出した。特にz方向の対称性がある利き生成では符号反転が集合比較から漏れるため、座標演算そのものに手計算の期待値を置いた。正常コードのRustは95テスト成功。
 
+さらに `NotationError::Display` の空出力を発見し、棋譜インポートの理由・不正な指し手のindex/text・Sessionへの伝播を確認する1テストを追加した。同じテストが `RecordError::Display` の空出力も拒否することをコピー上で確認した。正常コードのRustは96テスト成功。
+
 分割2の95件は91 caught・1 unviable・3 missed。missedは次の同値変異と確認し、raw成果物を新集計で照合して91 caught・1 unviable・3 equivalentになった。変異名と `movegen.rs` 全体のソースハッシュを承認リストへ記録した。全8分割の完了を意味する結果ではない。
 
 | 変異 | 同値の根拠 |

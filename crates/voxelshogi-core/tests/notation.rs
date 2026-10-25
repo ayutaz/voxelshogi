@@ -7,6 +7,26 @@ use voxelshogi_core::notation::{NotationError, from_vsfen, parse_move, to_vsfen}
 use voxelshogi_core::record::{GameRecord, RULESET_ID, RecordError, Termination};
 use voxelshogi_core::{Board, Color, GameResult, GameState, Move, PieceKind, Square, WinReason};
 
+#[test]
+fn import_error_text_retains_the_reason_and_offending_move() {
+    assert_eq!(
+        NotationError::Invalid("bad square".into()).to_string(),
+        "invalid notation: bad square"
+    );
+    assert_eq!(
+        RecordError::BadMoveString {
+            index: 2,
+            text: "bad".into(),
+        }
+        .to_string(),
+        "BadMoveString { index: 2, text: \"bad\" }"
+    );
+    let mut session = voxelshogi_core::session::Session::new();
+    assert_eq!(
+        session.play("bad"),
+        Err("invalid notation: bad move string \"bad\"".into())
+    );
+}
 const EMPTY_LAYER: &str = "9/9/9/9/9/9/9/9/9";
 
 fn kings_only_vsfen(side: char, hands: &str) -> String {
