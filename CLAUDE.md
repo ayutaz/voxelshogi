@@ -69,11 +69,10 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
 - 完了
   - Phase 0: 調査と設計
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
-- 進行中
-  - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開済み。残りは `CLOUDFLARE_API_TOKEN` の登録（ユーザー作業）と、CI からの自動デプロイの確認
+  - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
   1. M1: 探索AI（Rust）
-  2. M2: Web で AI と対局 → Phase 2 完了
+  2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証
   4. M4: Python バインディングとデータ生成
   5. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）

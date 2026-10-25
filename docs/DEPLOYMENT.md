@@ -23,13 +23,13 @@
 |---|---|---|
 | `CLOUDFLARE_ACCOUNT_ID` | Secret | 登録済み（2026-10-25） |
 | `WORKERS_SUBDOMAIN` | Variable | 登録済み（`yousan-apps`） |
-| `CLOUDFLARE_API_TOKEN` | Secret | **未登録（ユーザー作業）** |
+| `CLOUDFLARE_API_TOKEN` | Secret | 登録済み（2026-10-25。個人アカウントの「Edit Cloudflare Workers」トークン） |
 
 `production` 環境は、CI の初回実行で作成済み。必要なら承認ルールを付ける。
 
-`CLOUDFLARE_API_TOKEN` が未登録の間は、deploy ジョブは「skipped」の notice を出して成功扱いになる。登録すると、main への push ごとに自動デプロイされる。
+main への push ごとに、CI から自動デプロイされる（2026-10-25 に初回の自動デプロイとスモークテストが成功）。`CLOUDFLARE_API_TOKEN` を削除した場合は、deploy ジョブは「skipped」の notice を出して成功扱いになる。
 
-#### `CLOUDFLARE_API_TOKEN` の登録手順（ユーザー作業）
+#### `CLOUDFLARE_API_TOKEN` の登録手順（トークンを作り直すとき）
 
 CLI の OAuth ログインは期限付きで、API トークンを作る権限もない。そのため、CI 用のトークンはダッシュボードで作る。
 

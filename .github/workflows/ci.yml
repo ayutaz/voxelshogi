@@ -95,7 +95,7 @@ jobs:
         with:
           name: web-dist
           path: apps/web/dist
-      - name: Deploy (skipped until CLOUDFLARE_API_TOKEN is configured)
+      - name: Deploy
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: npx --yes wrangler@4.152.0 deploy
       - name: Smoke test
