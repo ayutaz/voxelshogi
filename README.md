@@ -21,11 +21,11 @@
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-次は M0（CI/CD と品質基盤）を整えてから、M1（探索AI）へ進みます。[調査結果と実装計画](docs/CI_CD_PLAN.md) をまとめています（設定の実装は未着手）。
+M0（CI/CD と品質基盤）を実装中です。完了後に M1（探索AI）へ進みます。[調査結果・実装計画・検証記録](docs/CI_CD_PLAN.md) をまとめています。
 
 ## ローカルで動かす
 
-必要なもの: Rust（stable）と `wasm32-unknown-unknown` ターゲット、`wasm-bindgen-cli` 0.2.129、Node.js、pnpm。
+必要なもの: Rust 1.97.1（`rust-toolchain.toml` から rustup が導入）、`wasm-bindgen-cli` 0.2.129、Node.js 24.22.1（`.node-version`）、pnpm 10.32.1。
 
 ```bash
 cargo test --workspace          # ルールエンジンのテスト

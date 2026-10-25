@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
+    "lint": "eslint .",
     "test": "vitest run",
     "e2e": "playwright test",
     "deploy": "../../scripts/cf.sh deploy"
@@ -22,15 +23,19 @@
     "three": "0.186.1"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@playwright/test": "1.64.1",
     "@testing-library/react": "^16.3.3",
-    "@types/node": "^26.6.5",
+    "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "6.1.2",
+    "eslint": "10.13.0",
+    "eslint-plugin-react-hooks": "7.1.1",
     "jsdom": "^30.1.3",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
     "vite": "8.3.5",
     "vitest": "5.0.5"
   },

@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PROFILE="${1:-release}"
-cargo build --profile "$PROFILE" --target wasm32-unknown-unknown -p voxelshogi-wasm
+cargo build --locked --profile "$PROFILE" --target wasm32-unknown-unknown -p voxelshogi-wasm
 DIR="$PROFILE"; [ "$PROFILE" = "dev" ] && DIR=debug
 wasm-bindgen --target web --out-dir apps/web/src/wasm/pkg \
   "target/wasm32-unknown-unknown/$DIR/voxelshogi_wasm.wasm"
