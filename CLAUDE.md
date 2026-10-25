@@ -65,9 +65,11 @@ pnpm dev
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
 - 進行中
   - Phase 2: Web ゲーム Alpha。ゴールのうち、残りは Cloudflare Secrets の登録（ユーザー作業）と公開 URL でのスモークテスト
-- **次にやること（優先順）**
-  1. **探索AI（αβ探索、駒得評価）を Rust に実装し、Web の Worker で動かす**。理由: Web の Normal 難易度と、Phase 3 の Search Dataset の教師に必要。
-  2. **将棋ったーの公開棋譜を使った互換性検証**（`docs/RULESET.md` §9）。理由: ルール準拠の主張を裏付けるため。
-  3. **PyO3 バインディングとデータ生成（Parquet）**。理由: Phase 3 の本体。
-  4. **ONNX/WebGPU の早期検証**。ランダム重みの小型 Transformer で行う。理由: 本格学習の前に変換・推論の可否を確認する（`docs/TECH_STACK_RESEARCH.md` §3.4）。
-  5. **Cloudflare の Secrets 登録**（ユーザー作業）→ 自動デプロイ → Phase 2 完了。
+- **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
+  1. M1: 探索AI（Rust）
+  2. M2: Web で AI と対局 → Phase 2 完了
+  3. M3: ブラウザでのモデル推論の検証
+  4. M4: Python バインディングとデータ生成
+  5. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
+  6. M6: Transformer-S の学習
+- ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

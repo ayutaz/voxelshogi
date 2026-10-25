@@ -22,7 +22,7 @@
 2. GitHub リポジトリ → Settings → Secrets and variables → Actions で、次を登録する。
    - Secrets: `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`
    - Variables（任意、スモークテスト用）: `WORKERS_SUBDOMAIN`（`<account-subdomain>` の部分）
-3. Settings → Environments で、`production` 環境を作成する（承認ルールを付けることもできる）。
+3. Settings → Environments の `production` 環境は、CI の初回実行で作成済み。必要なら承認ルールを付ける。
 
 Secrets が登録されていない間は、deploy ジョブは「skipped」の notice を出して成功扱いになる。
 
