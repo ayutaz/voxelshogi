@@ -5,7 +5,7 @@
 ## ADR-001: ルールは Rust の単一エンジンに集約する（2026-10-25）
 
 - **状況**: Web・Python（データ生成・学習）・探索のそれぞれでルールを実装すると、実装間でずれが生じ、そのずれが学習データを汚す。
-- **決定**: `voxelshogi-core`（依存は serde のみ）にルールを実装する。WASM（wasm-bindgen）と Python（PyO3、予定）は薄いラッパーにする。Web の TypeScript は、エンジンの出力（駒コード・指し手文字列）をデコードするだけにする。
+- **決定**: `voxelshogi-core`（依存は serde と serde_json のみ）にルールを実装する。WASM（wasm-bindgen）と Python（PyO3、予定）は薄いラッパーにする。Web の TypeScript は、エンジンの出力（駒コード・指し手文字列）をデコードするだけにする。
 - **影響**: UI の合法手ハイライトも、エンジンが返す合法手リストから作る。TS 側に利きの計算はない。
 
 ## ADR-002: ルール準拠先は将棋ったー三次元将棋（10/17 改定後）（2026-10-25）
@@ -42,7 +42,8 @@
 
 ## ADR-008: デプロイは GitHub Actions から行う（Cloudflare Git 連携は使わない）（2026-10-25）
 
-- **決定**: CI で Rust・Web 単体・E2E のテストが通った後、同じワークフローで `wrangler deploy` を実行する。Secrets（`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）が未登録の間は、デプロイをスキップする。
+- **決定**: CI で Rust・Web 単体・E2E のテストが通った後、同じワークフローで `wrangler deploy` を実行する。Secrets（`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）が未登録の場合は、デプロイをスキップする。
+- **状態**: 2026-10-25 に Secrets を登録し、main への push で自動デプロイされることを確認した。
 - **理由**:
   - Rust と wasm-bindgen のツールチェーン管理とキャッシュを、1か所にまとめられる。
   - テストに失敗した状態ではデプロイされないことを保証できる。
@@ -54,3 +55,10 @@
 - **決定**: `wrangler.jsonc` には `assets` だけを設定し、`not_found_handling: single-page-application` にする。
 - **理由**: 静的アセットへのリクエストは Worker を起動しないため、無料かつ回数無制限である（`docs/COST_ESTIMATE.md` §5）。
 - **影響**: 25MiB を超えるファイル（ONNX Runtime の WebGPU 用 wasm、大きなモデル）は、R2 から配信する必要がある（Phase 4）。
+
+## ADR-010: Cloudflare はプロジェクト専用のログインで操作する（2026-10-25）
+
+- **状況**: このマシンの wrangler はグローバルには別のアカウントでログインしており、Chrome もさらに別のアカウントでログインしている。そのままコマンドを実行すると、本プロジェクトが別のアカウントにデプロイされる恐れがある。
+- **決定**: デプロイ先は、ユーザーの個人アカウントとする（ユーザー指定）。ローカルの wrangler は、必ず `scripts/cf.sh` から起動する。このスクリプトは、`XDG_CONFIG_HOME` を `.cloudflare-cli/`（gitignore 済み）に向けて、ログイン情報をプロジェクト内に閉じ込める。`apps/web` の `pnpm run deploy` も、このスクリプトを経由する。
+- **理由**: グローバルのログインを変えずに済み、他のプロジェクトに影響しない。誤ったアカウントへのデプロイを、仕組みで防げる。
+- **影響**: CI 用の API トークンは、CLI の OAuth ログインでは作れないため、ダッシュボードで作る（`docs/DEPLOYMENT.md`）。公開サイトの検証は、`E2E_BASE_URL` を指定して E2E テストを公開 URL に対して実行する。

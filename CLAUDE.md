@@ -16,6 +16,7 @@
 | `apps/web` | VoxelShogi Arena（Vite + React + three/R3F）。エンジンの出力をデコードして表示するだけ |
 | `docs/` | 仕様・ADR・調査・見積もり |
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
+| `scripts/cf.sh` | プロジェクト専用ログイン（`.cloudflare-cli/`、git管理外）で wrangler を起動する（ADR-010） |
 | 予定 | `crates/voxelshogi-python`（PyO3）、`training/`、`export/`、`infrastructure/` |
 
 ## 開発規約（必読）

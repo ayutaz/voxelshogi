@@ -47,7 +47,7 @@
 
 **作業**
 
-- ローカル環境の確認: Apple M1、RAM 8GB、ディスク空き約6GB、rustc 1.97.1、Node 26、pnpm 10.32、uv 0.11、Docker なし
+- ローカル環境の確認: Apple M1、RAM 8GB、ディスク空き約6〜9GB、rustc 1.97.1、Node 26、pnpm 10.32、uv 0.11、Docker なし
 - 将棋ったーのルールを一次資料から読み解き、`docs/RULESET.md` にまとめた
 - 関連研究 `docs/RELATED_WORK.md`、技術調査 `docs/TECH_STACK_RESEARCH.md`、費用 `docs/COST_ESTIMATE.md`、調査サマリ `docs/RESEARCH.md`
 - ADR-001〜009、`docs/PROJECT_SPEC.md`、CLAUDE.md、本ファイル
@@ -55,7 +55,7 @@
 
 **既知の問題**
 
-- ディスクの空きが少ない（約6GB）。PyTorch のローカル導入は CPU 版に限り、慎重に行う。
+- ディスクの空きが少ない（約9GB）。PyTorch のローカル導入は CPU/MPS 版に限り、慎重に行う。uv のキャッシュ（約12GB）を整理すれば空きを増やせる（ユーザー側の準備を参照）。
 
 ---
 
@@ -123,7 +123,9 @@
 - 手番表示、勝敗表示、投了、undo/redo、棋譜一覧からのジャンプ
 - 棋譜の JSON 保存・読み込み（サイズ上限、再生による検証）
 - 人間 vs ランダムAI、AI vs AI 観戦（一時停止、1手進める、速度変更）
-- Cloudflare Static Assets の設定、CI（Rust / Web 単体 / E2E / Secrets がある場合のみデプロイ）
+- Cloudflare Static Assets の設定、CI（Rust / Web 単体 / E2E / main への push で自動デプロイとスモークテスト）
+- https://voxelshogi.yousan-apps.workers.dev に公開（ユーザーの個人アカウント。ローカル操作は `scripts/cf.sh` によるプロジェクト専用ログイン、ADR-010）
+- 公開サイトに対する E2E（`E2E_BASE_URL`）
 
 **テスト**
 
@@ -346,7 +348,7 @@ Phase 5〜7 は、M6 で実測する学習速度から費用を見積もり直�
 | 時期 | 内容 | 状態 |
 |---|---|---|
 | Phase 2 の完了に必須 | Cloudflare の個人アカウントで API トークンを作り、`CLOUDFLARE_API_TOKEN` を登録する | ✅ 2026-10-25 |
-| M3 まで | ディスクの空きを 20GB 以上にする（2026-10-25 時点で約9GB） | ⬜ |
+| M3 まで | ディスクの空きを 20GB 以上にする（2026-10-25 時点で約9GB）。uv のキャッシュ（`~/.cache/uv`、約12GB）を `uv cache clean` で消すのがいちばん効く。キャッシュなので、必要になれば再ダウンロードされる | ⬜ |
 | M4 で公開する前 | データセットとモデルのライセンスを決める（提案: データセットは CC-BY-4.0、モデルは Apache-2.0） | ⬜ |
 | M4 で公開する前 | Hugging Face への公開方法を決める（提案: 最初はローカルの `ayousanz` ログインから手動で公開する。CI から公開する場合は `HF_TOKEN` を登録する） | ⬜ |
 | M3 の結果しだい | R2 を使う場合は、Cloudflare に支払い方法を登録する（無料枠の範囲で使う場合でも、有効化に必要） | ⬜ |

@@ -333,12 +333,12 @@
 
 1. ORT Web WebGPU の Conv3d naive 実装の実速度（M1 / 一般的な Windows iGPU / dGPU）と、Transformer 案との比較。
 2. Vite 8 + `onnxruntime-web/webgpu` で `dist/` に 25.54 MiB の wasm が出力されるか（実ビルドで確認）、`wasmPaths` の `{mjs, wasm}` 個別指定の挙動。
-3. `_headers` の `/*` が SPA フォールバックの `index.html` 応答にも適用されるか（デプロイ後 `curl -I`）。
+3. ~~`_headers` の `/*` が SPA フォールバックの `index.html` 応答にも適用されるか~~ → **解決（2026-10-25）**: 公開 URL の存在しないパスへの `curl -I` で、`X-Content-Type-Options` などが付くことを確認した。
 4. Static Assets の 25 MiB が非圧縮サイズ基準か。
 5. WebGPU / JSPI / COEP credentialless の各ブラウザ対応状況（本日一次情報未確認）。
 6. torch 2.14 での `torch.compile` × DDP の推奨順序、MPS での BF16/compile 対応。
 7. Hugging Face private repo のストレージ無料枠。
-8. `getrandom` 0.4 の wasm32-unknown-unknown での設定方法（コアから排除するなら不要）。
+8. ~~`getrandom` 0.4 の wasm32-unknown-unknown での設定方法~~ → **不要（2026-10-25）**: コアの依存は serde と serde_json だけで、`getrandom` に依存していない（Zobrist は固定シードの SplitMix64）。
 9. Node 26 の LTS 化状況。
 
 ## 出典（すべて 2026-10-25 取得）

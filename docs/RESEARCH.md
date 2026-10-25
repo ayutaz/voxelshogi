@@ -35,6 +35,6 @@
 1. ONNX Runtime Web の WebGPU 用 wasm が、Cloudflare Static Assets の1ファイル25MiB上限を超える（27MiB）。R2 で配信するか、軽量ビルド（JSPI 16MiB、WASM のみ 13.6MiB）を使う。
 2. WebGPU では、Conv3d が最適化されていない汎用カーネルでしか動かない。ONNX 標準の `Attention` 演算子は CPU で実行される。→ 本格学習の前に、小型モデルで実測する。
 3. RTX 5090 では、CUDA 13 版の PyTorch が必要。
-4. ローカルのディスク空きが約6GB しかない（2026-10-25 時点）。
+4. ローカルのディスク空きが約9GB しかない（2026-10-25 時点）。uv のキャッシュ（`~/.cache/uv`）が約12GB あり、整理すれば空きを大きく増やせる。
 
 各リスクに対応するフェーズとゴールは `docs/ROADMAP.md` を参照（1・2 は Phase 4 の最優先作業、3 は Phase 5）。
