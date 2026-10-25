@@ -29,6 +29,24 @@ fn new_session_starts_at_initial_position() {
 }
 
 #[test]
+fn emptiness_tracks_the_record_and_goto_accepts_both_endpoints() {
+    let mut session = Session::new();
+    assert!(session.is_empty());
+    session.goto(0).unwrap();
+    session.play("577567").unwrap();
+    assert!(!session.is_empty());
+    let after = session.state().hash();
+    session.goto(1).unwrap();
+    assert_eq!(session.state().hash(), after);
+    session.goto(0).unwrap();
+    assert!(!session.is_empty(), "undo retains the move in the record");
+    session.goto(1).unwrap();
+    assert_eq!(session.state().hash(), after);
+    assert!(session.goto(2).is_err());
+    assert_eq!(session.cursor(), 1);
+}
+
+#[test]
 fn play_advances_and_rejects_illegal_moves_without_changing_state() {
     let mut s = Session::new();
     let before = s.state().hash();

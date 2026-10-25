@@ -70,7 +70,7 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 | raw出力 | git管理外 `coverage/m0-mutants-after/mutants.out/` の全inventory・outcomes・diff・log |
 | 照合結果 | `node scripts/ci/mutation-report.mjs coverage/m0-mutants-after/mutants.out` が成功。`review.json` は `{"caught":215,"unviable":15,"equivalent":2,"total":232}` |
 
-core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で調査中。このrunは `d9f5509` のため、2同値を分類する新しい集計ステップはまだ含まない。raw出力を取得後に新集計で照合し、見つかった未分類変異は個別に確認する。232件だけの結果をcore全体の結果とは扱わない。
+core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で初回調査を完了した。`d9f5509` 時点の結果は666 caught・58 unviable・34 missed・timeout 0。各分割のbaselineは成功した。このrunには同値変異の新集計と、以下の追加テストはまだ含まれず、rawの生き残りがあるため失敗している。成功した調査とは扱わず、修正後の全体CIを別途確認する。232件だけの結果をcore全体の結果とは扱わない。
 
 ### core全体の追加調査
 
@@ -79,6 +79,15 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 追加範囲で `Board::Debug` の空出力、`Square::from_index` の上限729を許してしまう変異、`Square::offset` のz方向の符号反転、`Square` のDebug/Displayを空にする計5変異を発見した。`geometry_contracts.rs` に盤面・座標表示、明示的な座標インデックス、各軸の加算と全6境界の3テストを追加し、全5変異をコピー上で検出した。特にz方向の対称性がある利き生成では符号反転が集合比較から漏れるため、座標演算そのものに手計算の期待値を置いた。正常コードのRustは95テスト成功。
 
 さらに `NotationError::Display` の空出力を発見し、棋譜インポートの理由・不正な指し手のindex/text・Sessionへの伝播を確認する1テストを追加した。同じテストが `RecordError::Display` の空出力も拒否することをコピー上で確認した。正常コードのRustは96テスト成功。
+
+全8分割の結果から、さらに入力とセッションの境界の検証不足を確認した。手書きの期待値による5テストを追加し、正常コードのRust計101テストとfmt・Clippyが成功した。
+
+- VSFENの空マス数は単独の1〜9のみ。`09`・`45`を拒否し、持ち駒の先頭0も拒否する。162歩を持つ局面は受理する。
+- VSFENは4096 bytes以下、手数番号は1,000,000以下を受理し、それぞれ境界の前後を検証する。サイズ超過は構文解析に進まず拒否する。
+- 棋譜JSONは4 MiB以下、指し手は20,000手以下を受理する。正しいJSONに空白を付けてサイズ上限を検証する。再生時の手数上限は、範囲内では先頭の不正な指し手まで検証し、上限超過時は先に`TooLong`で拒否することを確認する。
+- `Session::is_empty`はundoで保持した履歴も含めて判定する。`goto`は0と履歴末尾を受理し、末尾の次を拒否する。
+
+初回の34 missedを同じ名前で再選択し、追加テストで26件を検出し、根拠付きの同値8件だけが残ることを再確認した。baselineのbuild/testも成功し、ビルド不能・timeoutは0件。rawの終了コードは2で、新集計が全34件を照合して `{"caught":26,"unviable":0,"equivalent":8,"total":34}` を出力した。証拠はgit管理外の `coverage/m0-all-survivors-after/mutants.out/`。製品コードの変更や、新たな同値の承認追加はない。更新後の全758件のCIは別途確認する。
 
 分割2の95件は91 caught・1 unviable・3 missed。missedは次の同値変異と確認し、raw成果物を新集計で照合して91 caught・1 unviable・3 equivalentになった。変異名と `movegen.rs` 全体のソースハッシュを承認リストへ記録した。全8分割の完了を意味する結果ではない。
 
