@@ -4,7 +4,9 @@
 //! This crate has no dependency on browsers, Python or GPUs.
 
 pub mod board;
+pub mod capture;
 pub mod coord;
+pub mod experiment;
 pub mod movegen;
 pub mod moves;
 pub mod notation;
