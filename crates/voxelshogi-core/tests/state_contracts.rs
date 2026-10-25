@@ -66,11 +66,11 @@ fn checked_application_accepts_optional_promotion_in_each_sides_zone() {
 fn checked_application_requires_promotion_for_dead_end_pieces() {
     for side in Color::ALL {
         let rank = |y| if side == Color::Black { y } else { 8 - y };
-        for (kind, from_y, to_x, to_y, to_z) in [
-            (PieceKind::Pawn, 1, 4, 0, 4),
-            (PieceKind::Lance, 1, 4, 0, 4),
-            (PieceKind::Knight, 2, 5, 0, 5),
-            (PieceKind::Knight, 3, 5, 1, 5),
+        for (kind, promoted, from_y, to_x, to_y, to_z) in [
+            (PieceKind::Pawn, PieceKind::Tokin, 1, 4, 0, 4),
+            (PieceKind::Lance, PieceKind::PromotedLance, 1, 4, 0, 4),
+            (PieceKind::Knight, PieceKind::PromotedKnight, 2, 5, 0, 5),
+            (PieceKind::Knight, PieceKind::PromotedKnight, 3, 5, 1, 5),
         ] {
             let mut b = kings();
             let from = sq(4, rank(from_y), 4);
@@ -82,10 +82,7 @@ fn checked_application_requires_promotion_for_dead_end_pieces() {
                 "{side:?} {kind:?}"
             );
             let next = g.apply_move(&normal(from, to, true)).unwrap();
-            assert_eq!(
-                next.board().get(to),
-                Some(Piece::new(side, kind.promote().unwrap()))
-            );
+            assert_eq!(next.board().get(to), Some(Piece::new(side, promoted)));
         }
     }
 }

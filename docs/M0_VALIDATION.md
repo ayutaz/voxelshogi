@@ -11,7 +11,11 @@
 - 品質計測: [40181542587](https://github.com/ayutaz/voxelshogi/actions/runs/40181542587)
 - 統合後の本番公開: [40183599117](https://github.com/ayutaz/voxelshogi/actions/runs/40183599117) を追跡中。
 
-fork PR の実検証は未完了。CLI で利用できるログインは元リポジトリ所有者の `ayutaz` のみ。別の所有先が必要なため、利用してよい組織をユーザーへ確認中。別名の個人所有fork作成APIも、新しい永続的な公開リポジトリの具体的な作成先・名前・公開範囲の承認がないとして自動承認レビューに拒否され、実行されていない。所属しているだけの組織に検証リポジトリを作成しない。Dependabot PR の成功や YAML 上の制限で、この実検証を代用しない。
+fork PR の実検証は未実施で、外部からの開発参加を受け入れる際の追加確認とする。ユーザーから必要性を問われ、現在の一人開発における M0 の必須条件としたのは過剰だったと見直した。通常PR・Dependabot・本番環境の制限は引き続き必須検証とし、forkを検証済みとは扱わない。
+
+別名の個人所有fork作成APIは、新しい永続的な公開リポジトリの具体的な作成先・名前・公開範囲の承認がないとして自動承認レビューに拒否され、実行されていない。作成依頼は取り下げた。既存の所属組織にもリポジトリを作成していない。
+
+APIの再確認では repository Secrets は空、Cloudflare の2件は production environment にのみ存在し、そのデプロイ許可は `main` の1件のみ。CI の deploy は main の push と成功した Gate を要求し、PRでは省略する。実行した通常PR・Dependabot PRの動作と、設定で保証する範囲を区別して記録する。
 
 ## 本番を変更しない復旧訓練 — 完了
 
@@ -56,7 +60,17 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 | 千日手区間の開始を `first + 1` から `first * 1` にする | 1 | 同値変異。first自身と現在の局面は同じ盤面・手番・王手状態。末尾に既に含まれる値を再度含めても `all` / `any` は変わらない。ハッシュ衝突の扱いは元実装と同じ |
 | 千日手判定の存在確認 `.any` の手番比較を `==` から `!=` にする | 1 | 同値変異。履歴は合法着手ごとに手番を交代し、4回目の同一手番の出現区間には両方の手番が必ずある。どちらを検索しても `any` は true。王手を判定する `.filter` は変更されない |
 
-同値2件を caught として数えない。全232件の再調査と、core 全体の週次・手動ジョブは別の範囲として結果を記録する。
+同値2件を caught として数えない。同じ232件の再調査は完了し、215 caught・15 unviable・2 equivalent・timeout 0・未分類の生き残り0と確認した。以前の18 missedのうち、16件がテストで検出され、2件は根拠付きで同値と分類された。
+
+| 再調査 | 証拠 |
+|---|---|
+| 対象 | `piece.rs`・`state.rs`・`zobrist.rs` の232件。製品ソースは main `e3f7f7a` と同一、テストは作業コミット `d9f5509` の追加6件を含む |
+| 実行 | cargo-mutants 27.1.0、Rust 1.97.1、`--timeout 90 --jobs 2 --cargo-arg=--locked` |
+| 時間 | 2026-10-25 10:20 UTC開始、約18分。baselineのbuildとtestも成功 |
+| raw出力 | git管理外 `coverage/m0-mutants-after/mutants.out/` の全inventory・outcomes・diff・log |
+| 照合結果 | `node scripts/ci/mutation-report.mjs coverage/m0-mutants-after/mutants.out` が成功。`review.json` は `{"caught":215,"unviable":15,"equivalent":2,"total":232}` |
+
+core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で調査中。このrunは `d9f5509` のため、2同値を分類する新しい集計ステップはまだ含まない。raw出力を取得後に新集計で照合し、見つかった未分類変異は個別に確認する。232件だけの結果をcore全体の結果とは扱わない。
 
 ### 継続実行での同値変異の扱い
 

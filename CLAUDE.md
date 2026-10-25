@@ -80,7 +80,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1 完了。依存監査・CodeQL・品質計測と本番公開・Secrets 移行は成功。main 保護設定済み、PR と fork 経路の検証・全体変異の残件分類・復旧訓練が残る）
+  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1・2・5 完了。PRの通常取り込み・拒否と隔離復旧訓練は確認済み。変異調査と統合後の公開を検証中。fork実検証は外部からの開発参加時に追加）
   1. M1: 探索AI（Rust）
   2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証

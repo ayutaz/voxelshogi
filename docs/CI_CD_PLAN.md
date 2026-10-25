@@ -20,7 +20,7 @@
 | main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
 | PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェック成功後、bypass なしで squash merge 済み（main `e3f7f7a`）。未完了時の通常 merge 拒否と正常時の取り込みを確認 |
 | 復旧訓練 | 成功runの旧 `web-dist` を再ビルドせず loopback 配信し、Chrome E2E 6件が成功。本番は変更していない。[証拠と手順](M0_VALIDATION.md) |
-| 残り | fork PR の実検証、全232変異の再調査とcore全体ジョブ、統合後の本番公開結果を追跡中。[残件の検証記録](M0_VALIDATION.md)。M0 全体は未完了、M1 は未着手 |
+| 残り | 232変異の再調査は215 caught・15 unviable・2 equivalentで完了。core全体758件の調査と統合後の本番公開を追跡中。[残件の検証記録](M0_VALIDATION.md)。fork実検証は外部からの開発参加時の追加確認。M0 全体は未完了、M1 は未着手 |
 
 人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
 
@@ -56,10 +56,10 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | 順 | 目的 | 主な変更先 | 完了条件 | 状態 |
 |---|---|---|---|---|
 | M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | ✅ main の検査と Gate 成功、異常系検証済み |
-| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 監査・3言語解析・更新 PR・報告経路を確認済み。fork PR の実行検証が残る |
+| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | ✅ 監査・3言語解析・通常/更新 PR・報告経路を確認済み |
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 CI 計測・既知の9変異が成功。全体調査の生き残り分類が残る |
 | M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 本番 SHA・公開 E2E・環境 Secrets 移行・隔離復旧訓練済み。統合後の公開を追跡中 |
-| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | 🟡 保護設定・未完了チェックの merge 拒否を確認。正常系・fork 検証は PR で追跡 |
+| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ✅ PR #2で拒否と全必須チェック成功後の通常取り込みを確認。有効な保護ルールも再確認済み |
 
 ### M0-1 CI の再現性と静的検査
 
@@ -79,11 +79,11 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 - Rust は `cargo-deny` で既知の脆弱性・ライセンス・取得元を監査する。Web は `pnpm audit` を開発用依存も含めて実行する。PR/main だけでなく毎週も実行し、コード更新がなくても新規 advisory を拾う。Rust の既知の脆弱性は全件、Web は high/critical を必須チェックの失敗とする。例外は advisory ID・理由・期限を記録し、全体を無効化する回避はしない。[RustSec](https://rustsec.org/)
 - 依存監査と dependency-review は `ci.yml` のジョブとして `CI Gate` に結び、週次でも同じ監査コマンドを使う。CodeQL は `security.yml` に分け、M0-5 で別の必須チェックまたは code scanning rule に結ぶ。独立した workflow 間を `needs` で参照する設計にはしない。
 - PR では dependency-review で追加・更新された依存関係を確認し、high/critical を失敗にする。fork/Dependabot PR でも secrets なしで動かし、PR へのコメント書き込み権限は不要とする。[Dependency review](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review)
-- CodeQL を Rust・JavaScript/TypeScript・Actions に追加する。現在の公式対応言語に Rust と Actions も含まれる。PR/main/週次で実行し、SARIF のアップロードに必要な権限だけを解析ジョブに付与する。fork PR の権限差も検証する。[CodeQL の対応言語](https://docs.github.com/en/code-security/concepts/code-scanning/codeql/codeql-code-scanning)
+- CodeQL を Rust・JavaScript/TypeScript・Actions に追加する。現在の公式対応言語に Rust と Actions も含まれる。PR/main/週次で実行し、SARIF のアップロードに必要な権限だけを解析ジョブに付与する。fork PR の実行時の権限差は外部からの開発参加時に追加検証する。[CodeQL の対応言語](https://docs.github.com/en/code-security/concepts/code-scanning/codeql/codeql-code-scanning)
 - repository の Secret scanning・Push protection と private vulnerability reporting を有効化する。非公開報告が使えることを確認してから、その URL を案内する `SECURITY.md` を追加する。[GitHub の設定ガイド](https://docs.github.com/en/code-security/getting-started/quickstart-for-securing-your-repository)
 - `GITHUB_TOKEN` の既定 read 権限を維持する。未信頼の PR コードを secrets や書き込み token と同じ実行環境で動かさず、`pull_request_target` で PR head を実行する構成を導入しない。
 
-**検証**: 通常 PR・Dependabot PR・fork PR の経路を確認する。監査対象に既知の脆弱性を持つ依存を置いた隔離 fixture で監査が失敗することを確かめる。Secret scanning は設定値を再取得して確認し、本物の認証情報をテスト用に push しない。CodeQL は対象言語ごとの解析完了と alert の初回トリアージを確認する。
+**検証**: 通常 PR・Dependabot PR の経路を確認する。fork PR の実検証は、外部からの開発参加を受け入れる際に追加する（2026-10-25、ユーザーの必要性確認を受けて計画を見直し）。監査対象に既知の脆弱性を持つ依存を置いた隔離 fixture で監査が失敗することを確かめる。Secret scanning は設定値を再取得して確認し、本物の認証情報をテスト用に push しない。CodeQL は対象言語ごとの解析完了と alert の初回トリアージを確認する。
 
 ### M0-3 テスト品質の計測
 
@@ -112,7 +112,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 - 必須 Gate には lint・Rust・MSRV・WASM/Web/E2E・依存監査を含め、dependency-review も PR では必須とする。CodeQL 3種類と Rust/Web カバレッジ・既知変異の3種類を、別の必須チェックとして追加する。docs のみでも全7チェックを実行する。全体変異調査と本番 deploy は PR の必須チェックに含めない。
 - `CONTRIBUTING.md` と PR テンプレートに、TDD、独立した期待値、変異テスト、ローカル確認コマンド、ドキュメント更新、AI が作った差分も確認することを記載する。`CLAUDE.md` の手順も PR 運用へ変更する。
 
-**検証**: Gate の単体テストで failure・cancelled・skipped・欠落を拒否することを確認し、GitHub では必須チェックが未完了の PR の通常 merge を拒否することを確認する。壊したテストを push して検証する方法は使わない。正常系では全チェックが成功して取り込み可能になることと、自己承認なしで取り込めることを確認する。fork/Dependabot PR に本番 secrets が渡らず、deploy も起動しないことを確認する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
+**検証**: Gate の単体テストで failure・cancelled・skipped・欠落を拒否することを確認し、GitHub では必須チェックが未完了の PR の通常 merge を拒否することを確認する。壊したテストを push して検証する方法は使わない。正常系では全チェックが成功して取り込み可能になることと、自己承認なしで取り込めることを確認する。通常/Dependabot PR のdeploy省略と、production Secretsの保存先・main限定ポリシーを確認する。fork PR の実検証は外部からの開発参加時に追加する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
 
 ## 定常運用
 
@@ -215,4 +215,4 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
 - PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
 
-PR #2の通常取り込みと隔離成果物による復旧訓練は完了した。変異の再調査、fork PRの検証、統合後の公開を [M0_VALIDATION.md](M0_VALIDATION.md) と [PR #3](https://github.com/ayutaz/voxelshogi/pull/3) で追跡する。fork PR の実検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。
+PR #2の通常取り込みと隔離成果物による復旧訓練は完了した。変異の再調査と統合後の公開を [M0_VALIDATION.md](M0_VALIDATION.md) と [PR #3](https://github.com/ayutaz/voxelshogi/pull/3) で追跡する。fork PR の実検証は現在の一人開発でM0を止める条件にはせず、外部からの開発参加時に追加する。未実施であることは維持し、検証済みと読み替えない。残るM0項目を検証後に完了し、M1 の TDD 手順へ進む。
