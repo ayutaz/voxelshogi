@@ -1,0 +1,11 @@
+// Cloudflare Workers Static Assets: the whole app is static (no Worker script),
+// so asset requests are served without invoking a Worker (free, see docs/DEPLOYMENT.md).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "voxelshogi",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
