@@ -106,7 +106,7 @@
 
 | 条件 | 状態 | 根拠 |
 |---|---|---|
-| ブラウザでゲームが遊べる | ✅ | 人間 vs 人間、人間 vs ランダムAI、AI vs AI 観戦 |
+| ブラウザでゲームが遊べる | ✅ | 人間 vs ランダムAI、AI vs AI 観戦。人間同士の対局・マルチプレイは対象外 |
 | ローカルで動作確認できる | ✅ | `pnpm dev`、Playwright E2E 5件（実ブラウザ） |
 | Cloudflare にデプロイできる構成がある | ✅ | `wrangler.jsonc`（Static Assets）、CI の deploy ジョブ（ADR-008, 009） |
 | 実際の公開に必要な認証・承認を使用する | ✅ | ユーザーの承認のもと、個人アカウントへのプロジェクト専用ログインで https://voxelshogi.yousan-apps.workers.dev に公開（2026-10-25） |

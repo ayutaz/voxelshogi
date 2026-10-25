@@ -56,6 +56,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
 
 ## 決定事項（ユーザー確認済み）
 
+- 対局モードは人間 vs AI と AI vs AI 観戦に限定する。人間同士の対局（ローカル・オンライン）とマルチプレイは実装しない。
 - GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。モデル・データセットのライセンスは、公開前にユーザーに確認する。
 - Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。

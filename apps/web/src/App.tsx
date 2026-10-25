@@ -8,9 +8,8 @@ import { GameStore, MAX_IMPORT_BYTES } from './game/store';
 import { createRng, pickRandomMove } from './ai/random';
 
 type Controller = 'human' | 'random';
-type Mode = 'hvh' | 'h-r' | 'r-h' | 'r-r';
+type Mode = 'h-r' | 'r-h' | 'r-r';
 const MODES: Record<Mode, { label: string; b: Controller; w: Controller }> = {
-  hvh: { label: '人間 vs 人間', b: 'human', w: 'human' },
   'h-r': { label: '人間(先手) vs ランダムAI', b: 'human', w: 'random' },
   'r-h': { label: 'ランダムAI vs 人間(後手)', b: 'random', w: 'human' },
   'r-r': { label: 'AI vs AI 観戦', b: 'random', w: 'random' },
@@ -23,7 +22,7 @@ export function App() {
   const [selection, setSelection] = useState<Selection>(NO_SELECTION);
   const [promotion, setPromotion] = useState<ClickResult['promotion']>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>('hvh');
+  const [mode, setMode] = useState<Mode>('h-r');
   const [running, setRunning] = useState(true);
   const [delay, setDelay] = useState(400);
   const [view, setView] = useState<'3d' | '2d' | 'both'>('both');
@@ -95,7 +94,7 @@ export function App() {
     const r = store.importRecord(await file.text());
     setMessage(r.ok ? '棋譜を読み込みました' : `読み込めません: ${r.error}`);
     setSelection(NO_SELECTION);
-    if (r.ok) setMode('hvh');
+    if (r.ok) setMode('h-r');
   };
 
   const status = snap.result

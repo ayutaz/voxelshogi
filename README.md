@@ -6,6 +6,7 @@
 
 - Rust製ルールエンジン（WebAssembly / Python から共通利用）
 - ブラウザで遊べる VoxelShogi Arena — **https://voxelshogi.yousan-apps.workers.dev** （Alpha 版）
+- 対局モード: 人間 vs AI（先手・後手）、AI vs AI 観戦
 - エンジンによる合成データセット / Transformer Policy-Value モデル（Hugging Face 公開予定）
 
 ルールは [将棋ったー「三次元将棋」](https://shogitter.com/rule/三次元将棋)（2026-10-17 改定版）に準拠します。詳細は [docs/RULESET.md](docs/RULESET.md) を参照してください。
