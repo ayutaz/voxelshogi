@@ -1,6 +1,8 @@
-# M0 残件の検証記録
+# M0 検証記録
 
 対象: main `e3f7f7a` からの作業ブランチ `chore/finish-m0-validation`。2026-10-25。
+
+M0-1〜5の実装と検証が揃った。最終文書コミットも必須7チェックを通し、保護を迂回しない通常のsquash merge後にmainのCI・配信SHA・公開E2Eの成功を確認してM0を確定する。最終の取り込みと公開の結果は [PR #3](https://github.com/ayutaz/voxelshogi/pull/3) のChecks・統合コミットに紐づくmainのCIを正とする。文書更新では、下記 `5a14c0d` のソース・テスト・CI設定を変更しない。
 
 ## PR と取り込み制御
 
@@ -10,6 +12,8 @@
 - CodeQL: [40181542576](https://github.com/ayutaz/voxelshogi/actions/runs/40181542576)
 - 品質計測: [40181542587](https://github.com/ayutaz/voxelshogi/actions/runs/40181542587)
 - 統合後の本番公開: [40183599117](https://github.com/ayutaz/voxelshogi/actions/runs/40183599117) でdeploy・配信SHA・公開E2Eがすべて成功。公開URLも `e3f7f7a392d58ebc167d3f058eaa2f35b2f0f6cc` と一致、Cloudflare version IDは `0f356b50-806b-4621-aecf-c554ccdf7a71`。
+
+PR #3の機能・テスト更新 `5a14c0d` も、[通常CI 40187911594](https://github.com/ayutaz/voxelshogi/actions/runs/40187911594)・[CodeQL 40187911528](https://github.com/ayutaz/voxelshogi/actions/runs/40187911528)・[品質計測40187911530](https://github.com/ayutaz/voxelshogi/actions/runs/40187911530) が成功し、必須7チェックすべてのpassをAPIで確認した。通常CIではRust 101テスト、MSRV、Web単体33件、ブラウザE2E 6件と依存監査が成功し、PRの本番deployは省略された。
 
 fork PR の実検証は未実施で、外部からの開発参加を受け入れる際の追加確認とする。ユーザーから必要性を問われ、現在の一人開発における M0 の必須条件としたのは過剰だったと見直した。通常PR・Dependabot・本番環境の制限は引き続き必須検証とし、forkを検証済みとは扱わない。
 
@@ -45,6 +49,19 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 
 ## 変異テストの生き残り分類
 
+### 最新のカバレッジ
+
+`5a14c0d` の[Quality 40187911530](https://github.com/ayutaz/voxelshogi/actions/runs/40187911530) でRust/Webのカバレッジと既知変異9件の検査がすべて成功した。保存したLCOV・HTML・JSONの存在と計測行数、変異のbaseline成功と9件すべてのcaughtを再確認した。
+
+| 対象 | 行カバレッジ | 範囲 |
+|---|---|---|
+| Rust core | 95.92%（1457 / 1519） | 独立参照実装・統合テスト・examplesを除く。WASMラッパーは対象外 |
+| Web単体 | 35.37%（127 / 359） | 未importのUI/3Dも含む。生成WASM glueとブラウザE2Eの計測値は含まない |
+
+割合の一律基準は設けない。Webの未計測領域は残しており、実ブラウザE2Eの成功とは別の証拠として扱う。
+
+### 生き残りの再現とテスト補強
+
 以前の調査は core の全ファイルではなく、`piece.rs`・`state.rs`・`zobrist.rs` の232変異が対象だった。元の結果は199 caught、18 missed、15 unviable、timeout 0。ビルド不能は検出成功に数えない。
 
 同じ18件を main `e3f7f7a` の86テストで再実行した結果は9 caught、9 missed。以前追加した6テストの効果を確認した。さらに `tests/state_contracts.rs` の6テストを追加し、残る振る舞いの変化7件が実際にテスト失敗になることをコピー上で確認した。製品コードの変更はない。正常コードの Rust 92テスト、Clippy が成功。
@@ -70,11 +87,11 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 | raw出力 | git管理外 `coverage/m0-mutants-after/mutants.out/` の全inventory・outcomes・diff・log |
 | 照合結果 | `node scripts/ci/mutation-report.mjs coverage/m0-mutants-after/mutants.out` が成功。`review.json` は `{"caught":215,"unviable":15,"equivalent":2,"total":232}` |
 
-core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で初回調査を完了した。`d9f5509` 時点の結果は666 caught・58 unviable・34 missed・timeout 0。各分割のbaselineは成功した。このrunには同値変異の新集計と、以下の追加テストはまだ含まれず、rawの生き残りがあるため失敗している。成功した調査とは扱わず、修正後の全体CIを別途確認する。232件だけの結果をcore全体の結果とは扱わない。
+core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で初回調査を完了した。`d9f5509` 時点の結果は666 caught・58 unviable・34 missed・timeout 0。各分割のbaselineは成功した。このrunには同値変異の新集計と、以下の追加テストはまだ含まれず、rawの生き残りがあるため失敗した。後述の修正後の全体CI成功とは区別する。232件だけの結果をcore全体の結果とは扱わない。
 
 ### core全体の追加調査
 
-ローカルでも、既存の232件と重複しない526件を実行中。生成された全758件の名前集合が232件と526件の和集合と一致し、交差が空であることを確認した。
+ローカルでも、既存の232件と重複しない526件を完了した。結果は451 caught・43 unviable・32 missed・timeout 0。先の232件との合計は全758件で666 caught・58 unviable・34 missedとなり、GitHubの初回調査と一致した。全inventoryの名前集合が232件と526件の和集合と一致し、交差が空であることも照合した。この実行は追加の座標・入力境界テストより前のスナップショットで、見つかった34件は下記の再検証ですべて対応している。
 
 追加範囲で `Board::Debug` の空出力、`Square::from_index` の上限729を許してしまう変異、`Square::offset` のz方向の符号反転、`Square` のDebug/Displayを空にする計5変異を発見した。`geometry_contracts.rs` に盤面・座標表示、明示的な座標インデックス、各軸の加算と全6境界の3テストを追加し、全5変異をコピー上で検出した。特にz方向の対称性がある利き生成では符号反転が集合比較から漏れるため、座標演算そのものに手計算の期待値を置いた。正常コードのRustは95テスト成功。
 
@@ -87,9 +104,29 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 - 棋譜JSONは4 MiB以下、指し手は20,000手以下を受理する。正しいJSONに空白を付けてサイズ上限を検証する。再生時の手数上限は、範囲内では先頭の不正な指し手まで検証し、上限超過時は先に`TooLong`で拒否することを確認する。
 - `Session::is_empty`はundoで保持した履歴も含めて判定する。`goto`は0と履歴末尾を受理し、末尾の次を拒否する。
 
-初回の34 missedを同じ名前で再選択し、追加テストで26件を検出し、根拠付きの同値8件だけが残ることを再確認した。baselineのbuild/testも成功し、ビルド不能・timeoutは0件。rawの終了コードは2で、新集計が全34件を照合して `{"caught":26,"unviable":0,"equivalent":8,"total":34}` を出力した。証拠はgit管理外の `coverage/m0-all-survivors-after/mutants.out/`。製品コードの変更や、新たな同値の承認追加はない。更新後の全758件のCIは別途確認する。
+初回の34 missedを同じ名前で再選択し、追加テストで26件を検出し、根拠付きの同値8件だけが残ることを再確認した。baselineのbuild/testも成功し、ビルド不能・timeoutは0件。rawの終了コードは2で、新集計が全34件を照合して `{"caught":26,"unviable":0,"equivalent":8,"total":34}` を出力した。証拠はgit管理外の `coverage/m0-all-survivors-after/mutants.out/`。製品コードの変更や、新たな同値の承認追加はない。
 
-分割2の95件は91 caught・1 unviable・3 missed。missedは次の同値変異と確認し、raw成果物を新集計で照合して91 caught・1 unviable・3 equivalentになった。変異名と `movegen.rs` 全体のソースハッシュを承認リストへ記録した。全8分割の完了を意味する結果ではない。
+### 全758件のCI再検証 — 完了
+
+更新後の `5a14c0d30cc748ff22cd843146f95e496dc9252d` を対象とした[全体再検証40187925728](https://github.com/ayutaz/voxelshogi/actions/runs/40187925728) は8分割すべて成功した。cargo-mutants 27.1.0・Rust 1.97.1、各分割は `--shard N/8 --timeout 90 --jobs 2 --cargo-arg=--locked` で実行した。
+
+| 分割 | caught | unviable | equivalent | 合計 |
+|---|---:|---:|---:|---:|
+| 0 | 87 | 8 | 0 | 95 |
+| 1 | 67 | 28 | 0 | 95 |
+| 2 | 91 | 1 | 3 | 95 |
+| 3 | 91 | 1 | 3 | 95 |
+| 4 | 90 | 5 | 0 | 95 |
+| 5 | 89 | 6 | 0 | 95 |
+| 6 | 94 | 1 | 0 | 95 |
+| 7 | 83 | 8 | 2 | 93 |
+| **全体** | **692** | **58** | **8** | **758** |
+
+全8件のartifact `full-mutations-0`〜`full-mutations-7` を新しい一時ディレクトリへ取得して監査した。各baselineのbuild/test成功、空でないinventoryと全outcomesの1対1対応、実行されたテスト失敗によるcaught、ソース指紋を含む同値の根拠を照合した。CI保存の `review.json` と再集計は全分割で一致し、現在の `cargo mutants --list --json` の全758件と各分割の和集合も一致した。欠落・重複・timeout・未分類の生き残りは0件。ビルド不能58件と同値8件をcaughtには含めない。rawレポート・diff・log・reviewは同runで7日保存する。
+
+### 同値変異の根拠（移動生成）
+
+初回runの分割2の95件は91 caught・1 unviable・3 missed。missedは次の同値変異と確認し、raw成果物を新集計で照合して91 caught・1 unviable・3 equivalentになった。変異名と `movegen.rs` 全体のソースハッシュを承認リストへ記録した。この分類を更新後の全体CIでも再確認した。
 
 | 変異 | 同値の根拠 |
 |---|---|
@@ -97,7 +134,7 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 | 飛車の `umax == 0 || vmax == 0` → `&&` | 片方が0なら出力用の二重ループは空。追加で初期化するDPの片辺も盤内読み取りと局所変数の更新だけで、移動先の集合を変えない |
 | 角の方向bit生成の `sign > 0` → `sign >= 0` | 3軸の符号もそれぞれ `[-1, 1]` だけで、方向bitは変わらない |
 
-分割3も95件中91 caught・1 unviable・3 missedで完了した。次の3件を契約上の同値として分類し、新集計で91 caught・1 unviable・3 equivalentと照合した。
+初回runの分割3も95件中91 caught・1 unviable・3 missedで完了した。次の3件を契約上の同値として分類し、新集計で91 caught・1 unviable・3 equivalentと照合した。
 
 | 変異 | 同値の範囲・根拠 |
 |---|---|
