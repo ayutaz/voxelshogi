@@ -4,7 +4,8 @@
 
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
-- 進捗: `docs/ROADMAP.md`
+- 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
+- 設計判断: `docs/ARCHITECTURE_DECISIONS.md`、エンジン: `docs/GAME_ENGINE.md`、デプロイ: `docs/DEPLOYMENT.md`
 
 ## 構成
 
@@ -48,7 +49,7 @@ pnpm dev
 
 ## 決定事項（ユーザー確認済み）
 
-- GitHub は `ayutaz/voxelshogi`。最初は Private で作成し、公開後は GitHub Actions を最大限活用する。
+- GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。モデル・データセットのライセンスは、公開前にユーザーに確認する。
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
 - ルールは将棋ったー三次元将棋の 10/17 改定後版。未記載の終局条件は将棋ったーの既定を継承する。
@@ -57,15 +58,16 @@ pnpm dev
 
 ## 現在の進捗と次の作業
 
-進捗の詳細は `docs/ROADMAP.md` にある。
+進捗の詳細と、各フェーズの目的・ゴール（完了条件）は `docs/ROADMAP.md` にある。フェーズを完了とするのは、ゴールの全項目を満たしたときだけ。
 
 - 完了
   - Phase 0: 調査と設計
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
-  - Phase 2 Alpha: WASM、3D+2D UI、人間 vs 人間・人間 vs ランダムAI・AI vs AI 観戦、棋譜の保存と読み込み、E2E、CI、Cloudflare 設定
+- 進行中
+  - Phase 2: Web ゲーム Alpha。ゴールのうち、残りは Cloudflare Secrets の登録（ユーザー作業）と公開 URL でのスモークテスト
 - **次にやること（優先順）**
   1. **探索AI（αβ探索、駒得評価）を Rust に実装し、Web の Worker で動かす**。理由: Web の Normal 難易度と、Phase 3 の Search Dataset の教師に必要。
   2. **将棋ったーの公開棋譜を使った互換性検証**（`docs/RULESET.md` §9）。理由: ルール準拠の主張を裏付けるため。
-  3. **PyO3 バインディングとデータ生成（Parquet）**。理由: Phase 3 の開始条件。
+  3. **PyO3 バインディングとデータ生成（Parquet）**。理由: Phase 3 の本体。
   4. **ONNX/WebGPU の早期検証**。ランダム重みの小型 Transformer で行う。理由: 本格学習の前に変換・推論の可否を確認する（`docs/TECH_STACK_RESEARCH.md` §3.4）。
-  5. **Cloudflare の Secrets 登録**（ユーザー作業）→ 自動デプロイ。
+  5. **Cloudflare の Secrets 登録**（ユーザー作業）→ 自動デプロイ → Phase 2 完了。

@@ -8,11 +8,13 @@
 
 ## 自動デプロイ（GitHub Actions）
 
-`.github/workflows/ci.yml` の流れは次のとおり。
+`.github/workflows/ci.yml` の流れは次のとおり。トリガーは main への push、PR、手動実行（workflow_dispatch）。
 
 1. `rust`: fmt、clippy、test
-2. `web`: WASM のビルド、型チェック、Vitest、ビルド、Playwright
-3. `deploy`: main への push 時のみ実行。`web` のビルド成果物で `wrangler deploy` を行い、スモークテストをする
+2. `web`: WASM のビルド、型チェック、Vitest、ビルド、Playwright（Chromium）
+3. `deploy`: main への push 時のみ実行（PR と手動実行では動かない）。`web` のビルド成果物で `wrangler deploy` を行い、スモークテストをする
+
+リポジトリは 2026-10-25 に Public 化した。Public リポジトリの GitHub Actions（標準ランナー）は無料のため、Private 時代に出ていた「Actions budget」による未起動は解消している。同日の初回実行で、`rust`（約40秒）と `web`（約1分20秒、E2E 5件を含む）がともに成功した。
 
 ### ユーザーに行ってほしい準備
 
