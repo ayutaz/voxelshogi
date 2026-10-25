@@ -151,8 +151,18 @@ jobs:
       - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
         with:
           tool: cargo-mutants@27.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
       - name: Test core mutants
-        run: cargo mutants --package voxelshogi-core --shard "$SHARD/8" --timeout 90 --jobs 2 --cargo-arg=--locked
+        run: |
+          mutant_status=0
+          cargo mutants --package voxelshogi-core --shard "$SHARD/8" --timeout 90 --jobs 2 --cargo-arg=--locked || mutant_status=$?
+          # Exit 2 means survivors; only the exact, source-pinned equivalences may pass review.
+          if [ "$mutant_status" -ne 0 ] && [ "$mutant_status" -ne 2 ]; then
+            exit "$mutant_status"
+          fi
+          node scripts/ci/mutation-report.mjs mutants.out
         env:
           SHARD: ${{ matrix.shard }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

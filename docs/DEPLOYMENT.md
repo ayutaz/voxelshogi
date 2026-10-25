@@ -1,6 +1,6 @@
 # デプロイ（Cloudflare Workers Static Assets）
 
-M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した成果物での復旧訓練は未実施。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
+M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
 ## 構成
 

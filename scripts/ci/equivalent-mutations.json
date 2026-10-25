@@ -1,0 +1,14 @@
+[
+  {
+    "name": "crates/voxelshogi-core/src/state.rs:474:49: replace + with * in GameState::repetition_result",
+    "file": "crates/voxelshogi-core/src/state.rs",
+    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
+    "reason": "docs/M0_VALIDATION.md: first occurrence and last occurrence share the same position/side/check; including that duplicate does not change all/any. Re-review whenever the source changes."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/state.rs:479:47: replace == with != in GameState::repetition_result",
+    "file": "crates/voxelshogi-core/src/state.rs",
+    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
+    "reason": "docs/M0_VALIDATION.md: a fourfold repetition span contains both alternating sides, so the separate any guard is true for either side. The check-filter is unchanged."
+  }
+]

@@ -18,8 +18,9 @@
 | 品質計測 | [Quality 40168054255](https://github.com/ayutaz/voxelshogi/actions/runs/40168054255) の Rust/Web カバレッジと既知の9変異が成功、各レポートを保存済み。全体変異ジョブはこの実行では省略 |
 | production 認証 | 新規 API トークンとアカウント ID を environment Secrets に直接登録し、本番公開で使用済み。成功確認後、旧 repository Secrets の2件を削除し、repository 側は空、production 側の2件は保持と API で確認 |
 | main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
-| PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) で通常 CI・Security・Quality measurements の起動を確認。必須チェック未完了時の通常 squash merge は、7チェック未成功・CodeQL 結果待ちのルール違反として HTTP 405 で拒否された。PR は未マージ |
-| 残り | 全体変異調査の生き残り分類、隔離した成果物での復旧訓練、正常な PR の取り込み・fork PR の検証。M0 全体は未完了、M1 は未着手 |
+| PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェック成功後、bypass なしで squash merge 済み（main `e3f7f7a`）。未完了時の通常 merge 拒否と正常時の取り込みを確認 |
+| 復旧訓練 | 成功runの旧 `web-dist` を再ビルドせず loopback 配信し、Chrome E2E 6件が成功。本番は変更していない。[証拠と手順](M0_VALIDATION.md) |
+| 残り | fork PR の実検証、全232変異の再調査とcore全体ジョブ、統合後の本番公開結果を追跡中。[残件の検証記録](M0_VALIDATION.md)。M0 全体は未完了、M1 は未着手 |
 
 人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
 
@@ -57,7 +58,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | ✅ main の検査と Gate 成功、異常系検証済み |
 | M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 監査・3言語解析・更新 PR・報告経路を確認済み。fork PR の実行検証が残る |
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 CI 計測・既知の9変異が成功。全体調査の生き残り分類が残る |
-| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 本番 SHA・公開 E2E・環境 Secrets 移行済み。復旧訓練が残る |
+| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 本番 SHA・公開 E2E・環境 Secrets 移行・隔離復旧訓練済み。統合後の公開を追跡中 |
 | M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | 🟡 保護設定・未完了チェックの merge 拒否を確認。正常系・fork 検証は PR で追跡 |
 
 ### M0-1 CI の再現性と静的検査
@@ -214,4 +215,4 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
 - PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
 
-次は M0-5 の正常な PR の取り込みと fork 経路の検証、M0-3 の全体変異調査の残件分類、M0-4 の隔離成果物による復旧訓練を行う。fork PR を実際に作成した検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。
+PR #2の通常取り込みと隔離成果物による復旧訓練は完了した。変異の再調査、fork PRの検証、統合後の公開を [M0_VALIDATION.md](M0_VALIDATION.md) と [PR #3](https://github.com/ayutaz/voxelshogi/pull/3) で追跡する。fork PR の実検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。
