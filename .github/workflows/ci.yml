@@ -109,4 +109,6 @@ jobs:
           fi
       - name: Report skipped deploy
         if: env.CLOUDFLARE_API_TOKEN == ''
+        # checkout is skipped here, so apps/web does not exist
+        working-directory: .
         run: echo "::notice::Cloudflare secrets are not configured; deploy skipped."
