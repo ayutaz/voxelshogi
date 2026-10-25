@@ -38,7 +38,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | 順 | 目的 | 主な変更先 | 完了条件 | 状態 |
 |---|---|---|---|---|
 | M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | 🟡 ローカル検証済み、CI 確認待ち |
-| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | ⬜ |
+| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 ローカル監査・保護機能の有効化済み、CI 確認待ち |
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | ⬜ |
 | M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | ⬜ |
 | M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ⬜ |
@@ -133,3 +133,15 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 - 異常系: 不正な Actions 式、React Hooks 違反、TypeScript 型エラー、Vitest の失敗、lockfile 欠落を各検査が拒否した。一時ファイルは検証後に除去した。
 - `CI Gate` はテストを先に追加して未実装の失敗を確認し、その後7テストが成功。必須結果の failure/cancelled/skipped/欠落を拒否し、失敗を成功扱いする変異も検出した。
 - GitHub の main 保護やセキュリティ設定は、この段階では未変更。CI の実行結果は確認後に追記する。
+
+### M0-2 監査と報告経路
+
+2026-10-25: Dependabot を Cargo・npm/pnpm・Actions の週次更新として設定。Rust の cargo-deny と Web の pnpm audit、PR の dependency-review を `CI Gate` に追加した。CodeQL は Rust・JavaScript/TypeScript・Actions の3言語を独立した workflow で解析する。週次監査は通常 CI と同じ reusable workflow を使う。
+
+- GitHub 設定を有効化し、API で Secret scanning / Push protection が `enabled`、private vulnerability reporting が `true` と確認。初回確認時の未解決 Secret scanning alerts は0件。非公開報告 URL を `SECURITY.md` に記載した。
+- Wrangler 4.152.0 を lockfile で管理し、CI・ローカルとも同じバイナリを実行する。認証情報は deploy ステップだけに渡す。
+- Wrangler → miniflare → undici に high 1件・moderate 2件を検出。`miniflare>undici` を修正版7.30.1に限定する override で解消し、再監査は0件。次回 Wrangler 更新時に override なしで修正版が解決されるか確認する。[修正版の根拠](https://github.com/advisories/GHSA-xjj6-f33q-929c)
+- Rust は workspace 依存のバージョンを明記して、脆弱性・ライセンス・取得元・禁止依存の監査がすべて成功。advisory の無視設定は追加していない。
+- 隔離 fixture の undici 7.30.0 と lz4-sys 1.9.3 を監査が拒否し、それぞれ GHSA-xjj6-f33q-929c / RUSTSEC-2022-0051 を検出した。fixture の依存コードは実行していない。
+- 依存変更後も Web lint/typecheck・33単体テスト・build・Chrome E2E 5件が成功。Gate は追加した RED 3件を確認後、9件が成功。PR の dependency-review 省略を許さず、push/手動時の正常な省略だけを許可する。
+- CodeQL の実行結果、更新 PR、fork/Dependabot PR の動作は GitHub での確認後に追記する。
