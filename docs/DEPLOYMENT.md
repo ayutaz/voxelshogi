@@ -27,11 +27,13 @@ CodeQL は別の Security workflow、カバレッジと変異テストは Qualit
 
 | 名前 | 種類 | 状態 |
 |---|---|---|
-| `CLOUDFLARE_ACCOUNT_ID` | Secret | 登録済み（2026-10-25） |
+| `CLOUDFLARE_ACCOUNT_ID` | production environment Secret | 登録済み（2026-10-25、プロジェクト専用ログインで対象アカウントを照合） |
 | `WORKERS_SUBDOMAIN` | Variable | 登録済み（`yousan-apps`） |
-| `CLOUDFLARE_API_TOKEN` | Secret | 登録済み（2026-10-25。個人アカウントの「Edit Cloudflare Workers」トークン） |
+| `CLOUDFLARE_API_TOKEN` | production environment Secret | 登録済み（2026-10-25、`voxelshogi-github-production-20261025`） |
 
-`production` 環境は作成済みで、デプロイ元は main に制限済み（M0-4、2026-10-25）。Cloudflare secrets は repository からこの環境へ移行中。日常の自動公開に人手の承認待ちは追加しない。
+`production` 環境は作成済みで、デプロイ元は main に制限済み（M0-4、2026-10-25）。Cloudflare の管理画面で新しい API トークンを発行し、`gh secret set --env production` へ直接登録した。権限は指定の個人アカウントの Workers スクリプト編集、有効期限なし（ユーザー承認済み）。この権限はアカウント内の全 Workers が対象。日常の自動公開に人手の承認待ちは追加しない。
+
+認証情報は会話・ローカルファイル・Actions artifact に保存しない。登録後に本番 CI が成功したことを確認してから、不要になった repository 側の同名 Secrets を削除する。既存の Cloudflare トークン自体は、他の利用先への影響を確認せず失効させない。
 
 main の最新候補は、CI から自動デプロイされる（2026-10-25 に初回の自動デプロイが成功）。本番でトークン・アカウント ID・サブドメインが不足した場合は失敗とする。PR と通常の手動 CI は本番公開しない。実行中の本番公開・公開後検証は次の push で中断しない。
 
@@ -41,8 +43,8 @@ Job Summary には設定検証・公開・配信 SHA 確認・公開 E2E の結�
 
 CLI の OAuth ログインは期限付きで、API トークンを作る権限もない。そのため、CI 用のトークンはダッシュボードで作る。
 
-1. 個人アカウントでダッシュボードにログインする。このマシンの Chrome の通常ウィンドウは別アカウントでログインしているため、シークレットウィンドウなどを使う。
-2. My Profile → API Tokens → Create Token で、「Edit Cloudflare Workers」テンプレートからトークンを作り、コピーする。
+1. ダッシュボードにログインし、対象の個人アカウントであることを確認する。
+2. My Profile → API Tokens → Create Token でカスタムトークンを作成する。権限を Account / Workers Scripts / Edit、リソースを対象の個人アカウントに限定して発行し、コピーする。
 3. 自分のターミナルで次を実行する。トークンの値を画面や会話に出さずに登録でき、最後にクリップボードを空にする。
 
    ```bash

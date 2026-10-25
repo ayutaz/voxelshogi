@@ -182,5 +182,6 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - ローカルの Web lint・33単体テスト・型チェック付き build・Chrome E2E 6件が成功。JS/WASM の取得失敗をブラウザで注入して初期化の失敗を検出し、異なる公開 SHA も E2E が拒否した。一時検証ファイルは除去済み。
 - デプロイ制御の9テストは RED 確認後に成功。設定不足、秘密値を含まないエラー表示、古い候補、誤った公開 SHA、HTML fallback、HTTP/通信障害、Cloudflare version ID の欠落・重複を検証した。古い候補や誤った配信版を許す変異もテストが検出した。CI 制御用テストは計20件。
 - production の branch policy を設定し、許可元が `main` の1件だけであることを API で確認。承認者と待機時間は追加していない。
-- secrets は一時的な手動 workflow で、このリポジトリの production 用の**固定公開鍵**へ直接再暗号化する。外部の任意の鍵を入力する機能は設けない。artifact に出すのは ciphertext だけで、ローカルで値を復号しない。Python 3.14.9とwheel hash付きの依存で実装し、ダミー値の暗号化・受取側での復号・平文非出力を検証した。
-- 実際の移行、本番 E2E、復旧訓練は結果を確認して追記する。公開の成功を確認するまでは repository secrets を削除しない。移行完了後に一時 workflow と暗号化用依存を削除する。
+- Cloudflare の管理画面で、ユーザーが承認した `voxelshogi-github-production-20261025` を発行した。対象は指定の個人アカウントの全 Workers スクリプトの編集、有効期限なし。`gh secret set --env production` の標準入力へ直接登録し、値は会話・ローカルファイル・artifact に出していない。アカウント ID もプロジェクト専用ログインで照合して直接登録し、API で production の登録名と更新日時を確認した。
+- 認証情報を artifact 経由で移行する workflow と、その暗号化用依存は、workflow の実行履歴が0件であることを確認して削除した。
+- 新しい production Secrets を使った本番 CI の成功を確認してから、不要になった repository 側の同名 Secrets を削除する。本番 E2E・復旧訓練など、M0-4 全体の検証結果は確認後に追記する。
