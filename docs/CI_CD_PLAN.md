@@ -40,7 +40,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | ✅ main の検査と Gate 成功、異常系検証済み |
 | M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 ローカル監査・保護機能の有効化済み、CI 確認待ち |
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 ローカル計測・既知の9変異検出済み、CI 確認待ち |
-| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | ⬜ |
+| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 ローカルの正常・異常系検証済み、本番と移行を検証中 |
 | M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ⬜ |
 
 ### M0-1 CI の再現性と静的検査
@@ -174,3 +174,13 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - main の [Security run 40167203380](https://github.com/ayutaz/voxelshogi/actions/runs/40167203380): Rust・JavaScript/TypeScript・Actions の CodeQL が成功。API で未解決 code scanning alerts は0件と確認。
 - [Dependabot PR #1](https://github.com/ayutaz/voxelshogi/pull/1): 更新 PR の作成と、dependency-review・依存監査・全テスト・CodeQL・CI Gate の成功、本番 deploy の省略を確認。
 - main でも PR 専用ジョブの省略が deploy に伝わる問題を発見したため、成功した Gate と非キャンセル状態を明示する条件に修正（`944c337`）。本番 deploy・公開後検証の追跡は M0-4 で行う。
+
+### M0-4 公開版の確認と環境の制限
+
+2026-10-25: `pnpm build` で commit SHA を `build-info.json` に保存し、同一 run の artifact を公開する。production の共通ロックを取得後に main の先頭と照合し、古い候補は公開しない。本番設定の不足を失敗とし、公開後は有限回の SHA 確認と E2E 6件を実行する。公開検証が成功した Cloudflare version ID と SHA は30日、失敗 trace は7日保存する。
+
+- ローカルの Web lint・33単体テスト・型チェック付き build・Chrome E2E 6件が成功。JS/WASM の取得失敗をブラウザで注入して初期化の失敗を検出し、異なる公開 SHA も E2E が拒否した。一時検証ファイルは除去済み。
+- デプロイ制御の9テストは RED 確認後に成功。設定不足、秘密値を含まないエラー表示、古い候補、誤った公開 SHA、HTML fallback、HTTP/通信障害、Cloudflare version ID の欠落・重複を検証した。古い候補や誤った配信版を許す変異もテストが検出した。CI 制御用テストは計20件。
+- production の branch policy を設定し、許可元が `main` の1件だけであることを API で確認。承認者と待機時間は追加していない。
+- secrets は一時的な手動 workflow で、このリポジトリの production 用の**固定公開鍵**へ直接再暗号化する。外部の任意の鍵を入力する機能は設けない。artifact に出すのは ciphertext だけで、ローカルで値を復号しない。Python 3.14.9とwheel hash付きの依存で実装し、ダミー値の暗号化・受取側での復号・平文非出力を検証した。
+- 実際の移行、本番 E2E、復旧訓練は結果を確認して追記する。公開の成功を確認するまでは repository secrets を削除しない。移行完了後に一時 workflow と暗号化用依存を削除する。

@@ -42,7 +42,7 @@
 
 ## ADR-008: デプロイは GitHub Actions から行う（Cloudflare Git 連携は使わない）（2026-10-25）
 
-- **決定**: CI で Rust・Web 単体・E2E のテストが通った後、同じワークフローで `wrangler deploy` を実行する。Secrets（`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）が未登録の場合は、デプロイをスキップする。
+- **決定**: CI で Rust・Web 単体・E2E のテストが通った後、同じワークフローで `wrangler deploy` を実行する。初期は Secrets 未登録時にスキップしたが、M0-4 で本番の設定漏れは失敗に変更する。PR・通常の手動 CI は本番公開しない。
 - **状態**: 2026-10-25 に Secrets を登録し、main への push で自動デプロイされることを確認した。
 - **理由**:
   - Rust と wasm-bindgen のツールチェーン管理とキャッシュを、1か所にまとめられる。
@@ -62,3 +62,10 @@
 - **決定**: デプロイ先は、ユーザーの個人アカウントとする（ユーザー指定）。ローカルの wrangler は、必ず `scripts/cf.sh` から起動する。このスクリプトは、`XDG_CONFIG_HOME` を `.cloudflare-cli/`（gitignore 済み）に向けて、ログイン情報をプロジェクト内に閉じ込める。`apps/web` の `pnpm run deploy` も、このスクリプトを経由する。
 - **理由**: グローバルのログインを変えずに済み、他のプロジェクトに影響しない。誤ったアカウントへのデプロイを、仕組みで防げる。
 - **影響**: CI 用の API トークンは、CLI の OAuth ログインでは作れないため、ダッシュボードで作る（`docs/DEPLOYMENT.md`）。公開サイトの検証は、`E2E_BASE_URL` を指定して E2E テストを公開 URL に対して実行する。
+
+## ADR-011: 本番の版とテスト済みコミットを照合する（2026-10-25）
+
+- **状況**: HTML の文字列確認だけでは JS/WASM の配信不良を検出できず、CI が検証した版と公開 URL の版も照合できなかった。全 workflow の中断設定により deploy が途中で中断される可能性もあった。
+- **決定**: `web-dist` に commit SHA を付け、同じ run の成果物を公開する。production の deploy と公開検証を直列化し、ロック取得後に古い候補を除外する。配信 SHA と実ブラウザ E2E の両方が成功した版の Cloudflare version ID を保存する。
+- **理由**: PR のテスト、統合後のテスト、実際の配信の成功をそれぞれ検証でき、復旧先も具体的に選べる。
+- **影響**: Cloudflare 認証は production environment に閉じる。設定漏れは失敗とし、公開後の一時的な E2E 失敗だけで自動 rollback は行わない。復旧手順は `docs/DEPLOYMENT.md` に記録し、隔離した artifact の再配信で検証する。初回の本番検証と移行は M0-4 の記録で追跡する。
