@@ -1,0 +1,41 @@
+# Rust
+/target/
+**/target/
+# WASM build output
+/apps/web/src/wasm/pkg/
+/crates/voxelshogi-wasm/pkg/
+# Node
+node_modules/
+dist/
+.wrangler/
+*.tsbuildinfo
+playwright-report/
+test-results/
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+*.so
+# Data / models / checkpoints (never commit; publish to Hugging Face instead)
+/data/
+/checkpoints/
+/runs/
+*.parquet
+*.safetensors
+*.onnx
+*.pt
+*.ckpt
+!apps/web/public/models/.gitkeep
+# Secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
