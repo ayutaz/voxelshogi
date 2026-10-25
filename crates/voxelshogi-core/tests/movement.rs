@@ -70,18 +70,34 @@ fn gold_and_gold_like_pieces_have_eighteen_moves() {
         let got = offs(kind, Color::Black);
         assert_eq!(got.len(), 18, "{kind:?}");
         // excluded: same-layer diagonal back
-        assert!(!got.contains(&(1, 1, 0)) && !got.contains(&(-1, 1, 0)), "{kind:?}");
+        assert!(
+            !got.contains(&(1, 1, 0)) && !got.contains(&(-1, 1, 0)),
+            "{kind:?}"
+        );
         // excluded: whole back row of the upper and lower layer
         for dx in -1..=1 {
-            assert!(!got.contains(&(dx, 1, 1)) && !got.contains(&(dx, 1, -1)), "{kind:?}");
+            assert!(
+                !got.contains(&(dx, 1, 1)) && !got.contains(&(dx, 1, -1)),
+                "{kind:?}"
+            );
         }
         // included: straight back, sideways, straight up/down, diagonal forward in other layers
-        for o in [(0, 1, 0), (1, 0, 0), (0, 0, 1), (0, 0, -1), (1, 0, 1), (-1, -1, -1), (0, -1, 1)] {
+        for o in [
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 0, 1),
+            (0, 0, -1),
+            (1, 0, 1),
+            (-1, -1, -1),
+            (0, -1, 1),
+        ] {
             assert!(got.contains(&o), "{kind:?} missing {o:?}");
         }
     }
     let white = offs(PieceKind::Gold, Color::White);
-    assert!(white.contains(&(0, 1, 0)) && !white.contains(&(1, -1, 0)) && !white.contains(&(0, -1, 1)));
+    assert!(
+        white.contains(&(0, 1, 0)) && !white.contains(&(1, -1, 0)) && !white.contains(&(0, -1, 1))
+    );
 }
 
 #[test]
@@ -93,11 +109,23 @@ fn king_moves_to_all_26_neighbours() {
 #[test]
 fn step_pieces_are_clipped_at_board_edges() {
     let corner = sq(0, 0, 0);
-    assert_eq!(targets(&lone(PieceKind::King, Color::Black, corner), corner).len(), 7);
+    assert_eq!(
+        targets(&lone(PieceKind::King, Color::Black, corner), corner).len(),
+        7
+    );
     assert!(targets(&lone(PieceKind::Pawn, Color::Black, corner), corner).is_empty());
-    assert!(targets(&lone(PieceKind::Knight, Color::Black, sq(4, 1, 4)), sq(4, 1, 4)).is_empty());
+    assert!(
+        targets(
+            &lone(PieceKind::Knight, Color::Black, sq(4, 1, 4)),
+            sq(4, 1, 4)
+        )
+        .is_empty()
+    );
     let k = sq(0, 8, 0);
-    assert_eq!(offsets_from(k, targets(&lone(PieceKind::Knight, Color::Black, k), k)), [(1, -2, 1)].into());
+    assert_eq!(
+        offsets_from(k, targets(&lone(PieceKind::Knight, Color::Black, k), k)),
+        [(1, -2, 1)].into()
+    );
 }
 
 #[test]
@@ -135,14 +163,29 @@ fn cannot_move_onto_own_piece_but_can_capture() {
 
 #[test]
 fn lance_slides_forward_until_blocked() {
-    assert_eq!(offs(PieceKind::Lance, Color::Black), [(0, -1, 0), (0, -2, 0), (0, -3, 0), (0, -4, 0)].into());
+    assert_eq!(
+        offs(PieceKind::Lance, Color::Black),
+        [(0, -1, 0), (0, -2, 0), (0, -3, 0), (0, -4, 0)].into()
+    );
     let o = center();
-    let b = board_with(&[(o, Color::Black, PieceKind::Lance), (sq(4, 2, 4), Color::White, PieceKind::Pawn)]);
-    assert_eq!(offsets_from(o, targets(&b, o)), [(0, -1, 0), (0, -2, 0)].into());
-    let b = board_with(&[(o, Color::Black, PieceKind::Lance), (sq(4, 2, 4), Color::Black, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Lance),
+        (sq(4, 2, 4), Color::White, PieceKind::Pawn),
+    ]);
+    assert_eq!(
+        offsets_from(o, targets(&b, o)),
+        [(0, -1, 0), (0, -2, 0)].into()
+    );
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Lance),
+        (sq(4, 2, 4), Color::Black, PieceKind::Pawn),
+    ]);
     assert_eq!(offsets_from(o, targets(&b, o)), [(0, -1, 0)].into());
     // pieces in other layers / files do not block
-    let b = board_with(&[(o, Color::Black, PieceKind::Lance), (sq(4, 2, 5), Color::White, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Lance),
+        (sq(4, 2, 5), Color::White, PieceKind::Pawn),
+    ]);
     assert_eq!(targets(&b, o).len(), 4);
 }
 
@@ -154,23 +197,35 @@ fn rook_on_empty_board_reaches_every_square_sharing_a_coordinate() {
     assert_eq!(offs(PieceKind::Rook, Color::Black).len(), 216);
     // from a corner: all squares with some coordinate 0 → 729 - 8^3 - 1
     let c = sq(0, 0, 0);
-    assert_eq!(targets(&lone(PieceKind::Rook, Color::Black, c), c).len(), 216);
+    assert_eq!(
+        targets(&lone(PieceKind::Rook, Color::Black, c), c).len(),
+        216
+    );
 }
 
 #[test]
 fn rook_two_axis_move_is_blocked_by_any_piece_in_the_rectangle() {
     let o = center();
     // blocker at (+1, 0, 0) blocks every target with dx >= 1 (the rectangle always contains it)
-    let b = board_with(&[(o, Color::Black, PieceKind::Rook), (sq(5, 4, 4), Color::Black, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Rook),
+        (sq(5, 4, 4), Color::Black, PieceKind::Pawn),
+    ]);
     let t = targets(&b, o);
     assert_eq!(t.len(), 216 - 68);
     assert!(t.iter().all(|s| s.x() <= 4));
-    let b = board_with(&[(o, Color::Black, PieceKind::Rook), (sq(5, 4, 4), Color::White, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Rook),
+        (sq(5, 4, 4), Color::White, PieceKind::Pawn),
+    ]);
     let t = set_of(targets(&b, o));
     assert_eq!(t.len(), 216 - 67);
     assert!(t.contains(&sq(5, 4, 4)));
     // blocker inside the rectangle but not on any axis: (+2, -2, 0)
-    let b = board_with(&[(o, Color::Black, PieceKind::Rook), (sq(6, 2, 4), Color::Black, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Rook),
+        (sq(6, 2, 4), Color::Black, PieceKind::Pawn),
+    ]);
     let t = set_of(targets(&b, o));
     assert!(!t.contains(&sq(7, 1, 4)) && !t.contains(&sq(6, 1, 4)) && !t.contains(&sq(7, 2, 4)));
     assert!(t.contains(&sq(5, 3, 4)) && t.contains(&sq(6, 3, 4)) && t.contains(&sq(5, 2, 4)));
@@ -183,7 +238,10 @@ fn rook_two_axis_move_is_blocked_by_any_piece_in_the_rectangle() {
 #[test]
 fn plain_rook_diagonal_step_is_blocked_but_dragon_king_step_is_not() {
     let o = center();
-    let blockers = [(sq(5, 4, 4), Color::Black, PieceKind::Pawn), (sq(4, 3, 4), Color::Black, PieceKind::Pawn)];
+    let blockers = [
+        (sq(5, 4, 4), Color::Black, PieceKind::Pawn),
+        (sq(4, 3, 4), Color::Black, PieceKind::Pawn),
+    ];
     let mut pieces = vec![(o, Color::Black, PieceKind::Rook)];
     pieces.extend_from_slice(&blockers);
     let rook = set_of(targets(&board_with(&pieces), o));
@@ -200,16 +258,29 @@ fn plain_rook_diagonal_step_is_blocked_but_dragon_king_step_is_not() {
 #[test]
 fn bishop_on_empty_board_from_centre_and_corner() {
     // per distance a: 12*(2a-1) squares with exactly two |d|=a plus 8 space diagonals
-    assert_eq!(offs(PieceKind::Bishop, Color::Black).len(), 20 + 44 + 68 + 92);
+    assert_eq!(
+        offs(PieceKind::Bishop, Color::Black).len(),
+        20 + 44 + 68 + 92
+    );
     let c = sq(0, 0, 0);
     // corner: per a, 3 pairs * a values of the third axis + 1 → sum(3a+1, a=1..8) = 116
-    assert_eq!(targets(&lone(PieceKind::Bishop, Color::Black, c), c).len(), 116);
+    assert_eq!(
+        targets(&lone(PieceKind::Bishop, Color::Black, c), c).len(),
+        116
+    );
 }
 
 #[test]
 fn bishop_geometry_two_axes_equal_third_not_larger() {
     let got = offs(PieceKind::Bishop, Color::Black);
-    for o in [(1, 1, 0), (2, -2, 1), (3, 1, -3), (-4, -4, -4), (2, 2, 2), (0, 4, -4)] {
+    for o in [
+        (1, 1, 0),
+        (2, -2, 1),
+        (3, 1, -3),
+        (-4, -4, -4),
+        (2, 2, 2),
+        (0, 4, -4),
+    ] {
         assert!(got.contains(&o), "{o:?}");
     }
     for o in [(1, 0, 0), (2, 1, 0), (3, 2, 1), (1, 2, 2 + 1), (0, 0, 1)] {
@@ -221,10 +292,16 @@ fn bishop_geometry_two_axes_equal_third_not_larger() {
 fn bishop_planar_diagonal_blocker_blocks_the_whole_wedge() {
     let o = center();
     // blocker at (+1,-1,0) blocks every target (a,-a,k) with |k| <= a: sum(2a+1, a=1..4) = 24
-    let b = board_with(&[(o, Color::Black, PieceKind::Bishop), (sq(5, 3, 4), Color::Black, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Bishop),
+        (sq(5, 3, 4), Color::Black, PieceKind::Pawn),
+    ]);
     let t = targets(&b, o);
     assert_eq!(t.len(), 224 - 24);
-    let b = board_with(&[(o, Color::Black, PieceKind::Bishop), (sq(5, 3, 4), Color::White, PieceKind::Pawn)]);
+    let b = board_with(&[
+        (o, Color::Black, PieceKind::Bishop),
+        (sq(5, 3, 4), Color::White, PieceKind::Pawn),
+    ]);
     assert_eq!(targets(&b, o).len(), 224 - 23);
 }
 
@@ -234,17 +311,35 @@ fn bishop_trapezoid_is_asymmetric() {
     let from = sq(0, 0, 0);
     let to = sq(2, 2, 1);
     for blocker in [sq(1, 1, 0), sq(1, 1, 1), sq(2, 2, 0)] {
-        let b = board_with(&[(from, Color::Black, PieceKind::Bishop), (blocker, Color::Black, PieceKind::Gold)]);
-        assert!(!set_of(targets(&b, from)).contains(&to), "should be blocked by {blocker:?}");
+        let b = board_with(&[
+            (from, Color::Black, PieceKind::Bishop),
+            (blocker, Color::Black, PieceKind::Gold),
+        ]);
+        assert!(
+            !set_of(targets(&b, from)).contains(&to),
+            "should be blocked by {blocker:?}"
+        );
     }
     for free in [sq(0, 0, 1), sq(1, 0, 0), sq(2, 1, 1), sq(1, 2, 1)] {
-        let b = board_with(&[(from, Color::Black, PieceKind::Bishop), (free, Color::Black, PieceKind::Gold)]);
-        assert!(set_of(targets(&b, from)).contains(&to), "should not be blocked by {free:?}");
+        let b = board_with(&[
+            (from, Color::Black, PieceKind::Bishop),
+            (free, Color::Black, PieceKind::Gold),
+        ]);
+        assert!(
+            set_of(targets(&b, from)).contains(&to),
+            "should not be blocked by {free:?}"
+        );
     }
     // the reverse move (2,2,1) -> (0,0,0) is blocked by (0,0,1) but not by (2,2,0).
-    let b = board_with(&[(to, Color::Black, PieceKind::Bishop), (sq(0, 0, 1), Color::Black, PieceKind::Gold)]);
+    let b = board_with(&[
+        (to, Color::Black, PieceKind::Bishop),
+        (sq(0, 0, 1), Color::Black, PieceKind::Gold),
+    ]);
     assert!(!set_of(targets(&b, to)).contains(&from));
-    let b = board_with(&[(to, Color::Black, PieceKind::Bishop), (sq(2, 2, 0), Color::Black, PieceKind::Gold)]);
+    let b = board_with(&[
+        (to, Color::Black, PieceKind::Bishop),
+        (sq(2, 2, 0), Color::Black, PieceKind::Gold),
+    ]);
     assert!(set_of(targets(&b, to)).contains(&from));
 }
 
@@ -253,17 +348,32 @@ fn bishop_space_diagonal_needs_all_three_trapezoids_clear() {
     let from = sq(0, 0, 0);
     let to = sq(1, 1, 1);
     for blocker in [sq(1, 1, 0), sq(1, 0, 1), sq(0, 1, 1)] {
-        let b = board_with(&[(from, Color::Black, PieceKind::Bishop), (blocker, Color::White, PieceKind::Gold)]);
+        let b = board_with(&[
+            (from, Color::Black, PieceKind::Bishop),
+            (blocker, Color::White, PieceKind::Gold),
+        ]);
         assert!(!set_of(targets(&b, from)).contains(&to), "{blocker:?}");
     }
     for free in [sq(1, 0, 0), sq(0, 1, 0), sq(0, 0, 1)] {
-        let b = board_with(&[(from, Color::Black, PieceKind::Bishop), (free, Color::White, PieceKind::Gold)]);
+        let b = board_with(&[
+            (from, Color::Black, PieceKind::Bishop),
+            (free, Color::White, PieceKind::Gold),
+        ]);
         assert!(set_of(targets(&b, from)).contains(&to), "{free:?}");
     }
     // (0,0,0) -> (2,2,2): exactly these 10 squares block.
     let to = sq(2, 2, 2);
     let blocking: Vec<Square> = [
-        (1, 1, 0), (1, 0, 1), (0, 1, 1), (1, 1, 1), (2, 2, 0), (2, 2, 1), (2, 0, 2), (2, 1, 2), (0, 2, 2), (1, 2, 2),
+        (1, 1, 0),
+        (1, 0, 1),
+        (0, 1, 1),
+        (1, 1, 1),
+        (2, 2, 0),
+        (2, 2, 1),
+        (2, 0, 2),
+        (2, 1, 2),
+        (0, 2, 2),
+        (1, 2, 2),
     ]
     .iter()
     .map(|&(x, y, z)| sq(x, y, z))
@@ -272,7 +382,10 @@ fn bishop_space_diagonal_needs_all_three_trapezoids_clear() {
         if s == from || s == to || s.x() > 2 || s.y() > 2 || s.z() > 2 {
             continue;
         }
-        let b = board_with(&[(from, Color::Black, PieceKind::Bishop), (s, Color::White, PieceKind::Gold)]);
+        let b = board_with(&[
+            (from, Color::Black, PieceKind::Bishop),
+            (s, Color::White, PieceKind::Gold),
+        ]);
         let reaches = set_of(targets(&b, from)).contains(&to);
         assert_eq!(reaches, !blocking.contains(&s), "blocker {s:?}");
     }
@@ -303,17 +416,26 @@ fn horse_has_unblockable_king_steps() {
 #[test]
 fn shogitter_blocking_diagrams_match_reference() {
     let origin = Square::from_display(5, 5, 5).unwrap();
-    let cases: [(PieceKind, &[(u8, u8, u8)]); 2] = [
+    type Case<'a> = (PieceKind, &'a [(u8, u8, u8)]);
+    let cases: [Case; 2] = [
         (PieceKind::Rook, &[(7, 7, 5), (3, 5, 5)]),
         (PieceKind::Bishop, &[(7, 4, 3), (3, 5, 3), (7, 7, 7)]),
     ];
     for (kind, blockers) in cases {
         let mut pieces = vec![(origin, Color::Black, kind)];
         for &(f, r, l) in blockers {
-            pieces.push((Square::from_display(f, r, l).unwrap(), Color::White, PieceKind::Pawn));
+            pieces.push((
+                Square::from_display(f, r, l).unwrap(),
+                Color::White,
+                PieceKind::Pawn,
+            ));
         }
         let b = board_with(&pieces);
-        assert_eq!(set_of(targets(&b, origin)), reference_targets(&b, origin), "{kind:?}");
+        assert_eq!(
+            set_of(targets(&b, origin)),
+            reference_targets(&b, origin),
+            "{kind:?}"
+        );
     }
 }
 
@@ -328,7 +450,11 @@ fn every_piece_kind_matches_reference_on_random_boards() {
         let mut b = random_board(&mut rng, density);
         for _ in 0..6 {
             let from = Square::from_index(rng.below(729) as usize).unwrap();
-            let color = if rng.below(2) == 0 { Color::Black } else { Color::White };
+            let color = if rng.below(2) == 0 {
+                Color::Black
+            } else {
+                Color::White
+            };
             let kind = PieceKind::ALL[rng.below(14) as usize];
             b.set(from, Some(voxelshogi_core::Piece::new(color, kind)));
             let got = set_of(targets(&b, from));
@@ -347,7 +473,11 @@ fn attacks_agrees_with_targets_including_own_occupied_squares() {
     for _ in 0..60 {
         let mut b = random_board(&mut rng, 15);
         let from = Square::from_index(rng.below(729) as usize).unwrap();
-        let color = if rng.below(2) == 0 { Color::Black } else { Color::White };
+        let color = if rng.below(2) == 0 {
+            Color::Black
+        } else {
+            Color::White
+        };
         let kind = PieceKind::ALL[rng.below(14) as usize];
         b.set(from, Some(voxelshogi_core::Piece::new(color, kind)));
         for to in Square::all() {
@@ -356,9 +486,19 @@ fn attacks_agrees_with_targets_including_own_occupied_squares() {
             }
             // Replace the target with an enemy piece and compare with the reference.
             let mut b2 = b.clone();
-            b2.set(to, Some(voxelshogi_core::Piece::new(color.opponent(), PieceKind::Gold)));
+            b2.set(
+                to,
+                Some(voxelshogi_core::Piece::new(
+                    color.opponent(),
+                    PieceKind::Gold,
+                )),
+            );
             let want = reference_targets(&b2, from).contains(&to);
-            assert_eq!(attacks(&b, from, to), want, "{color:?} {kind:?} {from:?} -> {to:?}");
+            assert_eq!(
+                attacks(&b, from, to),
+                want,
+                "{color:?} {kind:?} {from:?} -> {to:?}"
+            );
         }
     }
 }

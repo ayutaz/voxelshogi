@@ -33,7 +33,10 @@ impl Square {
     /// Creates a square from signed coordinates, returning `None` when off the board.
     #[inline]
     pub fn from_i32(x: i32, y: i32, z: i32) -> Option<Square> {
-        if (0..SIZE as i32).contains(&x) && (0..SIZE as i32).contains(&y) && (0..SIZE as i32).contains(&z) {
+        if (0..SIZE as i32).contains(&x)
+            && (0..SIZE as i32).contains(&y)
+            && (0..SIZE as i32).contains(&z)
+        {
             Some(Square::new(x as u8, y as u8, z as u8))
         } else {
             None
@@ -78,7 +81,11 @@ impl Square {
 
     #[inline]
     pub fn offset(self, dx: i32, dy: i32, dz: i32) -> Option<Square> {
-        Square::from_i32(self.x() as i32 + dx, self.y() as i32 + dy, self.z() as i32 + dz)
+        Square::from_i32(
+            self.x() as i32 + dx,
+            self.y() as i32 + dy,
+            self.z() as i32 + dz,
+        )
     }
 
     /// Iterates all 729 squares in index order.

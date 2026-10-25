@@ -266,7 +266,11 @@ impl Gen<'_> {
             for (m, &v) in row.iter().enumerate() {
                 if v == 3 && !(skip_adjacent && m == 1) {
                     let sign = |axis: usize| if dir & (1 << axis) != 0 { 1 } else { -1 };
-                    let t = [o[0] + sign(0) * m as i32, o[1] + sign(1) * m as i32, o[2] + sign(2) * m as i32];
+                    let t = [
+                        o[0] + sign(0) * m as i32,
+                        o[1] + sign(1) * m as i32,
+                        o[2] + sign(2) * m as i32,
+                    ];
                     self.push_if_landable(at(t));
                 }
             }
@@ -276,7 +280,11 @@ impl Gen<'_> {
 
 /// Appends the pseudo-legal destination squares of `piece` standing on `from`.
 pub(crate) fn push_targets(board: &Board, from: Square, piece: Piece, out: &mut Vec<Square>) {
-    let mut g = Gen { board, color: piece.color, out };
+    let mut g = Gen {
+        board,
+        color: piece.color,
+        out,
+    };
     match piece.kind {
         PieceKind::Lance => g.slide(from, [0, piece.color.forward(), 0]),
         PieceKind::Rook => g.rook(from, false),
@@ -345,7 +353,9 @@ fn trapezoids_clear(board: &Board, o: Offset, t: Offset) -> bool {
 /// Whether the piece on `from` attacks `to`, i.e. could capture an enemy piece
 /// standing there. Ignores what actually occupies `to`.
 pub fn attacks(board: &Board, from: Square, to: Square) -> bool {
-    let Some(piece) = board.get(from) else { return false };
+    let Some(piece) = board.get(from) else {
+        return false;
+    };
     if from == to {
         return false;
     }

@@ -115,7 +115,11 @@ impl PieceKind {
     /// Index into the hand array, or `None` for kings and promoted pieces.
     #[inline]
     pub const fn hand_index(self) -> Option<usize> {
-        if (self as usize) < NUM_HAND_KINDS { Some(self as usize) } else { None }
+        if (self as usize) < NUM_HAND_KINDS {
+            Some(self as usize)
+        } else {
+            None
+        }
     }
 
     #[inline]
@@ -305,9 +309,18 @@ mod tests {
             assert_eq!(k.promote(), p, "{k:?}");
             assert_eq!(k.can_promote(), p.is_some(), "{k:?}");
         }
-        let gold_like: Vec<_> = PieceKind::ALL.into_iter().filter(|k| k.is_gold_like()).collect();
-        assert_eq!(gold_like, vec![Gold, Tokin, PromotedLance, PromotedKnight, PromotedSilver]);
-        let hand: Vec<_> = PieceKind::ALL.into_iter().filter(|k| k.hand_index().is_some()).collect();
+        let gold_like: Vec<_> = PieceKind::ALL
+            .into_iter()
+            .filter(|k| k.is_gold_like())
+            .collect();
+        assert_eq!(
+            gold_like,
+            vec![Gold, Tokin, PromotedLance, PromotedKnight, PromotedSilver]
+        );
+        let hand: Vec<_> = PieceKind::ALL
+            .into_iter()
+            .filter(|k| k.hand_index().is_some())
+            .collect();
         assert_eq!(hand, PieceKind::HAND.to_vec());
     }
 

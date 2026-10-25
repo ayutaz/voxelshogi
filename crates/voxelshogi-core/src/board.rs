@@ -17,7 +17,9 @@ impl Default for Board {
 
 impl Board {
     pub const fn empty() -> Board {
-        Board { cells: [0; NUM_SQUARES] }
+        Board {
+            cells: [0; NUM_SQUARES],
+        }
     }
 
     #[inline]
@@ -41,7 +43,12 @@ impl Board {
             .iter()
             .enumerate()
             .filter(|(_, c)| **c != 0)
-            .map(|(i, c)| (Square::from_index(i).unwrap(), Piece::from_code(*c).unwrap()))
+            .map(|(i, c)| {
+                (
+                    Square::from_index(i).unwrap(),
+                    Piece::from_code(*c).unwrap(),
+                )
+            })
     }
 
     pub fn count(&self) -> usize {
@@ -50,7 +57,10 @@ impl Board {
 
     pub fn find_king(&self, color: Color) -> Option<Square> {
         let code = Piece::new(color, PieceKind::King).code();
-        self.cells.iter().position(|c| *c == code).and_then(Square::from_index)
+        self.cells
+            .iter()
+            .position(|c| *c == code)
+            .and_then(Square::from_index)
     }
 
     /// The standard initial position of shogitter 三次元将棋 (372 pieces).
@@ -66,10 +76,19 @@ impl Board {
     /// (`(x,y,z) -> (8-x, 8-y, 8-z)`).
     pub fn initial() -> Board {
         let mut b = Board::empty();
-        let back = [PieceKind::King, PieceKind::Gold, PieceKind::Silver, PieceKind::Knight, PieceKind::Lance];
+        let back = [
+            PieceKind::King,
+            PieceKind::Gold,
+            PieceKind::Silver,
+            PieceKind::Knight,
+            PieceKind::Lance,
+        ];
         let put_black = |x: u8, y: u8, z: u8, kind: PieceKind, b: &mut Board| {
             b.set(Square::new(x, y, z), Some(Piece::new(Color::Black, kind)));
-            b.set(Square::new(8 - x, 8 - y, 8 - z), Some(Piece::new(Color::White, kind)));
+            b.set(
+                Square::new(8 - x, 8 - y, 8 - z),
+                Some(Piece::new(Color::White, kind)),
+            );
         };
         for x in 0..SIZE as u8 {
             for z in 0..SIZE as u8 {
@@ -77,7 +96,11 @@ impl Board {
                 put_black(x, 8, z, back[d], &mut b);
                 put_black(x, 6, z, PieceKind::Pawn, &mut b);
                 if d == 3 {
-                    let kind = if x == 1 || (z == 1 && x != 7) { PieceKind::Rook } else { PieceKind::Bishop };
+                    let kind = if x == 1 || (z == 1 && x != 7) {
+                        PieceKind::Rook
+                    } else {
+                        PieceKind::Bishop
+                    };
                     put_black(x, 7, z, kind, &mut b);
                 }
             }
@@ -97,7 +120,9 @@ mod tests {
     use super::*;
 
     fn count(b: &Board, color: Color, kind: PieceKind) -> usize {
-        b.pieces().filter(|(_, p)| p.color == color && p.kind == kind).count()
+        b.pieces()
+            .filter(|(_, p)| p.color == color && p.kind == kind)
+            .count()
     }
 
     #[test]

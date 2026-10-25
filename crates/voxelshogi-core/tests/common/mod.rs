@@ -7,7 +7,7 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeSet;
-use voxelshogi_core::{Board, Color, Piece, PieceKind, Square};
+use voxelshogi_core::{Board, Color, Move, Piece, PieceKind, Square};
 
 /// SplitMix64 — tiny deterministic RNG for property tests.
 pub struct Rng(pub u64);
@@ -44,7 +44,10 @@ pub fn set_of(v: impl IntoIterator<Item = Square>) -> BTreeSet<Square> {
     v.into_iter().collect()
 }
 
-pub fn offsets_from(origin: Square, v: impl IntoIterator<Item = Square>) -> BTreeSet<(i32, i32, i32)> {
+pub fn offsets_from(
+    origin: Square,
+    v: impl IntoIterator<Item = Square>,
+) -> BTreeSet<(i32, i32, i32)> {
     let o = origin.v();
     v.into_iter()
         .map(|s| {
@@ -59,7 +62,11 @@ pub fn random_board(rng: &mut Rng, density: u64) -> Board {
     let mut b = Board::empty();
     for s in Square::all() {
         if rng.chance(density) {
-            let color = if rng.below(2) == 0 { Color::Black } else { Color::White };
+            let color = if rng.below(2) == 0 {
+                Color::Black
+            } else {
+                Color::White
+            };
             let kind = PieceKind::ALL[rng.below(14) as usize];
             b.set(s, Some(Piece::new(color, kind)));
         }
@@ -171,55 +178,157 @@ fn is_bishop_geometry(d: [i32; 3]) -> bool {
 }
 
 fn is_rook_geometry(d: [i32; 3]) -> bool {
-    d != [0, 0, 0] && d.iter().any(|v| *v == 0)
+    d != [0, 0, 0] && d.contains(&0)
+}
+
+/// Reference attack predicate: could the piece on `from` capture an enemy on `to`?
+/// Checks only the single (from, to) pair, so it is cheap enough for full positions.
+pub fn reference_attacks(board: &Board, from: Square, to: Square) -> bool {
+    let Some(piece) = board.get(from) else {
+        return false;
+    };
+    if from == to {
+        return false;
+    }
+    let ysign = if piece.color == Color::Black { 1 } else { -1 };
+    let o = from.v();
+    let tv = to.v();
+    let d = [tv[0] - o[0], tv[1] - o[1], tv[2] - o[2]];
+    if reference_step_offsets(piece.kind).contains(&(d[0], d[1] * ysign, d[2])) {
+        return true;
+    }
+    let occupied = |p: [i32; 3]| p != o && p != tv && !board.is_empty(sq(p[0], p[1], p[2]));
+    match piece.kind {
+        // 同じz層で、前方へ駒にぶつかるまで
+        PieceKind::Lance => {
+            d[0] == 0
+                && d[2] == 0
+                && d[1] * ysign < 0
+                && (1..d[1].abs()).all(|i| !occupied([o[0], o[1] + d[1].signum() * i, o[2]]))
+        }
+        // 始点と終点を対角とする直方体内の駒は飛び越せない
+        PieceKind::Rook | PieceKind::Dragon => {
+            if !is_rook_geometry(d) {
+                return false;
+            }
+            for x in o[0].min(tv[0])..=o[0].max(tv[0]) {
+                for y in o[1].min(tv[1])..=o[1].max(tv[1]) {
+                    for z in o[2].min(tv[2])..=o[2].max(tv[2]) {
+                        if occupied([x, y, z]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            true
+        }
+        PieceKind::Bishop | PieceKind::Horse => {
+            is_bishop_geometry(d)
+                && reference_bishop_block_region(o, tv)
+                    .into_iter()
+                    .all(|p| !occupied(p))
+        }
+        _ => false,
+    }
 }
 
 /// Reference destination squares (pseudo-legal: own pieces excluded, captures included).
 pub fn reference_targets(board: &Board, from: Square) -> BTreeSet<Square> {
-    let Some(piece) = board.get(from) else { return BTreeSet::new() };
-    let o = from.v();
-    let ysign = if piece.color == Color::Black { 1 } else { -1 };
-    let occupied: Vec<[i32; 3]> = board.pieces().map(|(s, _)| s.v()).collect();
-    let mut out = BTreeSet::new();
-    let own = |s: Square| board.get(s).is_some_and(|p| p.color == piece.color);
+    let Some(piece) = board.get(from) else {
+        return BTreeSet::new();
+    };
+    Square::all()
+        .filter(|&t| {
+            reference_attacks(board, from, t) && board.get(t).is_none_or(|q| q.color != piece.color)
+        })
+        .collect()
+}
 
-    for (dx, dy, dz) in reference_step_offsets(piece.kind) {
-        if let Some(t) = from.offset(dx, dy * ysign, dz) {
-            if !own(t) {
-                out.insert(t);
-            }
-        }
+pub type Hands = [[u8; 7]; 2];
+
+pub fn reference_in_check(board: &Board, color: Color) -> bool {
+    let Some(king) = board.find_king(color) else {
+        return false;
+    };
+    board
+        .pieces()
+        .any(|(s, p)| p.color != color && reference_attacks(board, s, king))
+}
+
+fn in_zone(color: Color, y: u8) -> bool {
+    color.relative_rank(y) < 3
+}
+
+/// 行き所のない駒: the piece would have no move at all on an empty board from rank `y`.
+fn dead_end(kind: PieceKind, color: Color, y: u8) -> bool {
+    let rr = color.relative_rank(y);
+    match kind {
+        PieceKind::Pawn | PieceKind::Lance => rr == 0,
+        PieceKind::Knight => rr <= 1,
+        _ => false,
     }
-    let kind = piece.kind;
-    for t in Square::all() {
-        if t == from || own(t) || out.contains(&t) {
-            continue;
-        }
-        let tv = t.v();
-        let d = [tv[0] - o[0], tv[1] - o[1], tv[2] - o[2]];
-        let ok = match kind {
-            // 同じz層で、前方へ駒にぶつかるまで
-            PieceKind::Lance => {
-                d[0] == 0
-                    && d[2] == 0
-                    && d[1] * ysign < 0
-                    && !occupied.iter().any(|h| h[0] == o[0] && h[2] == o[2] && (h[1] - o[1]) * d[1].signum() > 0 && (h[1] - o[1]).abs() < d[1].abs())
-            }
-            // 始点と終点を対角とする直方体内の駒は飛び越せない
-            PieceKind::Rook | PieceKind::Dragon => {
-                is_rook_geometry(d) && !occupied.iter().any(|h| *h != o && *h != tv && in_box(*h, o, tv))
-            }
-            PieceKind::Bishop | PieceKind::Horse => {
-                is_bishop_geometry(d) && {
-                    let region = reference_bishop_block_region(o, tv);
-                    !occupied.iter().any(|h| region.contains(h))
+}
+
+/// Reference legal moves, written directly from docs/RULESET.md §3–§6.
+pub fn reference_legal_moves(board: &Board, hands: &Hands, side: Color) -> Vec<Move> {
+    let mut moves = Vec::new();
+    let leaves_king_safe = |b: &Board| !reference_in_check(b, side);
+    for (from, piece) in board.pieces().filter(|(_, p)| p.color == side) {
+        for to in reference_targets(board, from) {
+            let can_promote =
+                piece.kind.can_promote() && (in_zone(side, from.y()) || in_zone(side, to.y()));
+            let must_promote = dead_end(piece.kind, side, to.y());
+            for promote in [false, true] {
+                if (promote && !can_promote) || (!promote && must_promote) {
+                    continue;
+                }
+                let mut b = board.clone();
+                b.set(from, None);
+                let kind = if promote {
+                    piece.kind.promote().unwrap()
+                } else {
+                    piece.kind
+                };
+                b.set(to, Some(Piece::new(side, kind)));
+                if leaves_king_safe(&b) {
+                    moves.push(Move::Normal { from, to, promote });
                 }
             }
-            _ => false,
-        };
-        if ok {
-            out.insert(t);
         }
     }
-    out
+    for (hi, kind) in PieceKind::HAND.into_iter().enumerate() {
+        if hands[side.index()][hi] == 0 {
+            continue;
+        }
+        for to in Square::all() {
+            if !board.is_empty(to) || dead_end(kind, side, to.y()) {
+                continue;
+            }
+            // 二歩: same layer and file = same (x, z) column
+            if kind == PieceKind::Pawn
+                && (0..9).any(|y| {
+                    board.get(sq(to.x() as i32, y, to.z() as i32))
+                        == Some(Piece::new(side, PieceKind::Pawn))
+                })
+            {
+                continue;
+            }
+            let mut b = board.clone();
+            b.set(to, Some(Piece::new(side, kind)));
+            if !leaves_king_safe(&b) {
+                continue;
+            }
+            // 打ち歩詰め
+            if kind == PieceKind::Pawn && reference_in_check(&b, side.opponent()) {
+                let mut h = *hands;
+                h[side.index()][hi] -= 1;
+                if reference_legal_moves(&b, &h, side.opponent()).is_empty() {
+                    continue;
+                }
+            }
+            moves.push(Move::Drop { kind, to });
+        }
+    }
+    moves.sort();
+    moves
 }
