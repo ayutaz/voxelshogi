@@ -28,5 +28,23 @@
     "file": "crates/voxelshogi-core/src/movegen.rs",
     "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
     "reason": "All three direction signs come from [-1, 1], so > 0 and >= 0 encode the same direction bits. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:253:56: replace > with < in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "Equivalent to the unordered target-set contract only: for b=0, either c-axis sign emits the same planar target once with the same g[0]/pe[0] clearance; b>0 is unchanged. Enumeration order may change and is not a cross-version API guarantee. Reproducibility records engine commit. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:253:56: replace > with >= in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "sc is always -1 or 1, so > 0 and >= 0 choose the same planar-diagonal emission. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:369:66: replace < with <= in attacks",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "With dx=dz=0, the newly accepted dy=0 case is exactly from==to, which returned false before this match. The lance attack result is unchanged. See docs/M0_VALIDATION.md."
   }
 ]

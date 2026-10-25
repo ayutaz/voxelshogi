@@ -29,6 +29,8 @@ voxelshogi_core::notation::to_vsfen(&next);
 GameRecord::from_moves(&g, &moves[..1]).to_json();
 ```
 
+`targets()` と `legal_moves()` は移動先・指し手の集合を返すAPIで、列挙順序のバージョン間互換性は保証しない。乱数で要素を選ぶ処理や探索の同点処理を再現する際は、シード・設定に加えてエンジンのコミットを固定する。ルールの正しさを調べる比較は集合として行い、順序が要件になる処理はその処理側で順序を定義する。
+
 ## VSFEN
 
 `<盤> <手番 b|w> <持ち駒 or -> <手数>`
