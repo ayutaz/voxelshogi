@@ -7,6 +7,7 @@
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
 - 設計判断: `docs/ARCHITECTURE_DECISIONS.md`、エンジン: `docs/GAME_ENGINE.md`、デプロイ: `docs/DEPLOYMENT.md`
 - M1 前の CI/CD 強化計画と検証記録: `docs/CI_CD_PLAN.md`（M0。完了）
+- 次の探索AIの実装手順と完了条件: `docs/M1_PLAN.md`（未着手）
 
 ## 構成
 
@@ -79,9 +80,9 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - Phase 0: 調査と設計
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
-  - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、復旧訓練、全758変異の調査と分類を確認済み（`docs/M0_VALIDATION.md`）
+  - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、隔離復旧訓練、全758変異の調査と分類を確認済み。PR #3の最終文書も取り込み済みで、統合コミット `1ff4e2f` の本番公開・配信SHA・公開E2E 6件まで2026-10-26（JST）に成功した（`docs/M0_VALIDATION.md` の完了時記録）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M1: 探索AI（Rust）
+  1. M1: 探索AI（Rust、未着手）。`docs/M1_PLAN.md` の7段階で、状態遷移・評価・参照探索・戦術・最適化・上限・計測の順に進める
   2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証
   4. M4: Python バインディングとデータ生成

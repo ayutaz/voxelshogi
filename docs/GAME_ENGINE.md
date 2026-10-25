@@ -45,7 +45,7 @@ GameRecord::from_moves(&g, &moves[..1]).to_json();
 - Zobrist の鍵は SplitMix64（シード `voxelshg`）から生成する。初期局面のハッシュ `043b66e12f6b84fd` をテストで固定している。
 - 千日手は、局面の履歴（ハッシュ、手番、王手かどうか）から判定する。
 
-## 性能（2026-10-25 実測、M1、release）
+## 性能（2026-10-25 実測、Apple M1 CPU、release）
 
 | 項目 | 値 |
 |---|---|
