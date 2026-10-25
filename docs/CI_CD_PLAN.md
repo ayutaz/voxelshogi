@@ -96,7 +96,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 ### M0-4 デプロイと公開後の検証
 
 - PR はテストのみ、main の push はテスト済みの同じ artifact を公開する構成を維持する。`CI Gate` の成功を deploy の前提にする。artifact と配信ファイルに commit SHA を付け、本番 E2E は配信版が対象 SHA と一致することを先に確認する。
-- PR の古い CI は中断してよいが、実行中の本番 deploy と公開検証は次の push で中断しない。workflow 全体の現在の cancel 設定を見直し、deploy〜公開検証を共通の concurrency group で直列化する。ロック取得後に candidate SHA と main の先頭を比較し、古い候補はデプロイせず理由を Summary に記録する。concurrency だけではコミット順の公開は保証できない。[GitHub concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
+- 通常 CI は PR・main とも run ごとに独立させ、旧実行の待機中 Gate が新しい実行を止めないようにする。CodeQL と品質計測は古い PR 実行を中断する。実行中の本番 deploy と公開検証は次の push で中断しない。deploy〜公開検証を共通の concurrency group で直列化し、ロック取得後に candidate SHA と main の先頭を比較する。古い候補はデプロイせず理由を Summary に記録する。concurrency だけではコミット順の公開は保証できない。[GitHub concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
 - production のデプロイ元を main に限定し、Cloudflare secrets を repository から production environment へ移す。必要なジョブ・ステップにだけ渡す。まず環境側で動作を確認してから repository 側を削除する。対話式の本番承認は日常の自動デプロイに追加しない。[GitHub environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments)
 - main の本番 deploy では、API トークン・アカウント ID・サブドメインの不足を明示的に失敗させる。PR と通常の手動 CI が deploy しないことは正常動作として区別する。実装時に ADR-008 の「secrets 未登録ならスキップ」を改訂する。
 - 公開 URL に対して、対局操作5件と配信 SHA 確認1件の Playwright E2E を自動実行する。JS/WASM のロード、初期表示、着手・AI応答・undo・棋譜入出力を実ブラウザで確認する。反映待ちは有限回・有限時間にし、trace と対象 SHA を失敗 artifact に保存する。テストはブラウザ内の対局状態だけを変更する。
@@ -212,5 +212,6 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - 人間同士の対局モードを削除した `0e29eb4` では、Vitest 33件・E2E 6件と公開 E2E が成功した。Rust は86件、CI 制御用テストは20件。画面は人間先手・人間後手の AI 対局と AI 観戦のみ（ADR-012）。
 - 作業前のブランチ作成と PR を必須化した（ユーザー指定）。`AGENTS.md`、`CONTRIBUTING.md`、PR テンプレートを追加し、`.github/main-ruleset.json` を GitHub に適用した。API の有効ルールが定義中の全フィールドと一致することも確認した。
 - [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
+- PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
 
 次は M0-5 の正常な PR の取り込みと fork 経路の検証、M0-3 の全体変異調査の残件分類、M0-4 の隔離成果物による復旧訓練を行う。fork PR を実際に作成した検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。

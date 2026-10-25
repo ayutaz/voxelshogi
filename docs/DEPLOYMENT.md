@@ -37,7 +37,7 @@ CodeQL は別の Security workflow、カバレッジと変異テストは Qualit
 
 認証情報は会話・ローカルファイル・Actions artifact に保存しない。新しい production Secrets を使った [CI 40170836102](https://github.com/ayutaz/voxelshogi/actions/runs/40170836102) の公開と公開 E2E が成功した後、repository 側の同名 Secrets を削除済み。production 側の2件は保持している。既存の Cloudflare トークン自体は失効させていない。他の利用先への影響を確認せず失効させない。
 
-main の最新候補は、CI から自動デプロイされる（2026-10-25 に初回の自動デプロイが成功）。本番でトークン・アカウント ID・サブドメインが不足した場合は失敗とする。PR と通常の手動 CI は本番公開しない。PR の古い CI は中断し、main のビルド・テストは run ごとに実行する。本番公開・公開後検証は production のロックで直列化し、次の push で中断しない。
+main の最新候補は、CI から自動デプロイされる（2026-10-25 に初回の自動デプロイが成功）。本番でトークン・アカウント ID・サブドメインが不足した場合は失敗とする。PR と通常の手動 CI は本番公開しない。通常 CI は PR・main とも run ごとに独立して実行する。旧実行の待機中 Gate が新しい実行を止めないよう、workflow 全体の concurrency は設けない。CodeQL と品質計測は PR の旧実行を中断する。本番公開・公開後検証は production のロックで直列化し、次の push で中断しない。
 
 Job Summary には設定検証・公開・配信 SHA 確認・公開 E2E の結果を分けて表示する。公開検証が成功した run は、commit SHA・Cloudflare version ID・run ID の `production-<SHA>` artifact を30日保存する。失敗時は trace と取得できた version ID を7日保存する。
 
