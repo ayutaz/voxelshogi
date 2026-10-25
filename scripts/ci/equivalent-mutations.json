@@ -1,0 +1,50 @@
+[
+  {
+    "name": "crates/voxelshogi-core/src/state.rs:474:49: replace + with * in GameState::repetition_result",
+    "file": "crates/voxelshogi-core/src/state.rs",
+    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
+    "reason": "docs/M0_VALIDATION.md: first occurrence and last occurrence share the same position/side/check; including that duplicate does not change all/any. Re-review whenever the source changes."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/state.rs:479:47: replace == with != in GameState::repetition_result",
+    "file": "crates/voxelshogi-core/src/state.rs",
+    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
+    "reason": "docs/M0_VALIDATION.md: a fourfold repetition span contains both alternating sides, so the separate any guard is true for either side. The check-filter is unchanged."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:107:13: replace > with >= in room",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "All room callers supply signs -1 or 1, never zero; > 0 and >= 0 therefore agree. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:178:34: replace || with && in Gen<'_>::rook",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "If exactly one dimension is zero, the nested 1..=umax/1..=vmax output loop is empty. Initializing the other DP edge only performs in-bounds reads and changes local scratch memory. No target is added either way. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:232:37: replace > with >= in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "All three direction signs come from [-1, 1], so > 0 and >= 0 encode the same direction bits. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:253:56: replace > with < in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "Equivalent to the unordered target-set contract only: for b=0, either c-axis sign emits the same planar target once with the same g[0]/pe[0] clearance; b>0 is unchanged. Enumeration order may change and is not a cross-version API guarantee. Reproducibility records engine commit. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:253:56: replace > with >= in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "sc is always -1 or 1, so > 0 and >= 0 choose the same planar-diagonal emission. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:369:66: replace < with <= in attacks",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "With dx=dz=0, the newly accepted dy=0 case is exactly from==to, which returned false before this match. The lance attack result is unchanged. See docs/M0_VALIDATION.md."
+  }
+]

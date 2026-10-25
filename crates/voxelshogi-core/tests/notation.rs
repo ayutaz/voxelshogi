@@ -7,6 +7,26 @@ use voxelshogi_core::notation::{NotationError, from_vsfen, parse_move, to_vsfen}
 use voxelshogi_core::record::{GameRecord, RULESET_ID, RecordError, Termination};
 use voxelshogi_core::{Board, Color, GameResult, GameState, Move, PieceKind, Square, WinReason};
 
+#[test]
+fn import_error_text_retains_the_reason_and_offending_move() {
+    assert_eq!(
+        NotationError::Invalid("bad square".into()).to_string(),
+        "invalid notation: bad square"
+    );
+    assert_eq!(
+        RecordError::BadMoveString {
+            index: 2,
+            text: "bad".into(),
+        }
+        .to_string(),
+        "BadMoveString { index: 2, text: \"bad\" }"
+    );
+    let mut session = voxelshogi_core::session::Session::new();
+    assert_eq!(
+        session.play("bad"),
+        Err("invalid notation: bad move string \"bad\"".into())
+    );
+}
 const EMPTY_LAYER: &str = "9/9/9/9/9/9/9/9/9";
 
 fn kings_only_vsfen(side: char, hands: &str) -> String {
@@ -15,6 +35,98 @@ fn kings_only_vsfen(side: char, hands: &str) -> String {
         .map(|z| if z == 4 { mid } else { EMPTY_LAYER })
         .collect();
     format!("{} {side} {hands} 1", layers.join("|"))
+}
+
+#[test]
+fn vsfen_requires_single_nonzero_empty_counts_and_canonical_hand_counts() {
+    let valid = kings_only_vsfen('b', "-");
+    for rank in ["09", "45"] {
+        assert!(from_vsfen(&valid.replacen('9', rank, 1)).is_err());
+    }
+    for hands in ["01P", "001P", "0162P"] {
+        assert!(from_vsfen(&kings_only_vsfen('b', hands)).is_err());
+    }
+    // The set contains 162 pawns. All may be in hand in a partial position.
+    let parsed = from_vsfen(&kings_only_vsfen('b', "162P")).unwrap();
+    assert_eq!(
+        parsed.hands()[0][PieceKind::Pawn.hand_index().unwrap()],
+        162
+    );
+}
+
+#[test]
+fn vsfen_accepts_exact_size_and_move_number_limits_but_rejects_larger_inputs() {
+    let valid = kings_only_vsfen('b', "-");
+    for bytes in [4095, 4096, 4097, 4098] {
+        let padded = format!("{valid}{}", " ".repeat(bytes - valid.len()));
+        let result = from_vsfen(&padded);
+        assert_eq!(result.is_ok(), bytes <= 4096, "{bytes} bytes");
+        if bytes > 4096 {
+            assert_eq!(
+                result.unwrap_err().to_string(),
+                format!("invalid notation: input too long ({bytes} bytes)")
+            );
+        }
+    }
+    for number in [999_999, 1_000_000, 1_000_001, 1_000_002] {
+        let position = valid.strip_suffix('1').unwrap().to_owned() + &number.to_string();
+        match from_vsfen(&position) {
+            Ok(g) => {
+                assert!(number <= 1_000_000);
+                assert_eq!(g.ply(), number - 1);
+            }
+            Err(_) => assert!(number > 1_000_000),
+        }
+    }
+}
+
+#[test]
+fn record_move_limits_apply_to_json_and_replay_before_processing_moves() {
+    for count in [19_999, 20_000, 20_001, 20_002] {
+        let record = GameRecord {
+            ruleset_id: RULESET_ID.into(),
+            initial: kings_only_vsfen('b', "-"),
+            moves: vec!["bad".into(); count],
+            result: None,
+            termination: None,
+        };
+        let parsed = GameRecord::from_json(&record.to_json());
+        if count <= 20_000 {
+            assert_eq!(parsed.unwrap(), record);
+            // Within the limit, replay must proceed to validating the first move.
+            assert_eq!(
+                record.replay().unwrap_err(),
+                RecordError::BadMoveString {
+                    index: 0,
+                    text: "bad".into()
+                }
+            );
+        } else {
+            assert_eq!(parsed.unwrap_err(), RecordError::TooLong(count));
+            assert_eq!(record.replay().unwrap_err(), RecordError::TooLong(count));
+        }
+    }
+}
+
+#[test]
+fn record_json_accepts_exact_byte_limit_and_rejects_larger_valid_json() {
+    let record = GameRecord {
+        ruleset_id: RULESET_ID.into(),
+        initial: kings_only_vsfen('b', "-"),
+        moves: vec![],
+        result: None,
+        termination: None,
+    };
+    let json = record.to_json();
+    for bytes in [4_194_303, 4_194_304, 4_194_305, 4_194_306] {
+        let padded = format!("{json}{}", " ".repeat(bytes - json.len()));
+        let parsed = GameRecord::from_json(&padded);
+        if bytes <= 4_194_304 {
+            assert_eq!(parsed.unwrap(), record);
+        } else {
+            assert_eq!(parsed.unwrap_err(), RecordError::TooLong(bytes));
+        }
+    }
 }
 
 // ------------------------------------------------------------------ moves
