@@ -22,7 +22,7 @@
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-M0（CI/CD と品質基盤）は完了しました。固定ツールチェーン、依存監査、CodeQL、品質計測、配信 SHA と公開 E2E、main 保護、旧成果物の復旧訓練を確認済みです。全758変異を調査し、692件を検出、58件をビルド不能、8件を根拠付きの同値として分類しました。次は M1（探索AI、未着手）です。[調査結果・実装計画](docs/CI_CD_PLAN.md)・[検証記録](docs/M0_VALIDATION.md)
+M0（CI/CD と品質基盤）は、PRの取り込み・公開後検証まで完了しました。固定ツールチェーン、依存監査、CodeQL、品質計測、配信 SHA と公開 E2E、main 保護、旧成果物の隔離復旧訓練を確認済みです。全758変異を調査し、692件を検出、58件をビルド不能、8件を根拠付きの同値として分類しました。次は M1（探索AI、未着手）です。[M1の実装手順](docs/M1_PLAN.md)・[CI/CDの計画](docs/CI_CD_PLAN.md)・[M0の検証記録](docs/M0_VALIDATION.md)
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
@@ -49,6 +49,7 @@ pnpm dev                        # http://localhost:5173
 |---|---|
 | [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | 目的・スコープ・横断的な要件 |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
+| [docs/M1_PLAN.md](docs/M1_PLAN.md) | 次の探索AIの実装順・テスト・完了条件 |
 | [docs/RULESET.md](docs/RULESET.md) | ルール（`voxelshogi-standard-v1`） |
 | [docs/GAME_ENGINE.md](docs/GAME_ENGINE.md) | エンジンの API・VSFEN・性能 |
 | [docs/ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md) | 設計判断（ADR） |

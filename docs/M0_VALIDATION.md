@@ -1,12 +1,26 @@
 # M0 検証記録
 
-対象: main `e3f7f7a` からの作業ブランチ `chore/finish-m0-validation`。2026-10-25。
+対象: main `e3f7f7a` からの作業ブランチ `chore/finish-m0-validation`。検証開始: 2026-10-25、公開確認完了: 2026-10-26（JST）。
 
-M0-1〜5の実装と検証が揃った。最終文書コミットも必須7チェックを通し、保護を迂回しない通常のsquash merge後にmainのCI・配信SHA・公開E2Eの成功を確認してM0を確定する。最終の取り込みと公開の結果は [PR #3](https://github.com/ayutaz/voxelshogi/pull/3) のChecks・統合コミットに紐づくmainのCIを正とする。文書更新では、下記 `5a14c0d` のソース・テスト・CI設定を変更しない。
+M0-1〜5は完了した。[PR #3](https://github.com/ayutaz/voxelshogi/pull/3) の最終文書コミットも必須7チェックが成功し、保護を迂回せず通常の squash merge を行った。統合後の main の CI・CodeQL・本番公開・配信 SHA・公開 E2E の成功も確認済み。ソース・テスト・CI設定は全体変異調査時点の `5a14c0d` と同じ。
+
+## M0 完了時の取り込みと公開
+
+| 記録 | 確認結果 |
+|---|---|
+| PR 最終コミット | `ee7b1026e64a0825fdbe2283db7c11ee5b8d2298`。必須7チェック成功（[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40194273936)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40194273973)・[Quality](https://github.com/ayutaz/voxelshogi/actions/runs/40194273928)） |
+| 統合 | 2026-10-25 23:14 JST、PR #3 を squash merge。`1ff4e2fe76b60c470ed57c75c984620dcc8fc7c2` |
+| 統合後の検証 | [main CI 40201319748](https://github.com/ayutaz/voxelshogi/actions/runs/40201319748) と [main Security 40201319737](https://github.com/ayutaz/voxelshogi/actions/runs/40201319737) が成功 |
+| 公開後の検証 | 2026-10-26 00:53 JST、公開 E2E 6件成功（33.4秒）。deploy・配信 SHA 確認も省略なしで成功 |
+| Cloudflare version ID | `ce499132-9c06-4a0c-aea6-8491a10fbfa7` |
+| 公開記録 artifact | `production-1ff4e2fe76b60c470ed57c75c984620dcc8fc7c2`。commit・version・run ID を取得して照合 |
+| 独立した配信確認 | 公開 URL の `build-info.json` が HTTP 200 を返し、上記の完全長 commit SHA と一致 |
+
+この表は M0 完了時のスナップショット。以後の文書更新でも自動デプロイされるため、現在の公開版は配信中の `build-info.json` と対応する main の CI で確認する。次の M1 は未着手で、[実装計画](M1_PLAN.md) に従う。
 
 ## PR と取り込み制御
 
-[PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェックの成功後、保護を迂回せず squash merge した。main は `e3f7f7a392d58ebc167d3f058eaa2f35b2f0f6cc`。未完了時の merge 拒否と、成功時の通常取り込みの両方を確認済み。
+[PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェックの成功後、保護を迂回せず squash merge した。当時の統合コミットは `e3f7f7a392d58ebc167d3f058eaa2f35b2f0f6cc`。未完了時の merge 拒否と、成功時の通常取り込みの両方を確認済み。
 
 - 通常 CI: [40181542610](https://github.com/ayutaz/voxelshogi/actions/runs/40181542610)
 - CodeQL: [40181542576](https://github.com/ayutaz/voxelshogi/actions/runs/40181542576)
@@ -15,9 +29,7 @@ M0-1〜5の実装と検証が揃った。最終文書コミットも必須7チ�
 
 PR #3の機能・テスト更新 `5a14c0d` も、[通常CI 40187911594](https://github.com/ayutaz/voxelshogi/actions/runs/40187911594)・[CodeQL 40187911528](https://github.com/ayutaz/voxelshogi/actions/runs/40187911528)・[品質計測40187911530](https://github.com/ayutaz/voxelshogi/actions/runs/40187911530) が成功し、必須7チェックすべてのpassをAPIで確認した。通常CIではRust 101テスト、MSRV、Web単体33件、ブラウザE2E 6件と依存監査が成功し、PRの本番deployは省略された。
 
-fork PR の実検証は未実施で、外部からの開発参加を受け入れる際の追加確認とする。ユーザーから必要性を問われ、現在の一人開発における M0 の必須条件としたのは過剰だったと見直した。通常PR・Dependabot・本番環境の制限は引き続き必須検証とし、forkを検証済みとは扱わない。
-
-別名の個人所有fork作成APIは、新しい永続的な公開リポジトリの具体的な作成先・名前・公開範囲の承認がないとして自動承認レビューに拒否され、実行されていない。作成依頼は取り下げた。既存の所属組織にもリポジトリを作成していない。
+fork PR の実検証は未実施で、外部からの開発参加を受け入れる際の追加確認とする。現在の一人開発では M0 の完了条件に含めない。検証用 fork・組織リポジトリは作成していない。通常PR・Dependabot・本番環境の制限の検証とは区別する。
 
 APIの再確認では repository Secrets は空、Cloudflare の2件は production environment にのみ存在し、そのデプロイ許可は `main` の1件のみ。CI の deploy は main の push と成功した Gate を要求し、PRでは省略する。実行した通常PR・Dependabot PRの動作と、設定で保証する範囲を区別して記録する。
 
@@ -49,7 +61,7 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 
 ## 変異テストの生き残り分類
 
-### 最新のカバレッジ
+### M0 完了時のカバレッジ
 
 `5a14c0d` の[Quality 40187911530](https://github.com/ayutaz/voxelshogi/actions/runs/40187911530) でRust/Webのカバレッジと既知変異9件の検査がすべて成功した。保存したLCOV・HTML・JSONの存在と計測行数、変異のbaseline成功と9件すべてのcaughtを再確認した。
 

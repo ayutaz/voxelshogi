@@ -79,6 +79,8 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 
 M0-4 では SHA 確認を加えた6件に拡張済み。`0e29eb4` の CI で公開 E2E 6件が成功し、公開 URL の `build-info.json` も同じ完全長 SHA と確認した。人間同士の対局・マルチプレイはなく、人間 vs AI と AI 観戦のみを検証する。`build-info.json` は `Cache-Control: no-store` で配信し、検証の取得にも対象 SHA の query を付ける。`E2E_COMMIT` を省略した手動実行は、SHA 確認だけが skip となるため、版の一致の証拠には使わない。
 
+M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https://github.com/ayutaz/voxelshogi/actions/runs/40201319748) で commit `1ff4e2fe76b60c470ed57c75c984620dcc8fc7c2` の deploy・配信 SHA・公開 E2E 6件（33.4秒）がすべて成功した。Cloudflare version ID は `ce499132-9c06-4a0c-aea6-8491a10fbfa7`、記録 artifact は `production-1ff4e2fe76b60c470ed57c75c984620dcc8fc7c2`。これは完了時の記録であり、現在の公開版や復旧先を固定するものではない。以後の文書変更も自動デプロイされるため、最新の成功 run と配信中の `build-info.json` を確認する。[詳細](M0_VALIDATION.md)
+
 ## 復旧手順
 
 公開前の失敗なら現在のサイトを確認し、失敗した候補の問題を修正する。公開後の SHA 確認・E2E の失敗なら、現在の版が不完全な可能性があるため、次の手順で最後に公開検証が成功した版を選ぶ。
@@ -99,8 +101,9 @@ M0-4 では SHA 確認を加えた6件に拡張済み。`0e29eb4` の CI で公�
 
 復旧訓練は、本番を変更せず、成功 run の `web-dist` を一時ディレクトリへダウンロードしてローカルで配信し、同じ6件の E2E と SHA 確認を行う。本番での自動 rollback は導入しない。[Cloudflare の rollback 仕様](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
 
-## 今後の拡張（Phase 4 以降）
+## 今後の拡張（M3 の推論検証から）
 
-- 25MiB を超える ONNX Runtime の wasm やモデルは、R2 とカスタムドメインから配信する。`r2.dev` は開発用で、レート制限がある。
+- M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルドか R2 とカスタムドメインからの配信かを決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
+- 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。
 - マルチスレッド WASM を使う場合は、`_headers` に COOP/COEP を追加する。
 - 詳細は `docs/TECH_STACK_RESEARCH.md` §3.4 と §4、`docs/COST_ESTIMATE.md` §5。

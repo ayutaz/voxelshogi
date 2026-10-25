@@ -39,6 +39,7 @@ __pycache__/
 .dev.vars
 # Project-local Cloudflare CLI login (scripts/cf.sh)
 /.cloudflare-cli/
+/.codex/.local/
 /deployment-info.json
 /production-sealed.json
 *.pem
