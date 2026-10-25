@@ -2,13 +2,30 @@
 
 調査日: 2026-10-25。対象: `ayutaz/voxelshogi`、調査時の main: `cbf14c5`。
 
-**M1（探索AI）の前に、M0 として CI/CD と品質基盤を整える。** 現在はテストから自動デプロイまで動いているが、失敗した変更の main への取り込みを防ぐ設定と、依存関係・秘密情報・公開後の動作を継続的に確認する仕組みが不足している。
+**M1（探索AI）の前に、M0 として CI/CD と品質基盤を整える。** 調査開始時の不足と、実装後の状態を分けて記録する。
 
 本書は調査結果・実装計画・検証記録。M0 を実装中。現行のデプロイ手順は [DEPLOYMENT.md](DEPLOYMENT.md)、実行順と進捗は [ROADMAP.md](ROADMAP.md#実行計画マイルストーン) に記録する。
 
 ## 現在の状態
 
-ローカルの設定ファイルと GitHub REST API を照合した。最新コミットの [CI 実行](https://github.com/ayutaz/voxelshogi/actions/runs/40165004515) では Rust・Web・deploy の全ジョブと、本番デプロイ・スモークテストの各ステップが成功している。直近5回の main の push に対する CI はすべて成功している。
+2026-10-25 再確認。実装済みの main `0e29eb4` と GitHub API・公開サイトを照合した。今回の main 保護と PR 品質計測の追加は、作業ブランチで検証する。
+
+| 項目 | 現況・証拠 |
+|---|---|
+| 通常 CI と本番公開 | [CI 40170836102](https://github.com/ayutaz/voxelshogi/actions/runs/40170836102) で lint・Rust・MSRV・Web・監査・Gate・deploy が成功。配信 SHA 照合と公開 E2E 6件も成功。公開 SHA は `0e29eb42229ef111494d8d5b73f254729e4df38f` |
+| セキュリティ | [Security 40170836109](https://github.com/ayutaz/voxelshogi/actions/runs/40170836109) の CodeQL 3言語が成功。未解決 code scanning alerts は0件。Secret scanning・Push protection・非公開脆弱性報告は有効 |
+| 依存更新 PR | [Dependabot PR #1](https://github.com/ayutaz/voxelshogi/pull/1) は作成・CI 成功を確認済み、未マージ。自動マージは導入しない |
+| 品質計測 | [Quality 40168054255](https://github.com/ayutaz/voxelshogi/actions/runs/40168054255) の Rust/Web カバレッジと既知の9変異が成功、各レポートを保存済み。全体変異ジョブはこの実行では省略 |
+| production 認証 | 新規 API トークンとアカウント ID を environment Secrets に直接登録し、本番公開で使用済み。成功確認後、旧 repository Secrets の2件を削除し、repository 側は空、production 側の2件は保持と API で確認 |
+| main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
+| PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) で通常 CI・Security・Quality measurements の起動を確認。必須チェック未完了時の通常 squash merge は、7チェック未成功・CodeQL 結果待ちのルール違反として HTTP 405 で拒否された。PR は未マージ |
+| 残り | 全体変異調査の生き残り分類、隔離した成果物での復旧訓練、正常な PR の取り込み・fork PR の検証。M0 全体は未完了、M1 は未着手 |
+
+人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
+
+## 調査開始時の状態（変更前の記録）
+
+以下は main `cbf14c5` 時点の調査であり、現在の不足一覧ではない。当時の [CI 実行](https://github.com/ayutaz/voxelshogi/actions/runs/40165004515) では Rust・Web・deploy とスモークテストが成功していた。
 
 | 項目 | 確認結果 | 不足・影響 |
 |---|---|---|
@@ -38,10 +55,10 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | 順 | 目的 | 主な変更先 | 完了条件 | 状態 |
 |---|---|---|---|---|
 | M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | ✅ main の検査と Gate 成功、異常系検証済み |
-| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 ローカル監査・保護機能の有効化済み、CI 確認待ち |
-| M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 ローカル計測・既知の9変異検出済み、CI 確認待ち |
-| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 ローカルの正常・異常系検証済み、本番と移行を検証中 |
-| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ⬜ |
+| M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 監査・3言語解析・更新 PR・報告経路を確認済み。fork PR の実行検証が残る |
+| M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 CI 計測・既知の9変異が成功。全体調査の生き残り分類が残る |
+| M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | 🟡 本番 SHA・公開 E2E・環境 Secrets 移行済み。復旧訓練が残る |
+| M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | 🟡 保護設定・未完了チェックの merge 拒否を確認。正常系・fork 検証は PR で追跡 |
 
 ### M0-1 CI の再現性と静的検査
 
@@ -57,7 +74,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 ### M0-2 依存関係とセキュリティ
 
 - Dependabot を週次で設定する。対象は Cargo（`/`）、npm/pnpm（`/apps/web`）、GitHub Actions（`/`）。patch/minor をまとめ、major は分け、各 ecosystem の同時 PR 数を3件までにする。自動マージは初期導入に含めない。pnpm は Dependabot 上では `npm` ecosystem を使う。[設定仕様](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
-- `wasm-bindgen` 更新時は CLI とセットで検証する。Wrangler は Web の devDependency と lockfile で管理し、CI と `scripts/cf.sh` が同じものを起動する。現在の `npx --yes wrangler@4.152.0` / `pnpm dlx` の実行時解決を解消する。
+- `wasm-bindgen` 更新時は CLI とセットで検証する。Wrangler は Web の devDependency と lockfile で管理し、CI と `scripts/cf.sh` が同じものを起動する。調査開始時の `npx --yes wrangler@4.152.0` / `pnpm dlx` の実行時解決は解消済み。
 - Rust は `cargo-deny` で既知の脆弱性・ライセンス・取得元を監査する。Web は `pnpm audit` を開発用依存も含めて実行する。PR/main だけでなく毎週も実行し、コード更新がなくても新規 advisory を拾う。Rust の既知の脆弱性は全件、Web は high/critical を必須チェックの失敗とする。例外は advisory ID・理由・期限を記録し、全体を無効化する回避はしない。[RustSec](https://rustsec.org/)
 - 依存監査と dependency-review は `ci.yml` のジョブとして `CI Gate` に結び、週次でも同じ監査コマンドを使う。CodeQL は `security.yml` に分け、M0-5 で別の必須チェックまたは code scanning rule に結ぶ。独立した workflow 間を `needs` で参照する設計にはしない。
 - PR では dependency-review で追加・更新された依存関係を確認し、high/critical を失敗にする。fork/Dependabot PR でも secrets なしで動かし、PR へのコメント書き込み権限は不要とする。[Dependency review](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review)
@@ -79,28 +96,29 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 ### M0-4 デプロイと公開後の検証
 
 - PR はテストのみ、main の push はテスト済みの同じ artifact を公開する構成を維持する。`CI Gate` の成功を deploy の前提にする。artifact と配信ファイルに commit SHA を付け、本番 E2E は配信版が対象 SHA と一致することを先に確認する。
-- PR の古い CI は中断してよいが、実行中の本番 deploy と公開検証は次の push で中断しない。workflow 全体の現在の cancel 設定を見直し、deploy〜公開検証を共通の concurrency group で直列化する。ロック取得後に candidate SHA と main の先頭を比較し、古い候補はデプロイせず理由を Summary に記録する。concurrency だけではコミット順の公開は保証できない。[GitHub concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
+- 通常 CI は PR・main とも run ごとに独立させ、旧実行の待機中 Gate が新しい実行を止めないようにする。CodeQL と品質計測は古い PR 実行を中断する。実行中の本番 deploy と公開検証は次の push で中断しない。deploy〜公開検証を共通の concurrency group で直列化し、ロック取得後に candidate SHA と main の先頭を比較する。古い候補はデプロイせず理由を Summary に記録する。concurrency だけではコミット順の公開は保証できない。[GitHub concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
 - production のデプロイ元を main に限定し、Cloudflare secrets を repository から production environment へ移す。必要なジョブ・ステップにだけ渡す。まず環境側で動作を確認してから repository 側を削除する。対話式の本番承認は日常の自動デプロイに追加しない。[GitHub environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments)
 - main の本番 deploy では、API トークン・アカウント ID・サブドメインの不足を明示的に失敗させる。PR と通常の手動 CI が deploy しないことは正常動作として区別する。実装時に ADR-008 の「secrets 未登録ならスキップ」を改訂する。
-- 公開 URL に対して、既存5件の Playwright E2E を自動実行する。HTML に加え、JS/WASM のロード、初期表示、着手・AI応答・undo・棋譜入出力を実ブラウザで確認する。反映待ちは有限回・有限時間にし、trace と対象 SHA を失敗 artifact に保存する。テストはブラウザ内の対局状態だけを変更する。
+- 公開 URL に対して、対局操作5件と配信 SHA 確認1件の Playwright E2E を自動実行する。JS/WASM のロード、初期表示、着手・AI応答・undo・棋譜入出力を実ブラウザで確認する。反映待ちは有限回・有限時間にし、trace と対象 SHA を失敗 artifact に保存する。テストはブラウザ内の対局状態だけを変更する。
 - デプロイに失敗した場合と、デプロイ後の E2E に失敗した場合を区別して Job Summary に表示する。Cloudflare version ID・commit SHA・最後に公開検証が成功した版を記録し、手動の復旧手順を `DEPLOYMENT.md` に加える。公開 E2E の一時的な失敗だけで自動 rollback する仕組みは初期導入に含めない。復旧の実動作は隔離した環境またはローカルの旧 artifact で確認する。[Cloudflare rollback](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
 
 **検証**: 非本番の検証経路で設定漏れ・誤った配信 SHA・JS/WASM の取得失敗を検出する。近接する2回の main 更新でも deploy が中断・競合せず、最後に最新の成功版が配信されることを確認する。復旧手順では戻す版の明示と復旧後の公開 E2E を必須にする。
 
 ### M0-5 PR と main 保護
 
-- M0-1〜4 のチェックが main で成功してから、main の ruleset を設定する。PR 経由・必須 `CI Gate`・最新 main に対する検証を要求し、force push とブランチ削除を禁止する。日常運用の bypass は設けない。[利用できるルール](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
+- main での通常 CI・CodeQL・品質計測・公開 E2E の成功を確認し、ユーザー指示により復旧訓練・全体変異分類と並行して main の ruleset を設定する。PR 経由・必須 `CI Gate`・最新 main に対する検証を要求し、force push とブランチ削除を禁止する。管理者を含め bypass は設けない。[利用できるルール](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
 - 一人開発でも進められるよう、他者による承認の必須数は0とする。PR 自体と必須チェックは要求する。CodeQL は解析結果を別の必須チェックまたは code scanning rule に結び、解析成功だけで high/critical の alert を見逃さない構成にする。
-- 必須 Gate には lint・Rust・Web・依存監査を含め、PR 専用の dependency-review も PR では必須とする。定期品質計測や本番 deploy は PR の Gate に含めない。条件付きのジョブを一律成功扱いにする設計は避ける。
+- 必須 Gate には lint・Rust・MSRV・WASM/Web/E2E・依存監査を含め、dependency-review も PR では必須とする。CodeQL 3種類と Rust/Web カバレッジ・既知変異の3種類を、別の必須チェックとして追加する。docs のみでも全7チェックを実行する。全体変異調査と本番 deploy は PR の必須チェックに含めない。
 - `CONTRIBUTING.md` と PR テンプレートに、TDD、独立した期待値、変異テスト、ローカル確認コマンド、ドキュメント更新、AI が作った差分も確認することを記載する。`CLAUDE.md` の手順も PR 運用へ変更する。
 
-**検証**: 検証用 PR の必須テストを一時的に失敗させ、merge が許可されないことを API/UI で確認する。修正後にチェックが成功し、自己承認なしで取り込めることを確認する。fork/Dependabot PR に本番 secrets が渡らず、deploy も起動しないことを確認する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
+**検証**: Gate の単体テストで failure・cancelled・skipped・欠落を拒否することを確認し、GitHub では必須チェックが未完了の PR の通常 merge を拒否することを確認する。壊したテストを push して検証する方法は使わない。正常系では全チェックが成功して取り込み可能になることと、自己承認なしで取り込めることを確認する。fork/Dependabot PR に本番 secrets が渡らず、deploy も起動しないことを確認する。必須チェック名・ruleset・production の設定を再取得し、本書に記録する。
 
 ## 定常運用
 
 | タイミング | 実行内容 | 役割 |
 |---|---|---|
 | PR / main push | lint、Rust、WASM、Web、ローカル E2E、依存監査、CodeQL。dependency-review は PR のみ | 取り込み前と統合後の検証 |
+| PR | Rust/Web カバレッジ、既知の9変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認 |
 | main の検証成功後 | 同じ artifact を deploy、配信 SHA 確認、公開 E2E | 公開版の動作確認 |
 | 週次 / 手動 | 依存監査、CodeQL、カバレッジ、変異テスト。Dependabot の更新確認 | コード更新がなくても問題を検出 |
 
@@ -114,9 +132,9 @@ GitHub Actions の **Public リポジトリの標準 GitHub-hosted runner** は�
 |---|---|
 | M1 | 高速適用と検証付き適用の一致、手計算評価、少数駒局面の minimax 深さ1〜3との一致、詰み・駒損回避・合法手、固定深さ/ノードの再現性。最適化前後の評価値とノード数を比較。実時間の速さは計測値として保存する |
 | M2 | Worker の思考中の UI 操作、中断・新規対局・undo 後の古い応答の破棄、Easy/Normal の合法手、公開 E2E、バンドルサイズの計測 |
-| M3 | モデル変換と各 runtime の数値一致、対応演算子と配信上限。WebGPU が使える環境での検証を分離する |
+| M3 | FP32 と作成した FP16・量子化版ごとに、同じ変換版の基準実装との数値比較、対応演算子・backend・配信上限を検証する。公開技術デモの配信 SHA-256 とロード・推論を確認する。WebGPU は対象実機の検証を別に記録する |
 | M4 | Python lint/test、Rust バインディング、少量データの同一 seed 再生成・ハッシュ比較・検証・分割漏れ検出。10万局面の生成は通常 PR CI に入れない |
-| M6 | 小さな学習と checkpoint 再開の一致、ONNX 出力の一致。GPU 本学習は見積もり・承認後に実行し、通常 CI と分ける |
+| M6 | 小さな学習と checkpoint 再開、各公開変換版の数値・精度・棋力評価、配布ファイルと評価記録の SHA-256 一致、モデル選択と人間対AI・AI観戦の公開 E2E。実機の速度・メモリも測る。GPU 本学習は見積もり・承認後に実行し、通常 CI と分ける |
 | Phase 7 | 複数ブラウザ・モバイル・アクセシビリティ、公開監視、必要になった場合の PR preview と release 自動化 |
 
 M1 では、同じ固定深さ・固定ノード数で同じ結果になることと、時間上限で停止することを別のテストにする。実時間だけの上限では環境負荷により到達深さが変わるため、同じ手を保証する再現性条件には使わない。
@@ -124,6 +142,8 @@ M1 では、同じ固定深さ・固定ノード数で同じ結果になるこ�
 M0 の完了は、設定ファイルが存在することではなく、正常時の成功と異常時の検出、取り込み制御、公開後の検証までの確認で判断する。性能の厳密な回帰閾値や全環境のテストを最初から必須にはせず、M1 以降の実測に合わせて増やす。
 
 ## 実装と検証の記録
+
+以下は各段階の記録。テスト件数・設定の現況は冒頭の「現在の状態」と末尾の再確認記録を優先する。
 
 ### M0-1 ローカル検証
 
@@ -184,4 +204,14 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - production の branch policy を設定し、許可元が `main` の1件だけであることを API で確認。承認者と待機時間は追加していない。
 - Cloudflare の管理画面で、ユーザーが承認した `voxelshogi-github-production-20261025` を発行した。対象は指定の個人アカウントの全 Workers スクリプトの編集、有効期限なし。`gh secret set --env production` の標準入力へ直接登録し、値は会話・ローカルファイル・artifact に出していない。アカウント ID もプロジェクト専用ログインで照合して直接登録し、API で production の登録名と更新日時を確認した。
 - 認証情報を artifact 経由で移行する workflow と、その暗号化用依存は、workflow の実行履歴が0件であることを確認して削除した。
-- 新しい production Secrets を使った本番 CI の成功を確認してから、不要になった repository 側の同名 Secrets を削除する。本番 E2E・復旧訓練など、M0-4 全体の検証結果は確認後に追記する。
+- 新しい production Secrets を使った [本番 CI 40170836102](https://github.com/ayutaz/voxelshogi/actions/runs/40170836102) で公開・SHA 確認・E2E が成功。旧 repository Secrets の2件を削除し、production 側の2件が保持されていることを API で確認した。既存の Cloudflare トークン自体は失効させていない。復旧訓練は未実施。
+
+### 2026-10-25 再確認と次の順序
+
+- 品質計測 run `40168054255` の保存レポートを再取得し、Rust core 行カバレッジ94.27%（1432 / 1519）、Web 単体35.37%（127 / 359）を確認した。これは同 run のコミット `69e2904` の値で、未計測の後続変更まで保証するものではない。
+- 人間同士の対局モードを削除した `0e29eb4` では、Vitest 33件・E2E 6件と公開 E2E が成功した。Rust は86件、CI 制御用テストは20件。画面は人間先手・人間後手の AI 対局と AI 観戦のみ（ADR-012）。
+- 作業前のブランチ作成と PR を必須化した（ユーザー指定）。`AGENTS.md`、`CONTRIBUTING.md`、PR テンプレートを追加し、`.github/main-ruleset.json` を GitHub に適用した。API の有効ルールが定義中の全フィールドと一致することも確認した。
+- [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
+- PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
+
+次は M0-5 の正常な PR の取り込みと fork 経路の検証、M0-3 の全体変異調査の残件分類、M0-4 の隔離成果物による復旧訓練を行う。fork PR を実際に作成した検証はまだないため、Dependabot PR の実績や YAML 上の secrets 分離だけで確認済みとはしない。残る項目をすべて検証後に M0 を完了し、M1 の TDD 手順へ進む。

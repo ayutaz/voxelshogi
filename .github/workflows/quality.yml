@@ -1,6 +1,7 @@
 name: Quality measurements
 
 on:
+  pull_request:
   schedule:
     - cron: '43 16 * * 0'
   workflow_dispatch:
@@ -15,7 +16,7 @@ permissions:
 
 concurrency:
   group: quality-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   rust-coverage:

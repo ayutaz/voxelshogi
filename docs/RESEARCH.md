@@ -2,6 +2,8 @@
 
 詳細は各文書を参照。
 
+本書の外部技術・価格情報は初回調査時点の記録。採用済みの構成と現在の進捗は [ROADMAP.md](ROADMAP.md)、CI/CD の実装・検証は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。WASM は wasm-bindgen-cli を直接使用し、Python は3.14系を基本、依存が未対応の場合は3.13系とする。
+
 - ルール: `docs/RULESET.md`
 - 関連研究: `docs/RELATED_WORK.md`
 - 技術: `docs/TECH_STACK_RESEARCH.md`
@@ -35,6 +37,6 @@
 1. ONNX Runtime Web の WebGPU 用 wasm が、Cloudflare Static Assets の1ファイル25MiB上限を超える（27MiB）。R2 で配信するか、軽量ビルド（JSPI 16MiB、WASM のみ 13.6MiB）を使う。
 2. WebGPU では、Conv3d が最適化されていない汎用カーネルでしか動かない。ONNX 標準の `Attention` 演算子は CPU で実行される。→ 本格学習の前に、小型モデルで実測する。
 3. RTX 5090 では、CUDA 13 版の PyTorch が必要。
-4. ローカルのディスク空きが約9GB しかない（2026-10-25 時点）。uv のキャッシュ（`~/.cache/uv`）が約12GB あり、整理すれば空きを大きく増やせる。
+4. 初回調査のローカルディスク空きは約9GBだったが、2026-10-25 の再確認では約40GiB。現時点でキャッシュ削除は不要。M3 の依存導入前に再確認する。
 
-各リスクに対応するフェーズとゴールは `docs/ROADMAP.md` を参照（1・2 は Phase 4 の最優先作業、3 は Phase 5）。
+各リスクに対応する順序とゴールは `docs/ROADMAP.md` を参照。1・2 は M3 で先行検証し、3 は M6 の GPU 選定時に再確認する。M1 の教師用探索は αβ探索で、上記の Gumbel AlphaZero 案は後続の自己対局用である。

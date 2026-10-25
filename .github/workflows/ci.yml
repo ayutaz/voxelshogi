@@ -6,10 +6,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 permissions:
   contents: read
 
@@ -81,6 +77,7 @@ jobs:
 
   gate:
     name: CI Gate
+    # Keep fail/cancel detection; do not serialize workflows behind a queued gate.
     if: always()
     needs: [lint, rust, msrv, web, audit, dependency-review]
     runs-on: ubuntu-latest

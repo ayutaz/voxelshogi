@@ -7,9 +7,15 @@
 
 ---
 
+## 採用済みの構成と初回調査の区別
+
+以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
+
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-25 のディスク再確認は約40GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+
 ## 0. 結論サマリ
 
-### 0.1 ピン留め推奨バージョン（2026-10-25 時点の最新安定版）
+### 0.1 初回調査時のバージョン候補（2026-10-25）
 
 | 区分 | パッケージ | 最新安定版 | 公開日 | 推奨ピン | 備考 |
 |---|---|---|---|---|---|
@@ -65,7 +71,7 @@
 - **採用理由**: Rust⇔JS 間の事実上の標準 FFI。`#[wasm_bindgen]` で関数/構造体をエクスポートし、TypeScript 型定義（`.d.ts`）も生成される。リポジトリは `rustwasm` org の解散（2025）後、`github.com/wasm-bindgen/wasm-bindgen` に移管され、2026-10-24 にも push がある活発な状態。MSRV 1.81（ローカルの rustc 1.97.1 で問題なし）。
 - **注意点**:
   - **`wasm-bindgen` クレートと `wasm-bindgen-cli` のバージョンは完全一致必須**。不一致だと「schema version mismatch」でビルド失敗。`Cargo.toml` で `wasm-bindgen = "=0.2.129"` と `=` 固定し、CI で同じ CLI を入れる。
-  - ローカルには `wasm32-unknown-unknown` ターゲットが未インストール（`rustup target list --installed` は `aarch64-apple-darwin` のみ）。`rustup target add wasm32-unknown-unknown` が必要。
+  - 初回調査では `wasm32-unknown-unknown` が未インストールだった。Phase 2 で導入し、現在は WASM ビルドと実ブラウザテストが成功している。
   - ルールエンジンで乱数（Zobrist ハッシュ等）を使う場合、`getrandom`（最新 0.4.3）は wasm32-unknown-unknown で追加の feature/cfg 設定が必要になる系統。**Zobrist キーは固定シードの自前 PRNG（例: SplitMix64）で生成し、`getrandom` 依存をコアから排除**するのが安全（0.4 系の具体的な設定方法は [未確認]）。
   - 盤面（729 マス）を JS へ毎手コピーするとオーバーヘッドになる。`Uint8Array` ビュー（`js_sys::Uint8Array::view` 等）やフラットなバッファ受け渡しを基本にする。
 
@@ -75,7 +81,7 @@
 - **代替**:
   - **wasm-bindgen-cli 直接**: `cargo build --target wasm32-unknown-unknown --release` → `wasm-bindgen --target web --out-dir pkg ...` → （任意）`wasm-opt -O3`。ツールの数は減り、バージョン固定が明示的。ただし `package.json` 生成や `wasm-opt` の取得は自前。
   - **trunk（0.22.0）**: Yew/Leptos 等「Rust 製フロントエンド」の HTML 起点バンドラ。**本プロジェクトのフロントは Vite + React（TS）なので用途が合わない**。MSRV も 1.96.1 と高い。→ 不採用。
-- **推奨**: **開発初期は `wasm-pack build --target web`（0.15.0）**、CI では `wasm-bindgen-cli@0.2.129` 直接呼び出しに移行できるよう Makefile/justfile で薄くラップしておく。どちらでも成果物（`pkg/*.js` + `*.wasm` + `*.d.ts`）は同じ。
+- **初回の候補**: `wasm-pack build --target web`（0.15.0）を検討したが、ADR-007 で不採用。ローカル・CI とも wasm-bindgen-cli 0.2.129 を直接呼び出す。
   - `--target web` を推奨（`bundler` ターゲットは ESM の wasm import 提案に依存し、Vite では追加プラグインが必要になりがち）。生成された `init()` を Web Worker 内で呼ぶ。
   - `wasm-opt` は wasm-pack が binaryen を自動ダウンロードする。オフライン/CI でキャッシュするなら `[package.metadata.wasm-pack.profile.release] wasm-opt = ["-O3"]` 等で明示。
 
@@ -309,9 +315,9 @@
 ### 5.5 Gymnasium 1.4.0 [確認済: 版のみ]
 - **評価**: 単一エージェント RL 用 API。AlphaZero 型の自己対局（MCTS + NN）では環境ラッパとしての必要性は低く、2 人対戦なら PettingZoo（AEC API）の方が適合（PettingZoo の版は本日未確認）。**採用は任意・低優先**。外部研究者向けに Gymnasium 互換ラッパを後から用意する程度で良い。
 
-## 6. ローカル開発機（Apple M1 / 8 GB RAM / 空き約 9 GB）での注意
+## 6. ローカル開発機（Apple M1 / 8 GB RAM）の初回調査
 
-本日確認したローカル状態 [確認済]: rustc 1.97.1（ターゲットは `aarch64-apple-darwin` のみ）、node v26.3.1、npm 11.16.0、uv 0.11.23、uv 管理の Python 3.10〜3.14（3.13.9 あり）、メモリ 8 GiB、ルートボリューム空き 9.2 GiB、`~/.cache/uv` 12 GB、`~/.rustup` 563 MB、`~/.cargo` 435 MB、Playwright キャッシュ 520 MB。wasm-pack / wasm-bindgen / wasm-opt / wrangler / maturin は未インストール。
+初回調査時のローカル状態 [確認済]: rustc 1.97.1（ターゲットは `aarch64-apple-darwin` のみ）、node v26.3.1、npm 11.16.0、uv 0.11.23、uv 管理の Python 3.10〜3.14（3.13.9 あり）、メモリ 8 GiB、ルートボリューム空き 9.2 GiB、`~/.cache/uv` 12 GB、`~/.rustup` 563 MB、`~/.cargo` 435 MB、Playwright キャッシュ 520 MB。wasm-pack / wasm-bindgen / wasm-opt / wrangler / maturin は未インストールだった。現在の固定ツールチェーン・導入済みツール・空き容量は冒頭の更新を参照。
 
 | 項目 | ローカルで可否 | 対応 |
 |---|---|---|
