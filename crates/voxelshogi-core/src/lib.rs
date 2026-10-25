@@ -5,6 +5,7 @@
 
 pub mod board;
 pub mod coord;
+pub mod movegen;
 pub mod piece;
 
 pub use board::Board;
