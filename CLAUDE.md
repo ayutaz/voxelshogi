@@ -58,6 +58,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
 
 - GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。モデル・データセットのライセンスは、公開前にユーザーに確認する。
+- Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
 - ルールは将棋ったー三次元将棋の 10/17 改定後版。未記載の終局条件は将棋ったーの既定を継承する。
 - 公開 URL はまず workers.dev を使う。デプロイは GitHub Actions から行う（Cloudflare 側の Git 連携は使わない）。理由は `docs/DEPLOYMENT.md` を参照。
@@ -73,7 +74,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1〜2 を実装・検証中）
+  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1〜3 を実装・検証中）
   1. M1: 探索AI（Rust）
   2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証

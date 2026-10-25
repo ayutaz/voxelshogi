@@ -1,0 +1,163 @@
+name: Quality measurements
+
+on:
+  schedule:
+    - cron: '43 16 * * 0'
+  workflow_dispatch:
+    inputs:
+      full_mutations:
+        description: Run all core mutations in addition to the nine known regressions
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rust-coverage:
+    name: Rust core coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Avoid the LLVM coverage mismatches observed with opt-level 2.
+      CARGO_PROFILE_TEST_OPT_LEVEL: 0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - run: rustup component add llvm-tools-preview
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          key: coverage
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        with:
+          tool: cargo-llvm-cov@0.9.1
+      - name: Measure core coverage
+        run: |
+          mkdir -p coverage/rust
+          cargo llvm-cov --locked -p voxelshogi-core --ignore-filename-regex '/(tests|examples)/' --lcov --output-path coverage/rust/lcov.info
+          cargo llvm-cov report --ignore-filename-regex '/(tests|examples)/' --html --output-dir coverage/rust/html
+          cargo llvm-cov report --ignore-filename-regex '/(tests|examples)/' --json --summary-only --output-path coverage/rust/summary.json
+          test -s coverage/rust/lcov.info
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - name: Summarize core coverage
+        run: |
+          python - <<'PY'
+          import json, os
+          totals = json.load(open('coverage/rust/summary.json'))['data'][0]['totals']
+          assert totals['lines']['count'] > 0, 'No measured Rust lines'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('### Rust core coverage\n\n')
+              for kind in ['lines', 'functions', 'regions']:
+                  value = totals[kind]
+                  f.write(f"- {kind}: {value['percent']:.2f}% ({value['covered']}/{value['count']})\n")
+              f.write('\nIntegration/reference test files are excluded. Native coverage does not measure the WASM wrapper.\n')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: rust-coverage
+          path: coverage/rust
+          retention-days: 7
+          if-no-files-found: error
+
+  web-coverage:
+    name: Web unit coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        with:
+          tool: wasm-bindgen-cli@0.2.129
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: apps/web
+      - run: node scripts/ci/check-versions.mjs
+      - run: pnpm wasm
+        working-directory: apps/web
+      - run: pnpm coverage
+        working-directory: apps/web
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - name: Summarize Web coverage
+        run: |
+          python - <<'PY'
+          import json, os
+          totals = json.load(open('apps/web/coverage/coverage-summary.json'))['total']
+          assert totals['lines']['total'] > 0, 'No measured Web lines'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('### Web unit coverage\n\n')
+              for kind in ['lines', 'functions', 'branches']:
+                  value = totals[kind]
+                  f.write(f"- {kind}: {value['pct']:.2f}% ({value['covered']}/{value['total']})\n")
+              f.write('\nIncludes unimported UI/3D source; generated WASM glue is excluded. Browser E2E coverage is not included.\n')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: web-coverage
+          path: apps/web/coverage
+          retention-days: 7
+          if-no-files-found: error
+
+  mutation-regressions:
+    name: Known mutation regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+      - run: node --test scripts/ci/*.test.mjs
+      - run: node scripts/ci/mutation-smoke.mjs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: mutation-regressions
+          path: coverage/mutations
+          retention-days: 7
+          if-no-files-found: error
+
+  full-mutations:
+    name: Full core mutations (${{ matrix.shard }}/8)
+    if: github.event_name == 'schedule' || inputs.full_mutations
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        with:
+          tool: cargo-mutants@27.1.0
+      - name: Test core mutants
+        run: cargo mutants --package voxelshogi-core --shard "$SHARD/8" --timeout 90 --jobs 2 --cargo-arg=--locked
+        env:
+          SHARD: ${{ matrix.shard }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: full-mutations-${{ matrix.shard }}
+          path: mutants.out
+          retention-days: 7
+          if-no-files-found: error

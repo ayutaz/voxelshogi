@@ -12,6 +12,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "deploy": "../../scripts/cf.sh deploy"
   },
@@ -31,6 +32,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "jsdom": "^30.1.3",
@@ -45,6 +47,9 @@
     "overrides": {
       "miniflare>undici": "7.30.1"
     },
-    "onlyBuiltDependencies": ["esbuild", "workerd"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
   }
 }

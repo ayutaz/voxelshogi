@@ -12,6 +12,9 @@ dist/
 *.tsbuildinfo
 playwright-report/
 test-results/
+coverage/
+mutants.out/
+mutants.out.old/
 # Python
 __pycache__/
 *.py[cod]

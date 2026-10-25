@@ -10,6 +10,54 @@ use voxelshogi_core::{
 
 const NO_HANDS: Hands = [[0; 7]; 2];
 
+#[test]
+fn move_errors_display_the_reason_for_users() {
+    assert_eq!(
+        MoveError::Illegal("own king exposed".into()).to_string(),
+        "illegal move: own king exposed"
+    );
+    assert_eq!(MoveError::GameOver.to_string(), "the game is over");
+}
+
+#[test]
+fn hand_count_returns_each_sides_count_and_zero_for_undroppable_kinds() {
+    let black = [1, 2, 3, 4, 5, 6, 7];
+    let white = [7, 6, 5, 4, 3, 2, 1];
+    let state = GameState::from_parts(kings_and(&[]), [black, white], Color::Black);
+    for (color, expected) in [(Color::Black, black), (Color::White, white)] {
+        for (kind, count) in PieceKind::HAND.into_iter().zip(expected) {
+            assert_eq!(state.hand_count(color, kind), count, "{color:?} {kind:?}");
+        }
+        for kind in [
+            PieceKind::King,
+            PieceKind::Tokin,
+            PieceKind::PromotedLance,
+            PieceKind::PromotedKnight,
+            PieceKind::PromotedSilver,
+            PieceKind::Horse,
+            PieceKind::Dragon,
+        ] {
+            assert_eq!(state.hand_count(color, kind), 0, "{color:?} {kind:?}");
+        }
+    }
+}
+
+#[test]
+fn every_hand_kind_can_be_dropped_when_all_seven_are_held() {
+    // With only distant kings, the centre is empty and is a legal drop square
+    // for every kind: no nifu, dead end, own check, or pawn-drop mate.
+    for side in Color::ALL {
+        let state = GameState::from_parts(kings_and(&[]), [[1; 7]; 2], side);
+        let legal = state.legal_moves();
+        for kind in PieceKind::HAND {
+            assert!(legal.contains(&Move::Drop {
+                kind,
+                to: sq(4, 4, 4),
+            }));
+        }
+    }
+}
+
 fn hands_with(color: Color, kind: PieceKind, n: u8) -> Hands {
     let mut h = NO_HANDS;
     h[color.index()][kind.hand_index().unwrap()] = n;

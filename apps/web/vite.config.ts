@@ -8,5 +8,13 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.{ts,tsx}'],
     environment: 'node',
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/wasm/pkg/**'],
+      reporter: ['text', 'html', 'lcov', 'json-summary'],
+      reportsDirectory: 'coverage',
+      reportOnFailure: true,
+    },
   },
 });

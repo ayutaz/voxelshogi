@@ -37,9 +37,9 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 
 | 順 | 目的 | 主な変更先 | 完了条件 | 状態 |
 |---|---|---|---|---|
-| M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | 🟡 ローカル検証済み、CI 確認待ち |
+| M0-1 | CI 自体の誤りと環境のずれを検出する | `ci.yml`、`rust-toolchain.toml`、Web lint 設定、ビルドスクリプト | 固定環境で既存テストが通り、意図した lint・型・テストの失敗を検出する | ✅ main の検査と Gate 成功、異常系検証済み |
 | M0-2 | 依存関係とコードのセキュリティを継続確認する | `ci.yml`、`dependabot.yml`、`security.yml`、`deny.toml`、`SECURITY.md`、GitHub 設定 | 監査と CodeQL が成功し、更新 PR と非公開報告の経路が使える | 🟡 ローカル監査・保護機能の有効化済み、CI 確認待ち |
-| M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | ⬜ |
+| M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | 🟡 ローカル計測・既知の9変異検出済み、CI 確認待ち |
 | M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | ⬜ |
 | M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ⬜ |
 
@@ -145,3 +145,32 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 - 隔離 fixture の undici 7.30.0 と lz4-sys 1.9.3 を監査が拒否し、それぞれ GHSA-xjj6-f33q-929c / RUSTSEC-2022-0051 を検出した。fixture の依存コードは実行していない。
 - 依存変更後も Web lint/typecheck・33単体テスト・build・Chrome E2E 5件が成功。Gate は追加した RED 3件を確認後、9件が成功。PR の dependency-review 省略を許さず、push/手動時の正常な省略だけを許可する。
 - CodeQL の実行結果、更新 PR、fork/Dependabot PR の動作は GitHub での確認後に追記する。
+
+### M0-3 初回計測
+
+2026-10-25: `quality.yml` に Rust/Web カバレッジと既知の変異9件を週次・手動実行として追加。一般的な変異の調査は cargo-mutants 27.1.0 で core 全体を8分割し、週次または `full_mutations: true` で実行する。これらは PR の必須 Gate から分離する。
+
+| ローカル実測 | 結果 | 対象 |
+|---|---|---|
+| Rust 行カバレッジ | 93.94%（1427 / 1519） | core。`tests/` の独立参照実装・統合テストと `examples/` を計測値から除外。WASM ラッパーは対象外 |
+| Web 単体の行カバレッジ | 35.37%（127 / 359） | 未importの UI/3D ソースも含む。生成 WASM glue とブラウザ E2E の計測値は含まない |
+| 既知の変異 | 9 / 9 をテスト失敗で検出 | 先手の前進方向、詰みの勝者、Zobrist seed、駒index、成り状態、駒名、エラー表示、持ち駒数、全7種類の持ち駒からの駒打ち |
+
+Web の UI/3D は単体テストの未計測領域として残す。既存の実ブラウザ E2E 5件の成功と、単体テストのカバレッジは別の証拠として扱う。割合を上げる目的で対象ソースを除外しない。
+
+変異スクリプトは元コードを一時領域にコピーし、baseline 成功後に1件ずつ変更する。元のワークツリーは変更しない。テスト0件・ビルド不能・timeout は検出成功に数えず失敗とする。この判定は RED 確認後に2テストが成功し、timeout を検出成功扱いする変異もテストが拒否した。通常 CI の制御用テストは計11件。
+
+LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測行0件を成功扱いにしない。M0-1 の GitHub 初回実行では actionlint の導入Actionが未対応と判明したため、公式の1.7.12配布を固定 SHA256 で検証する導入に修正した（`c29432f`）。GitHub 実行結果と、全体変異調査の生き残りの分類は確認後に追記する。
+
+ユーザー指定により Python は3.14系を基本とし、未対応の依存に限って3.13系を使う。現在は `.python-version` で3.14.9に固定し、計測ジョブにも setup-python を明示した。ローカルの集計処理は3.14.9で実行し、計測行0件を拒否する異常系も確認した。[Python 3.14.9](https://www.python.org/downloads/release/python-3149/)
+
+広い変異調査で駒index・未成駒の成り判定・日本語駒名・エラー表示・持ち駒数・全7種類の持ち駒からの駒打ちの検証不足を発見し、手書きの期待値による6テストを追加した。追加したテストが各変異を拒否することを、コピー上で再現した。Rust は計86テスト。一般的な変異調査の生き残りを除外して数値だけを改善する設定は追加していない。
+
+改善前の Rust 行カバレッジは92.56%だった。表の93.94%は最初の4テスト追加後（84テスト時）の計測値。計測用には test の最適化を0にし、最適化2で発生した LLVM の関数データ不一致の警告を解消した。通常の Rust テストは最適化2を維持する。
+
+### GitHub での初回検証
+
+- main の [CI run 40167203527](https://github.com/ayutaz/voxelshogi/actions/runs/40167203527): lint・Rust・MSRV・Web・依存監査・CI Gate が成功。PR 専用の dependency-review は意図した省略。
+- main の [Security run 40167203380](https://github.com/ayutaz/voxelshogi/actions/runs/40167203380): Rust・JavaScript/TypeScript・Actions の CodeQL が成功。API で未解決 code scanning alerts は0件と確認。
+- [Dependabot PR #1](https://github.com/ayutaz/voxelshogi/pull/1): 更新 PR の作成と、dependency-review・依存監査・全テスト・CodeQL・CI Gate の成功、本番 deploy の省略を確認。
+- main でも PR 専用ジョブの省略が deploy に伝わる問題を発見したため、成功した Gate と非キャンセル状態を明示する条件に修正（`944c337`）。本番 deploy・公開後検証の追跡は M0-4 で行う。
