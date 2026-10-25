@@ -51,6 +51,14 @@ test('CIを確認した直後の短いwait・sleepを拒否し、監視終了は
   assert.equal(denied(check(waiting('functions.wait', { terminate: true }), minute)), false)
 })
 
+test('10分以上の一度の待機は許可し、1ms短い待機は拒否する', t => {
+  const check = fixture(t)
+  check(bash('gh pr checks 4'))
+  assert.equal(denied(check(waiting('clock.sleep', { duration_ms: 10 * minute - 1 }), minute)), true)
+  assert.equal(denied(check(waiting('clock.sleep', { duration_ms: 10 * minute }), minute)), false)
+  assert.equal(denied(check(bash('sleep 600'), minute)), false)
+})
+
 test('別の実作業を挟んだ後のビルド待ちを拒否しない', t => {
   const check = fixture(t)
   check(bash('gh pr checks 4'))

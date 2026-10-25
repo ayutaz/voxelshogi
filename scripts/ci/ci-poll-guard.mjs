@@ -37,6 +37,8 @@ export function checkPolicy(event, { stateDir = join(root, '.codex/.local/ci-pol
   const command = name === 'Bash' ? input.command ?? '' : ''
   const kind = classify(command)
   const wait = /^(?:(?:functions|clock)\.)?(?:wait|sleep)$/.test(name) || /^\s*sleep\s+\d/.test(command)
+  const waitMs = Number(input.duration_ms ?? input.yield_time_ms ??
+    (command.match(/^\s*sleep\s+(\d+(?:\.\d+)?)\s*$/)?.[1] ?? 0) * 1000)
   if (kind.fastWatch || kind.loop) return deny('CIの短いwatch・独自監視ループは使えません。単発確認か --interval 600 以上を使ってください。')
   if (input.terminate === true) return {}
   // An orchestration wrapper is not independent work between CI and its wait.
@@ -60,7 +62,7 @@ export function checkPolicy(event, { stateDir = join(root, '.codex/.local/ci-pol
     }
     if (!Array.isArray(state.waitingSessions) || (state.lastCheckAt !== null && !Number.isFinite(state.lastCheckAt))) throw new Error('Invalid polling state')
     const session = event.session_id ?? 'unknown'
-    if (wait && state.waitingSessions.includes(session)) return deny('CI待ちだけのwait/sleep呼び出しは繰り返しません。別作業を進めるか、CI未完了と記録して戻ってください。')
+    if (wait && waitMs < intervalMs && state.waitingSessions.includes(session)) return deny('CI待ちだけの短いwait/sleep呼び出しは繰り返しません。別作業を進めるか、CI未完了と記録して戻ってください。')
     if (kind.status) {
       const elapsed = nowMs - (state.lastCheckAt ?? -Infinity)
       if (elapsed < intervalMs) return deny(`CI再取得まであと${Math.ceil((intervalMs - elapsed) / 1000)}秒です。短いwaitループで待たないでください。`)
