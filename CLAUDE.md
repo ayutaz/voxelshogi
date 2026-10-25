@@ -22,6 +22,7 @@
 
 ## 開発規約（必読）
 
+- **実装・文書変更の前に必ず作業ブランチを作る。main に直接 commit / push しない。** `AGENTS.md` と `CONTRIBUTING.md` に従い、PR を作成して必須7チェックの成功後に取り込む。main 保護を無効化したり bypass したりしない。
 - **TDD を厳守する**（ユーザー指示）。テストを先に書き、失敗（RED）を確認してから最小の実装をする。
   - テストは、空の結果で通ってしまう抜け穴がないように書く。
   - 期待値は「ルール文からの手計算」または「独立した参照実装」で用意する。エンジンの出力をそのまま正解値にしない。
@@ -45,13 +46,16 @@ pnpm install
 pnpm wasm          # WASM ビルド（wasm32 target と wasm-bindgen-cli 0.2.129 が必要）
 pnpm test          # Vitest（実 WASM を Node で読み込む）
 pnpm typecheck
-pnpm vite build && pnpm e2e   # Playwright（ローカルはインストール済み Chrome、CI は PW_CHANNEL='' で Chromium）
+pnpm build && pnpm e2e   # 型検査と配信 SHA を含む build。ローカルは Chrome、CI は PW_CHANNEL='' で Chromium
 pnpm dev
 
+# 以下はリポジトリのルートで実行する
+cd ../..
 # 公開サイト
 scripts/cf.sh whoami                                        # 個人アカウントであることを確認
 scripts/cf.sh deploy                                        # apps/web/dist を手動デプロイ
-E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サイトに E2E を実行
+published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
+E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm --dir apps/web e2e
 ```
 
 ## 決定事項（ユーザー確認済み）
@@ -75,7 +79,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1 完了、M0-2〜4 を検証中）
+  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。M0-1 完了。依存監査・CodeQL・品質計測と本番公開・Secrets 移行は成功。main 保護設定済み、PR と fork 経路の検証・全体変異の残件分類・復旧訓練が残る）
   1. M1: 探索AI（Rust）
   2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証

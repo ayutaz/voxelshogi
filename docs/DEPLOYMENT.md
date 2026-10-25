@@ -1,6 +1,6 @@
 # デプロイ（Cloudflare Workers Static Assets）
 
-M0-4 の構成を実装し、検証中。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。本番での確認結果と secrets の移行状態は同書に記録する。
+M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した成果物での復旧訓練は未実施。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
 ## 構成
 
@@ -19,7 +19,9 @@ M0-4 の構成を実装し、検証中。調査・計画・検証記録は [CI_C
 4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する
 5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 6件を実行する
 
-CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
+CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR では CodeQL 3種類、Rust/Web カバレッジと既知変異の3種類も必須とする。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
+
+変更は必ず作業ブランチから PR を作成する。main は PR・最新 main に対する必須チェックを要求し、force push・削除・bypass を禁止する。[開発手順](../CONTRIBUTING.md)
 
 リポジトリは 2026-10-25 に Public 化した。Public リポジトリの GitHub Actions（標準ランナー）は無料のため、Private 時代に出ていた「Actions budget」による未起動は解消している。同日の初回実行で、`rust`（約40秒）と `web`（約1分20秒、E2E 5件を含む）がともに成功した。
 
@@ -33,7 +35,7 @@ CodeQL は別の Security workflow、カバレッジと変異テストは Qualit
 
 `production` 環境は作成済みで、デプロイ元は main に制限済み（M0-4、2026-10-25）。Cloudflare の管理画面で新しい API トークンを発行し、`gh secret set --env production` へ直接登録した。権限は指定の個人アカウントの Workers スクリプト編集、有効期限なし（ユーザー承認済み）。この権限はアカウント内の全 Workers が対象。日常の自動公開に人手の承認待ちは追加しない。
 
-認証情報は会話・ローカルファイル・Actions artifact に保存しない。登録後に本番 CI が成功したことを確認してから、不要になった repository 側の同名 Secrets を削除する。既存の Cloudflare トークン自体は、他の利用先への影響を確認せず失効させない。
+認証情報は会話・ローカルファイル・Actions artifact に保存しない。新しい production Secrets を使った [CI 40170836102](https://github.com/ayutaz/voxelshogi/actions/runs/40170836102) の公開と公開 E2E が成功した後、repository 側の同名 Secrets を削除済み。production 側の2件は保持している。既存の Cloudflare トークン自体は失効させていない。他の利用先への影響を確認せず失効させない。
 
 main の最新候補は、CI から自動デプロイされる（2026-10-25 に初回の自動デプロイが成功）。本番でトークン・アカウント ID・サブドメインが不足した場合は失敗とする。PR と通常の手動 CI は本番公開しない。PR の古い CI は中断し、main のビルド・テストは run ごとに実行する。本番公開・公開後検証は production のロックで直列化し、次の push で中断しない。
 
@@ -75,7 +77,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 
 2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 
-M0-4 では SHA 確認を加えた6件に拡張する。`build-info.json` は `Cache-Control: no-store` で配信し、検証の取得にも対象 SHA の query を付ける。`E2E_COMMIT` を省略した手動実行は、SHA 確認だけが skip となるため、版の一致の証拠には使わない。
+M0-4 では SHA 確認を加えた6件に拡張済み。`0e29eb4` の CI で公開 E2E 6件が成功し、公開 URL の `build-info.json` も同じ完全長 SHA と確認した。人間同士の対局・マルチプレイはなく、人間 vs AI と AI 観戦のみを検証する。`build-info.json` は `Cache-Control: no-store` で配信し、検証の取得にも対象 SHA の query を付ける。`E2E_COMMIT` を省略した手動実行は、SHA 確認だけが skip となるため、版の一致の証拠には使わない。
 
 ## 復旧手順
 
