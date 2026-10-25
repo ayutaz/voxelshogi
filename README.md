@@ -21,6 +21,8 @@
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
+次は M0（CI/CD と品質基盤）を整えてから、M1（探索AI）へ進みます。[調査結果と実装計画](docs/CI_CD_PLAN.md) をまとめています（設定の実装は未着手）。
+
 ## ローカルで動かす
 
 必要なもの: Rust（stable）と `wasm32-unknown-unknown` ターゲット、`wasm-bindgen-cli` 0.2.129、Node.js、pnpm。
@@ -44,6 +46,7 @@ pnpm dev                        # http://localhost:5173
 | [docs/GAME_ENGINE.md](docs/GAME_ENGINE.md) | エンジンの API・VSFEN・性能 |
 | [docs/ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md) | 設計判断（ADR） |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | CI と Cloudflare へのデプロイ |
+| [docs/CI_CD_PLAN.md](docs/CI_CD_PLAN.md) | CI/CD の現状調査・M1 前の強化計画と完了条件 |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | 調査サマリ（[関連研究](docs/RELATED_WORK.md)・[技術](docs/TECH_STACK_RESEARCH.md)・[費用](docs/COST_ESTIMATE.md)） |
 
 ## ライセンス

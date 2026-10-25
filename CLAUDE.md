@@ -6,6 +6,7 @@
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
 - 設計判断: `docs/ARCHITECTURE_DECISIONS.md`、エンジン: `docs/GAME_ENGINE.md`、デプロイ: `docs/DEPLOYMENT.md`
+- M1 前の CI/CD 強化計画と調査結果: `docs/CI_CD_PLAN.md`（M0。実装は未着手）
 
 ## 構成
 
@@ -72,6 +73,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev pnpm e2e   # 公開サ�
   - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
+  0. M0: CI/CD と品質基盤（`docs/CI_CD_PLAN.md`。調査・計画済み、実装は未着手）
   1. M1: 探索AI（Rust）
   2. M2: Web で AI と対局（Normal 難易度、Web Worker）
   3. M3: ブラウザでのモデル推論の検証

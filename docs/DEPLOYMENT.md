@@ -1,5 +1,7 @@
 # デプロイ（Cloudflare Workers Static Assets）
 
+本書は現在の構成を説明する。2026-10-25 に調査した main 保護・セキュリティ・公開後検証の不足と、M1 前に行う M0 の実装計画は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。以下の設定は、M0 実装時に更新する。
+
 ## 構成
 
 - `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
