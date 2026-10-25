@@ -3,8 +3,9 @@
 use std::fmt;
 
 /// The side to move. Black (先手, ☗) moves first and moves towards decreasing `y`.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, PartialOrd, Ord)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(
+    Clone, Copy, PartialEq, Eq, Hash, Debug, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 pub enum Color {
     Black = 0,
     White = 1,
@@ -50,8 +51,9 @@ impl Color {
 }
 
 /// All 14 piece kinds (8 base kinds and 6 promoted kinds).
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, PartialOrd, Ord)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(
+    Clone, Copy, PartialEq, Eq, Hash, Debug, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 pub enum PieceKind {
     Pawn = 0,
     Lance = 1,
@@ -229,8 +231,7 @@ impl PieceKind {
 }
 
 /// A piece on the board.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Piece {
     pub color: Color,
     pub kind: PieceKind,

@@ -18,8 +18,9 @@ pub const SIZE: usize = 9;
 pub const NUM_SQUARES: usize = SIZE * SIZE * SIZE;
 
 /// A square on the board, stored as `z * 81 + y * 9 + x`.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(
+    Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 pub struct Square(u16);
 
 impl Square {

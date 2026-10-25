@@ -11,8 +11,7 @@ use crate::zobrist::hash_position;
 /// Pieces in hand: `hands[color][hand_index]`, see [`PieceKind::HAND`].
 pub type Hands = [[u8; NUM_HAND_KINDS]; 2];
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub enum WinReason {
     /// The loser had no legal move (詰み).
     Checkmate,
@@ -21,15 +20,15 @@ pub enum WinReason {
     PerpetualCheck,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub enum DrawReason {
     /// The same position occurred four times (千日手).
     Repetition,
+    /// Not a rule outcome: a game adjudicated as a draw by a move limit (AI play / datasets).
+    MaxPlies,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub enum GameResult {
     Win { winner: Color, reason: WinReason },
     Draw { reason: DrawReason },
@@ -120,6 +119,61 @@ impl GameState {
             in_check,
         });
         s
+    }
+
+    /// Sets the absolute ply counter (e.g. from a VSFEN move number).
+    pub fn with_ply(mut self, ply: u32) -> GameState {
+        self.ply = ply;
+        self
+    }
+
+    /// Checks that the position could arise in a game: one king per side, piece totals
+    /// within the 372-piece set, no 行き所のない駒, no 二歩, and the side not to move
+    /// is not in check.
+    pub fn validate(&self) -> Result<(), String> {
+        const TOTAL: [u32; NUM_HAND_KINDS] = [162, 64, 48, 32, 16, 24, 24];
+        let mut totals = [0u32; NUM_HAND_KINDS];
+        let mut kings = [0u32; 2];
+        let mut pawn_columns = std::collections::HashSet::new();
+        for (s, p) in self.board.pieces() {
+            if p.kind == PieceKind::King {
+                kings[p.color.index()] += 1;
+                continue;
+            }
+            totals[p.kind.unpromote().hand_index().expect("non-king")] += 1;
+            if dead_end(p.kind, p.color, s.y()) {
+                return Err(format!("{p} on {s} can never move"));
+            }
+            if p.kind == PieceKind::Pawn && !pawn_columns.insert((p.color, s.x(), s.z())) {
+                return Err(format!(
+                    "two {:?} pawns in the column of {s} (二歩)",
+                    p.color
+                ));
+            }
+        }
+        if kings != [1, 1] {
+            return Err(format!(
+                "each side needs exactly one king (black {}, white {})",
+                kings[0], kings[1]
+            ));
+        }
+        for color in &self.hands {
+            for (i, &n) in color.iter().enumerate() {
+                totals[i] += n as u32;
+            }
+        }
+        for (i, kind) in PieceKind::HAND.into_iter().enumerate() {
+            if totals[i] > TOTAL[i] {
+                return Err(format!(
+                    "{} {kind:?} pieces exceed the {} in the set",
+                    totals[i], TOTAL[i]
+                ));
+            }
+        }
+        if self.is_in_check(self.side.opponent()) {
+            return Err("the side not to move is in check".to_string());
+        }
+        Ok(())
     }
 
     pub fn board(&self) -> &Board {

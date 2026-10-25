@@ -7,7 +7,9 @@ pub mod board;
 pub mod coord;
 pub mod movegen;
 pub mod moves;
+pub mod notation;
 pub mod piece;
+pub mod record;
 pub mod state;
 pub mod zobrist;
 
