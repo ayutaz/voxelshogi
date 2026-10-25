@@ -51,6 +51,7 @@ pnpm dev                        # http://localhost:5173
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
 | [docs/M1_PLAN.md](docs/M1_PLAN.md) | 次の探索AIの実装順・テスト・完了条件 |
 | [docs/RULESET.md](docs/RULESET.md) | ルール（`voxelshogi-standard-v1`） |
+| [docs/RULE_VARIANTS_RESEARCH.md](docs/RULE_VARIANTS_RESEARCH.md) | 9層同一配置・複数王の調査と未採用の試作案 |
 | [docs/GAME_ENGINE.md](docs/GAME_ENGINE.md) | エンジンの API・VSFEN・性能 |
 | [docs/ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md) | 設計判断（ADR） |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | CI と Cloudflare へのデプロイ |
