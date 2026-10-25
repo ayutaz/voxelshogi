@@ -10,5 +10,23 @@
     "file": "crates/voxelshogi-core/src/state.rs",
     "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
     "reason": "docs/M0_VALIDATION.md: a fourfold repetition span contains both alternating sides, so the separate any guard is true for either side. The check-filter is unchanged."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:107:13: replace > with >= in room",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "All room callers supply signs -1 or 1, never zero; > 0 and >= 0 therefore agree. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:178:34: replace || with && in Gen<'_>::rook",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "If exactly one dimension is zero, the nested 1..=umax/1..=vmax output loop is empty. Initializing the other DP edge only performs in-bounds reads and changes local scratch memory. No target is added either way. See docs/M0_VALIDATION.md."
+  },
+  {
+    "name": "crates/voxelshogi-core/src/movegen.rs:232:37: replace > with >= in Gen<'_>::bishop",
+    "file": "crates/voxelshogi-core/src/movegen.rs",
+    "source_sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d",
+    "reason": "All three direction signs come from [-1, 1], so > 0 and >= 0 encode the same direction bits. See docs/M0_VALIDATION.md."
   }
 ]

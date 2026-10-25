@@ -9,7 +9,7 @@
 - 通常 CI: [40181542610](https://github.com/ayutaz/voxelshogi/actions/runs/40181542610)
 - CodeQL: [40181542576](https://github.com/ayutaz/voxelshogi/actions/runs/40181542576)
 - 品質計測: [40181542587](https://github.com/ayutaz/voxelshogi/actions/runs/40181542587)
-- 統合後の本番公開: [40183599117](https://github.com/ayutaz/voxelshogi/actions/runs/40183599117) を追跡中。
+- 統合後の本番公開: [40183599117](https://github.com/ayutaz/voxelshogi/actions/runs/40183599117) でdeploy・配信SHA・公開E2Eがすべて成功。公開URLも `e3f7f7a392d58ebc167d3f058eaa2f35b2f0f6cc` と一致、Cloudflare version IDは `0f356b50-806b-4621-aecf-c554ccdf7a71`。
 
 fork PR の実検証は未実施で、外部からの開発参加を受け入れる際の追加確認とする。ユーザーから必要性を問われ、現在の一人開発における M0 の必須条件としたのは過剰だったと見直した。通常PR・Dependabot・本番環境の制限は引き続き必須検証とし、forkを検証済みとは扱わない。
 
@@ -72,10 +72,24 @@ E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e
 
 core全体の758件は別範囲として、[8分割の手動実行40184455263](https://github.com/ayutaz/voxelshogi/actions/runs/40184455263) で調査中。このrunは `d9f5509` のため、2同値を分類する新しい集計ステップはまだ含まない。raw出力を取得後に新集計で照合し、見つかった未分類変異は個別に確認する。232件だけの結果をcore全体の結果とは扱わない。
 
+### core全体の追加調査
+
+ローカルでも、既存の232件と重複しない526件を実行中。生成された全758件の名前集合が232件と526件の和集合と一致し、交差が空であることを確認した。
+
+追加範囲で `Board::Debug` の空出力、`Square::from_index` の上限729を許してしまう変異、`Square::offset` のz方向の符号反転、`Square` のDebug/Displayを空にする計5変異を発見した。`geometry_contracts.rs` に盤面・座標表示、明示的な座標インデックス、各軸の加算と全6境界の3テストを追加し、全5変異をコピー上で検出した。特にz方向の対称性がある利き生成では符号反転が集合比較から漏れるため、座標演算そのものに手計算の期待値を置いた。正常コードのRustは95テスト成功。
+
+分割2の95件は91 caught・1 unviable・3 missed。missedは次の同値変異と確認し、raw成果物を新集計で照合して91 caught・1 unviable・3 equivalentになった。変異名と `movegen.rs` 全体のソースハッシュを承認リストへ記録した。全8分割の完了を意味する結果ではない。
+
+| 変異 | 同値の根拠 |
+|---|---|
+| `room` の `sign > 0` → `sign >= 0` | 呼び出し側が渡す値は `[-1, 1]` のみで、0は渡らない |
+| 飛車の `umax == 0 || vmax == 0` → `&&` | 片方が0なら出力用の二重ループは空。追加で初期化するDPの片辺も盤内読み取りと局所変数の更新だけで、移動先の集合を変えない |
+| 角の方向bit生成の `sign > 0` → `sign >= 0` | 3軸の符号もそれぞれ `[-1, 1]` だけで、方向bitは変わらない |
+
 ### 継続実行での同値変異の扱い
 
 `scripts/ci/mutation-report.mjs` が全体調査の出力を照合する。変異を生成対象から除外せず、完了した baseline、空でない inventory と全結果の1対1対応、各変異の build/test 結果を確認する。未知の生き残り、timeout、途中終了、欠落したテスト結果、ツール版の変更は失敗とする。ビルド不能は unviable のままで、caught に含めない。
 
-同値2件は `scripts/ci/equivalent-mutations.json` に理由と対象ソース全体の SHA-256 を保存し、完全一致したものだけ equivalent に分類する。M1等で対象ソースが変わった場合は同値の根拠を再確認する。集計を `review.json` として raw report と一緒に保存する。cargo-mutants の終了コード2（生き残りあり）はこの照合を通った場合だけ成功とする。
+確認した同値変異は `scripts/ci/equivalent-mutations.json` に理由と対象ソース全体の SHA-256 を保存し、完全一致したものだけ equivalent に分類する。M1等で対象ソースが変わった場合は同値の根拠を再確認する。集計を `review.json` として raw report と一緒に保存する。cargo-mutants の終了コード2（生き残りあり）はこの照合を通った場合だけ成功とする。
 
 集計処理は RED を確認後、6テストが成功した。ソースハッシュ照合を無効にする変異もテストが拒否した。CI制御用テストは計26件。
