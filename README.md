@@ -4,9 +4,11 @@
 
 9×9×9（729マス・372枚）の三次元将棋を題材にした、再現可能な三次元将棋AI研究プラットフォームです（開発中）。
 
+**AI vs AIの対局を見て・眺める体験を中心に、そのためのモデルを開発・研究します。** ゲームとしての面白さ、分かりやすさ、見映えを重視し、対局する場合は人間 vs AIを用意します。
+
 - Rust製ルールエンジン（WebAssembly / Python から共通利用）
 - ブラウザで遊べる VoxelShogi Arena — **https://voxelshogi.yousan-apps.workers.dev** （Alpha 版）
-- 対局モード: 人間 vs AI（先手・後手）、AI vs AI 観戦
+- 主用途: AI vs AI 観戦。補助機能: 人間 vs AI（先手・後手）
 - エンジンによる合成データセット / Transformer Policy-Value モデル（Hugging Face 公開予定）
 
 ルールは [将棋ったー「三次元将棋」](https://shogitter.com/rule/三次元将棋)（2026-10-17 改定版）に準拠します。詳細は [docs/RULESET.md](docs/RULESET.md) を参照してください。
@@ -26,7 +28,7 @@ M0（CI/CD と品質基盤）は、PRの取り込み・公開後検証まで完�
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
-現在の対戦相手はランダムAIです。M3・M6では、実機のブラウザで動く変換済みモデルをデモに組み込みます。公開する FP16・量子化版なども個別に選択して対局・観戦できるようにし、配信する同じモデルで精度・棋力・速度・サイズを評価します。
+現在の観戦・対局で使うAIはランダムAIです。M3・M6では、実機のブラウザで動く変換済みモデルをデモに組み込みます。公開する FP16・量子化版なども個別に選択して対局・観戦できるようにし、配信する同じモデルで精度・棋力・速度・サイズを評価します。
 
 ## ローカルで動かす
 
@@ -51,6 +53,7 @@ pnpm dev                        # http://localhost:5173
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
 | [docs/M1_PLAN.md](docs/M1_PLAN.md) | 次の探索AIの実装順・テスト・完了条件 |
 | [docs/RULESET.md](docs/RULESET.md) | ルール（`voxelshogi-standard-v1`） |
+| [docs/RULE_VARIANTS_RESEARCH.md](docs/RULE_VARIANTS_RESEARCH.md) | 9層同一配置・複数王の調査と未採用の試作案 |
 | [docs/GAME_ENGINE.md](docs/GAME_ENGINE.md) | エンジンの API・VSFEN・性能 |
 | [docs/ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md) | 設計判断（ADR） |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | CI と Cloudflare へのデプロイ |
