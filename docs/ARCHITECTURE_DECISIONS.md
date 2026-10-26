@@ -112,3 +112,10 @@
 - **決定**: `search` モジュールに標準1王のαβを実装。評価は手番側の駒得と±1,000,000の終局値、詰み距離補正なし。反復深化・手の並べ替え・置換表を個別に切り替え、未完了反復は採用しない。WASMの時計を注入できるAPIを用意する。
 - **理由**: 候補の省略を行わず、独立した全探索と照合できる。置換表は呼び出し単位で新規作成し、深さ・ゲーム上限の残り手数を区別する。履歴の最大出現数＋探索深さが4未満と証明できるノードだけ履歴を省略し、他は再利用を止めることで、千日手・連続王手の履歴を混同しない。
 - **影響**: 固定深さ／ノードでは結果を再現できる。時間はsoft deadlineで1処理分の超過を許し、時間だけの再現性は約束しない。Nativeの単独計測を残すが、Webの難易度はM2のWASM/Workerで決める。R0の仕様・棋譜は維持し、正式な9王採用は別に判断する。全体調査で見つかったR0の検証不足を補強し、生成ループにも指し手数による独立した上限を付けた。結果は [M1検証記録](M1_VALIDATION.md)。
+
+## ADR-018: 履歴付き専用Workerと観戦を中心にしたWeb探索（2026-10-27）
+
+- **状況**: M1の同期探索を表示スレッドで実行すると操作が止まる。盤面hashだけでは千日手の履歴や、同じ盤面へ戻った新しい対局を識別できない。
+- **決定**: WASMはブラウザの単調時計を注入する薄い `bestMove` APIとする。専用のmodule Workerが全棋譜とカーソルを検証・復元し、通常の連続着手では再利用する。中断時はterminateし、request ID・revision・ruleset・カーソル・hash・手番・難易度を照合する。表示側でもrevisionと根を再確認し、検証付きplayを使う。
+- **理由**: 同期WASM実行中はcancelメッセージを処理できない。メッセージ・エラーの古い通知も破棄し、通信不正は表示して再試行する。Normalからランダムへ無言で切り替えない。[Worker terminate仕様](https://developer.mozilla.org/en-US/docs/Web/API/Worker/terminate)・[Viteのmodule Worker](https://vite.dev/guide/features.html#web-workers)。
+- **影響**: 初期モードはNormal同士の観戦・一時停止・2D。明示的な再開／1手送りを入口とし、3Dを選ぶまでそのコードを取得しない。3Dの準備完了は[rendererの描画統計](https://threejs.org/docs/pages/WebGLRenderer.html#WebGLRenderer~InfoRender)で実際のフレームを確認する。待ち時間と探索予算を分け、Normalは深さ6・50,000ノード・約1秒を基本とする。時間制限は引き続きsoft deadline。R0の固定9王棋譜、標準ルールID、Cloudflareのassets-only配信を維持し、SAB・COOP/COEP・NN推論・有料GPUは追加しない。実測と公開確認は [M2記録](M2_VALIDATION.md)。

@@ -33,7 +33,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 
 ## M2の進行中の差分（2026-10-27 JST）
 
-上記はM1完了時点の固定記録。作業ブランチ `feat/m2-worker-spectator` ではM2-1の `Game.bestMove`、ブラウザ時計、安全なJSON境界、Sessionの外部終局保持を実装・検証中。Workerと観戦UIへの接続、Normalの実機計測、初回ロード改善、M2の公開確認は未完了。[計画](M2_PLAN.md)・[段階別検証](M2_VALIDATION.md)。PR取り込みと本番反映の証拠は後続で追記する。
+上記はM1完了時点の固定記録。M2-1の `Game.bestMove`・時計・Sessionの終局保持は [PR #13](https://github.com/ayutaz/voxelshogi/pull/13) の必須7チェック成功後に通常取り込み済み。統合後のCIはaptダウンロードで中断し、この版の公開確認は未完了。`feat/m2-worker-client` では履歴付きWorker・観戦制御・3D分割を実装し、Web単体と実機ChromeのE2E21件を検証中。[計画](M2_PLAN.md)・[段階別検証](M2_VALIDATION.md)。固定SHAの計測・必須CI・M2の本番反映の証拠は後続で追記する。
 
 ## 文書の役割と更新範囲
 
@@ -44,7 +44,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。[M2_PLAN](M2_PLAN.md) が次の作業手順 |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies等のメタデータ再保存の制約も明記。M5互換性は未実施 |
 | [CI_CD_PLAN](CI_CD_PLAN.md)、[DEPLOYMENT](DEPLOYMENT.md) | 現行のCI・main保護・認証の配置・配信・復旧手順。過去のrunは固定記録として保持 |
-| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜017は当時の判断。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
+| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
 | [RULE_VARIANTS_RESEARCH](RULE_VARIANTS_RESEARCH.md) | ルールの先行調査と未実施の継続評価。標準のM1完了と9王への未適用を区別 |
 | [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。Gumbel・モデル構造・DDPを実装済み／確定採用と扱わない |

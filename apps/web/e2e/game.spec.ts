@@ -24,12 +24,16 @@ test('shows the initial position in 2D and 3D', async ({ page }) => {
   // layer V, rank 九: black king at file 5
   await expect(cell(page, idx(4, 8, 4))).toHaveText('玉');
   await expect(cell(page, idx(4, 6, 4))).toHaveText('歩');
+  await expect(page.getByTestId('board3d')).toHaveCount(0);
+  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
   await expect(page.getByTestId('board3d').locator('canvas')).toBeVisible();
-  await expect(page.getByTestId('mode')).toHaveValue('h-r');
+  await expect(page.getByTestId('mode')).toHaveValue('r-r');
   expect(await page.getByTestId('mode').locator('option').evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value))).toEqual(['h-r', 'r-h', 'r-r']);
 });
 
 test('human vs AI: select, see targets, move, inspect history, undo', async ({ page }) => {
+  await page.getByTestId('difficulty-w').selectOption('easy');
+  await page.getByTestId('mode').selectOption('h-r');
   await cell(page, idx(4, 6, 4)).click();
   await expect(page.locator('.board2d .cell.target')).toHaveCount(1);
   await expect(cell(page, idx(4, 5, 4))).toHaveClass(/target/);
@@ -51,6 +55,7 @@ test('human vs AI: select, see targets, move, inspect history, undo', async ({ p
 });
 
 test('human as White: the AI opens and answers automatically', async ({ page }) => {
+  await page.getByTestId('difficulty-b').selectOption('easy');
   await page.getByTestId('mode').selectOption('r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 5000 });
   await cell(page, idx(4, 2, 4)).click();
@@ -60,7 +65,9 @@ test('human as White: the AI opens and answers automatically', async ({ page }) 
 });
 
 test('AI vs AI can be watched and paused', async ({ page }) => {
-  await page.getByTestId('mode').selectOption('r-r');
+  await page.getByTestId('difficulty-b').selectOption('easy');
+  await page.getByTestId('difficulty-w').selectOption('easy');
+  await page.getByTestId('toggle-run').click();
   await expect.poll(async () => page.getByTestId('move-list').locator('li').count(), { timeout: 8000 }).toBeGreaterThan(4);
   await page.getByTestId('toggle-run').click();
   const n = await page.getByTestId('move-list').locator('li').count();
@@ -76,6 +83,8 @@ test('AI vs AI can be watched and paused', async ({ page }) => {
 });
 
 test('records round-trip through save and load, and invalid files are rejected', async ({ page }) => {
+  await page.getByTestId('difficulty-w').selectOption('easy');
+  await page.getByTestId('mode').selectOption('h-r');
   await cell(page, idx(4, 6, 4)).click();
   await cell(page, idx(4, 5, 4)).click();
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');

@@ -1,6 +1,6 @@
 # M2 実行計画：Webで探索AI同士を観戦
 
-更新: 2026-10-27。**M2-1のWASM探索APIを実装・検証中。M2全体は未完了。** M1はRustの探索まで完了した。Workerと観戦UIの接続は後続で、公開画面は引き続きランダムAI、比較室はR0の固定棋譜再生である。[現在地と確認元](STATUS.md)、[全体の目的・ゴール](ROADMAP.md)、[段階ごとの検証](M2_VALIDATION.md)。
+更新: 2026-10-27。**M2-1はPR #13で取り込み済み。M2-2〜4のWorker・観戦UI・3D分割を実装しローカル検証中。M2全体の公開確認は未完了。** 比較室は引き続きR0の固定棋譜再生である。[現在地と確認元](STATUS.md)、[全体の目的・ゴール](ROADMAP.md)、[段階ごとの検証](M2_VALIDATION.md)。
 
 ## 目的とゴール
 
@@ -37,15 +37,17 @@ M1の標準1王探索をブラウザへつなぎ、AI同士の攻防を画面を
 | M2-4 | バンドル分割とNormalの実機計測 | production buildでWorker/WASMを配信、2Dのみの初回取得、3Dの後読込と比較室への遷移 | 分割前後の計測JSON、端末別の予算・fallback判断 |
 | M2-5 | 通常統合と公開確認 | 全必須チェック、main CI、公開SHA、公開E2Eと実機操作 | 検証記録、API文書・ROADMAP・費用見積もりの更新 |
 
-### WASMとWorkerの契約案
+### WASMとWorkerの契約
 
-WASMの `Game.bestMove(configJson)` はM2-1で追加する同期API。[確定した入出力](GAME_ENGINE.md#wasm探索api) を使う。以下のWorkerメッセージはM2-2で固定する予定の契約であり、まだ存在するAPIとして扱わない。
+WASMの `Game.bestMove(configJson)` はM2-1の同期API。[入出力](GAME_ENGINE.md#wasm探索api) を使う。Workerのschemaは1で、実装の型・検証は `apps/web/src/ai/search-protocol.ts` にある。
 
 | メッセージ | 含める情報・扱い |
 |---|---|
 | 要求 | 一意なrequest ID、対局／状態のrevision、標準ruleset ID、検証可能な棋譜と表示カーソル、根のhash・手番、深さ／ノード／時間／ゲーム手数上限、最適化設定 |
 | 成功応答 | 要求の識別子、根のhash・手番、指し手または終局、評価の有無、完了深さ・総ノード・最終反復ノード・TTヒット・停止理由、計測した時間 |
 | 失敗応答 | 要求の識別子、入力／初期化／実行などのエラー種別。表示側を勝手に進めず、再試行／再開できる状態にする |
+
+実際の要求は `schema:1, kind:'search', requestId, revision, ruleset, recordJson, cursor, hash, side, difficulty, seed, limits`。`difficulty` は `easy | normal`、`seed` はu32、`limits` はWASMの設定。返答は同じ根の識別子と `kind:'result', result, metrics`、または `kind:'error', code, message`。`result` はWASMと同じフィールドを持ち、Easyだけ停止理由 `random` を追加する。`metrics` はWorker内部の `initMs, replayMs, searchMs, totalMs`、クライアントは往復時間 `roundTripMs` を追加する。
 
 境界ではschema、既知のruleset、4 MiB以下の棋譜、カーソル範囲を検証する。深さ0〜64、置換表容量0〜1,000,000を守り、時間は有限・非負、JSから数値で渡す整数は安全整数に限定する。u64のhashは16桁hex、ノード統計は安全整数または明示した文字列表現とし、暗黙の丸めを許さない。既存の標準棋譜schemaの上限を緩めない。
 
@@ -80,3 +82,11 @@ M2-1ではMaxPlies／Abandonedの再保存を修正し、終局情報は全棋�
 M3は変換済み未学習モデルの実機推論・配信方法・演算の検証、M4はPythonとデータ生成、M5は独立した実棋譜互換性、M6は学習済みモデルと各変換版の観戦である。M2ではGPUレンタル、R2の有効化、モデル／データの公開を行わない。9王の正式採用やM1探索の9王対応も別の検証として扱う。
 
 ユーザー側の追加準備はM2には不要。モデル／データのライセンス、必要なR2の支払い方法、M6の有料GPUの見積もり承認は [ROADMAPの準備表](ROADMAP.md#ユーザー側の準備) の時期に行う。
+
+## 実装した観戦の操作
+
+初期モードは両AIがNormalの観戦、一時停止・2D表示。再開で自動進行し、停止中の1手送りはWorkerへの1要求・1着手だけで再び停止する。Normalは最大深さ6・50,000ノード・約1秒を既定にし、0.1／1／3秒の予算を選べる。着手間の待ち時間は別設定で、変更しても実行中の探索や予約済みの1手送りを消さない。
+
+初回2Dで3Dコードを取得せず、3D選択時に遅延ロードする。3Dの準備完了はcanvasの存在ではなく、実際に三角形を描いたフレームで判定する。人間先手／後手のモードに切り替えるとAI応答を自動で有効にし、棋譜読込・履歴操作・難易度／予算変更では停止する。読込は現在のモードを保ち、遅いファイル読込が新しい対局を上書きしない。
+
+残りは、変更を含むPRの必須CI、固定SHAの計測記録、mainの自動公開・配信SHA・公開E2E・実機確認と完了文書の取り込み。ローカルの成功だけでM2完了とはしない。

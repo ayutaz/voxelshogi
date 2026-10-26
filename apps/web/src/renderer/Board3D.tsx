@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
 import type { Selection } from '../game/interaction';
 import type { BoardSnapshot } from '../game/boardSnapshot';
+import { RenderReady } from './RenderReady';
 
 export interface LayerView {
   /** 'all': every layer opaque; 'focus': the focused layer opaque, others dimmed by `dim`. */
@@ -211,9 +212,12 @@ export function Board3D({
   cameraPosition?: [number, number, number];
   onSquare: (index: number) => void;
 }) {
+  const [ready, setReady] = useState(false);
   return (
-    <div className="board3d" data-testid="board3d">
+    <div className="board3d" data-testid="board3d" data-ready={ready} aria-busy={!ready}>
+      {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
       <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]}>
+        <RenderReady onReady={() => setReady(true)} />
         <color attach="background" args={['#14171d']} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />

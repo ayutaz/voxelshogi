@@ -53,7 +53,8 @@ main { display: flex; flex-direction: column; min-height: 0; padding: 8px; gap: 
 .views { display: grid; gap: 8px; flex: 1; min-height: 420px; }
 .views-both { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
 .views-3d, .views-2d { grid-template-columns: 1fr; }
-.board3d { min-height: 420px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.board3d { position: relative; min-height: 420px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.board3d-loading { position: absolute; top: 8px; left: 12px; z-index: 1; pointer-events: none; }
 
 .board2d { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .board2d-title { font-weight: 600; margin-bottom: 4px; }

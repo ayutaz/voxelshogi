@@ -1,5 +1,5 @@
 // Observable wrapper around the WASM engine for React (useSyncExternalStore).
-import { Game } from '../wasm/pkg/voxelshogi_wasm.js';
+import { Game, rulesetId } from '../wasm/pkg/voxelshogi_wasm.js';
 import type { Color } from './model';
 
 /** Imports larger than this are rejected before they reach the engine. */
@@ -10,6 +10,7 @@ export type ResultInfo =
   | { kind: 'draw'; reason: 'Repetition' | 'MaxPlies' };
 
 export interface Snapshot {
+  revision: number;
   board: Uint8Array;
   hands: Uint8Array;
   side: Color;
@@ -26,6 +27,7 @@ export interface Snapshot {
 }
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
+export interface SearchRoot { revision: number; cursor: number; ruleset: string; hash: string; side: Color }
 
 const BLACK_KING = 8;
 const WHITE_KING = 22;
@@ -46,6 +48,7 @@ export class GameStore {
   private game: Game;
   private cached: Snapshot | null = null;
   private listeners = new Set<() => void>();
+  private revision = 0;
 
   constructor(game: Game = new Game()) {
     this.game = game;
@@ -62,6 +65,7 @@ export class GameStore {
     const board = g.board();
     const result = parseResult(g.result());
     this.cached = {
+      revision: this.revision,
       board,
       hands: g.hands(),
       side: g.sideToMove() === 'b' ? 'b' : 'w',
@@ -80,6 +84,7 @@ export class GameStore {
   };
 
   private changed(): void {
+    this.revision += 1;
     this.cached = null;
     for (const l of this.listeners) l();
   }
@@ -96,6 +101,20 @@ export class GameStore {
 
   play(move: string): ActionResult {
     return this.attempt(() => this.game.play(move));
+  }
+
+  searchState(): SearchRoot & { recordJson: string } {
+    const s = this.snapshot();
+    return { revision: s.revision, cursor: s.ply, hash: s.hash, side: s.side,
+      ruleset: rulesetId(), recordJson: this.exportRecord() };
+  }
+
+  applyAiMove(root: SearchRoot, move: string): ActionResult {
+    const s = this.snapshot();
+    if (s.finished || root.revision !== s.revision || root.cursor !== s.ply || root.hash !== s.hash || root.side !== s.side || root.ruleset !== rulesetId()) {
+      return { ok: false, error: 'stale AI response' };
+    }
+    return this.play(move);
   }
 
   undo(): void {

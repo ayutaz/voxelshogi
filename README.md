@@ -22,7 +22,7 @@
 | 2 | Web ゲーム Alpha | ✅ 公開済み（main への push で自動デプロイ） |
 | M0 | CI/CD・main保護・品質基盤 | ✅ |
 | M1 | Rustの全幅探索AI | ✅ [検証・実測](docs/M1_VALIDATION.md) |
-| M2 | Web Workerによる探索AI観戦 | 🟡 WASM探索APIを実装・検証中。[実行計画](docs/M2_PLAN.md) |
+| M2 | Web Workerによる探索AI観戦 | 🟡 Worker・観戦UI・3D分割をローカル検証中。公開確認は未完了。[実行計画](docs/M2_PLAN.md) |
 | R0 | 9王ルール比較・同一棋譜のA/B観戦試作 | ✅ [比較室を公開](https://voxelshogi.yousan-apps.workers.dev/?experiment=1) |
 | 3〜7 | データセット、Transformer、自己対局、研究比較、正式公開 | ⬜ |
 
@@ -32,9 +32,9 @@ M0・R0・M1は通常PRの取り込みと公開後検証まで完了しました
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
-通常画面のライブ対局・観戦はランダムAIです。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)では、幅を制限したCPU探索AIが生成した棋譜を再生し、400手／800手と全体／注目表示を比較できます。計1,052局を生成・照合し、代表棋譜6件を公開しました。ブラウザ内のライブ探索と学習モデルは未実装です。[実測結果と再現手順](docs/NINE_KINGS_EXPERIMENT.md)
+M2の実装では、両AIにEasy（ランダム）／Normal（探索）を設定して観戦できます。初期表示は観戦・一時停止・2Dで、再開・1手送り・待ち時間変更・3D表示を使えます。公開版での確認は [段階別記録](docs/M2_VALIDATION.md) に残します。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)はCPU生成済みの固定棋譜を再生する別の試作で、400／800手と全体／注目表示を比較できます。学習モデルは後続のM3・M6です。
 
-M2-1ではRust core152件＋WASM境界5件、Web単体52件、NodeのCI制御46件、既知変異32件、E2E 9件を検証対象にしています。[段階別記録](docs/M2_VALIDATION.md)。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
+M2ではRust core152件＋WASM境界5件、Web単体111件、CI制御Node48件、既知変異はcore／WASM32件とWeb27件、E2E 21件を検証対象にしています。[段階別記録](docs/M2_VALIDATION.md)。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
 
 M3・M6では、実機のブラウザで動く変換済みモデルをデモに組み込みます。公開する FP16・量子化版なども個別に選択して対局・観戦できるようにし、配信する同じモデルで精度・棋力・速度・サイズを評価します。
 

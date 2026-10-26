@@ -49,11 +49,11 @@ pnpm build
 E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 ```
 
-`E2E_COMMIT` を指定すると配信SHAを含む全9件を検証する。省略した実行ではSHAの1件がskipになる。公開先へ実行する場合は、ローカルHEADではなく対象の公開SHAを指定する。
+`E2E_COMMIT` を指定すると配信SHAを含む全21件を検証する。省略した実行ではSHAの1件がskipになる。公開先へ実行する場合は、ローカルHEADではなく対象の公開SHAを指定する。
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の32変異（coreとWASM境界）の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。必須チェックは次の7件。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の32変異（coreとWASM境界）とWeb27変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の7件。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`

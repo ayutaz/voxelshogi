@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   build: { target: 'es2022', sourcemap: true },
+  worker: { format: 'es' },
   test: {
     include: ['tests/**/*.test.{ts,tsx}'],
     environment: 'node',
