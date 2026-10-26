@@ -162,7 +162,7 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 
 全体変異のテスト段階は `scripts/ci/mutation-cargo.sh` で有限の座標契約を先に確認し、成功時は元の全テストへ進む。座標変異による飛び駒ループのメモリ増加を防ぐためで、caughtの判定基準は変えない。固定Rust toolchainと実Cargoを明示して起動する。CIのShellCheckは `scripts/*.sh scripts/ci/*.sh` を対象とし、既知21変異・全1,172変異の分類は [M1記録](M1_VALIDATION.md) を参照。
 
-M2ではWeb単体115件、Rustはcore153件＋WASM境界5件、CI制御Node48件、E2E21件。Webジョブは12個の固定fixtureでNativeと実WASMの全探索結果を照合する。既知core/WASM33変異とWeb29変異も必須品質チェックで実行する。[検証記録](M2_VALIDATION.md)。Web・deployのrunnerはubuntu-24.04とし、Chromium本体をPlaywrightから導入する。既存ライブラリ／追加フォントのapt取得が15分上限で中断したため、runnerにある実行ライブラリを使い、実際の起動と全E2Eの成功を必須とする。公開確認は [M2計画](M2_PLAN.md) に従って完了させる。
+M2ではWeb単体115件、Rustはcore153件＋WASM境界5件、CI制御Node49件、E2E21件。Webジョブは12個の固定fixtureでNativeと実WASMの全探索結果を照合する。既知core/WASM33変異とWeb29変異も必須品質チェックで実行する。[検証記録](M2_VALIDATION.md)。Web・deployのrunnerはubuntu-24.04とし、Chromium本体をPlaywrightから導入する。既存ライブラリ／追加フォントのapt取得が15分上限で中断したため、runnerにある実行ライブラリを使い、実際の起動と全E2Eの成功を必須とする。公開確認は [M2計画](M2_PLAN.md) に従って完了させる。
 
 ## 実装と検証の記録
 
