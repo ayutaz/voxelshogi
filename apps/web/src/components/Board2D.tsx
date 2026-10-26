@@ -1,12 +1,12 @@
 import { decodePiece, displaySquare, parseMove, sliceGrid, type Slice } from '../game/model';
 import type { Selection } from '../game/interaction';
-import type { Snapshot } from '../game/store';
+import type { BoardSnapshot } from '../game/boardSnapshot';
 
 const KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
 
 interface Props {
-  snap: Snapshot;
+  snap: BoardSnapshot;
   slice: Slice;
   selection: Selection;
   onSquare: (index: number) => void;

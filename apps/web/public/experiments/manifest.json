@@ -1,0 +1,335 @@
+{
+  "schema": "voxelshogi-experiment-manifest-v1",
+  "sourceSha256": "dca303a42a274b4b4b9101d4518def20d631fe64d47fa28fdfbcecb9a84dbc2b",
+  "baseline": {
+    "rulesetId": "voxelshogi-standard-v1",
+    "sourceSha256": "5b1b16b4e7f3197fb98379833d6f6b4bd64946041f8f91ee6b8c0b170226d38d",
+    "summary": {
+      "games": 200,
+      "wins": {
+        "Black": 3,
+        "White": 1,
+        "draw": 196
+      },
+      "reasons": {
+        "move_limit": 196,
+        "checkmate": 4
+      },
+      "plies": {
+        "median": 400,
+        "p90": 400,
+        "min": 255,
+        "max": 400
+      },
+      "meanCapturedKings": 0,
+      "firstKingCapture": null,
+      "gamesWithoutKingCapture": 200,
+      "decisiveRate95": [
+        0.005,
+        0.04
+      ],
+      "targetRate95": [
+        0,
+        0
+      ],
+      "longestKingDrought": {
+        "median": 400,
+        "p90": 400,
+        "min": 255,
+        "max": 400
+      },
+      "crossLayerRate": 0.597063723709429,
+      "nodes": 2099228
+    }
+  },
+  "uncertainty": "seed-pair cluster bootstrap, 2000 resamples, percentile 95%; fixed heuristic only",
+  "engine": "b8999270bf2583ad589096aa5838388dcda8db88",
+  "search": {
+    "depth": 2,
+    "width": 8
+  },
+  "maxPlies": 400,
+  "pairSeeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99
+  ],
+  "selection": "nearest median game length, including cutoffs; ties: seed ascending, unswapped first",
+  "entries": [
+    {
+      "id": "voxelshogi-nine-kings-first5-v0",
+      "file": "voxelshogi-nine-kings-first5-v0.record.json",
+      "sha256": "1a19cf7571a726c21a501f79488f63148c2cfc745460a6286b82925bb27c22bd",
+      "sample": {
+        "seed": 0,
+        "swapped": false,
+        "plies": 400,
+        "kingCapturePlies": [
+          56,
+          200,
+          207,
+          286,
+          349,
+          385
+        ]
+      },
+      "summary": {
+        "games": 200,
+        "wins": {
+          "Black": 17,
+          "White": 13,
+          "draw": 170
+        },
+        "reasons": {
+          "move_limit": 170,
+          "target": 30
+        },
+        "plies": {
+          "median": 400,
+          "p90": 400,
+          "min": 127,
+          "max": 400
+        },
+        "meanCapturedKings": 4.555,
+        "firstKingCapture": {
+          "median": 60,
+          "p90": 212,
+          "min": 7,
+          "max": 379
+        },
+        "gamesWithoutKingCapture": 2,
+        "decisiveRate95": [
+          0.105,
+          0.205
+        ],
+        "targetRate95": [
+          0.105,
+          0.205
+        ],
+        "longestKingDrought": {
+          "median": 166,
+          "p90": 292,
+          "min": 47,
+          "max": 400
+        },
+        "crossLayerRate": 0.5710817996172667,
+        "nodes": 2062945
+      }
+    },
+    {
+      "id": "voxelshogi-nine-kings-all-v0",
+      "file": "voxelshogi-nine-kings-all-v0.record.json",
+      "sha256": "f668d1baebbf806c5ffe6af8512805421f68d128bcbbf2cf16a9ab68e15f1b78",
+      "sample": {
+        "seed": 0,
+        "swapped": false,
+        "plies": 400,
+        "kingCapturePlies": [
+          56,
+          200,
+          207,
+          286,
+          349,
+          385
+        ]
+      },
+      "summary": {
+        "games": 200,
+        "wins": {
+          "Black": 0,
+          "White": 0,
+          "draw": 200
+        },
+        "reasons": {
+          "move_limit": 200
+        },
+        "plies": {
+          "median": 400,
+          "p90": 400,
+          "min": 400,
+          "max": 400
+        },
+        "meanCapturedKings": 4.69,
+        "firstKingCapture": {
+          "median": 60,
+          "p90": 212,
+          "min": 7,
+          "max": 379
+        },
+        "gamesWithoutKingCapture": 2,
+        "decisiveRate95": [
+          0,
+          0
+        ],
+        "targetRate95": [
+          0,
+          0
+        ],
+        "longestKingDrought": {
+          "median": 168,
+          "p90": 292,
+          "min": 85,
+          "max": 400
+        },
+        "crossLayerRate": 0.56945,
+        "nodes": 2122044
+      }
+    },
+    {
+      "id": "voxelshogi-nine-kings-score-v0",
+      "file": "voxelshogi-nine-kings-score-v0.record.json",
+      "sha256": "2fa616c542a32640c1fdfa0c8fcf16687e644e7b5869d324387b69d3984be8da",
+      "sample": {
+        "seed": 0,
+        "swapped": false,
+        "plies": 400,
+        "kingCapturePlies": [
+          56,
+          200,
+          207,
+          286,
+          349,
+          385
+        ]
+      },
+      "summary": {
+        "games": 200,
+        "wins": {
+          "Black": 82,
+          "White": 85,
+          "draw": 33
+        },
+        "reasons": {
+          "score_limit": 200
+        },
+        "plies": {
+          "median": 400,
+          "p90": 400,
+          "min": 400,
+          "max": 400
+        },
+        "meanCapturedKings": 4.605,
+        "firstKingCapture": {
+          "median": 60,
+          "p90": 212,
+          "min": 7,
+          "max": 379
+        },
+        "gamesWithoutKingCapture": 2,
+        "decisiveRate95": [
+          0.78,
+          0.885
+        ],
+        "targetRate95": [
+          0,
+          0
+        ],
+        "longestKingDrought": {
+          "median": 168,
+          "p90": 292,
+          "min": 85,
+          "max": 400
+        },
+        "crossLayerRate": 0.5694125,
+        "nodes": 2122163
+      }
+    }
+  ]
+}

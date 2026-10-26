@@ -157,3 +157,35 @@ impl Game {
         self.session.to_record_json()
     }
 }
+
+/// Verified, fixed-record experimental spectator session. No browser-side rules.
+#[wasm_bindgen]
+pub struct ExperimentReplay {
+    replay: voxelshogi_core::experiment::Replay,
+}
+#[wasm_bindgen]
+impl ExperimentReplay {
+    #[wasm_bindgen(constructor)]
+    pub fn new(json: &str) -> Result<ExperimentReplay, JsError> {
+        voxelshogi_core::experiment::Replay::from_json(json)
+            .map(|replay| Self { replay })
+            .map_err(|e| JsError::new(&e))
+    }
+    pub fn snapshot(&self, ply: u32) -> Result<String, JsError> {
+        let g = self
+            .replay
+            .state(ply as usize)
+            .map_err(|e| JsError::new(&e))?;
+        let board: Vec<u8> = Square::all()
+            .map(|s| g.board().get(s).map_or(0, |p| p.code()))
+            .collect();
+        let king_capture = if ply == 0 {
+            false
+        } else {
+            self.replay.state(ply as usize - 1).unwrap().captured() != g.captured()
+        };
+        Ok(serde_json::json!({"board":board,"hands":g.hands(),"ply":ply,"hash":format!("{:016x}",g.hash()),
+            "captured":g.captured(),"outcome":g.outcome(),"side":if g.side()==Color::Black {"b"} else {"w"},
+            "lastMove":if ply==0 {None}else{Some(&self.replay.record.moves[ply as usize-1])},"kingCapture":king_capture}).to_string())
+    }
+}

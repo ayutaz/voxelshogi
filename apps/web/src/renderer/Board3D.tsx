@@ -1,10 +1,10 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { Canvas, type ThreeEvent } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
+import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
 import type { Selection } from '../game/interaction';
-import type { Snapshot } from '../game/store';
+import type { BoardSnapshot } from '../game/boardSnapshot';
 
 export interface LayerView {
   /** 'all': every layer opaque; 'focus': the focused layer opaque, others dimmed by `dim`. */
@@ -100,7 +100,7 @@ function Instances({ squares, geometry, material, rotateY = 0, offsetY = 0, onPi
   );
 }
 
-function Pieces({ snap, view, onSquare }: { snap: Snapshot; view: LayerView; onSquare: (i: number) => void }) {
+function Pieces({ snap, view, onSquare }: { snap: BoardSnapshot; view: LayerView; onSquare: (i: number) => void }) {
   const groups = useMemo(() => {
     const byKey = new Map<string, { code: number; dim: boolean; squares: number[] }>();
     snap.board.forEach((code, i) => {
@@ -142,7 +142,7 @@ const lastMaterial = new THREE.MeshBasicMaterial({ color: '#f2b134', transparent
 const checkMaterial = new THREE.MeshBasicMaterial({ color: '#e5484d', transparent: true, opacity: 0.45, depthWrite: false });
 const selectedMaterial = new THREE.MeshBasicMaterial({ color: '#3e7bfa', transparent: true, opacity: 0.4, depthWrite: false });
 
-function Highlights({ snap, selection, onSquare }: { snap: Snapshot; selection: Selection; onSquare: (i: number) => void }) {
+function Highlights({ snap, selection, onSquare }: { snap: BoardSnapshot; selection: Selection; onSquare: (i: number) => void }) {
   const targets = useMemo(() => (selection.type === 'none' ? [] : [...selection.targets.keys()]), [selection]);
   const last = useMemo(() => {
     if (!snap.lastMove) return [];
@@ -162,6 +162,23 @@ function Highlights({ snap, selection, onSquare }: { snap: Snapshot; selection: 
       <Instances key={`s${selected.length}`} squares={selected} geometry={cubeGeometry} material={selectedMaterial} />
     </>
   );
+}
+
+function MoveTrail({ move }: { move: string }) {
+  const parsed = useMemo(() => parseMove(move), [move]);
+  const start = useMemo(() => worldPosition(parsed.from ?? parsed.to), [parsed]);
+  const end = useMemo(() => worldPosition(parsed.to), [parsed]);
+  const ball = useRef<THREE.Mesh>(null);
+  const progress = useRef(0);
+  useFrame((_, delta) => {
+    progress.current = (progress.current + delta * 0.6) % 1;
+    const t = progress.current;
+    ball.current?.position.set(start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t + 0.45, start[2] + (end[2] - start[2]) * t);
+  });
+  return <>
+    <Line points={[start, end]} color="#ffcf71" lineWidth={3} />
+    <mesh ref={ball}><sphereGeometry args={[0.17, 12, 8]} /><meshBasicMaterial color="#fff0c2" /></mesh>
+  </>;
 }
 
 function LayerGrid({ view }: { view: LayerView }) {
@@ -184,21 +201,26 @@ export function Board3D({
   selection,
   view,
   onSquare,
+  showTrail = false,
+  cameraPosition = [0, 13, 15],
 }: {
-  snap: Snapshot;
+  snap: BoardSnapshot;
   selection: Selection;
   view: LayerView;
+  showTrail?: boolean;
+  cameraPosition?: [number, number, number];
   onSquare: (index: number) => void;
 }) {
   return (
     <div className="board3d" data-testid="board3d">
-      <Canvas camera={{ position: [0, 13, 15], fov: 45 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]}>
         <color attach="background" args={['#14171d']} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />
         <LayerGrid view={view} />
         <Pieces snap={snap} view={view} onSquare={onSquare} />
         <Highlights snap={snap} selection={selection} onSquare={onSquare} />
+        {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}
         <OrbitControls makeDefault enableDamping target={[0, 0, 0]} />
       </Canvas>
     </div>
