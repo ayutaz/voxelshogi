@@ -52,7 +52,7 @@ fn main() -> Result<(), MoveError> {
 - `GameRecord` は `ruleset_id = voxelshogi-standard-v1` と初期VSFENを持つ。JSONは4 MiB以下、20,000手以下。`from_json` は形式・サイズを読み、`replay` が全着手と結果を再検証する。UIの `Session` / WASMの `Game.fromRecordJson` は再生検証まで行う。
 - ルール外の終局は `Termination::{Resignation, MaxPlies, Abandoned}`。標準の上限打ち切りと9王の規定手数採点を混同しない。
 
-現行実装では `MaxPlies` は棋譜の申告結果の検証で扱い、`GameRecord::replay()` が返す `GameState` に打ち切り結果を保存しない。`Session::from_record_json` が明示的に再適用する終局理由は投了だけで、保存し直すとMaxPlies／Abandonedのメタデータは維持されない。M2でゲーム手数上限を画面に導入する場合は、この境界も整合させる（[計画](M2_PLAN.md#wasmとworkerの契約案)）。自然な詰み・千日手・連続王手の履歴と、外部打ち切りのメタデータを区別する。
+`GameRecord::replay()` が返す `GameState` 自体にはMaxPlies／Abandonedの外部打ち切りを保存しない。M2-1から `Session` は外部終局情報を保持し、`result()` は自然な終局を優先して規定手数の引き分けも返す。`is_finished()` は結果のないAbandonedも終了とする。終局情報は全棋譜の末尾でのみ有効で、undo先では未終了、redoで終了に戻る。分岐した手を指すと未来の終局情報を破棄する。`to_record_json()` はカーソルにかかわらず未来の手と終局情報も保存する。終了後の着手は拒否し、再投了で結果を上書きしない。
 
 ## M1：標準1王の探索API
 
@@ -81,7 +81,19 @@ fn main() -> Result<(), &'static str> {
 - `search_with_clock` は単調な経過時間の関数を受け取る。Nativeの `search` は必要なときだけ `Instant` を使い、M2のWASMアダプタにはブラウザの時計を渡す。
 - 全合法手を保持する。置換表は呼び出しごとに新規作成し、同じ深さ・上限までの残り手数を区別する。履歴の最大同一ハッシュ出現数＋残り探索深さが4未満のノードだけ履歴を省略して再利用し、それ以外では再利用を止める。EXACT/LOWER/UPPERを区別し、中断ノードは保存しない。
 - 同じ局面・履歴・設定・深さ／ノード上限で再現可能。時間だけの上限では完了深さが変わり得る。仕様・戦術・同値性と計測は [M1計画](M1_PLAN.md)・[検証記録](M1_VALIDATION.md) を参照。
-- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` やWeb Workerは [M2計画](M2_PLAN.md) で追加する。
+- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` は下記、Web Workerへの接続は [M2計画](M2_PLAN.md) のM2-2で追加する。
+
+### WASM探索API
+
+`Game.bestMove(configJson: string): string` は同期CPU探索で、表示中カーソルまでの `Session` の履歴を使う。局面・カーソル・redo先・棋譜を変更しない。ブラウザでは `performance.now()` の経過時間を `search_with_clock` に渡す。インタラクティブな画面からは専用Worker内で呼ぶ（WorkerはM2-2で追加予定）。
+
+設定はcamelCaseのJSONで、必須 `maxDepth` は0〜64。任意の `maxNodes` は0〜9,007,199,254,740,991の整数、`maxTimeMs` は同上限以下の有限・非負のミリ秒（小数可）、`maxGamePly` はu32範囲の絶対ply上限。省略・nullは上限なし。初期VSFENが42手目なら絶対plyは41で、表示カーソル0とは区別する。設定JSONは4,096 bytes以下。未知フィールド・不正型・範囲外を終了局面でも拒否する。
+
+`options` は省略可。`iterativeDeepening`、`moveOrdering`、`transpositionTable` はbool、`tableCapacity` は0〜1,000,000。省略した各値はcoreの既定（true・true・true・65,536）。設定例は `{"maxDepth":4,"maxNodes":50000,"maxTimeMs":1000}`。これはAPI例であり、Normalの確定予算は実機計測後に決める。
+
+返り値はJSON文字列。`schema: 1`、`bestMove: string | null`、`score: number | null`、`completedDepth: number`、`nodes`・`lastIterationNodes`・`ttHits` は**10進文字列**、`stopReason` は `depth | nodes | time | terminal`。u64統計をJSのnumberへ暗黙変換しない。`score` の視点・尺度・未完了時の合法代替手は上記Rust探索と同じ。外部終了のMaxPliesは手なし・評価0、Abandonedは手なし・評価nullを返す。`maxGamePly` は探索の打ち切り条件であり、このAPI自体で対局を終了・保存しない。
+
+`Game.isFinished(): boolean` はAbandonedも含めた終了判定。`Game.result()` はMaxPliesの引き分けも返すが、Abandonedはundefined。UIの `Snapshot.finished` と `legal` はこの終了判定に従う。
 
 ## 9王試作と探索のRust API
 
@@ -135,6 +147,7 @@ fn main() -> Result<(), String> {
 | `sideToMove()` / `ply()` / `moveCount()` / `hash()` | `b/w`、表示カーソル、棋譜長、16桁hexの局面ハッシュ |
 | `legalMoves()` / `play(text)` / `isInCheck(black)` / `result()` | 合法手・着手・王手・結果JSON文字列（未終局は `undefined`） |
 | `undo()` / `redo()` / `goto(ply)` / `resign()` | 標準の局面移動・投了 |
+| `bestMove(configJson)` / `isFinished()` | 同期探索の結果JSON文字列、外部中断を含む終了判定。上記WASM探索API参照 |
 | `moveList()` / `lastMove()` / `vsfen()` / `recordJson()` | 棋譜、直前手、局面と棋譜の保存 |
 | `new ExperimentReplay(json)` / `snapshot(ply)` | 検証済み9王棋譜の読取専用再生。`snapshot` はJSON文字列 |
 | `free()` | 各WASMオブジェクトを使い終わったら解放する |

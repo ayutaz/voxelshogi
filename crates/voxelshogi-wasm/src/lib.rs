@@ -6,6 +6,15 @@ use voxelshogi_core::session::Session;
 use voxelshogi_core::{Color, NUM_SQUARES, Square, notation};
 use wasm_bindgen::prelude::*;
 
+pub mod search_api;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(module = "/js/clock.js")]
+extern "C" {
+    #[wasm_bindgen(js_name = searchNow)]
+    fn search_now() -> f64;
+}
+
 #[wasm_bindgen(js_name = rulesetId)]
 pub fn ruleset_id() -> String {
     RULESET_ID.to_string()
@@ -143,9 +152,30 @@ impl Game {
     /// The result as JSON (e.g. `{"Win":{"winner":"White","reason":"Resignation"}}`), or undefined.
     pub fn result(&self) -> Option<String> {
         self.session
-            .state()
             .result()
             .map(|r| serde_json::to_string(&r).expect("serializable"))
+    }
+
+    #[wasm_bindgen(js_name = isFinished)]
+    pub fn is_finished(&self) -> bool {
+        self.session.is_finished()
+    }
+
+    /// Synchronous CPU search; call from a dedicated Worker in interactive apps.
+    #[wasm_bindgen(js_name = bestMove)]
+    pub fn best_move(&self, config: &str) -> Result<String, JsError> {
+        #[cfg(target_arch = "wasm32")]
+        let elapsed = {
+            let start = search_now();
+            move || std::time::Duration::from_secs_f64((search_now() - start).max(0.0) / 1000.0)
+        };
+        #[cfg(not(target_arch = "wasm32"))]
+        let elapsed = {
+            let start = std::time::Instant::now();
+            move || start.elapsed()
+        };
+        search_api::best_move_with_clock(&self.session, config, elapsed)
+            .map_err(|e| JsError::new(&e))
     }
 
     pub fn resign(&mut self) {
