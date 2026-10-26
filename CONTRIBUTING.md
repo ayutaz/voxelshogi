@@ -53,7 +53,7 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）とWeb27変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の7件。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）とWeb29変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の7件。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`

@@ -15,6 +15,7 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'worker-port-origin', file: 'ai/search.worker.ts', before: "if (event.origin !== '') return;", after: '', test: 'search-worker' },
   { name: 'worker-terminate', file: 'ai/search-client.ts', before: 'w.terminate();', after: '', test: 'search-client' },
   { name: 'worker-stale-callback', file: 'ai/search-client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'search-client' },
   { name: 'worker-stale-error', file: 'ai/search-client.ts', before: 'if (this.worker === worker) this.fail(new Error(event.message', after: 'if (true) this.fail(new Error(event.message', test: 'search-client' },
@@ -41,7 +42,8 @@ const mutations = [
   { name: 'arena-human-turn', file: 'ai/arena-controller.ts', before: "if (this.human()) { this.publish('human'); return; }", after: '', test: 'arena-controller' },
   { name: 'arena-speed-erases-step', file: 'ai/arena-controller.ts', before: ' && !this.scheduledSingle', after: '', test: 'arena-controller' },
   { name: 'render-ready-before-geometry', file: 'renderer/RenderReady.tsx', before: 'gl.info.render.triangles > 0', after: 'true', test: 'render-ready', extension: 'tsx' },
-  { name: 'render-ready-duplicate', file: 'renderer/RenderReady.tsx', before: '!reported.current && ', after: '', test: 'render-ready', extension: 'tsx' },
+  { name: 'render-ready-duplicate', file: 'renderer/RenderReady.tsx', before: 'if (!reported.current && gl.info.render.triangles > 0)', after: 'if (gl.info.render.triangles > 0)', test: 'render-ready', extension: 'tsx' },
+  { name: 'render-ready-demand-frame', file: 'renderer/RenderReady.tsx', before: 'if (!reported.current && gl.info.render.triangles === 0) invalidate();', after: '', test: 'render-ready', extension: 'tsx' },
 ];
 
 function main() {
@@ -85,7 +87,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 27);
+    assert.equal(results.length, 29);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

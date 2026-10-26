@@ -49,10 +49,24 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
   test.setTimeout(60_000);
   const workers: string[] = [];
   page.on('worker', (worker) => workers.push(worker.url()));
+  await page.addInitScript(() => {
+    const state = window as unknown as { renderedFrames: number };
+    state.renderedFrames = 0;
+    const original = WebGL2RenderingContext.prototype.clear;
+    WebGL2RenderingContext.prototype.clear = function (mask: number) {
+      state.renderedFrames++;
+      return original.call(this, mask);
+    };
+  });
   await page.goto('/');
   await page.getByRole('button', { name: '3D+2D', exact: true }).click();
   const canvas = page.getByTestId('board3d').locator('canvas');
   await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
+  await page.waitForTimeout(1000); // allow initial layout and camera damping to settle
+  const frames = await page.evaluate(() => (window as unknown as { renderedFrames: number }).renderedFrames);
+  expect(frames).toBeGreaterThan(0);
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(() => (window as unknown as { renderedFrames: number }).renderedFrames)).toBe(frames);
   await page.getByTestId('thinking-budget').selectOption('3000');
   const begin = async () => {
     await page.getByTestId('ai-step').click();

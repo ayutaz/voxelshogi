@@ -216,7 +216,7 @@ export function Board3D({
   return (
     <div className="board3d" data-testid="board3d" data-ready={ready} aria-busy={!ready}>
       {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
-      <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]}>
+      <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]} frameloop={showTrail && snap.lastMove ? 'always' : 'demand'}>
         <RenderReady onReady={() => setReady(true)} />
         <color attach="background" args={['#14171d']} />
         <ambientLight intensity={0.8} />

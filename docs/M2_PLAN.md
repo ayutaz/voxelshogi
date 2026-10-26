@@ -90,3 +90,9 @@ M3は変換済み未学習モデルの実機推論・配信方法・演算の検
 初回2Dで3Dコードを取得せず、3D選択時に遅延ロードする。3Dの準備完了はcanvasの存在ではなく、実際に三角形を描いたフレームで判定する。人間先手／後手のモードに切り替えるとAI応答を自動で有効にし、棋譜読込・履歴操作・難易度／予算変更では停止する。読込は現在のモードを保ち、遅いファイル読込が新しい対局を上書きしない。
 
 残りは、変更を含むPRの必須CI、固定SHAの計測記録、mainの自動公開・配信SHA・公開E2E・実機確認と完了文書の取り込み。ローカルの成功だけでM2完了とはしない。
+
+### 静止中の3D描画とWorker入口
+
+3Dは盤面・表示設定・カメラが変わったときだけ描画し、比較室で移動軌跡をアニメーションする場合は連続描画する。初期フレームに駒が描かれるまで次フレームを要求し、描画後に準備完了を通知する。実ブラウザで静止中のWebGL描画回数が増えないこと、探索中の操作と中断、既存の比較室を確認する。[R3Fのon-demand rendering](https://r3f.docs.pmnd.rs/advanced/scaling-performance) に従う。
+
+専用Workerの入口では空の `MessageEvent.origin` を受け付け、Window用のoriginを持つイベントは探索前に拒否する。専用WorkerのpostMessageは暗黙のMessagePortを使い、originは初期値の空文字である。[HTMLのmessage port post message steps](https://html.spec.whatwg.org/multipage/web-messaging.html#message-port-post-message-steps) を参照。これはWindow間メッセージの同一origin認証を代替する仕組みではなく、専用Workerとしての受信契約であり、棋譜・設定・応答の検証も維持する。
