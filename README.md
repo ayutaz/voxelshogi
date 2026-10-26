@@ -22,17 +22,17 @@
 | 2 | Web ゲーム Alpha | ✅ 公開済み（main への push で自動デプロイ） |
 | M0 | CI/CD・main保護・品質基盤 | ✅ |
 | M1 | Rustの全幅探索AI | ✅ [検証・実測](docs/M1_VALIDATION.md) |
-| M2 | Web Workerによる探索AI観戦 | 🟡 Worker・観戦UI・3D分割をローカル検証中。公開確認は未完了。[実行計画](docs/M2_PLAN.md) |
+| M2 | Web Workerによる探索AI観戦 | ✅ 公開URLで探索AI観戦・中断・実機検証を完了。[計画と完了条件](docs/M2_PLAN.md) |
 | R0 | 9王ルール比較・同一棋譜のA/B観戦試作 | ✅ [比較室を公開](https://voxelshogi.yousan-apps.workers.dev/?experiment=1) |
 | 3〜7 | データセット、Transformer、自己対局、研究比較、正式公開 | ⬜ |
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-M0・R0・M1は通常PRの取り込みと公開後検証まで完了しました。M1は全1,172変異の分類と、Apple M1 Nativeで初期局面の深さ2・約0.33秒を確認済みです。[現在地と確認元](docs/STATUS.md)・[M1検証記録](docs/M1_VALIDATION.md)。次は [M2のWeb探索AI観戦](docs/M2_PLAN.md) です。
+M0・R0・M1・M2は通常PRの取り込みと公開後検証まで完了しました。M1は全1,172変異の分類と、Apple M1 Nativeで初期局面の深さ2・約0.33秒を確認済みです。[現在地と確認元](docs/STATUS.md)・[M1検証記録](docs/M1_VALIDATION.md)。次はM3のブラウザ推論検証です。[実行計画](docs/ROADMAP.md) に従います。
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
-M2の実装では、両AIにEasy（ランダム）／Normal（探索）を設定して観戦できます。初期表示は観戦・一時停止・2Dで、再開・1手送り・待ち時間変更・3D表示を使えます。公開版での確認は [段階別記録](docs/M2_VALIDATION.md) に残します。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)はCPU生成済みの固定棋譜を再生する別の試作で、400／800手と全体／注目表示を比較できます。学習モデルは後続のM3・M6です。
+公開サイトでは、両AIにEasy（ランダム）／Normal（探索）を設定して観戦できます。初期表示は観戦・一時停止・2Dで、再開・1手送り・待ち時間変更・3D表示を使えます。公開SHA・実機計測・検証結果は [段階別記録](docs/M2_VALIDATION.md) に保存しています。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)はCPU生成済みの固定棋譜を再生する別の試作で、400／800手と全体／注目表示を比較できます。学習モデルは後続のM3・M6です。
 
 M2ではRust core153件＋WASM境界5件、Web単体115件、CI制御Node49件、既知変異はcore／WASM33件とWeb29件、E2E 21件を検証対象にしています。[段階別記録](docs/M2_VALIDATION.md)。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
 
@@ -60,7 +60,7 @@ pnpm dev                        # http://localhost:5173
 | 文書 | 内容 |
 |---|---|
 | [docs/STATUS.md](docs/STATUS.md) | 現在の実装・公開・CIと文書の役割 |
-| [docs/M2_PLAN.md](docs/M2_PLAN.md) | 次のWeb探索AI観戦の実装順・TDD・完了条件 |
+| [docs/M2_PLAN.md](docs/M2_PLAN.md) | 完了したWeb探索AI観戦の実装順・TDD・完了条件 |
 | [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | 目的・スコープ・横断的な要件 |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
 | [docs/M1_PLAN.md](docs/M1_PLAN.md) | 探索AIの実装順・契約・完了条件 |

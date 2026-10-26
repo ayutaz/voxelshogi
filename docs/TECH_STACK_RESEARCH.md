@@ -13,7 +13,7 @@
 
 Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。今回のディスク再確認は約32GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。下表の公開サイズはこの固定版。M2の作業差分では標準1王の全幅探索を専用module Workerへ接続し、観戦・両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを実装した。固定SHAの計測と公開確認は [M2記録](M2_VALIDATION.md) で追う。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリは未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
+2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。下表の公開サイズはこの固定版。M2の作業差分では標準1王の全幅探索を専用module Workerへ接続し、観戦・両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを実装した。固定SHAの計測と公開確認は [M2記録](M2_VALIDATION.md) に保存した。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリは未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
 
 | 現在の構成 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
@@ -24,6 +24,8 @@ Python は3.14系を基本、依存が未対応の場合のみ3.13系とする�
 | 公開WASM | 284,605 bytes（約285 kB） | 2026-10-26、公開版2405e86から取得した非圧縮バイト数 |
 | 公開入口JS / 比較室JS | 1,196,200 / 11,389 bytes（約1.20 MB / 11.4 kB） | 同上。比較室JSは遅延ロード、重い共通JS分割はM2で継続 |
 | R0 | 1,052局を照合、代表6棋譜を公開 | [実測報告](NINE_KINGS_EXPERIMENT.md)。モデル推論ではない |
+
+M2の固定コミット `63a4716` では、実Chromeの2D初回JSは255,096 bytes、3D選択後は累計1,207,163 bytes。WASMは探索追加で361,171 bytes、専用Workerは11,784 bytes。初回2Dの軽量化と3D利用時の全体量を分けて扱う。[固定SHAのNetwork・GPU・探索計測](experiments/m2-search-browser-local.json)・[旧公開版の実取得](experiments/m2-initial-load-before.json)。Normalは1秒予算で初期局面の深さ2を3回とも完了し、3Dを実際に描画したMetal/Apple M1上で計測した。公開版 `3a500cd` はWASM361,183 bytesで、[公開計測](experiments/m2-search-browser-public.json) と [同じCI成果物とのSHA照合](experiments/m2-public-artifact-match.json) を保存した。MacとLinuxのWASMは別のSHAで記録する。静止中の3Dはdemand描画、移動軌跡は連続描画とする。
 
 WASMサイズはビルド環境でも差が出るため、配信バイト数とローカル生成物の値を混ぜない。以下の外部版・公開日・サイズは、特記がなければ2026-10-25の調査記録。将来の推論・学習の採用版や性能を確定したものではない。
 

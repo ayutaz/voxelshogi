@@ -69,7 +69,10 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
   expect(await page.evaluate(() => (window as unknown as { renderedFrames: number }).renderedFrames)).toBe(frames);
   await page.getByTestId('thinking-budget').selectOption('3000');
   const begin = async () => {
+    const previousWorkers = workers.length;
     await page.getByTestId('ai-step').click();
+    // The public module fetch and Playwright's worker event are asynchronous.
+    await expect.poll(() => workers.length).toBe(previousWorkers + 1);
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
   };
   const cancel = async () => {
@@ -94,8 +97,17 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30, { steps: 2 });
   await page.mouse.up();
-  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  await cancel();
+  // OrbitControls damping keeps drawing. Playwright click actionability waits
+  // for animation frames, which can outlast the real search on software GL.
+  // Observe and click atomically; keep the actual mouse drag and real Worker.
+  const cameraPhase = await page.evaluate(() => {
+    const phase = document.querySelector('[data-testid="ai-phase"]')?.textContent ?? '';
+    if (phase.includes('思考中')) document.querySelector<HTMLButtonElement>('[data-testid="cancel-search"]')?.click();
+    return phase;
+  });
+  expect(cameraPhase).toMatch(/思考中/);
+  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
   expect((await canvas.screenshot()).equals(beforeCamera)).toBe(false);
 
   await begin();

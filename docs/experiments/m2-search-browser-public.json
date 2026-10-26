@@ -1,0 +1,1176 @@
+{
+  "schema": "voxelshogi-m2-browser-v1",
+  "checkedAtUtc": "2026-10-26T19:02:45.745Z",
+  "sourceCommit": "3a500cdcdd020cbc3e632a4cb56229d3a305edd7",
+  "dirty": false,
+  "runtimeFingerprint": "3837765cf98973921ebe123c03b0625ce8cc4bc9dd6508ea43a1c070a39480f1",
+  "sourceFiles": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "b0e157cafae16465815a66d949a1ade6de3e24ee7e00e413124d0ac873c7e7b6"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "80b29f730be236f977d060a7969f9f2c4908bb821508a165935913a19f204bad"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "8b3205dda69524b0aa7925ff2d421c040e375bb6ada6483c67b066ec0f800f72"
+    },
+    {
+      "path": "apps/web/pnpm-lock.yaml",
+      "sha256": "605ccb2f9286dc0b8be1e19c055bac094276614ba112cf023df1916a444db32e"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "43eda146cff6d3c9e43b508c1e3f385721924ca8dcc4eb4a8ff3f594683e4811"
+    },
+    {
+      "path": "apps/web/src/ai/arena-controller.ts",
+      "sha256": "29b36619560002ee90724f316e88a32f74ab1c59308696af34be032754993768"
+    },
+    {
+      "path": "apps/web/src/ai/random.ts",
+      "sha256": "3ad00d0b8f8161787db8491128c4591dedd09c22e55e390721f3334079ffede9"
+    },
+    {
+      "path": "apps/web/src/ai/search-client.ts",
+      "sha256": "5505784885f22c6753b87a974c0aa51576f4f6f70249115be0da712795f37949"
+    },
+    {
+      "path": "apps/web/src/ai/search-engine.ts",
+      "sha256": "2c26281cbabdffc729c20e8818385023e4091e58f968685aa77a2ed7a9971fef"
+    },
+    {
+      "path": "apps/web/src/ai/search-protocol.ts",
+      "sha256": "34f4842ab2cbafbcbc5586e9b369e270d44099f7aa10e6489280d4dbd8fe2dcd"
+    },
+    {
+      "path": "apps/web/src/ai/search.worker.ts",
+      "sha256": "fbb805c9cc6799a2a341d0064ef9a145768e0589727dde47b0550dc4b3d2c82e"
+    },
+    {
+      "path": "apps/web/src/components/Board2D.tsx",
+      "sha256": "ebdaaac3d164cd296ee527d115461beb7e91b99b4c2c42dcf865b548bb5903d8"
+    },
+    {
+      "path": "apps/web/src/components/Panels.tsx",
+      "sha256": "65c70f397c8754b69427720583b5ae1a4e8b64e094eeed9446ba8f2913c48bd4"
+    },
+    {
+      "path": "apps/web/src/experiment/ExperimentViewer.tsx",
+      "sha256": "d26e05b49ee97a6eb5c761286edd34811f47f4ecea1285b818912073d18179eb"
+    },
+    {
+      "path": "apps/web/src/experiment/experiment.css",
+      "sha256": "3621840c9768e782b7a717d849ea898361e5a69c5c90ff31f1e5d02f0e7e0251"
+    },
+    {
+      "path": "apps/web/src/experiment/integrity.ts",
+      "sha256": "6a3e4a483fc10369e5c3475ecc782aee85767ffcc5af2ea37a6a9589c53d2b72"
+    },
+    {
+      "path": "apps/web/src/game/boardSnapshot.ts",
+      "sha256": "17d08accd892aa517bf46f593c3238b065a3f333d98a1bfb0cd8dcb44c4c577c"
+    },
+    {
+      "path": "apps/web/src/game/interaction.ts",
+      "sha256": "6b9b93e4a5387089e86ceed7d580b9091620be5bc61ac557e2ea9b1970536520"
+    },
+    {
+      "path": "apps/web/src/game/model.ts",
+      "sha256": "d28187b1c392700b8c946b0b203f045b0def5b3551017590b9afcdfce9b06118"
+    },
+    {
+      "path": "apps/web/src/game/store.ts",
+      "sha256": "9e40dfaab4be27f3f82f8925f0c797bbefc1f8711ff78b8837703b3a99042d44"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "sha256": "aaac460d88b8a1b33720bd796b046e22dedc44e163d8cc4163da8ed0f3c067b9"
+    },
+    {
+      "path": "apps/web/src/renderer/Board3D.tsx",
+      "sha256": "b5a321232a747d275bd43f8448e94027b39cbf8e385998bb44eb3c374fb16b65"
+    },
+    {
+      "path": "apps/web/src/renderer/RenderReady.tsx",
+      "sha256": "3c2aaa41586dc8687c3d782b3977f31be8587617705ec34fef4182648a44e708"
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "5bcabb0a7b70f352d97b33a02765a6011ea781826b0326bdc6915a57ae0b25ee"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "sha256": "01afcb619222bb8aaaf532db5b6f0f14427819da87473026bf342b1912a49a92"
+    },
+    {
+      "path": "crates/voxelshogi-core/Cargo.toml",
+      "sha256": "5afbab4bbe8852176262f8467174fa6f06c12cfeb136ae29eb5f432323fab710"
+    },
+    {
+      "path": "crates/voxelshogi-core/examples/bench.rs",
+      "sha256": "e27c195f15d8feabdd6be42bd8566b273425301028d9d82e1528dceb5a89140e"
+    },
+    {
+      "path": "crates/voxelshogi-core/examples/compare_rules.rs",
+      "sha256": "f0766873fa9a13e80b0c653487e3aedf196f234ce34883c2fca9d3d857e71167"
+    },
+    {
+      "path": "crates/voxelshogi-core/examples/search_bench.rs",
+      "sha256": "4ee17ea47a2be6597cd20e9f6a1a3f4d05e65507e0fddb4c9182086f862f52a6"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/board.rs",
+      "sha256": "828240781761083c041f167947437057a963120060b0b01b290111d9947e395a"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/capture.rs",
+      "sha256": "3dca28474b601b61c07e8b2358848971a1becb5cf03f7b9844e972c40cdb4c6e"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/coord.rs",
+      "sha256": "81c6937a4d12fa66e1ad45289a4af21babddc058ca88fce3319fbbdc3a731329"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/experiment.rs",
+      "sha256": "ff9955c564523591d3a025c384ba973fe0490d79581e7e83befac19d7fb3a8c8"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/lib.rs",
+      "sha256": "cc867fb64eb870aec20b079ab7a8f13223582d329f30d2daf34a598c6137cb17"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/movegen.rs",
+      "sha256": "9d48983fd568d39aef33d3bb06efe3e6dc8e39ab52fc167d0eed52cdc429a33d"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/moves.rs",
+      "sha256": "1c8e50a014664c9b213897d4c547a1a081aa77e715c5f7f8a6cae3019186c179"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/notation.rs",
+      "sha256": "9e6ae32bb48d5fd07df8f563c580fdcc52c7b8df33a4290c3128b743d155acaf"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/piece.rs",
+      "sha256": "585500bc818ae36c5e2cb3042642d9bc64a1ab8175aa59c13a24bf08f3876ba9"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/record.rs",
+      "sha256": "94745c87d2e39c7ca47fbaaeba6487dfd6785ba6c9191024fe6f4e580eee53a6"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/search.rs",
+      "sha256": "923ac6fe99a733a4939807af97348a2eed4ed2554c94a313410bff6f6476a240"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/session.rs",
+      "sha256": "51ce3a27c0cb1e0a7f12687ba45803dc4f7ae593391474687f3386d38c07709c"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/state.rs",
+      "sha256": "a583d74b2994ef2cadcf75b42e91586dfce4cf783cebd84b12d01e306b2ff58c"
+    },
+    {
+      "path": "crates/voxelshogi-core/src/zobrist.rs",
+      "sha256": "c11a281f52a76aa81a7d424c5ff61c9f10e5d620d7aacb2663fcffd41fe3bed3"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/capture_boundaries.rs",
+      "sha256": "d71b481ebc7ca9397ac7595cbd73f174f56192042817263db10b76bf83ec3ec8"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/capture_experiment.rs",
+      "sha256": "e19d882f8e8f62fe4f3442f9ed4045e0f8c5c9390660cabb0feaf0d34721ecf1"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/common/mod.rs",
+      "sha256": "86dc744672d18de188c9dced094323b1d9345117d4898d991060cfe7919a0f2d"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/experiment_record.rs",
+      "sha256": "51e7eb9669726192a3ed1b951f1ce77744c006303474db11a764b7e82f5250fe"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/geometry_contracts.rs",
+      "sha256": "2af14afeb806cf852b2d0004ffbb244c63effa419612f8f75c525e9096bb93fc"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/movement.rs",
+      "sha256": "bbb2cc1b2a1b4e6ede9befde8fdebc9fdc47a80487323a24a2097b42904dae1f"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/notation.rs",
+      "sha256": "5ba31993cb6ea72d5c3f4b089833a32e84432c9dc89610e49bbb907f660a71b0"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/piece_contracts.rs",
+      "sha256": "dd355f011bbb4e809237b962699f55d3172b7020fde1e602478e2c9bc21e3b98"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/rules.rs",
+      "sha256": "a964a32071c7a1e2b8208632832d3a7127a0033fed70f8e8803c28c02998dd9a"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/search_contracts.rs",
+      "sha256": "82c2d78bc5a2e23dcfdd9c7c5b39f81ef5d293f9a73b89b71370a23d0831362f"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/session.rs",
+      "sha256": "b4c821f88de00541530be03408dcae9c70e5e9a772fb9dd840fb359c574ef0ad"
+    },
+    {
+      "path": "crates/voxelshogi-core/tests/state_contracts.rs",
+      "sha256": "ee0b38e0e58d343d22842374e5af5828c2106d53217ed20ae831af7d8f62a190"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/Cargo.toml",
+      "sha256": "a68595ec31430f5fdb256216f293fb674f31bc232cf44f4ca19fc76f4a42dde9"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/examples/search_fixtures.rs",
+      "sha256": "761db8b100c87711572f041370d6dd6513257da7cf5a3d822cc4b55c8a0571ad"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/examples/search_profiles.rs",
+      "sha256": "96afbdc18958e63ce1948d70fd25cea738ad73d15678ea584bf099aaa8b52f29"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/js/clock.js",
+      "sha256": "d2497e2a739e93e56558ee7095dbae5063c0eec017fd5513821e79c5fa772867"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/src/lib.rs",
+      "sha256": "cdee34d57d765ab91ebffad791dd84466c38b5f93fda4d71c0c33aad5fba2220"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/src/search_api.rs",
+      "sha256": "a8245ccde3da65e05a1bfdbc29dcae7577b0020fc43670b050894cea5cb3a4f0"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/tests/fixtures/search.json",
+      "sha256": "9dc167cdf1747853eb5e2b8c7ae0255d53d294959ef84d2661de57546582c34e"
+    },
+    {
+      "path": "crates/voxelshogi-wasm/tests/search_api.rs",
+      "sha256": "73db24aac38c3fe36018e76722b708bde13f581a10cc0d803f78e0a080be91e0"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "8426022dcf3cbd6b106cda60c0aa89ad194a12d2a0931b0e8f580d4f0f3c5fa5"
+    }
+  ],
+  "baseUrl": "https://voxelshogi.yousan-apps.workers.dev",
+  "publishedCommit": "3a500cdcdd020cbc3e632a4cb56229d3a305edd7",
+  "environment": {
+    "cpu": "Apple M1",
+    "memoryBytes": 8589934592,
+    "platform": "darwin",
+    "osRelease": "27.0.0",
+    "browser": "155.0.8059.85",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+    "node": "24.22.1",
+    "graphics": {
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)",
+      "vendor": "Google Inc. (Apple)"
+    },
+    "rust": "rustc 1.97.1 (8bab26f4f 2026-07-14)"
+  },
+  "settings": {
+    "concurrent3dRendering": true,
+    "workerReuse": true,
+    "limits": {
+      "maxDepth": 6,
+      "maxNodes": 50000,
+      "maxTimeMs": 1000
+    }
+  },
+  "initialNetwork": [
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/index-Dl_AXcXe.css",
+      "entryType": "resource",
+      "startTime": 72.19999992847443,
+      "duration": 29.899999976158142,
+      "navigationId": 1681,
+      "initiatorType": "link",
+      "deliveryType": "",
+      "nextHopProtocol": "h2",
+      "renderBlockingStatus": "blocking",
+      "contentType": "text/css",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 72.19999992847443,
+      "domainLookupStart": 72.19999992847443,
+      "domainLookupEnd": 72.19999992847443,
+      "connectStart": 72.19999992847443,
+      "secureConnectionStart": 72.19999992847443,
+      "connectEnd": 72.19999992847443,
+      "requestStart": 81.5,
+      "responseStart": 101.59999990463257,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 101.59999990463257,
+      "responseEnd": 102.09999990463257,
+      "transferSize": 1956,
+      "encodedBodySize": 1656,
+      "decodedBodySize": 4341,
+      "responseStatus": 200,
+      "serverTiming": []
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/index-BuMZ1Hlh.js",
+      "entryType": "resource",
+      "startTime": 72.19999992847443,
+      "duration": 65.39999997615814,
+      "navigationId": 1681,
+      "initiatorType": "script",
+      "deliveryType": "",
+      "nextHopProtocol": "h2",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/javascript",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 72.19999992847443,
+      "domainLookupStart": 72.19999992847443,
+      "domainLookupEnd": 72.19999992847443,
+      "connectStart": 72.19999992847443,
+      "secureConnectionStart": 72.19999992847443,
+      "connectEnd": 72.19999992847443,
+      "requestStart": 81.59999990463257,
+      "responseStart": 128.69999992847443,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 128.69999992847443,
+      "responseEnd": 137.59999990463257,
+      "transferSize": 83198,
+      "encodedBodySize": 82898,
+      "decodedBodySize": 255096,
+      "responseStatus": 200,
+      "serverTiming": []
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+      "entryType": "resource",
+      "startTime": 152.29999995231628,
+      "duration": 57.10000002384186,
+      "navigationId": 1681,
+      "initiatorType": "fetch",
+      "deliveryType": "",
+      "nextHopProtocol": "h3",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 152.29999995231628,
+      "domainLookupStart": 152.39999997615814,
+      "domainLookupEnd": 152.39999997615814,
+      "connectStart": 152.39999997615814,
+      "secureConnectionStart": 152.39999997615814,
+      "connectEnd": 152.39999997615814,
+      "requestStart": 152.89999997615814,
+      "responseStart": 196,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 196,
+      "responseEnd": 209.39999997615814,
+      "transferSize": 126430,
+      "encodedBodySize": 126130,
+      "decodedBodySize": 361183,
+      "responseStatus": 200,
+      "serverTiming": [
+        {
+          "name": "cfExtPri",
+          "duration": 0,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/favicon.svg",
+      "entryType": "resource",
+      "startTime": 155.69999992847443,
+      "duration": 58.300000071525574,
+      "navigationId": 1681,
+      "initiatorType": "other",
+      "deliveryType": "",
+      "nextHopProtocol": "h3",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "image/svg+xml",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 155.69999992847443,
+      "domainLookupStart": 155.69999992847443,
+      "domainLookupEnd": 155.69999992847443,
+      "connectStart": 155.69999992847443,
+      "secureConnectionStart": 155.69999992847443,
+      "connectEnd": 155.69999992847443,
+      "requestStart": 155.89999997615814,
+      "responseStart": 213.79999995231628,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 213.79999995231628,
+      "responseEnd": 214,
+      "transferSize": 572,
+      "encodedBodySize": 272,
+      "decodedBodySize": 368,
+      "responseStatus": 200,
+      "serverTiming": [
+        {
+          "name": "cfExtPri",
+          "duration": 0,
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "after3dNetwork": [
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/index-Dl_AXcXe.css",
+      "entryType": "resource",
+      "startTime": 72.19999992847443,
+      "duration": 29.899999976158142,
+      "navigationId": 1681,
+      "initiatorType": "link",
+      "deliveryType": "",
+      "nextHopProtocol": "h2",
+      "renderBlockingStatus": "blocking",
+      "contentType": "text/css",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 72.19999992847443,
+      "domainLookupStart": 72.19999992847443,
+      "domainLookupEnd": 72.19999992847443,
+      "connectStart": 72.19999992847443,
+      "secureConnectionStart": 72.19999992847443,
+      "connectEnd": 72.19999992847443,
+      "requestStart": 81.5,
+      "responseStart": 101.59999990463257,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 101.59999990463257,
+      "responseEnd": 102.09999990463257,
+      "transferSize": 1956,
+      "encodedBodySize": 1656,
+      "decodedBodySize": 4341,
+      "responseStatus": 200,
+      "serverTiming": []
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/index-BuMZ1Hlh.js",
+      "entryType": "resource",
+      "startTime": 72.19999992847443,
+      "duration": 65.39999997615814,
+      "navigationId": 1681,
+      "initiatorType": "script",
+      "deliveryType": "",
+      "nextHopProtocol": "h2",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/javascript",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 72.19999992847443,
+      "domainLookupStart": 72.19999992847443,
+      "domainLookupEnd": 72.19999992847443,
+      "connectStart": 72.19999992847443,
+      "secureConnectionStart": 72.19999992847443,
+      "connectEnd": 72.19999992847443,
+      "requestStart": 81.59999990463257,
+      "responseStart": 128.69999992847443,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 128.69999992847443,
+      "responseEnd": 137.59999990463257,
+      "transferSize": 83198,
+      "encodedBodySize": 82898,
+      "decodedBodySize": 255096,
+      "responseStatus": 200,
+      "serverTiming": []
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+      "entryType": "resource",
+      "startTime": 152.29999995231628,
+      "duration": 57.10000002384186,
+      "navigationId": 1681,
+      "initiatorType": "fetch",
+      "deliveryType": "",
+      "nextHopProtocol": "h3",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 152.29999995231628,
+      "domainLookupStart": 152.39999997615814,
+      "domainLookupEnd": 152.39999997615814,
+      "connectStart": 152.39999997615814,
+      "secureConnectionStart": 152.39999997615814,
+      "connectEnd": 152.39999997615814,
+      "requestStart": 152.89999997615814,
+      "responseStart": 196,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 196,
+      "responseEnd": 209.39999997615814,
+      "transferSize": 126430,
+      "encodedBodySize": 126130,
+      "decodedBodySize": 361183,
+      "responseStatus": 200,
+      "serverTiming": [
+        {
+          "name": "cfExtPri",
+          "duration": 0,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/favicon.svg",
+      "entryType": "resource",
+      "startTime": 155.69999992847443,
+      "duration": 58.300000071525574,
+      "navigationId": 1681,
+      "initiatorType": "other",
+      "deliveryType": "",
+      "nextHopProtocol": "h3",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "image/svg+xml",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 155.69999992847443,
+      "domainLookupStart": 155.69999992847443,
+      "domainLookupEnd": 155.69999992847443,
+      "connectStart": 155.69999992847443,
+      "secureConnectionStart": 155.69999992847443,
+      "connectEnd": 155.69999992847443,
+      "requestStart": 155.89999997615814,
+      "responseStart": 213.79999995231628,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 213.79999995231628,
+      "responseEnd": 214,
+      "transferSize": 572,
+      "encodedBodySize": 272,
+      "decodedBodySize": 368,
+      "responseStatus": 200,
+      "serverTiming": [
+        {
+          "name": "cfExtPri",
+          "duration": 0,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "https://voxelshogi.yousan-apps.workers.dev/assets/Board3D-Dvwp3CeF.js",
+      "entryType": "resource",
+      "startTime": 436.6999999284744,
+      "duration": 43.5,
+      "navigationId": 1681,
+      "initiatorType": "script",
+      "deliveryType": "",
+      "nextHopProtocol": "h3",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/javascript",
+      "contentEncoding": "zstd",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 436.6999999284744,
+      "domainLookupStart": 436.6999999284744,
+      "domainLookupEnd": 436.6999999284744,
+      "connectStart": 436.6999999284744,
+      "secureConnectionStart": 436.6999999284744,
+      "connectEnd": 436.6999999284744,
+      "requestStart": 437,
+      "responseStart": 465.09999990463257,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 465.09999990463257,
+      "responseEnd": 480.1999999284744,
+      "transferSize": 261183,
+      "encodedBodySize": 260883,
+      "decodedBodySize": 952067,
+      "responseStatus": 200,
+      "serverTiming": [
+        {
+          "name": "cfExtPri",
+          "duration": 0,
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "path": "/assets/index-BuMZ1Hlh.js",
+      "bytes": 255096,
+      "sha256": "cf7398a4dcb6492384897a0e0431c5a76d8b52981532f398e2fc93c509dc2bed",
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+      "bytes": 361183,
+      "sha256": "f0ff6f99d6482f4d40da757503a43c46a3e1e4953c440f35fe6d1b2b86e5881d",
+      "contentType": "application/wasm"
+    },
+    {
+      "path": "/assets/Board3D-Dvwp3CeF.js",
+      "bytes": 952067,
+      "sha256": "08b2b8cbd83454521f3fa4884610554097cffbc87e4ab2aab1a16dd7d6496a4d",
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/assets/search.worker-B1wHbOjO.js",
+      "bytes": 11784,
+      "sha256": "cd6937275f4e9432bf0bdc82378c86257067bab40b55b485a56b99b4c00a0eb9",
+      "contentType": "text/javascript"
+    }
+  ],
+  "records": [
+    {
+      "path": "/experiments/long/manifest.json",
+      "bytes": 4862,
+      "sha256": "5aaf36fb4a0f012921dbc20dbbf8d4c2130896b1f560e71a744b7c7201ecc7ab"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 11483,
+      "sha256": "71403a23c49649cae2b17ceb56f42d530328b1c19d62c13e5587a362b9ac31a3"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 7466,
+      "sha256": "0b728de53d2794cbe4c8901611450c83c480a84ca14a2c5315dd30f731fc529b"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 11664,
+      "sha256": "80a69c1091e5995c45bf5e08816459db0edd91879fdcfcf86b5a1d50bbba93a6"
+    },
+    {
+      "path": "/experiments/manifest.json",
+      "bytes": 6036,
+      "sha256": "cbb4ba3dc55ccace51f33ba6060b1255d8977e387ee3d17b3eaa7a72e91f2b60"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 6033,
+      "sha256": "f668d1baebbf806c5ffe6af8512805421f68d128bcbbf2cf16a9ab68e15f1b78"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 6036,
+      "sha256": "1a19cf7571a726c21a501f79488f63148c2cfc745460a6286b82925bb27c22bd"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 6036,
+      "sha256": "2fa616c542a32640c1fdfa0c8fcf16687e644e7b5869d324387b69d3984be8da"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "initial-1",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1\",\"moves\":[],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 1,
+      "revision": 0,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "initial-2",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1\",\"moves\":[],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 2,
+      "revision": 1,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "initial-3",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1\",\"moves\":[],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 3,
+      "revision": 2,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "after-two-plies",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1\",\"moves\":[\"577567\",\"533543\"],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 4,
+      "revision": 3,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 2,
+      "hash": "8389387bc4629ac3",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "capture-promotion",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1\",\"moves\":[],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 5,
+      "revision": 4,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "8e02e7f1c6157c31",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "pieces-in-hand",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/4+p4/4+R4/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b 2Ps 1\",\"moves\":[],\"result\":null,\"termination\":null}",
+      "schema": 1,
+      "kind": "search",
+      "requestId": 6,
+      "revision": 5,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "26d6123f193bec3a",
+      "side": "b",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    },
+    {
+      "name": "history-with-redo",
+      "recordJson": "{\"ruleset_id\":\"voxelshogi-standard-v1\",\"initial\":\"8k/9/9/9/9/9/9/9/K8|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9 w - 1\",\"moves\":[\"111211\",\"991891\",\"211111\",\"891991\",\"111211\",\"991891\",\"211111\",\"891991\",\"111211\",\"991891\",\"211111\",\"891991\"],\"result\":{\"Draw\":{\"reason\":\"Repetition\"}},\"termination\":null}",
+      "cursor": 8,
+      "schema": 1,
+      "kind": "search",
+      "requestId": 7,
+      "revision": 6,
+      "ruleset": "voxelshogi-standard-v1",
+      "hash": "057b43c0717c9c4d",
+      "side": "w",
+      "difficulty": "normal",
+      "seed": 42,
+      "limits": {
+        "maxDepth": 6,
+        "maxNodes": 50000,
+        "maxTimeMs": 1000
+      }
+    }
+  ],
+  "browserProfiles": [
+    {
+      "name": "initial-1",
+      "schema": 1,
+      "requestId": 1,
+      "revision": 0,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "12144",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "253"
+      },
+      "metrics": {
+        "initMs": 1.8000000715255737,
+        "replayMs": 1.7999999523162842,
+        "searchMs": 1001.2000000476837,
+        "totalMs": 1004.8000000715256
+      },
+      "roundTripMs": 1052.8999999761581
+    },
+    {
+      "name": "initial-2",
+      "schema": 1,
+      "requestId": 2,
+      "revision": 1,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "13217",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "300"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.10000002384185791,
+        "searchMs": 1000.1000000238419,
+        "totalMs": 1000.2000000476837
+      },
+      "roundTripMs": 1000.5
+    },
+    {
+      "name": "initial-3",
+      "schema": 1,
+      "requestId": 3,
+      "revision": 2,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "043b66e12f6b84fd",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "13225",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "300"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.10000002384185791,
+        "searchMs": 1000.3999999761581,
+        "totalMs": 1000.5
+      },
+      "roundTripMs": 1000.7000000476837
+    },
+    {
+      "name": "after-two-plies",
+      "schema": 1,
+      "requestId": 4,
+      "revision": 3,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 2,
+      "hash": "8389387bc4629ac3",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "588522+",
+        "completedDepth": 2,
+        "lastIterationNodes": "1293",
+        "nodes": "8938",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "69"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.3999999761581421,
+        "searchMs": 1001,
+        "totalMs": 1001.3999999761581
+      },
+      "roundTripMs": 1001.5
+    },
+    {
+      "name": "capture-promotion",
+      "schema": 1,
+      "requestId": 5,
+      "revision": 4,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "8e02e7f1c6157c31",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "232222",
+        "completedDepth": 3,
+        "lastIterationNodes": "39677",
+        "nodes": "50000",
+        "schema": 1,
+        "score": 1000000,
+        "stopReason": "nodes",
+        "ttHits": "37932"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.10000002384185791,
+        "searchMs": 148.5,
+        "totalMs": 148.60000002384186
+      },
+      "roundTripMs": 148.89999997615814
+    },
+    {
+      "name": "pieces-in-hand",
+      "schema": 1,
+      "requestId": 6,
+      "revision": 5,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 0,
+      "hash": "26d6123f193bec3a",
+      "side": "b",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "555545",
+        "completedDepth": 2,
+        "lastIterationNodes": "2359",
+        "nodes": "50000",
+        "schema": 1,
+        "score": 1150,
+        "stopReason": "nodes",
+        "ttHits": "8191"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.10000002384185791,
+        "searchMs": 346,
+        "totalMs": 346.10000002384186
+      },
+      "roundTripMs": 346.2000000476837
+    },
+    {
+      "name": "history-with-redo",
+      "schema": 1,
+      "requestId": 7,
+      "revision": 6,
+      "ruleset": "voxelshogi-standard-v1",
+      "cursor": 8,
+      "hash": "057b43c0717c9c4d",
+      "side": "w",
+      "difficulty": "normal",
+      "kind": "result",
+      "result": {
+        "bestMove": "111211",
+        "completedDepth": 6,
+        "lastIterationNodes": "5943",
+        "nodes": "8768",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "depth",
+        "ttHits": "5613"
+      },
+      "metrics": {
+        "initMs": 0,
+        "replayMs": 0.19999992847442627,
+        "searchMs": 43.5,
+        "totalMs": 43.699999928474426
+      },
+      "roundTripMs": 43.89999997615814
+    }
+  ],
+  "nativeProfiles": [
+    {
+      "name": "initial-1",
+      "replayMs": 0.147125,
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "14194",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "300"
+      },
+      "searchMs": 1000.2615420000001,
+      "totalMs": 1000.410875
+    },
+    {
+      "name": "initial-2",
+      "replayMs": 0.060875000000000005,
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "14186",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "300"
+      },
+      "searchMs": 1000.664,
+      "totalMs": 1000.7268750000001
+    },
+    {
+      "name": "initial-3",
+      "replayMs": 0.057916,
+      "result": {
+        "bestMove": "171161",
+        "completedDepth": 2,
+        "lastIterationNodes": "1272",
+        "nodes": "14246",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "300"
+      },
+      "searchMs": 1000.479833,
+      "totalMs": 1000.539916
+    },
+    {
+      "name": "after-two-plies",
+      "replayMs": 0.07725,
+      "result": {
+        "bestMove": "588522+",
+        "completedDepth": 2,
+        "lastIterationNodes": "1293",
+        "nodes": "30850",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "time",
+        "ttHits": "2473"
+      },
+      "searchMs": 1000.0158329999999,
+      "totalMs": 1000.0952080000001
+    },
+    {
+      "name": "capture-promotion",
+      "replayMs": 0.017042,
+      "result": {
+        "bestMove": "232222",
+        "completedDepth": 3,
+        "lastIterationNodes": "39677",
+        "nodes": "50000",
+        "schema": 1,
+        "score": 1000000,
+        "stopReason": "nodes",
+        "ttHits": "37932"
+      },
+      "searchMs": 88.084542,
+      "totalMs": 88.10341700000001
+    },
+    {
+      "name": "pieces-in-hand",
+      "replayMs": 0.016667,
+      "result": {
+        "bestMove": "555545",
+        "completedDepth": 2,
+        "lastIterationNodes": "2359",
+        "nodes": "50000",
+        "schema": 1,
+        "score": 1150,
+        "stopReason": "nodes",
+        "ttHits": "8191"
+      },
+      "searchMs": 210.698291,
+      "totalMs": 210.716875
+    },
+    {
+      "name": "history-with-redo",
+      "replayMs": 0.071708,
+      "result": {
+        "bestMove": "111211",
+        "completedDepth": 6,
+        "lastIterationNodes": "5943",
+        "nodes": "8768",
+        "schema": 1,
+        "score": 0,
+        "stopReason": "depth",
+        "ttHits": "5613"
+      },
+      "searchMs": 25.490875,
+      "totalMs": 25.5645
+    }
+  ],
+  "sizeComparison": {
+    "baselineCommit": "2405e86a0313d4b454119bd472937f2e10622bf5",
+    "baselineEntryJsBytes": 1196200,
+    "actualInitialJsBytes": 255096,
+    "actualInitialJsTransferredBytes": 83198
+  }
+}
