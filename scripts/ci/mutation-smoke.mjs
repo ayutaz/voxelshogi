@@ -36,6 +36,17 @@ const mutations = [
   {"name": "search-incomplete-result", "file": "search.rs", "before": "result.stop_reason = reason;", "after": "result.score = Some(123); result.stop_reason = reason;", "args": ["--test", "search_contracts", "depth_node_and_time_limits_keep_only_a_completed_iteration"]},
 
   {"name": "baseline-move-counter", "file": "state.rs", "before": "next.ply += 1;", "after": "next.ply *= 1;", "args": ["--test", "experiment_record", "standard_baseline_uses_existing_rules_and_verified_record"]},
+  { name: 'session-termination-import', file: 'session.rs', before: 'session.termination = rec.termination;', after: 'session.termination = None;', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'session-termination-cursor', file: 'session.rs', before: '(self.cursor == self.len())', after: 'true', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'session-termination-branch', file: 'session.rs', before: 'self.termination = None;', after: '', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'session-terminal-play', file: 'session.rs', before: 'if self.is_finished() {\n            return Err', after: 'if false {\n            return Err', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'session-terminal-resign', file: 'session.rs', before: 'if self.is_finished() {\n            return;', after: 'if false {\n            return;', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'wasm-safe-integer', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'n > JS_MAX_SAFE_INTEGER', after: 'n > JS_MAX_SAFE_INTEGER + 1', args: ['--test', 'search_api', 'rejects_unsafe_numbers_unknown_fields_and_invalid_options_even_at_terminal'] },
+  { name: 'wasm-time-scale', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'ms / 1000.0', after: 'ms / 100.0', args: ['--test', 'search_api', 'incomplete_iterations_have_null_scores_and_clock_is_injected'] },
+  { name: 'wasm-node-budget', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'max_nodes: c.max_nodes,', after: 'max_nodes: None,', args: ['--test', 'search_api', 'incomplete_iterations_have_null_scores_and_clock_is_injected'] },
+  { name: 'wasm-absolute-ply', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'max_game_ply: c.max_game_ply,', after: 'max_game_ply: c.max_game_ply.map(|n| n + session.state().ply()),', args: ['--test', 'search_api', 'adapter_matches_native_and_hand_counted_corner_king_tree_without_changing_cursor'] },
+  { name: 'wasm-null-score', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: '"score":r.score,', after: '"score":r.score.or(Some(0)),', args: ['--test', 'search_api', 'incomplete_iterations_have_null_scores_and_clock_is_injected'] },
+  { name: 'wasm-abandoned-fallback', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'session.state().result().is_none() && session.termination().is_some()', after: 'false', args: ['--test', 'search_api', 'terminal_records_do_not_produce_fallback_moves'] },
 ];
 
 function main() {
@@ -44,8 +55,8 @@ function main() {
   mkdirSync(output, { recursive: true });
   const work = mkdtempSync(join(tmpdir(), 'voxelshogi-mutations-'));
   const results = [];
-  const run = (name, args) => {
-    const result = spawnSync('cargo', ['test', '--locked', '-p', 'voxelshogi-core', ...args], {
+  const run = (name, args, crate = 'voxelshogi-core') => {
+    const result = spawnSync('cargo', ['test', '--locked', '-p', crate, ...args], {
       cwd: work,
       env: { ...process.env, CARGO_TERM_COLOR: 'never', CARGO_TARGET_DIR: join(root, 'target/mutation-smoke') },
       encoding: 'utf8', timeout: 120_000, maxBuffer: 8 * 1024 * 1024,
@@ -57,13 +68,14 @@ function main() {
     for (const file of ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml']) cpSync(join(root, file), join(work, file));
     cpSync(join(root, 'crates'), join(work, 'crates'), { recursive: true, filter: (source) => !['target', 'pkg'].includes(basename(source)) });
     assert.equal(run('baseline', []), 'passed', 'Original tests must pass before injecting mutations');
+    assert.equal(run('wasm-baseline', [], 'voxelshogi-wasm'), 'passed', 'WASM adapter tests must pass before injecting mutations');
     for (const mutation of mutations) {
-      const path = join(work, 'crates/voxelshogi-core/src', mutation.file);
+      const path = join(work, 'crates', mutation.crate ?? 'voxelshogi-core', 'src', mutation.file);
       const original = readFileSync(path, 'utf8');
       assert.equal(original.split(mutation.before).length - 1, 1, `Stale mutation anchor: ${mutation.name}`);
       try {
         writeFileSync(path, original.replace(mutation.before, mutation.after));
-        const outcome = run(mutation.name, mutation.args);
+        const outcome = run(mutation.name, mutation.args, mutation.crate);
         results.push({ name: mutation.name, outcome });
         console.log(`${mutation.name}: ${outcome}`);
         assert.equal(outcome, 'caught', `Mutation was not caught by a failing test: ${mutation.name}`);
@@ -71,7 +83,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 21);
+    assert.equal(results.length, 32);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

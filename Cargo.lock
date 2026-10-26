@@ -128,6 +128,7 @@ dependencies = [
 name = "voxelshogi-wasm"
 version = "0.1.0"
 dependencies = [
+ "serde",
  "serde_json",
  "voxelshogi-core",
  "wasm-bindgen",

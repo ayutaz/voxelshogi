@@ -3,7 +3,7 @@
 
 use crate::notation::{from_vsfen, parse_move, to_vsfen};
 use crate::record::{GameRecord, Termination};
-use crate::state::{GameResult, GameState, WinReason};
+use crate::state::{DrawReason, GameResult, GameState};
 
 #[derive(Clone, Debug)]
 pub struct Session {
@@ -11,6 +11,8 @@ pub struct Session {
     states: Vec<GameState>,
     moves: Vec<String>,
     cursor: usize,
+    /// External termination belongs to the end of the full record, not the cursor.
+    termination: Option<Termination>,
 }
 
 impl Session {
@@ -23,6 +25,7 @@ impl Session {
             states: vec![start],
             moves: Vec::new(),
             cursor: 0,
+            termination: None,
         }
     }
 
@@ -43,11 +46,31 @@ impl Session {
         if rec.termination == Some(Termination::Resignation) {
             session.resign();
         }
+        session.termination = rec.termination;
         Ok(session)
     }
 
     pub fn state(&self) -> &GameState {
         &self.states[self.cursor]
+    }
+
+    pub fn termination(&self) -> Option<Termination> {
+        (self.cursor == self.len())
+            .then_some(self.termination)
+            .flatten()
+    }
+
+    pub fn result(&self) -> Option<GameResult> {
+        self.state().result().or_else(|| {
+            (self.termination() == Some(Termination::MaxPlies)).then_some(GameResult::Draw {
+                reason: DrawReason::MaxPlies,
+            })
+        })
+    }
+
+    /// Abandoned games are stopped even though they have no winning/drawn result.
+    pub fn is_finished(&self) -> bool {
+        self.termination().is_some() || self.result().is_some()
     }
 
     pub fn moves(&self) -> &[String] {
@@ -76,6 +99,9 @@ impl Session {
 
     /// Plays a move at the cursor. Moves after the cursor are discarded.
     pub fn play(&mut self, mv: &str) -> Result<(), String> {
+        if self.is_finished() {
+            return Err("game is finished".into());
+        }
         let m = parse_move(mv).map_err(|e| e.to_string())?;
         let next = self.state().apply_move(&m).map_err(|e| e.to_string())?;
         self.states.truncate(self.cursor + 1);
@@ -83,6 +109,7 @@ impl Session {
         self.states.push(next);
         self.moves.push(m.to_string());
         self.cursor += 1;
+        self.termination = None;
         Ok(())
     }
 
@@ -113,27 +140,28 @@ impl Session {
 
     /// The side to move at the cursor resigns; later moves are discarded.
     pub fn resign(&mut self) {
+        if self.is_finished() {
+            return;
+        }
         self.states.truncate(self.cursor + 1);
         self.moves.truncate(self.cursor);
         self.states[self.cursor].resign();
+        self.termination = Some(Termination::Resignation);
     }
 
     pub fn to_record_json(&self) -> String {
         let last = self.states.last().expect("at least the start state");
-        let result = last.result();
-        let termination = match result {
-            Some(GameResult::Win {
-                reason: WinReason::Resignation,
-                ..
-            }) => Some(Termination::Resignation),
-            _ => None,
-        };
+        let result = last.result().or_else(|| {
+            (self.termination == Some(Termination::MaxPlies)).then_some(GameResult::Draw {
+                reason: DrawReason::MaxPlies,
+            })
+        });
         GameRecord {
             ruleset_id: crate::record::RULESET_ID.to_string(),
             initial: to_vsfen(&self.states[0]),
             moves: self.moves.clone(),
             result,
-            termination,
+            termination: self.termination,
         }
         .to_json()
     }

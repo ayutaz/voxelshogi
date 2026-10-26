@@ -161,3 +161,81 @@ fn session_from_vsfen_uses_that_start_position() {
     let rec = GameRecord::from_json(&s.to_record_json()).unwrap();
     assert_eq!(rec.initial, v);
 }
+
+#[test]
+fn external_termination_survives_export_and_only_applies_at_record_end() {
+    use voxelshogi_core::DrawReason;
+    for termination in [Termination::MaxPlies, Termination::Abandoned] {
+        let expected = (termination == Termination::MaxPlies).then_some(GameResult::Draw {
+            reason: DrawReason::MaxPlies,
+        });
+        let record = GameRecord {
+            ruleset_id: voxelshogi_core::record::RULESET_ID.into(),
+            initial: to_vsfen(&GameState::new()),
+            moves: vec!["577567".into(), "533543".into()],
+            result: expected,
+            termination: Some(termination),
+        };
+        let mut s = Session::from_record_json(&record.to_json()).unwrap();
+        assert_eq!(s.result(), expected);
+        assert_eq!(s.termination(), Some(termination));
+        assert!(s.is_finished());
+        let before = s.to_record_json();
+        assert!(
+            s.play("567557").is_err(),
+            "externally stopped games cannot advance"
+        );
+        s.resign();
+        assert_eq!(
+            s.to_record_json(),
+            before,
+            "a finished result cannot be replaced"
+        );
+        assert_eq!(GameRecord::from_json(&before).unwrap(), record);
+        assert!(s.undo());
+        assert_eq!(s.result(), None);
+        assert_eq!(s.termination(), None);
+        assert!(!s.is_finished());
+        assert_eq!(
+            s.to_record_json(),
+            before,
+            "export includes the redo future"
+        );
+        assert!(s.redo());
+        assert!(s.is_finished());
+        s.goto(0).unwrap();
+        assert!(s.play("577567").is_ok());
+        assert!(!s.is_finished());
+        let branched = GameRecord::from_json(&s.to_record_json()).unwrap();
+        assert_eq!(branched.moves, ["577567"]);
+        assert_eq!(branched.termination, None);
+        assert_eq!(branched.result, None);
+        branched.replay().unwrap();
+    }
+}
+
+#[test]
+fn resignation_at_an_earlier_cursor_replaces_future_external_termination() {
+    let record = GameRecord {
+        ruleset_id: voxelshogi_core::record::RULESET_ID.into(),
+        initial: to_vsfen(&GameState::new()),
+        moves: vec!["577567".into()],
+        result: None,
+        termination: Some(Termination::Abandoned),
+    };
+    let mut s = Session::from_record_json(&record.to_json()).unwrap();
+    s.goto(0).unwrap();
+    s.resign();
+    assert_eq!(
+        s.result(),
+        Some(GameResult::Win {
+            winner: Color::White,
+            reason: WinReason::Resignation,
+        })
+    );
+    assert_eq!(s.termination(), Some(Termination::Resignation));
+    let saved = GameRecord::from_json(&s.to_record_json()).unwrap();
+    assert!(saved.moves.is_empty());
+    assert_eq!(saved.termination, Some(Termination::Resignation));
+    saved.replay().unwrap();
+}

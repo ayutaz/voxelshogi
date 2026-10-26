@@ -130,6 +130,8 @@ jobs:
       - run: pnpm wasm
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Compare native and real WASM search
+        run: node ../../scripts/ci/search-parity.mjs
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm e2e

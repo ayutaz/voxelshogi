@@ -19,6 +19,7 @@ export interface Snapshot {
   moves: string[];
   lastMove: string | null;
   result: ResultInfo | null;
+  finished: boolean;
   inCheck: Record<Color, boolean>;
   kingSquare: Record<Color, number>;
   hash: string;
@@ -64,12 +65,13 @@ export class GameStore {
       board,
       hands: g.hands(),
       side: g.sideToMove() === 'b' ? 'b' : 'w',
-      legal: result ? [] : g.legalMoves(),
+      legal: g.isFinished() ? [] : g.legalMoves(),
       ply: g.ply(),
       moveCount: g.moveCount(),
       moves: g.moveList(),
       lastMove: g.lastMove() ?? null,
       result,
+      finished: g.isFinished(),
       inCheck: { b: g.isInCheck(true), w: g.isInCheck(false) },
       kingSquare: { b: board.indexOf(BLACK_KING), w: board.indexOf(WHITE_KING) },
       hash: g.hash(),

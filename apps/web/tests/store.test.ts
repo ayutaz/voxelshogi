@@ -66,4 +66,22 @@ describe('GameStore', () => {
     const r = s.importRecord('x'.repeat(5 * 1024 * 1024));
     expect(r.ok).toBe(false);
   });
+
+  it('marks abandoned and move-limit records as finished, preserving their metadata', () => {
+    const s = new GameStore();
+    s.play('577567');
+    for (const termination of ['Abandoned', 'MaxPlies']) {
+      const record = { ...JSON.parse(s.exportRecord()), termination,
+        result: termination === 'MaxPlies' ? { Draw: { reason: 'MaxPlies' } } : null };
+      expect(s.importRecord(JSON.stringify(record))).toEqual({ ok: true });
+      expect(s.snapshot().finished).toBe(true);
+      expect(s.snapshot().legal).toEqual([]);
+      expect(s.snapshot().result).toEqual(termination === 'MaxPlies' ? { kind: 'draw', reason: 'MaxPlies' } : null);
+      expect(JSON.parse(s.exportRecord())).toEqual(record);
+      s.undo();
+      expect(s.snapshot().finished).toBe(false);
+      expect(s.snapshot().legal.length).toBe(424);
+      s.redo();
+    }
+  });
 });

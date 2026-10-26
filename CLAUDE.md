@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M2_PLAN.md`（計画策定済み・実装未着手）
+- 次の実行計画: `docs/M2_PLAN.md`（M2-1のWASM探索APIを実装・検証中。Worker／観戦UIは未実装）
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -22,7 +22,7 @@
 | `crates/voxelshogi-wasm` | wasm-bindgen による薄いラッパー（`Game`／`ExperimentReplay` クラス）。ルールを再実装しない |
 | `apps/web` | VoxelShogi Arena（Vite + React + three/R3F）。エンジンの出力をデコードして表示するだけ |
 | `docs/` | 仕様・ADR・調査・見積もり・`experiments/` の固定集計 |
-| `crates/voxelshogi-core/src/search.rs` | M1の標準1王・全幅αβ探索。WASM公開API／WorkerはM2で追加 |
+| `crates/voxelshogi-core/src/search.rs` | M1の標準1王・全幅αβ探索。M2-1でWASM `Game.bestMove` を追加。WorkerはM2-2 |
 | `scripts/experiment-pack.mjs` | R0のJSONLをWASMで再生照合し、集計と代表棋譜を作成 |
 | `apps/web/public/experiments` | 400／800手の代表棋譜6件と配信用manifest。学習モデルではない |
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
@@ -45,7 +45,7 @@
 ## コマンド
 
 ```bash
-cargo test --locked --workspace            # Rust（150件、プロファイル test は opt-level 2）
+cargo test --locked --workspace            # Rust（core152件＋WASM境界5件、testはopt-level 2）
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
 cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度

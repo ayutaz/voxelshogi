@@ -1,0 +1,326 @@
+[
+  {
+    "name": "corner-kings-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 42",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 2
+    },
+    "expected": {
+      "schema": 1,
+      "score": 0,
+      "completedDepth": 2,
+      "nodes": "29",
+      "lastIterationNodes": "21",
+      "ttHits": "0",
+      "stopReason": "depth",
+      "bestMove": "999888"
+    }
+  },
+  {
+    "name": "repetition-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/K8|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9 w - 1",
+      "moves": [
+        "111211",
+        "991891",
+        "211111",
+        "891991",
+        "111211",
+        "991891",
+        "211111",
+        "891991",
+        "111211",
+        "991891",
+        "211111",
+        "891991"
+      ],
+      "result": {
+        "Draw": {
+          "reason": "Repetition"
+        }
+      },
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0,
+      "maxNodes": 0,
+      "maxTimeMs": 0
+    },
+    "expected": {
+      "bestMove": null,
+      "score": 0,
+      "stopReason": "terminal",
+      "nodes": "0"
+    }
+  },
+  {
+    "name": "perpetual-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/K8|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/8R/9/9/9/9 w - 1",
+      "moves": [
+        "111211",
+        "159259",
+        "211111",
+        "259159",
+        "111211",
+        "159259",
+        "211111",
+        "259159",
+        "111211",
+        "159259",
+        "211111",
+        "259159"
+      ],
+      "result": {
+        "Win": {
+          "winner": "White",
+          "reason": "PerpetualCheck"
+        }
+      },
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0,
+      "maxNodes": 0,
+      "maxTimeMs": 0
+    },
+    "expected": {
+      "bestMove": null,
+      "score": 1000000,
+      "stopReason": "terminal",
+      "nodes": "0"
+    }
+  },
+  {
+    "name": "mate-in-one-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 1
+    },
+    "expected": {
+      "score": 1000000,
+      "completedDepth": 1,
+      "stopReason": "depth"
+    },
+    "mateWinner": "Black"
+  },
+  {
+    "name": "material-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/4+p4/4+R4/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b 2Ps 1",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0
+    },
+    "expected": {
+      "score": 500,
+      "completedDepth": 0,
+      "nodes": "1",
+      "stopReason": "depth"
+    }
+  },
+  {
+    "name": "corner-kings-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 w - 42",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 2
+    },
+    "expected": {
+      "schema": 1,
+      "score": 0,
+      "completedDepth": 2,
+      "nodes": "29",
+      "lastIterationNodes": "21",
+      "ttHits": "0",
+      "stopReason": "depth",
+      "bestMove": "111211"
+    }
+  },
+  {
+    "name": "repetition-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|8k/9/9/9/9/9/9/9/K8 b - 1",
+      "moves": [
+        "999899",
+        "119219",
+        "899999",
+        "219119",
+        "999899",
+        "119219",
+        "899999",
+        "219119",
+        "999899",
+        "119219",
+        "899999",
+        "219119"
+      ],
+      "result": {
+        "Draw": {
+          "reason": "Repetition"
+        }
+      },
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0,
+      "maxNodes": 0,
+      "maxTimeMs": 0
+    },
+    "expected": {
+      "bestMove": null,
+      "score": 0,
+      "stopReason": "terminal",
+      "nodes": "0"
+    }
+  },
+  {
+    "name": "perpetual-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "9/9/9/9/r8/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|8k/9/9/9/9/9/9/9/K8 b - 1",
+      "moves": [
+        "999899",
+        "951851",
+        "899999",
+        "851951",
+        "999899",
+        "951851",
+        "899999",
+        "851951",
+        "999899",
+        "951851",
+        "899999",
+        "851951"
+      ],
+      "result": {
+        "Win": {
+          "winner": "Black",
+          "reason": "PerpetualCheck"
+        }
+      },
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0,
+      "maxNodes": 0,
+      "maxTimeMs": 0
+    },
+    "expected": {
+      "bestMove": null,
+      "score": 1000000,
+      "stopReason": "terminal",
+      "nodes": "0"
+    }
+  },
+  {
+    "name": "mate-in-one-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/2g6/9/9|9/9/9/9/9/9/1+r7/9/9|9/9/9/9/9/9/9/9/K8 w - 1",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 1
+    },
+    "expected": {
+      "score": 1000000,
+      "completedDepth": 1,
+      "stopReason": "depth"
+    },
+    "mateWinner": "White"
+  },
+  {
+    "name": "material-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/4+p4/4+R4/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 w 2Ps 1",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 0
+    },
+    "expected": {
+      "score": -500,
+      "completedDepth": 0,
+      "nodes": "1",
+      "stopReason": "depth"
+    }
+  },
+  {
+    "name": "node-budget-b",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 42",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 4,
+      "maxNodes": 9
+    },
+    "expected": {
+      "schema": 1,
+      "bestMove": "999888",
+      "score": 0,
+      "completedDepth": 1,
+      "nodes": "9",
+      "lastIterationNodes": "8",
+      "ttHits": "0",
+      "stopReason": "nodes"
+    }
+  },
+  {
+    "name": "node-budget-w",
+    "record": {
+      "ruleset_id": "voxelshogi-standard-v1",
+      "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 w - 42",
+      "moves": [],
+      "result": null,
+      "termination": null
+    },
+    "config": {
+      "maxDepth": 4,
+      "maxNodes": 9
+    },
+    "expected": {
+      "schema": 1,
+      "bestMove": "111211",
+      "score": 0,
+      "completedDepth": 1,
+      "nodes": "9",
+      "lastIterationNodes": "8",
+      "ttHits": "0",
+      "stopReason": "nodes"
+    }
+  }
+]
