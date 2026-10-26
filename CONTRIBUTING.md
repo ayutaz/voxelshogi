@@ -53,7 +53,7 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の14変異の回帰検証を実行する。必須チェックは次の7件。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の20変異の回帰検証を実行する。必須チェックは次の7件。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`

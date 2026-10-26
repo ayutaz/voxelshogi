@@ -535,3 +535,186 @@ impl Default for GameState {
         GameState::new()
     }
 }
+
+// Search-only contracts. External moves still go through check_move/apply_move.
+impl GameState {
+    /// Apply a move generated from this exact position, retaining the complete history.
+    pub(crate) fn after_generated(&self, mv: &Move) -> Self {
+        self.make_unchecked(mv)
+    }
+
+    /// A stored result (repetition/resignation), without generating moves for mate detection.
+    pub(crate) fn recorded_result(&self) -> Option<GameResult> {
+        self.terminal
+    }
+
+    /// Conservative upper bound: even visiting one past hash at every future ply
+    /// cannot produce four occurrences when max_count + depth < 4. Only then may
+    /// a search cache omit history. Otherwise cache scores are not reused.
+    pub(crate) fn repetition_possible_within(&self, depth: u8) -> bool {
+        let mut counts = std::collections::HashMap::new();
+        self.history.iter().any(|entry| {
+            let count = counts.entry(entry.hash).or_insert(0usize);
+            *count += 1;
+            *count + usize::from(depth) >= 4
+        })
+    }
+}
+
+#[cfg(test)]
+mod search_transition_tests {
+    use super::*;
+
+    fn same(a: &GameState, b: &GameState) {
+        assert_eq!(a.board(), b.board());
+        assert_eq!(a.hands(), b.hands());
+        assert_eq!(a.side_to_move(), b.side_to_move());
+        assert_eq!(a.ply(), b.ply());
+        assert_eq!(a.hash(), b.hash());
+        assert_eq!(a.history, b.history);
+        assert_eq!(a.terminal, b.terminal);
+        assert_eq!(a.result(), b.result());
+    }
+
+    #[test]
+    fn generated_transitions_match_checked_for_every_candidate_in_seeded_games() {
+        for mut seed in [42u64, 7931] {
+            let mut game = GameState::new();
+            for _ in 0..16 {
+                let moves = game.legal_moves();
+                assert!(!moves.is_empty());
+                for mv in &moves {
+                    same(&game.after_generated(mv), &game.apply_move(mv).unwrap());
+                }
+                seed ^= seed << 13;
+                seed ^= seed >> 7;
+                seed ^= seed << 17;
+                let mv = moves[seed as usize % moves.len()];
+                let next = game.after_generated(&mv);
+                assert_eq!(
+                    next.legal_moves(),
+                    game.apply_move(&mv).unwrap().legal_moves()
+                );
+                game = next;
+            }
+        }
+    }
+
+    #[test]
+    fn generated_transitions_preserve_perpetual_check_history_for_both_colors() {
+        for checker in Color::ALL {
+            let sq = |x, y, z| {
+                if checker == Color::Black {
+                    Square::new(x, y, z)
+                } else {
+                    Square::new(8 - x, 8 - y, 8 - z)
+                }
+            };
+            let mut b = Board::empty();
+            for (at, color, kind) in [
+                (sq(0, 0, 0), checker.opponent(), PieceKind::King),
+                (sq(8, 8, 0), checker, PieceKind::King),
+                (sq(0, 4, 8), checker, PieceKind::Rook),
+            ] {
+                b.set(at, Some(Piece::new(color, kind)));
+            }
+            let mut g = GameState::from_parts(b, [[0; 7]; 2], checker.opponent());
+            let cycle = [
+                (sq(0, 0, 0), sq(1, 0, 0)),
+                (sq(0, 4, 8), sq(1, 4, 8)),
+                (sq(1, 0, 0), sq(0, 0, 0)),
+                (sq(1, 4, 8), sq(0, 4, 8)),
+            ];
+            for i in 0..12 {
+                let (from, to) = cycle[i % 4];
+                let mv = Move::Normal {
+                    from,
+                    to,
+                    promote: false,
+                };
+                same(&g.after_generated(&mv), &g.apply_move(&mv).unwrap());
+                g = g.after_generated(&mv);
+            }
+            assert_eq!(
+                g.result(),
+                Some(GameResult::Win {
+                    winner: checker.opponent(),
+                    reason: WinReason::PerpetualCheck
+                })
+            );
+        }
+    }
+
+    #[test]
+    fn generated_capture_promotion_drop_and_repetition_preserve_contracts() {
+        let sq = Square::new;
+        let mut board = Board::empty();
+        board.set(sq(8, 8, 8), Some(Piece::new(Color::Black, PieceKind::King)));
+        board.set(sq(0, 0, 0), Some(Piece::new(Color::White, PieceKind::King)));
+        board.set(sq(4, 2, 4), Some(Piece::new(Color::Black, PieceKind::Pawn)));
+        board.set(
+            sq(4, 1, 4),
+            Some(Piece::new(Color::White, PieceKind::PromotedSilver)),
+        );
+        let game = GameState::from_parts(board, [[0; 7]; 2], Color::Black);
+        let mv = Move::Normal {
+            from: sq(4, 2, 4),
+            to: sq(4, 1, 4),
+            promote: true,
+        };
+        assert!(game.legal_moves().contains(&mv));
+        let next = game.after_generated(&mv);
+        same(&next, &game.apply_move(&mv).unwrap());
+        assert_eq!(next.hand_count(Color::Black, PieceKind::Silver), 1);
+        assert_eq!(
+            next.board().get(sq(4, 1, 4)),
+            Some(Piece::new(Color::Black, PieceKind::Tokin))
+        );
+        let reply = Move::Normal {
+            from: sq(0, 0, 0),
+            to: sq(0, 1, 0),
+            promote: false,
+        };
+        let game = next.apply_move(&reply).unwrap();
+        let drop = Move::Drop {
+            kind: PieceKind::Silver,
+            to: sq(4, 4, 4),
+        };
+        assert!(game.legal_moves().contains(&drop));
+        same(
+            &game.after_generated(&drop),
+            &game.apply_move(&drop).unwrap(),
+        );
+        assert_eq!(
+            game.after_generated(&drop)
+                .hand_count(Color::Black, PieceKind::Silver),
+            0
+        );
+        let mut board = Board::empty();
+        board.set(sq(8, 8, 8), Some(Piece::new(Color::Black, PieceKind::King)));
+        board.set(sq(0, 0, 0), Some(Piece::new(Color::White, PieceKind::King)));
+        let mut game = GameState::from_parts(board, [[0; 7]; 2], Color::Black);
+        let cycle = [
+            (sq(8, 8, 8), sq(7, 8, 8)),
+            (sq(0, 0, 0), sq(1, 0, 0)),
+            (sq(7, 8, 8), sq(8, 8, 8)),
+            (sq(1, 0, 0), sq(0, 0, 0)),
+        ];
+        for i in 0..12 {
+            let (from, to) = cycle[i % 4];
+            let mv = Move::Normal {
+                from,
+                to,
+                promote: false,
+            };
+            same(&game.after_generated(&mv), &game.apply_move(&mv).unwrap());
+            game = game.after_generated(&mv);
+        }
+        assert_eq!(
+            game.result(),
+            Some(GameResult::Draw {
+                reason: DrawReason::Repetition
+            })
+        );
+    }
+}

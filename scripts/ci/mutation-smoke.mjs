@@ -28,6 +28,13 @@ const mutations = [
   { name: 'capture-repetition', file: 'capture.rs', before: '.count() >= 4', after: '.count() >= 3', args: ['--test', 'capture_experiment', 'repetition_is_fourfold'] },
   { name: 'capture-record-hash', file: 'experiment.rs', before: 'format!("{:016x}", g.hash()) != r.final_hash', after: 'false', args: ['--test', 'experiment_record', 'complete_record_replays_and_rejects_forgery'] },
   { name: 'capture-king-value', file: 'experiment.rs', before: '25_000 *', after: '0 *', args: ['--lib', 'experiment::tests::finds_immediate_target_and_evaluation_has_hand_calculated_sign'] },
+  {"name": "search-material-sign", "file": "search.rs", "before": "    value\n}\n", "after": "    -value\n}\n", "args": ["--test", "search_contracts", "material_values_and_side_perspective_are_hand_counted"]},
+  {"name": "search-terminal-before-material", "file": "search.rs", "before": "terminal(game, !game.has_legal_move(), self.limits.max_game_ply)", "after": "None", "args": ["--test", "search_contracts", "finds_mate_in_one_for_both_sides_and_terminal_precedes_zero_depth_and_budgets"]},
+  {"name": "search-node-budget", "file": "search.rs", "before": "self.nodes >= nodes", "after": "self.nodes > nodes", "args": ["--test", "search_contracts", "depth_node_and_time_limits_keep_only_a_completed_iteration"]},
+  {"name": "search-tt-history", "file": "search.rs", "before": "|| game.repetition_possible_within(depth)", "after": "|| false", "args": ["--lib", "search::tests::history_sensitive_positions_never_probe_position_only_scores"]},
+  {"name": "search-tt-bound", "file": "search.rs", "before": "if entry.bound == Bound::Exact", "after": "if true", "args": ["--lib", "search::tests::cache_bounds_are_not_mistaken_for_exact_scores"]},
+  {"name": "search-incomplete-result", "file": "search.rs", "before": "result.stop_reason = reason;", "after": "result.score = Some(123); result.stop_reason = reason;", "args": ["--test", "search_contracts", "depth_node_and_time_limits_keep_only_a_completed_iteration"]},
+
 ];
 
 function main() {
@@ -63,7 +70,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 14);
+    assert.equal(results.length, 20);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
