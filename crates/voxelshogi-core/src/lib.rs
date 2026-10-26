@@ -12,6 +12,7 @@ pub mod moves;
 pub mod notation;
 pub mod piece;
 pub mod record;
+pub mod search;
 pub mod session;
 pub mod state;
 pub mod zobrist;

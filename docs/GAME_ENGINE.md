@@ -1,6 +1,6 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
-更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。PythonバインディングとM1完成版の探索は未実装。
+更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・統合の状況は [M1検証記録](M1_VALIDATION.md)。PythonバインディングとWebのライブ探索は未実装。
 
 ## モジュール
 
@@ -17,6 +17,7 @@
 | `session` | 標準の棋譜カーソル、undo/redo/goto、投了、入出力 |
 | `capture` | 9王試作の `CaptureGame` / `CaptureRule` / `Outcome`。立体移動は `movegen` を共用 |
 | `experiment` | 幅制限探索、実験棋譜、検証済み `Replay`、標準1王の比較対照 |
+| `search` | 標準1王の全幅αβ、駒得評価、反復深化・置換表・上限・計測 |
 
 ## 標準ルールのRust API
 
@@ -51,6 +52,35 @@ fn main() -> Result<(), MoveError> {
 - `GameRecord` は `ruleset_id = voxelshogi-standard-v1` と初期VSFENを持つ。JSONは4 MiB以下、20,000手以下。`from_json` は形式・サイズを読み、`replay` が全着手と結果を再検証する。UIの `Session` / WASMの `Game.fromRecordJson` は再生検証まで行う。
 - ルール外の終局は `Termination::{Resignation, MaxPlies, Abandoned}`。標準の上限打ち切りと9王の規定手数採点を混同しない。
 
+## M1：標準1王の探索API
+
+```rust
+use voxelshogi_core::GameState;
+use voxelshogi_core::search::{search, SearchLimits, SearchOptions};
+
+fn main() -> Result<(), &'static str> {
+    let game = GameState::new();
+    let limits = SearchLimits {
+        max_depth: 3, max_nodes: Some(2_000),
+        max_time: None, max_game_ply: None,
+    };
+    let result = search(&game, limits, SearchOptions::default())?;
+    assert!(game.is_legal(&result.best_move.unwrap()));
+    assert!(result.nodes <= 2_000);
+    Ok(())
+}
+```
+
+- `evaluate(&GameState)` は手番側の駒得（歩=100）、`piece_value(PieceKind)` は固定の駒価値。王の捕獲を評価せず、終局を先に処理する。勝ち／負けは±1,000,000、引き分け0。詰み距離の補正はない。
+- `SearchLimits` は深さ0〜64、ノード数、時間、任意の絶対ゲーム手数上限。`SearchOptions` は反復深化・手の並べ替え・置換表とその容量（0〜1,000,000件）。不正な上限はエラー。
+- `SearchResult` は `best_move`、`score`、`completed_depth`、`nodes`、`last_iteration_nodes`、`tt_hits`、`stop_reason`。停止理由は `Depth / Nodes / Time / Terminal`。
+- 中断した反復の評価は採用しない。未探索なら合法な代替手を返して `score=None`、深さ0を完了した場合は静的評価。終局では手なしと終局評価を返す。代替手は `Move` 全順序の最初。
+- ノード数は根・葉・置換表ヒットを含む訪問局面数。反復全体で予算を共有し、根の事前の終局確認・合法手取得は数えない。時間上限は各ノード直前に確認し、合法手生成など1処理分は超過し得る。
+- `search_with_clock` は単調な経過時間の関数を受け取る。Nativeの `search` は必要なときだけ `Instant` を使い、M2のWASMアダプタにはブラウザの時計を渡す。
+- 全合法手を保持する。置換表は呼び出しごとに新規作成し、同じ深さ・上限までの残り手数を区別する。履歴の最大同一ハッシュ出現数＋残り探索深さが4未満のノードだけ履歴を省略して再利用し、それ以外では再利用を止める。EXACT/LOWER/UPPERを区別し、中断ノードは保存しない。
+- 同じ局面・履歴・設定・深さ／ノード上限で再現可能。時間だけの上限では完了深さが変わり得る。仕様・戦術・同値性と計測は [M1計画](M1_PLAN.md)・[検証記録](M1_VALIDATION.md) を参照。
+- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` やWeb WorkerはM2で追加する。
+
 ## 9王試作と探索のRust API
 
 ```rust
@@ -80,7 +110,7 @@ fn main() -> Result<(), String> {
 | `from_parts` | テストなどの任意局面。駒総数・二歩・行き所を検証し、欠けた相手王を捕獲済みとして数える。履歴はply 0から |
 | `choose_move` | 同じ局面・履歴・設定・seedで再現。深さ1〜3、候補幅1〜64。`(Move, ノード数)` またはエラー |
 
-探索用の `after_generated` は同じ局面の生成済み合法手だけを渡すcrate内部の経路。外部には検証付きAPIを使う。R0探索は候補幅を切るため、全合法手のminimax値を保存する保証はない。反復深化・置換表・ノード／時間上限・M1の戦術契約は未実装。
+探索用の `after_generated` は同じ局面の生成済み合法手だけを渡すcrate内部の経路。外部には検証付きAPIを使う。R0探索は候補幅を切るため、全合法手のminimax値を保存する保証はない。このR0実装には反復深化・置換表・ノード／時間上限を追加していない。標準1王のM1探索は上記の別APIを使う。
 
 ### 実験棋譜と比較対照
 

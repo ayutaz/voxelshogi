@@ -157,7 +157,10 @@ jobs:
       - name: Test core mutants
         run: |
           mutant_status=0
-          cargo mutants --package voxelshogi-core --shard "$SHARD/8" --timeout 90 --jobs 2 --cargo-arg=--locked || mutant_status=$?
+          # Invoke the binary directly: `cargo mutants` resets CARGO to Cargo itself.
+          toolchain="$(rustup show active-toolchain)"
+          RUSTUP_TOOLCHAIN="${toolchain%% *}" VOXELSHOGI_MUTATION_CARGO="$(rustup which cargo)" CARGO="$GITHUB_WORKSPACE/scripts/ci/mutation-cargo.sh" \
+            cargo-mutants mutants --package voxelshogi-core --shard "$SHARD/8" --timeout 90 --jobs 2 --cargo-arg=--locked || mutant_status=$?
           # Exit 2 means survivors; only the exact, source-pinned equivalences may pass review.
           if [ "$mutant_status" -ne 0 ] && [ "$mutant_status" -ne 2 ]; then
             exit "$mutant_status"

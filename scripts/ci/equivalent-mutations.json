@@ -2,14 +2,14 @@
   {
     "name": "crates/voxelshogi-core/src/state.rs:474:49: replace + with * in GameState::repetition_result",
     "file": "crates/voxelshogi-core/src/state.rs",
-    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
-    "reason": "docs/M0_VALIDATION.md: first occurrence and last occurrence share the same position/side/check; including that duplicate does not change all/any. Re-review whenever the source changes."
+    "source_sha256": "a583d74b2994ef2cadcf75b42e91586dfce4cf783cebd84b12d01e306b2ff58c",
+    "reason": "docs/M0_VALIDATION.md: first occurrence and last occurrence share the same position/side/check; including that duplicate does not change all/any. Re-review whenever the source changes. M1 re-review: only search helpers/tests were appended; the repetition implementation and this source location are unchanged."
   },
   {
     "name": "crates/voxelshogi-core/src/state.rs:479:47: replace == with != in GameState::repetition_result",
     "file": "crates/voxelshogi-core/src/state.rs",
-    "source_sha256": "f0535aab9a9fa56e592f0b10de923c5d0e0fa90ea8b7447d513ec27095389737",
-    "reason": "docs/M0_VALIDATION.md: a fourfold repetition span contains both alternating sides, so the separate any guard is true for either side. The check-filter is unchanged."
+    "source_sha256": "a583d74b2994ef2cadcf75b42e91586dfce4cf783cebd84b12d01e306b2ff58c",
+    "reason": "docs/M0_VALIDATION.md: a fourfold repetition span contains both alternating sides, so the separate any guard is true for either side. The check-filter is unchanged. M1 re-review: only search helpers/tests were appended; the repetition implementation and this source location are unchanged."
   },
   {
     "name": "crates/voxelshogi-core/src/movegen.rs:107:13: replace > with >= in room",

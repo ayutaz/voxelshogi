@@ -12,7 +12,7 @@
 ## 実装と調査の現在地
 
 - 標準1王の独立実装・Web AlphaとM0のCI/CDは完了。R0では9王3ルールを別IDで実装し、現行1王の対照・上限／幅の感度を含む1,052局を生成・再生照合した。
-- [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)は生成済み6棋譜のA/B観戦再生。通常画面のライブ対局はランダムAI。M1完成版の探索・M2のWorker・学習モデルは未実装。
+- [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)は生成済み6棋譜のA/B観戦再生。通常画面のライブ対局はランダムAI。標準1王のM1全幅探索は実装・検証済み（[記録](M1_VALIDATION.md)）。M2のWorker・学習モデルは未実装。
 - 正式なルール採用、観戦者による理解度・好みの測定、M3の実機モデル推論、M4のPython／学習データ生成、M5の実棋譜互換性検証は残っている。
 - [先行ルール調査](RULE_VARIANTS_RESEARCH.md)と[R0実測](NINE_KINGS_EXPERIMENT.md)を分け、M1以降の研究候補を実装済みと扱わない。R0の手作り探索評価は、将来の強化学習の報酬設計とは別である。
 

@@ -36,7 +36,7 @@ fn complete_record_replays_and_rejects_forgery() {
 }
 #[test]
 fn bounded_search_is_reproducible_and_returns_legal_moves() {
-    let g = CaptureGame::new(CaptureRule::AllKings, 400).unwrap();
+    let g = CaptureGame::new(CaptureRule::AllKings, 2).unwrap();
     let c = SearchConfig { depth: 2, width: 8 };
     let a = choose_move(&g, c, 42).unwrap();
     let b = choose_move(&g, c, 42).unwrap();
@@ -58,6 +58,7 @@ fn standard_baseline_uses_existing_rules_and_verified_record() {
     .unwrap();
     assert_eq!(r.record.moves.len(), 2);
     let g = r.record.replay().unwrap();
+    assert_eq!(g.ply(), 2);
     assert_eq!(format!("{:016x}", g.hash()), r.final_hash);
     assert_eq!(r.record.ruleset_id, "voxelshogi-standard-v1");
     assert_eq!(
@@ -71,4 +72,77 @@ fn standard_baseline_uses_existing_rules_and_verified_record() {
         )
         .unwrap()
     );
+}
+
+#[test]
+fn replay_size_metadata_boundaries_and_cursor_helpers_are_explicit() {
+    let record = ExperimentRecord::play(
+        CaptureRule::ScoreLimit,
+        2,
+        17,
+        false,
+        SearchConfig { depth: 1, width: 2 },
+        "fixture",
+    )
+    .unwrap();
+    let value = serde_json::to_value(&record).unwrap();
+    let mut replay = Replay::from_json(&value.to_string()).unwrap();
+    assert!(!replay.is_empty());
+    assert_eq!(replay.len(), 2);
+    // The Rust record field is public; helpers reflect edits to its move list.
+    replay.record.moves.clear();
+    assert!(replay.is_empty());
+    assert_eq!(replay.len(), 0);
+    for n in [1, 128] {
+        let mut v = value.clone();
+        v["engine"] = "x".repeat(n).into();
+        assert!(Replay::from_json(&v.to_string()).is_ok());
+    }
+    for n in [0, 129, 130] {
+        let mut v = value.clone();
+        v["engine"] = "x".repeat(n).into();
+        assert_eq!(
+            Replay::from_json(&v.to_string()).err().as_deref(),
+            Some("invalid record metadata")
+        );
+    }
+    let mut v = value.clone();
+    v["schema"] = "unsupported".into();
+    assert_eq!(
+        Replay::from_json(&v.to_string()).err().as_deref(),
+        Some("invalid record metadata")
+    );
+    let mut v = value.clone();
+    v["moves"] = serde_json::json!(["bad", "bad", "bad"]);
+    assert_eq!(
+        Replay::from_json(&v.to_string()).err().as_deref(),
+        Some("invalid record metadata")
+    );
+    let text = value.to_string();
+    let mut exact = text.clone();
+    exact.push_str(&" ".repeat(4 * 1024 * 1024 - exact.len()));
+    assert!(Replay::from_json(&exact).is_ok());
+    for extra in [1, 2] {
+        let mut large = exact.clone();
+        large.push_str(&" ".repeat(extra));
+        assert_eq!(
+            Replay::from_json(&large).err().as_deref(),
+            Some("record exceeds 4 MiB")
+        );
+    }
+}
+
+#[test]
+fn experiment_configuration_accepts_only_the_documented_depth_and_width_ranges() {
+    for depth in [1, 3] {
+        for width in [1, 64] {
+            assert!(SearchConfig { depth, width }.validate().is_ok());
+        }
+    }
+    for depth in [0, 4, u8::MAX] {
+        assert!(SearchConfig { depth, width: 2 }.validate().is_err());
+    }
+    for width in [0, 65, usize::MAX] {
+        assert!(SearchConfig { depth: 2, width }.validate().is_err());
+    }
 }
