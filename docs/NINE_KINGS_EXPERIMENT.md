@@ -49,7 +49,7 @@
 
 ## 同じ棋譜による観戦表示
 
-公開版は通常画面から「9王ルール比較室」へ入る。直接URLは `/?experiment=1`。400手主試験と800手試験を切り替え、各ルールを選べる。ブラウザ内の対局・推論ではなく、実際に生成した探索AI対探索AIの棋譜再生であることを画面に明記する。
+公開版は通常画面から「9王ルール比較室」へ入る。直接URLは [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)。400手主試験と800手試験を切り替え、各ルールを選べる。ブラウザ内の対局・推論ではなく、実際に生成した探索AI対探索AIの棋譜再生であることを画面に明記する。
 
 | 表示 | 変える見せ方 | 共通に保つ情報 |
 |---|---|---|
@@ -102,6 +102,8 @@ node scripts/experiment-pack.mjs runs/nine-kings/wide.jsonl runs/nine-kings/wide
 - 局所変異で、目標判定の境界、得点比較の勝者、千日手回数、最終ハッシュ照合、王評価、SHA照合、代表選択の順位、A/B時の局面リセットを検出した。注入した変異は復元済み。
 - ローカル：Rust 116件、Web単体36件（実WASM、公開用6棋譜とSHA・捕獲イベント）、CI制御Node 42件、既知変異14件、fmt／clippy／actionlint／ShellCheck／Web lint／型検査／buildを実行した。実機Chromeの全9件E2E（配信SHA、A/B保持、再生・停止、全王捕獲の決着、破損拒否を含む）が成功した。
 - Mac実機Chrome 155.0.8059.85で、400手・seed0・先後交換なしの56手目をA/Bで目視確認した。局面ハッシュは両方 `d1f6004f594e20f0`。1440px幅と390px幅で横方向のはみ出しはない。全層を初期カメラ内に収める調整を行った。人の好みの実験を実施したとは扱わない。
-- 統合前の必須7チェックと、統合後の本番デプロイ・配信SHA・公開E2Eを確認してから公開完了とする。最終記録は公開確認後に更新する。
+- [実装PR #7](https://github.com/ayutaz/voxelshogi/pull/7) は、必須7チェックすべての成功とCodeQL警告なしを確認し、通常のsquash mergeで統合した。[PR CI](https://github.com/ayutaz/voxelshogi/actions/runs/40248077708)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40248077596)・[Quality](https://github.com/ayutaz/voxelshogi/actions/runs/40248077726)。統合コミットは `92c57fdfeed8bf19669692a67edf5bac10d0b5f3`。
+- **公開確認完了（2026-10-26 JST）**：[main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40249850975) で通常CI・本番デプロイ・配信SHA照合・公開E2Eが成功し、[main Security](https://github.com/ayutaz/voxelshogi/actions/runs/40249850944) も成功した。Mac実機Chromeから公開URLへの全9件E2Eも成功。配信SHAは `92c57fdfeed8bf19669692a67edf5bac10d0b5f3`、公開manifestと全6棋譜のSHA-256は測定・保存したファイルと一致した。
+- R0の実装・比較計測・観戦試作・公開検証は完了。正式採用と観戦者による理解度・好みの評価は別の判断として残す。
 
 現段階では、長めの観戦を許すなら5王先取を中心に、一定時間で結果を見たい用途には得点比較を並べて試すのが妥当という**試作上の見通し**。全王捕獲は長期戦の候補として残す。弱い固定探索AIの成績だけで正式採用せず、観戦の理解度・好みと、M1の強い探索での再評価を次の判断材料にする。M1完成・M2ライブ探索・M3/M6実機モデル推論はこの試作では完了扱いにしない。
