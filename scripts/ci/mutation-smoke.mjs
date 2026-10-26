@@ -35,6 +35,7 @@ const mutations = [
   {"name": "search-tt-bound", "file": "search.rs", "before": "if entry.bound == Bound::Exact", "after": "if true", "args": ["--lib", "search::tests::cache_bounds_are_not_mistaken_for_exact_scores"]},
   {"name": "search-incomplete-result", "file": "search.rs", "before": "result.stop_reason = reason;", "after": "result.score = Some(123); result.stop_reason = reason;", "args": ["--test", "search_contracts", "depth_node_and_time_limits_keep_only_a_completed_iteration"]},
 
+  {"name": "baseline-move-counter", "file": "state.rs", "before": "next.ply += 1;", "after": "next.ply *= 1;", "args": ["--test", "experiment_record", "standard_baseline_uses_existing_rules_and_verified_record"]},
 ];
 
 function main() {
@@ -70,7 +71,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 20);
+    assert.equal(results.length, 21);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

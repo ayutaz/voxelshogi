@@ -271,7 +271,11 @@ impl ExperimentRecord {
         let mut g = CaptureGame::new(rule, max_plies)?;
         let mut moves = Vec::new();
         let mut nodes = 0;
-        while g.outcome().is_none() {
+        // Bound generation independently of the engine's ply/result counters.
+        for _ in 0..max_plies {
+            if g.outcome().is_some() {
+                break;
+            }
             let stream = (g.side() == Color::White) ^ swapped;
             let (mv, n) = choose_move(
                 &g,
@@ -291,7 +295,9 @@ impl ExperimentRecord {
             search,
             engine: engine.into(),
             moves,
-            outcome: g.outcome().unwrap(),
+            outcome: g
+                .outcome()
+                .ok_or("move cap reached without a capture-game outcome")?,
             final_hash: format!("{:016x}", g.hash()),
             nodes,
         })
@@ -362,7 +368,7 @@ mod tests {
             Square::new(4, 1, 0),
             Some(Piece::new(Color::Black, PieceKind::Rook)),
         );
-        CaptureGame::from_parts(b, [[0; 7]; 2], Color::Black, rule, 400).unwrap()
+        CaptureGame::from_parts(b, [[0; 7]; 2], Color::Black, rule, 2).unwrap()
     }
     #[test]
     fn finds_immediate_target_and_evaluation_has_hand_calculated_sign() {
@@ -422,6 +428,16 @@ mod tests {
             }
             g = g.after_generated(&moves[mix(ply) as usize % moves.len()]);
         }
+        // Keep real-game fixtures finite even if a mutant stops decreasing depth.
+        // The synthetic tree below separately checks nonzero horizons through depth 3.
+        let g = CaptureGame::from_parts(
+            g.board().clone(),
+            *g.hands(),
+            g.side(),
+            CaptureRule::AllKings,
+            4,
+        )
+        .unwrap();
         for depth in 1..=3 {
             let c = SearchConfig { depth, width: 4 };
             let mut nodes = 0;
@@ -462,7 +478,11 @@ pub fn play_baseline(
     let initial = crate::notation::to_vsfen(&pos.game);
     let mut moves = Vec::new();
     let mut nodes = 0;
-    while pos.terminal_score().is_none() {
+    // Count actual generated moves as well as consulting the game outcome.
+    for _ in 0..max_plies {
+        if pos.terminal_score().is_some() {
+            break;
+        }
         let stream = (pos.side() == Color::White) ^ swapped;
         let (m, n) = choose(
             &pos,
@@ -501,4 +521,434 @@ pub fn play_baseline(
         final_hash: format!("{:016x}", pos.hash()),
         nodes,
     })
+}
+
+#[cfg(test)]
+mod audit_contracts {
+    use super::*;
+    use crate::{Board, GameState, Hands, Piece, Square};
+    const VALUES: [i32; 14] = [
+        100, 300, 320, 450, 550, 800, 1000, 0, 550, 550, 550, 550, 1100, 1300,
+    ];
+    #[derive(Clone)]
+    struct Data {
+        board: Board,
+        hands: Hands,
+        side: Color,
+    }
+    impl Position for Data {
+        fn board(&self) -> &Board {
+            &self.board
+        }
+        fn hands(&self) -> &Hands {
+            &self.hands
+        }
+        fn side(&self) -> Color {
+            self.side
+        }
+        fn hash(&self) -> u64 {
+            7
+        }
+        fn legal_moves(&self) -> Vec<Move> {
+            panic!("data-only position")
+        }
+        fn after_generated(&self, _: &Move) -> Self {
+            panic!("data-only position")
+        }
+        fn terminal_score(&self) -> Option<i32> {
+            None
+        }
+        fn evaluate(&self) -> i32 {
+            material(self)
+        }
+    }
+    #[test]
+    fn material_and_standard_evaluation_have_hand_counted_board_hand_and_advancement_terms() {
+        for side in Color::ALL {
+            let sign = if side == Color::Black { 1 } else { -1 };
+            for kind in PieceKind::ALL {
+                let mut board = Board::empty();
+                board.set(Square::new(4, 4, 4), Some(Piece::new(side, kind)));
+                let data = Data {
+                    board: board.clone(),
+                    hands: [[0; 7]; 2],
+                    side,
+                };
+                assert_eq!(material(&data), sign * (VALUES[kind.index()] + 12));
+                let standard = StandardPosition {
+                    game: GameState::from_parts(board, [[0; 7]; 2], side),
+                    limit: 400,
+                };
+                assert_eq!(standard.evaluate(), sign * (VALUES[kind.index()] + 12));
+            }
+            for (i, kind) in PieceKind::HAND.into_iter().enumerate() {
+                let mut hands = [[0; 7]; 2];
+                hands[side.index()][i] = 2;
+                assert_eq!(
+                    material(&Data {
+                        board: Board::empty(),
+                        hands,
+                        side
+                    }),
+                    sign * 2 * VALUES[kind.index()]
+                );
+            }
+        }
+    }
+    #[test]
+    fn splitmix_and_move_ranking_follow_fixed_numeric_contracts() {
+        // Evaluated with arbitrary-precision arithmetic, reductions modulo 2^64,
+        // and integer division by 2^30/2^27/2^31, independently of native wrapping.
+        for (input, expected) in [
+            (0, 0xe220a8397b1dcdaf),
+            (1, 0x910a2dec89025cc1),
+            (u64::MAX, 0xe4d971771b652c20),
+        ] {
+            assert_eq!(mix(input), expected);
+        }
+        let from = Square::new(4, 3, 4);
+        let to = Square::new(4, 2, 4);
+        assert_eq!(from.index(), 355);
+        assert_eq!(to.index(), 346);
+        // Normal key = (355*729+346)*2 = 518282, plus one for promotion.
+        for kind in PieceKind::ALL {
+            let mut board = Board::empty();
+            board.set(from, Some(Piece::new(Color::Black, PieceKind::Pawn)));
+            board.set(to, Some(Piece::new(Color::White, kind)));
+            let data = Data {
+                board,
+                hands: [[0; 7]; 2],
+                side: Color::Black,
+            };
+            let captured = if kind == PieceKind::King {
+                100_000
+            } else {
+                VALUES[kind.index()] * 10
+            };
+            assert_eq!(
+                order(
+                    &data,
+                    Move::Normal {
+                        from,
+                        to,
+                        promote: false
+                    },
+                    42
+                ),
+                (captured + 3, 0x452b823b157f3cdb)
+            );
+            assert_eq!(
+                order(
+                    &data,
+                    Move::Normal {
+                        from,
+                        to,
+                        promote: true
+                    },
+                    42
+                ),
+                (captured + 503, 0xa9e85a5fb76686de)
+            );
+        }
+        let data = Data {
+            board: Board::empty(),
+            hands: [[0; 7]; 2],
+            side: Color::White,
+        };
+        assert_eq!(
+            order(
+                &data,
+                Move::Normal {
+                    from,
+                    to,
+                    promote: false
+                },
+                42
+            ),
+            (-3, 0x452b823b157f3cdb)
+        );
+        let random = [
+            0x59463314cb2150bf,
+            0xeb21428386756844,
+            0x04cc518e5ccbb7a5,
+            0xcef60e44048b254b,
+            0x202c37c0248c4938,
+            0x92bb8628c97e22f1,
+            0x081ed5bf3bb77de1,
+        ];
+        for (i, kind) in PieceKind::HAND.into_iter().enumerate() {
+            assert_eq!(
+                order(
+                    &data,
+                    Move::Drop {
+                        kind,
+                        to: Square::new(4, 4, 4)
+                    },
+                    42
+                ),
+                (0, random[i])
+            );
+        }
+    }
+    #[derive(Clone)]
+    struct Tree {
+        board: Board,
+        hands: Hands,
+        side: Color,
+        ply: u8,
+        path: usize,
+        equal: bool,
+    }
+    impl Position for Tree {
+        fn board(&self) -> &Board {
+            &self.board
+        }
+        fn hands(&self) -> &Hands {
+            &self.hands
+        }
+        fn side(&self) -> Color {
+            self.side
+        }
+        fn hash(&self) -> u64 {
+            7
+        }
+        fn terminal_score(&self) -> Option<i32> {
+            None
+        }
+        fn evaluate(&self) -> i32 {
+            if self.equal {
+                return 0;
+            }
+            match self.ply {
+                0 => 17,
+                1 => [100, -300][self.path],
+                2 => [-50, 500, -200, -1000][self.path],
+                3 => [91, -37, 23, -83, -43, 79, 13, 61][self.path],
+                _ => panic!("tree depth"),
+            }
+        }
+        fn legal_moves(&self) -> Vec<Move> {
+            // Invalid depth recursion must fail a test, rather than run to timeout.
+            assert!(self.ply < 3, "search did not decrease its depth");
+            [5, 6]
+                .map(|x| Move::Normal {
+                    from: Square::new(4, 4, 4),
+                    to: Square::new(x, 4, 4),
+                    promote: false,
+                })
+                .to_vec()
+        }
+        fn after_generated(&self, m: &Move) -> Self {
+            let mut next = self.clone();
+            next.path = 2 * self.path + usize::from(m.to().x() == 6);
+            next.ply += 1;
+            next.side = self.side.opponent();
+            next
+        }
+    }
+    fn reference(g: &impl Position, c: SearchConfig, depth: u8, seed: u64) -> (i32, Vec<Move>) {
+        if let Some(score) = g.terminal_score() {
+            return (score, vec![]);
+        }
+        if depth == 0 {
+            return (
+                (if g.side() == Color::Black { 1 } else { -1 }) * g.evaluate(),
+                vec![],
+            );
+        }
+        let mut best = i32::MIN;
+        let mut moves = vec![];
+        for mv in candidates(g, c, seed) {
+            let score = -reference(&g.after_generated(&mv), c, depth - 1, seed).0;
+            if score > best {
+                best = score;
+                moves.clear();
+            }
+            if score == best {
+                moves.push(mv);
+            }
+        }
+        (best, moves)
+    }
+    #[test]
+    fn retained_tree_search_and_choose_match_unpruned_reference_on_nonzero_payoffs() {
+        let config = |depth| SearchConfig { depth, width: 2 };
+        for side in Color::ALL {
+            let tree = Tree {
+                board: Board::empty(),
+                hands: [[0; 7]; 2],
+                side,
+                ply: 0,
+                path: 0,
+                equal: false,
+            };
+            for depth in 0..=3 {
+                for seed in 0..8 {
+                    let expected = reference(&tree, config(depth), depth, seed);
+                    let mut nodes = 0;
+                    assert_eq!(
+                        search(
+                            &tree,
+                            config(depth),
+                            depth,
+                            -2_000_000,
+                            2_000_000,
+                            seed,
+                            &mut nodes
+                        ),
+                        expected.0
+                    );
+                    assert!(nodes > 0);
+                    if depth > 0 {
+                        let (mv, nodes) = choose(&tree, config(depth), seed).unwrap();
+                        assert!(expected.1.contains(&mv));
+                        assert!(nodes > 0);
+                    }
+                    if depth == 0 {
+                        assert_eq!(nodes, 1);
+                    }
+                }
+            }
+        }
+        let equal = Tree {
+            board: Board::empty(),
+            hands: [[0; 7]; 2],
+            side: Color::Black,
+            ply: 0,
+            path: 0,
+            equal: true,
+        };
+        for seed in 0..8 {
+            let (mv, nodes) = choose(&equal, config(1), seed).unwrap();
+            assert_eq!(mv, candidates(&equal, config(1), seed)[0]);
+            assert_eq!(nodes, 2);
+        }
+    }
+    #[test]
+    fn record_generation_assigns_seed_streams_and_counts_nodes_for_each_side() {
+        let config = SearchConfig { depth: 1, width: 4 };
+        for seed in [17, 42, 913] {
+            let base = mix(seed);
+            for swapped in [false, true] {
+                let streams = if swapped {
+                    [base ^ 0xd1b54a32d192ed03, base]
+                } else {
+                    [base, base ^ 0xd1b54a32d192ed03]
+                };
+                let mut capture = CaptureGame::new(CaptureRule::ScoreLimit, 2).unwrap();
+                let mut standard = StandardPosition {
+                    game: GameState::new(),
+                    limit: 2,
+                };
+                let mut capture_moves = vec![];
+                let mut standard_moves = vec![];
+                for stream in streams {
+                    let (mv, n) = choose_move(&capture, config, stream).unwrap();
+                    assert_eq!(n, 4);
+                    capture_moves.push(mv.to_string());
+                    capture = capture.after_move(&mv).unwrap();
+                    let (mv, n) = choose(&standard, config, stream).unwrap();
+                    assert_eq!(n, 4);
+                    standard_moves.push(mv.to_string());
+                    standard = standard.after_generated(&mv);
+                }
+                let capture = ExperimentRecord::play(
+                    CaptureRule::ScoreLimit,
+                    2,
+                    seed,
+                    swapped,
+                    config,
+                    "fixture",
+                )
+                .unwrap();
+                let standard = play_baseline(2, seed, swapped, config, "fixture").unwrap();
+                assert_eq!(capture.moves, capture_moves);
+                assert_eq!(capture.nodes, 8);
+                assert_eq!(standard.record.moves, standard_moves);
+                assert_eq!(standard.nodes, 8);
+            }
+        }
+    }
+    #[test]
+    fn position_adapters_preserve_hands_hash_and_asymmetric_king_scores() {
+        for (black, white, expected) in [(8, 7, 24_200), (7, 8, -25_800)] {
+            let mut b = Board::empty();
+            for x in 0..black {
+                b.set(
+                    Square::new(x, 8, 0),
+                    Some(Piece::new(Color::Black, PieceKind::King)),
+                );
+            }
+            for x in 0..white {
+                b.set(
+                    Square::new(x, 0, 0),
+                    Some(Piece::new(Color::White, PieceKind::King)),
+                );
+            }
+            let mut hands = [[0; 7]; 2];
+            hands[0][0] = 2;
+            hands[1][6] = 1;
+            let g = CaptureGame::from_parts(b, hands, Color::Black, CaptureRule::ScoreLimit, 2)
+                .unwrap();
+            assert_eq!(evaluation(&g), expected);
+            assert_eq!(Position::hands(&g), &hands);
+            assert!(g.hash() > 1);
+            assert_eq!(Position::hash(&g), g.hash());
+        }
+        for side in Color::ALL {
+            let mut hands = [[0; 7]; 2];
+            hands[side.index()][6] = 2;
+            let p = StandardPosition {
+                game: GameState::from_parts(Board::empty(), hands, side),
+                limit: 2,
+            };
+            assert_eq!(
+                p.evaluate(),
+                if side == Color::Black { 2000 } else { -2000 }
+            );
+            assert_eq!(p.hands(), &hands);
+        }
+        for (black, white, score) in [(9, 5, 1_000_000), (5, 9, -1_000_000)] {
+            let mut b = Board::empty();
+            for x in 0..black {
+                b.set(
+                    Square::new(x, 8, 0),
+                    Some(Piece::new(Color::Black, PieceKind::King)),
+                );
+            }
+            for x in 0..white {
+                b.set(
+                    Square::new(x, 0, 0),
+                    Some(Piece::new(Color::White, PieceKind::King)),
+                );
+            }
+            let mut g =
+                CaptureGame::from_parts(b, [[0; 7]; 2], Color::Black, CaptureRule::ScoreLimit, 2)
+                    .unwrap();
+            for (from, to) in [
+                (Square::new(4, 8, 0), Square::new(4, 7, 0)),
+                (Square::new(0, 0, 0), Square::new(0, 1, 0)),
+            ] {
+                g = g
+                    .after_move(&Move::Normal {
+                        from,
+                        to,
+                        promote: false,
+                    })
+                    .unwrap();
+            }
+            assert_eq!(Position::terminal_score(&g), Some(score));
+        }
+    }
+    #[test]
+    fn standard_control_terminal_score_honors_material_perspective_and_game_limit() {
+        let mut game = GameState::new();
+        game.resign();
+        let mut p = StandardPosition { game, limit: 0 };
+        assert_eq!(p.terminal_score(), Some(-1_000_000));
+        p.game = GameState::new();
+        assert_eq!(p.terminal_score(), Some(0));
+        p.limit = 1;
+        assert_eq!(p.terminal_score(), None);
+    }
 }

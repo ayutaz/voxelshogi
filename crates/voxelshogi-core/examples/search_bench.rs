@@ -89,6 +89,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     ] {
         measurements.push(measure("two-kings", &sparse, limits(4), options));
     }
+    let mut tactical_board = sparse.board().clone();
+    tactical_board.set(
+        Square::new(4, 3, 4),
+        Some(Piece::new(Color::Black, PieceKind::Pawn)),
+    );
+    tactical_board.set(
+        Square::new(4, 2, 4),
+        Some(Piece::new(Color::White, PieceKind::Rook)),
+    );
+    let tactical = GameState::from_parts(tactical_board, [[0; 7]; 2], Color::Black);
+    for options in [
+        plain,
+        SearchOptions {
+            move_ordering: true,
+            ..plain
+        },
+    ] {
+        measurements.push(measure(
+            "capture-and-promotion",
+            &tactical,
+            limits(2),
+            options,
+        ));
+    }
     for _ in 0..3 {
         let mut timed = limits(64);
         timed.max_time = Some(Duration::from_secs(1));
@@ -96,7 +120,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let mut fixed = limits(64);
     fixed.max_nodes = Some(10_000);
-    measurements.push(measure("initial-fixed-nodes", &initial, fixed, default));
+    for _ in 0..2 {
+        measurements.push(measure("initial-fixed-nodes", &initial, fixed, default));
+    }
     println!(
         "{}",
         serde_json::to_string_pretty(

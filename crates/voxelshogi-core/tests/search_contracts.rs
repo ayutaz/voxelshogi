@@ -130,31 +130,31 @@ fn oracle(g: &GameState, depth: u8, max_ply: Option<u32>) -> (i32, Vec<Move>) {
 #[test]
 fn alpha_beta_matches_independent_full_width_oracle_depths_one_to_three() {
     for side in Color::ALL {
-        let mut b = kings();
-        b.set(
-            Square::new(4, 3, 4),
-            Some(Piece::new(Color::Black, PieceKind::Pawn)),
-        );
-        b.set(
-            Square::new(5, 5, 5),
-            Some(Piece::new(Color::White, PieceKind::Pawn)),
-        );
-        let game = GameState::from_parts(b, [[0; 7]; 2], side);
-        for depth in 1..=3 {
-            let expected = oracle(&game, depth, None);
-            for flags in 0..8 {
-                let options = SearchOptions {
-                    iterative_deepening: flags & 1 != 0,
-                    move_ordering: flags & 2 != 0,
-                    transposition_table: flags & 4 != 0,
-                    table_capacity: 65_536,
-                };
-                let result = search(&game, limits(depth), options).unwrap();
-                assert_eq!(result.score, Some(expected.0), "{side:?} depth {depth}");
-                assert!(expected.1.contains(&result.best_move.unwrap()));
-                assert_eq!(result.completed_depth, depth);
-                assert_eq!(result.stop_reason, StopReason::Depth);
-                assert!(result.nodes >= 1);
+        for white_pawn in [Square::new(5, 5, 5), Square::new(4, 1, 4)] {
+            let mut b = kings();
+            b.set(
+                Square::new(4, 3, 4),
+                Some(Piece::new(Color::Black, PieceKind::Pawn)),
+            );
+            b.set(white_pawn, Some(Piece::new(Color::White, PieceKind::Pawn)));
+            let game = GameState::from_parts(b, [[0; 7]; 2], side);
+            for depth in 1..=3 {
+                let expected = oracle(&game, depth, None);
+                for flags in 0..8 {
+                    let options = SearchOptions {
+                        iterative_deepening: flags & 1 != 0,
+                        move_ordering: flags & 2 != 0,
+                        transposition_table: flags & 4 != 0,
+                        table_capacity: 65_536,
+                    };
+                    let result = search(&game, limits(depth), options).unwrap();
+                    assert_eq!(result.score, Some(expected.0), "{side:?} depth {depth}");
+                    assert!(expected.1.contains(&result.best_move.unwrap()));
+                    assert_eq!(result.completed_depth, depth);
+                    assert_eq!(result, search(&game, limits(depth), options).unwrap());
+                    assert_eq!(result.stop_reason, StopReason::Depth);
+                    assert!(result.nodes >= 1);
+                }
             }
         }
     }
@@ -319,7 +319,11 @@ fn game_move_limit_and_invalid_configurations_are_explicit() {
             .score,
         Some(0)
     );
-    assert!(search(&tiny, limits(65), SearchOptions::default()).is_err());
+    let invalid_depth = SearchLimits {
+        max_nodes: Some(0),
+        ..limits(65)
+    };
+    assert!(search(&tiny, invalid_depth, SearchOptions::default()).is_err());
     let options = SearchOptions {
         table_capacity: 1_000_001,
         ..SearchOptions::default()

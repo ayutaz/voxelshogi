@@ -613,4 +613,42 @@ mod tests {
         order_moves(&game, &mut moves, false, Some(quiet));
         assert_eq!(moves, [capture, promote, quiet]);
     }
+    #[test]
+    fn ordering_uses_captured_board_and_hand_values_and_actual_promotion_gain() {
+        let sq = Square::new;
+        let mut board = Board::empty();
+        for (at, color, kind) in [
+            (sq(8, 8, 8), Color::Black, PieceKind::King),
+            (sq(0, 0, 0), Color::White, PieceKind::King),
+            (sq(4, 3, 4), Color::Black, PieceKind::Gold),
+            (sq(4, 2, 4), Color::White, PieceKind::Tokin),
+            (sq(3, 2, 4), Color::White, PieceKind::Pawn),
+            (sq(5, 4, 5), Color::Black, PieceKind::Rook),
+            (sq(5, 4, 6), Color::White, PieceKind::Lance),
+            (sq(2, 4, 5), Color::Black, PieceKind::Rook),
+            (sq(2, 4, 6), Color::White, PieceKind::Gold),
+            (sq(1, 3, 1), Color::Black, PieceKind::Pawn),
+        ] {
+            board.set(at, Some(Piece::new(color, kind)));
+        }
+        let game = GameState::from_parts(board, [[0; 7]; 2], Color::Black);
+        game.validate().unwrap();
+        let mv = |from, to, promote| Move::Normal { from, to, promote };
+        // Gold: 550 removed + 550 in hand = 1100; tokin: 550+100=650;
+        // lance: 300+300=600; quiet promotion: 550-100=450; pawn: 100+100=200.
+        let expected = [
+            mv(sq(2, 4, 5), sq(2, 4, 6), false),
+            mv(sq(4, 3, 4), sq(4, 2, 4), false),
+            mv(sq(5, 4, 5), sq(5, 4, 6), false),
+            mv(sq(1, 3, 1), sq(1, 2, 1), true),
+            mv(sq(4, 3, 4), sq(3, 2, 4), false),
+        ];
+        for m in expected {
+            assert!(game.is_legal(&m));
+        }
+        let mut moves = expected;
+        moves.reverse();
+        order_moves(&game, &mut moves, true, None);
+        assert_eq!(moves, expected);
+    }
 }
