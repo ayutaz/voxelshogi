@@ -37,7 +37,7 @@ cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo test --locked --workspace
 node --test scripts/ci/*.test.mjs
 actionlint
-shellcheck scripts/*.sh
+shellcheck scripts/*.sh scripts/ci/*.sh
 
 cd apps/web
 pnpm install --frozen-lockfile

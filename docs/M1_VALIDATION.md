@@ -1,6 +1,6 @@
 # M1：探索AIの検証記録
 
-2026-10-26（JST）。標準 `voxelshogi-standard-v1` を対象とする。M1の実装・独立検証・全体変異調査・Native計測を完了した。本書と関連文書のM1完了表記は、[PR #10](https://github.com/ayutaz/voxelshogi/pull/10) の最終必須CI成功・保護を迂回しない通常取り込み後の状態を示す。統合前はこの条件をmergeの必須条件とする。9王ルールの正式採用、Web Workerとライブ探索はこの完了条件に含めない。
+2026-10-26（JST）。標準 `voxelshogi-standard-v1` を対象とする。M1の実装・独立検証・全体変異調査・Native計測を完了した。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10) は最終必須CI成功後、保護を迂回せず通常取り込み済み。以下はM1完了時点の記録で、以後の文書更新による公開SHAとは区別する。9王ルールの正式採用、Web Workerとライブ探索はこの完了条件に含めない。
 
 ## 実装と独立した期待値
 
@@ -24,8 +24,18 @@ TDDでは、未実装の高速適用・評価・探索APIに対する失敗を�
 - 既存14件にM1の6件と対局生成カウンターの1件を加えた21変異を `node scripts/ci/mutation-smoke.mjs` で注入し、全件を実行済みのテスト失敗で検出した。評価の符号、深さ0での終局優先、ノード上限の境界、置換表の履歴省略・境界分類、中断時の評価上書きを対象とする。baselineの成功を先に確認し、作業ツリーは変更しない。
 - `state.rs` のM0同値変異2件は、既存の `repetition_result` と位置が不変で、検索用helperとテストのみを末尾に追加したことを確認し、理由とファイル全体のSHA-256を更新した。移動生成の6件は変更していない。
 - core全体の手動調査：[Quality run 40290161440](https://github.com/ayutaz/voxelshogi/actions/runs/40290161440)。8分割の初回ではR0の不足とタイムアウトを確認し、1分割はrunner shutdownで中断した。これを成功に数えず、[再検証40298338587](https://github.com/ayutaz/voxelshogi/actions/runs/40298338587) でも同じ分割がrunner shutdownで中断した。座標の契約を対局テストより先に確認するCIアダプタを追加し、[再検証40306644146](https://github.com/ayutaz/voxelshogi/actions/runs/40306644146) で全8分割が成功した。全1,172変異は **1,075 caught・89 unviable・8 equivalent**。未知の生き残り・timeout・中断・欠落は0件。[分割ごとの対象SHA・ZIPのSHA-256・集計](experiments/m1-mutations.json) を保存した。
-- ローカル：Rust 150件、CI制御Node 46件、fmt・Clippy成功。Web lint・型検査・Vitest 36件・WASM/productionビルド・Mac実機ChromeのローカルE2E 9件も成功。公開版は統合後のmain CIの配信SHA・公開E2Eで確認する。
-- 実装・CI修正 `b45fb90` の必須7チェックがすべてGitHub Actions（app ID 15368）から成功し、CodeQL未解決警告は0件、mainは保護された `5baae602` であることを確認した。最終文書追加後のheadでも再度7チェックと最新mainを確認してから通常squash mergeする。
+- ローカル：Rust 150件、CI制御Node 46件、fmt・Clippy成功。Web lint・型検査・Vitest 36件・WASM/productionビルド・Mac実機ChromeのローカルE2E 9件も成功。統合後の公開検証も下記のとおり成功した。
+- 実装・CI修正 `b45fb90` の必須7チェックがすべてGitHub Actions（app ID 15368）から成功し、CodeQL未解決警告は0件、mainは保護された `5baae602` であることを確認した。最終文書head `adcf953a191a90e966121baf8ecb025b21a16216` も必須7チェックが成功し、最新main・CodeQL警告0件を確認して通常squash mergeした。
+
+## 統合と公開の確定記録
+
+- PR #10の統合コミットは `80ca27fec60088c811328fae95dc7158e3ff81b6`。PRの最終headと内容が完全一致し、ローカルmainもfast-forwardで同期した。
+- 最終PRの [CI 40310055317](https://github.com/ayutaz/voxelshogi/actions/runs/40310055317) は、初回のWebジョブでブラウザ依存導入に約14分かかり15分上限に到達した。E2E 9件の成功表示だけでジョブを成功扱いにせず、失敗したWeb/Gateの再実行が成功してから取り込んだ。
+- 統合後の [main CI 40314197838](https://github.com/ayutaz/voxelshogi/actions/runs/40314197838) は通常CI・本番deploy・配信SHA・公開E2Eが成功。[Security 40314197854](https://github.com/ayutaz/voxelshogi/actions/runs/40314197854) の3言語解析も成功し、未解決CodeQL警告は0件。
+- 公開 `build-info.json` が上記の完全長SHAを返すことを独立に確認。同じSHAを指定したMac実機Chromeの公開E2Eも **9件成功（14.3秒）**。
+- 追加した `scripts/ci/mutation-cargo.sh` を継続的にShellCheckするため、CIと開発手順の対象を `scripts/*.sh scripts/ci/*.sh` にそろえた。製品コードの変更はなく、全体変異調査の対象ソースは `b45fb90` と同一。
+
+## runner中断の調査と修正
 
 CIの同じ分割で繰り返したrunner中断は成功に数えていない。ローカルの隔離診断では `Square::x` を常に0にする変異でテストのRSSが256 MiBを超え、所有するプロセスだけを停止した。座標getterの異常で飛び駒のループが進まなくなり、座標のassertion失敗をCargoが回収する前にメモリを消費し続ける。GitHub側のOOMログそのものは取得できていないため、runner shutdownとの因果は推定である。
 
