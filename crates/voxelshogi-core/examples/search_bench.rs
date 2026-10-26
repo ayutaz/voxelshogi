@@ -30,11 +30,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--exit-code",
             &engine,
             "--",
-            "Cargo.toml",
-            "Cargo.lock",
-            "rust-toolchain.toml",
-            "crates/voxelshogi-core/src",
-            "crates/voxelshogi-core/examples/search_bench.rs",
+            ":(top)Cargo.toml",
+            ":(top)Cargo.lock",
+            ":(top)rust-toolchain.toml",
+            ":(top)crates/voxelshogi-core/src",
+            ":(top)crates/voxelshogi-core/examples/search_bench.rs",
         ])
         .status()?;
     if !status.success() {
