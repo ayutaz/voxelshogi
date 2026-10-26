@@ -27,7 +27,9 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - Python は `.python-version`（3.14系）を使い、依存が未対応の場合のみ3.13へ切り替える。さらに古い版が必要なら理由・対象・解消条件を記録する。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
-変更に関連する検証を実行する。Rust、Node、pnpm、wasm-bindgen の版はリポジトリの固定値に合わせる。
+文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。
+
+変更に関連する検証を実行する。Rust、Node、pnpm、wasm-bindgenの版は固定値に合わせる（`rust-toolchain.toml`、`.node-version`、Webの `packageManager` / lockfile）。Pythonは `.python-version` を使う。ローカルE2Eは既存Chrome、CIは `PW_CHANNEL=''` でChromiumを使う。
 
 ```bash
 cargo fmt --all --check
@@ -44,8 +46,10 @@ pnpm wasm
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm e2e
+E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 ```
+
+`E2E_COMMIT` を指定すると配信SHAを含む全9件を検証する。省略した実行ではSHAの1件がskipになる。公開先へ実行する場合は、ローカルHEADではなく対象の公開SHAを指定する。
 
 ## PR と公開の自動チェック
 
