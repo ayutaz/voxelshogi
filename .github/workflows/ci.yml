@@ -48,7 +48,7 @@ jobs:
           tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP/actionlint-bin" actionlint
           echo "$RUNNER_TEMP/actionlint-bin" >> "$GITHUB_PATH"
       - run: actionlint -color
-      - run: shellcheck scripts/*.sh
+      - run: shellcheck scripts/*.sh scripts/ci/*.sh
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           package_json_file: apps/web/package.json

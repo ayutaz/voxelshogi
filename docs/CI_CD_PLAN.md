@@ -16,7 +16,7 @@
 | 品質の継続検証 | Rust **150件**、Web単体 **36件**、CI制御Node **46件**、既知変異 **21件**。M1の最新検証は [記録](M1_VALIDATION.md) を参照。直前の文書PR #8でも [Quality 40252580699](https://github.com/ayutaz/voxelshogi/actions/runs/40252580699) が成功。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
 | main保護 | ruleset **25816100** はactive、bypassなし、PR必須・最新main検証・必須7チェック・CodeQL error/high以上・force push/削除禁止。他者承認0。チェック発行元はGitHub Actions App **15368** |
 | 認証・セキュリティ設定 | repository Secretsは空。productionにCloudflareの2件、許可元mainのみ。Secret scanning・Push protection・非公開脆弱性報告・Dependabot security updatesは有効。名前・設定だけを再確認し、秘密値は取得していない |
-| 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1全幅探索も完了（PR #10統合後）。全1,172変異を1,075 caught・89 unviable・8 equivalentに分類した。R0の幅制限探索とは別API。Dependabot PR #1は未マージ |
+| 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1全幅探索もPR #10の通常取り込み・公開後検証まで完了。全1,172変異を1,075 caught・89 unviable・8 equivalentに分類した。R0の幅制限探索とは別API。Dependabot PR #1は未マージ |
 
 公開版は固定されないため、以後は `build-info.json` と対応する成功runを確認する。CI取得は最短10分間隔でまとめ、短いwaitも反復しない。
 
