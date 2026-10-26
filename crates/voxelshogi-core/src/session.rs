@@ -38,13 +38,15 @@ impl Session {
     /// Imports an untrusted record: every move and the claimed result are re-validated.
     pub fn from_record_json(s: &str) -> Result<Session, String> {
         let rec = GameRecord::from_json(s).map_err(|e| e.to_string())?;
-        rec.replay().map_err(|e| e.to_string())?;
+        let replayed = rec.replay().map_err(|e| e.to_string())?;
         let mut session = Session::from_vsfen(&rec.initial)?;
         for m in &rec.moves {
             session.play(m)?;
         }
         if rec.termination == Some(Termination::Resignation) {
-            session.resign();
+            // Restore the exact accepted record outcome. The interactive
+            // resign() guard must not reinterpret an already validated record.
+            *session.states.last_mut().expect("start state") = replayed;
         }
         session.termination = rec.termination;
         Ok(session)

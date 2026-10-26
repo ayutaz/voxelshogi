@@ -46,7 +46,7 @@
 ## コマンド
 
 ```bash
-cargo test --locked --workspace            # Rust（core152件＋WASM境界5件、testはopt-level 2）
+cargo test --locked --workspace            # Rust（core153件＋WASM境界5件、testはopt-level 2）
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
 cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度

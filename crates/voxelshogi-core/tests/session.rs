@@ -239,3 +239,64 @@ fn resignation_at_an_earlier_cursor_replaces_future_external_termination() {
     assert_eq!(saved.termination, Some(Termination::Resignation));
     saved.replay().unwrap();
 }
+
+#[test]
+fn imported_resignation_retains_the_exact_validated_replay_result() {
+    use voxelshogi_core::{Board, Piece, PieceKind, Square};
+    for winner in Color::ALL {
+        let sq = |x, y, z| {
+            if winner == Color::Black {
+                Square::new(x, y, z)
+            } else {
+                Square::new(8 - x, 8 - y, 8 - z)
+            }
+        };
+        let mut board = Board::empty();
+        for (at, color, kind) in [
+            (sq(0, 0, 0), winner.opponent(), PieceKind::King),
+            (sq(8, 8, 8), winner, PieceKind::King),
+            (sq(2, 2, 2), winner, PieceKind::Gold),
+            (sq(1, 1, 1), winner, PieceKind::Dragon),
+        ] {
+            board.set(at, Some(Piece::new(color, kind)));
+        }
+        let game = GameState::from_parts(board, [[0; 7]; 2], winner.opponent());
+        assert_eq!(
+            game.result(),
+            Some(GameResult::Win {
+                winner,
+                reason: WinReason::Checkmate
+            })
+        );
+        // Existing record validation accepts a recorded resignation at this
+        // position. Import/export must retain that validated result exactly.
+        let expected = Some(GameResult::Win {
+            winner,
+            reason: WinReason::Resignation,
+        });
+        let record = GameRecord {
+            ruleset_id: voxelshogi_core::record::RULESET_ID.into(),
+            initial: to_vsfen(&game),
+            moves: vec![],
+            result: expected,
+            termination: Some(Termination::Resignation),
+        };
+        assert_eq!(record.replay().unwrap().result(), expected);
+        let imported = Session::from_record_json(&record.to_json()).unwrap();
+        assert_eq!(imported.result(), expected);
+        assert_eq!(
+            GameRecord::from_json(&imported.to_record_json()).unwrap(),
+            record
+        );
+        // An interactive resignation still cannot overwrite an already finished game.
+        let mut interactive = Session::from_vsfen(&record.initial).unwrap();
+        interactive.resign();
+        assert_eq!(
+            interactive.result(),
+            Some(GameResult::Win {
+                winner,
+                reason: WinReason::Checkmate
+            })
+        );
+    }
+}

@@ -44,36 +44,62 @@ for (const b of ['easy', 'normal']) for (const w of ['easy', 'normal']) {
 }
 
 test('2D/3D and camera remain interactive during real search, and cancel prevents a late move', async ({ page }) => {
+  // Software-GL screenshots can take seconds in CI. Capture outside searches;
+  // every actual control operation must still finish before its real reply.
+  test.setTimeout(60_000);
+  const workers: string[] = [];
+  page.on('worker', (worker) => workers.push(worker.url()));
   await page.goto('/');
   await page.getByRole('button', { name: '3D+2D', exact: true }).click();
   const canvas = page.getByTestId('board3d').locator('canvas');
-  await expect(canvas).toBeVisible();
   await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
   await page.getByTestId('thinking-budget').selectOption('3000');
-  await page.getByTestId('ai-step').click();
-  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+  const begin = async () => {
+    await page.getByTestId('ai-step').click();
+    await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+  };
+  const cancel = async () => {
+    await page.getByTestId('cancel-search').click();
+    await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+    await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+  };
+  await begin();
+  await page.getByTestId('move-delay').fill('50');
+  await expect(page.getByTestId('move-delay')).toHaveValue('50');
   await page.getByTestId('slice-index').fill('5');
   await expect(page.getByTestId('slice-index')).toHaveValue('5');
+  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+  expect(workers).toHaveLength(1); // display speed did not restart the search
+  await cancel();
+
   await canvas.scrollIntoViewIfNeeded();
   const beforeCamera = await canvas.screenshot();
   const box = (await canvas.boundingBox())!;
+  await begin();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30, { steps: 5 });
+  await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30, { steps: 2 });
   await page.mouse.up();
+  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+  await cancel();
   expect((await canvas.screenshot()).equals(beforeCamera)).toBe(false);
+
+  await begin();
   await page.getByRole('button', { name: '2D', exact: true }).click();
   await expect(page.getByTestId('board3d')).toHaveCount(0);
+  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+  await cancel();
+  await begin();
   await page.getByRole('button', { name: '3D+2D', exact: true }).click();
   await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
   await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  await page.getByTestId('cancel-search').click();
-  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  await cancel();
   await page.waitForTimeout(3300);
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
   await page.getByTestId('thinking-budget').selectOption('100');
   await page.getByTestId('ai-step').click();
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+  expect(workers).toHaveLength(5); // explicit cancellations recreated it
 });
 
 test('Worker load failures are visible and retry recreates the worker', async ({ page }) => {
@@ -206,4 +232,7 @@ test('humans can play either color against Normal search', async ({ page }) => {
   await cell(2).click(); await cell(3).click();
   await expect(page.getByTestId('status')).toHaveText('4手目 ☖後手の番');
   await expect(page.getByTestId('ai-analysis')).toContainText('Normal');
+  await page.getByRole('button', { name: '投了', exact: true }).click();
+  await expect(page.getByTestId('status')).toHaveText('☗先手の勝ち（投了）');
+  await expect(page.getByTestId('ai-step')).toBeDisabled();
 });

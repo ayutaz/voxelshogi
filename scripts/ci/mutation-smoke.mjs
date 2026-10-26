@@ -37,6 +37,7 @@ const mutations = [
 
   {"name": "baseline-move-counter", "file": "state.rs", "before": "next.ply += 1;", "after": "next.ply *= 1;", "args": ["--test", "experiment_record", "standard_baseline_uses_existing_rules_and_verified_record"]},
   { name: 'session-termination-import', file: 'session.rs', before: 'session.termination = rec.termination;', after: 'session.termination = None;', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
+  { name: 'session-validated-result', file: 'session.rs', before: '*session.states.last_mut().expect("start state") = replayed;', after: 'session.resign();', args: ['--test', 'session', 'imported_resignation_retains_the_exact_validated_replay_result'] },
   { name: 'session-termination-cursor', file: 'session.rs', before: '(self.cursor == self.len())', after: 'true', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
   { name: 'session-termination-branch', file: 'session.rs', before: 'self.termination = None;', after: '', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
   { name: 'session-terminal-play', file: 'session.rs', before: 'if self.is_finished() {\n            return Err', after: 'if false {\n            return Err', args: ['--test', 'session', 'external_termination_survives_export_and_only_applies_at_record_end'] },
@@ -83,7 +84,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 32);
+    assert.equal(results.length, 33);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
