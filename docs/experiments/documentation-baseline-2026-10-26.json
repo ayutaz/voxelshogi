@@ -1,0 +1,83 @@
+{
+  "schema": "voxelshogi-documentation-baseline-v1",
+  "checkedAtUtc": "2026-10-26T13:20:42.070423+00:00",
+  "sourceCommit": "2405e86a0313d4b454119bd472937f2e10622bf5",
+  "publishedCommit": "2405e86a0313d4b454119bd472937f2e10622bf5",
+  "url": "https://voxelshogi.yousan-apps.workers.dev",
+  "entryJs": "/assets/index-Btkn-qLU.js",
+  "assets": [
+    {
+      "path": "/assets/ExperimentViewer-BjpePWrd.js",
+      "bytes": 11389,
+      "sha256": "8ef3f4035794025f9f25966e4bb7dca9ec810c84bed0649f5c02c4eec734cd9b",
+      "contentType": "text/javascript",
+      "cacheControl": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/assets/index-Btkn-qLU.js",
+      "bytes": 1196200,
+      "sha256": "96138e5a32aa11c9ed54caac2a414eeba98303b08a40e1de37de4360d573f834",
+      "contentType": "text/javascript",
+      "cacheControl": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/assets/voxelshogi_wasm_bg-CTKWGNbg.wasm",
+      "bytes": 284605,
+      "sha256": "d98ea4244c4a1890ae0d8a9ac58271c428c86362fb139649322ee5c2bc65564f",
+      "contentType": "application/wasm",
+      "cacheControl": "public, max-age=31536000, immutable"
+    }
+  ],
+  "records": [
+    {
+      "path": "/experiments/long/manifest.json",
+      "bytes": 4862,
+      "sha256": "5aaf36fb4a0f012921dbc20dbbf8d4c2130896b1f560e71a744b7c7201ecc7ab"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 11483,
+      "sha256": "71403a23c49649cae2b17ceb56f42d530328b1c19d62c13e5587a362b9ac31a3"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 7466,
+      "sha256": "0b728de53d2794cbe4c8901611450c83c480a84ca14a2c5315dd30f731fc529b"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 11664,
+      "sha256": "80a69c1091e5995c45bf5e08816459db0edd91879fdcfcf86b5a1d50bbba93a6"
+    },
+    {
+      "path": "/experiments/manifest.json",
+      "bytes": 6036,
+      "sha256": "cbb4ba3dc55ccace51f33ba6060b1255d8977e387ee3d17b3eaa7a72e91f2b60"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 6033,
+      "sha256": "f668d1baebbf806c5ffe6af8512805421f68d128bcbbf2cf16a9ab68e15f1b78"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 6036,
+      "sha256": "1a19cf7571a726c21a501f79488f63148c2cfc745460a6286b82925bb27c22bd"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 6036,
+      "sha256": "2fa616c542a32640c1fdfa0c8fcf16687e644e7b5869d324387b69d3984be8da"
+    }
+  ],
+  "headers": {
+    "buildInfo": "no-store",
+    "html": {
+      "permissions-policy": "camera=(), microphone=(), geolocation=()",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-content-type-options": "nosniff"
+    },
+    "manifest": "no-cache"
+  },
+  "diskFreeBytes": 34533277696
+}

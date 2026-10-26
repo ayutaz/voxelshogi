@@ -2,6 +2,8 @@
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
+更新: 2026-10-26。確認元 `2405e86` の [main CI 40318499296](https://github.com/ayutaz/voxelshogi/actions/runs/40318499296) は通常検証・deploy・配信SHA・公開E2E9件が成功した。最新配信を固定する値ではなく、本更新の確認元である。[現在地と取得記録](STATUS.md)。
+
 ## 構成
 
 - `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
@@ -78,7 +80,7 @@ published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
 E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm e2e
 ```
 
-現在は通常対局5件・配信SHA1件・R0比較室3件の計9件。ローカルは既存Chrome、CIはインストールしたChromiumを使う。2026-10-26には公開版 `73f4cdc63c44afca80d785bee8281689c0218933` の [main CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で公開E2Eまで成功し、公開manifestと全6棋譜のSHAも独立照合した。これは確認時点の記録であり、以後の版は配信情報で確認する。
+現在は通常対局5件・配信SHA1件・R0比較室3件の計9件。ローカルは既存Chrome、CIはインストールしたChromiumを使う。今回の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
 
 以下は過去の公開検証の記録。2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 
@@ -116,7 +118,9 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
 
 復旧訓練は、本番を変更せず、成功 run の `web-dist` を一時ディレクトリへダウンロードしてローカルで配信し、**その成果物の版に対応するE2E**とSHA確認を行う。M0で実施した旧版の訓練は当時の6件。`web-dist` は7日、`production-<SHA>` は30日保存なので、期限切れの場合は別の検証済み成功runを選ぶ。本番での自動 rollback は導入しない。[Cloudflare の rollback 仕様](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
 
-## 今後の拡張（M3 の推論検証から）
+## 今後の拡張（M2の探索、M3の推論検証）
+
+- M2は単一スレッドのM1探索をブラウザの専用Workerで実行する。Worker・WASMの配信、操作中の中断、バンドル分割を通常CI／公開E2Eで検証する。COOP/COEPやR2はM2の必須条件にせず、[M2計画](M2_PLAN.md) に従う。
 
 - M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルド・R2公開バケットとカスタムドメイン・Worker経由配信などを比較して決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
 - 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。

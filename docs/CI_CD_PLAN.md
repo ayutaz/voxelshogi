@@ -8,12 +8,12 @@
 
 ## 現在の状態
 
-2026-10-26（JST）。公開・設定行はR0追加直後の公開版 `73f4cdc63c44afca80d785bee8281689c0218933` の確認記録。品質・進捗はM1のPR #10時点へ更新した。最新の配信SHAは `build-info.json` で確認する。
+2026-10-26（JST）。M1完了後のmain／公開SHA `2405e86a0313d4b454119bd472937f2e10622bf5` と現行設定を再照合した。本更新の確認元であり、以後の文書PRの配信SHAを固定しない。[現在地](STATUS.md) と公開 `build-info.json` を参照。
 
 | 項目 | 現在の確認結果 |
 |---|---|
-| R0直後のmain CI・公開記録 | [CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で通常CI・deploy・配信SHA・公開E2E **9件**が成功。[Security 40254365229](https://github.com/ayutaz/voxelshogi/actions/runs/40254365229) の3言語解析も成功 |
-| 品質の継続検証 | Rust **150件**、Web単体 **36件**、CI制御Node **46件**、既知変異 **21件**。M1の最新検証は [記録](M1_VALIDATION.md) を参照。直前の文書PR #8でも [Quality 40252580699](https://github.com/ayutaz/voxelshogi/actions/runs/40252580699) が成功。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
+| 確認元mainのCI・公開 | [CI 40318499296](https://github.com/ayutaz/voxelshogi/actions/runs/40318499296) で通常CI・deploy・配信SHA・公開E2E **9件**が成功。[Security 40318499415](https://github.com/ayutaz/voxelshogi/actions/runs/40318499415) の3言語解析も成功。未解決CodeQL警告0件 |
+| 品質の継続検証 | Rust **150件**、Web単体 **36件**、CI制御Node **46件**、既知変異 **21件**。M1の最新検証は [記録](M1_VALIDATION.md) を参照。M1追記の [PR #11](https://github.com/ayutaz/voxelshogi/pull/11) も必須7チェック成功・通常取り込み済み。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
 | main保護 | ruleset **25816100** はactive、bypassなし、PR必須・最新main検証・必須7チェック・CodeQL error/high以上・force push/削除禁止。他者承認0。チェック発行元はGitHub Actions App **15368** |
 | 認証・セキュリティ設定 | repository Secretsは空。productionにCloudflareの2件、許可元mainのみ。Secret scanning・Push protection・非公開脆弱性報告・Dependabot security updatesは有効。名前・設定だけを再確認し、秘密値は取得していない |
 | 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1全幅探索もPR #10の通常取り込み・公開後検証まで完了。全1,172変異を1,075 caught・89 unviable・8 equivalentに分類した。R0の幅制限探索とは別API。Dependabot PR #1は未マージ |
@@ -154,9 +154,15 @@ GitHub Actions の **Public リポジトリの標準 GitHub-hosted runner** は�
 | M6 | 小さな学習とcheckpoint再開、各公開変換版の数値・精度・棋力評価、配布ファイルと評価記録のSHA-256一致、両AIのモデル・変換版の選択と観戦操作の公開E2E、人間対AIの補助機能。モデル・条件・結果を記録し、3D表示と推論の同時動作・速度・メモリを実機でも測る。GPU本学習は見積もり・承認後に実行し、通常CIと分ける |
 | Phase 7 | 複数ブラウザ・モバイル・アクセシビリティ、公開監視、必要になった場合の PR preview と release 自動化 |
 
-M1 では、同じ固定深さ・固定ノード数で同じ結果になることと、時間上限で停止することを別のテストにする。実時間だけの上限では環境負荷により到達深さが変わるため、同じ手を保証する再現性条件には使わない。
+M1では、同じ固定深さ・固定ノード数で同じ結果になることと、時間上限で停止することを別のテストで確認した。実時間だけの上限では環境負荷により到達深さが変わるため、同じ手を保証する再現性条件には使わない。
 
 M0 の完了は、設定ファイルが存在することではなく、正常時の成功と異常時の検出、取り込み制御、公開後の検証までの確認で判断する。性能の厳密な回帰閾値や全環境のテストを最初から必須にはせず、M1 以降の実測に合わせて増やす。
+
+## M1後の継続検証
+
+全体変異のテスト段階は `scripts/ci/mutation-cargo.sh` で有限の座標契約を先に確認し、成功時は元の全テストへ進む。座標変異による飛び駒ループのメモリ増加を防ぐためで、caughtの判定基準は変えない。固定Rust toolchainと実Cargoを明示して起動する。CIのShellCheckは `scripts/*.sh scripts/ci/*.sh` を対象とし、既知21変異・全1,172変異の分類は [M1記録](M1_VALIDATION.md) を参照。
+
+M2の実WASM・Worker・観戦E2Eは [M2計画](M2_PLAN.md) に従って追加する。公開テストの件数とコマンドも実装に合わせて更新する。
 
 ## 実装と検証の記録
 
@@ -186,8 +192,6 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 - CodeQL の実行結果、更新 PR、fork/Dependabot PR の動作は GitHub での確認後に追記する。
 
 ### M0-3 初回計測
-
-2026-10-26（M1）: 全体変異のテスト段階は `scripts/ci/mutation-cargo.sh` で座標契約を先に確認し、成功時は元の全テストへ進む。座標変異による飛び駒ループのメモリ増加を防ぐためで、caughtの判定基準は変えない。固定Rust toolchainと実Cargoを明示して起動する。詳細は [M1の検証記録](M1_VALIDATION.md)。
 
 2026-10-25: `quality.yml` に Rust/Web カバレッジと既知の変異9件を週次・手動実行として追加。一般的な変異の調査は cargo-mutants 27.1.0 で core 全体を8分割し、週次または `full_mutations: true` で実行する。これらは PR の必須 Gate から分離する。
 

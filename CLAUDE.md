@@ -4,6 +4,8 @@
 
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
+- 現在地・公開／品質の確認元: `docs/STATUS.md`
+- 次の実行計画: `docs/M2_PLAN.md`（計画策定済み・実装未着手）
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -91,7 +93,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M2: Web で探索AI同士を観戦（Normal 難易度、Web Worker。人間対AIも補助機能として利用）
+  1. M2: Web で探索AI同士を観戦（Normal 難易度、Web Worker。人間対AIも補助機能として利用）。`docs/M2_PLAN.md` のM2-1〜5に従い、履歴復元・中断・古い応答の破棄・実機計測も検証
   2. M3: ブラウザでのモデル推論の検証
   3. M4: Python バインディングとデータ生成
   4. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）

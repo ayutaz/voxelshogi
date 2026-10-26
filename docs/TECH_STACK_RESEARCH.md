@@ -11,17 +11,17 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-26のディスク再確認は約33GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。今回のディスク再確認は約32GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-26に実装・公開版 `73f4cdc` と照合した。標準ルールのライブ対局はランダムAI、R0は幅制限CPU探索による生成棋譜再生。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリはプロジェクトに未導入で、M3/M4/M6の候補である。WASMの初期化・再生は現在メインスレッドで行い、Web WorkerはM2以降。COOP/COEPもまだ付与していない。
+2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。標準1王のM1全幅探索はNativeまで完了し、次は [M2](M2_PLAN.md)。標準ルールのライブ対局はランダムAI、R0は幅制限CPU探索による生成棋譜再生。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリはプロジェクトに未導入で、M3/M4/M6の候補である。WASMの初期化・再生は現在メインスレッドで行い、Web WorkerはM2以降。COOP/COEPもまだ付与していない。
 
 | 現在の構成 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
-| Web / WASM | 下記の採用パッケージは完全固定、wasm-bindgenとCLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| 検証 | M1でRust150、Web36、Node46、既知変異21、E2E9件 | [M1検証記録](M1_VALIDATION.md)。以下の公開サイズはR0時点の値として保持 |
-| 公開WASM | 283,618 bytes（約284 kB） | 2026-10-26、公開版73f4cdcから取得した非圧縮バイト数 |
+| Web / WASM | 主要runtimeの直依存は完全固定、開発依存の範囲指定もlockfileで解決を固定。wasm-bindgenとCLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
+| 検証 | M1でRust150、Web36、Node46、既知変異21、E2E9件 | [M1検証記録](M1_VALIDATION.md)。以下の公開サイズは2405e86の取得値 |
+| 公開WASM | 284,605 bytes（約285 kB） | 2026-10-26、公開版2405e86から取得した非圧縮バイト数 |
 | 公開入口JS / 比較室JS | 1,196,200 / 11,389 bytes（約1.20 MB / 11.4 kB） | 同上。比較室JSは遅延ロード、重い共通JS分割はM2で継続 |
 | R0 | 1,052局を照合、代表6棋譜を公開 | [実測報告](NINE_KINGS_EXPERIMENT.md)。モデル推論ではない |
 
@@ -74,7 +74,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 3. **[確認済] ONNX 標準 `Attention`（opset 23）は WebGPU EP に登録がなく CPU にフォールバックする。** WebGPU で動くのは `com.microsoft` ドメインの `Attention` / `MultiHeadAttention` で、しかも mask・past/present 入力があると CPU フォールバック。→ opset 18でMatMul/Softmaxに分解する構成をM3の候補にする。実際の変換グラフ・対応演算・backend割当は未検証。
 4. **[確認済] TypeScript 7.0.2 が `latest` だが typescript-eslint は `typescript <6.1.0` を要求。** 当面 TS 6.0.3 に固定。
 5. **[確認済] PyTorch の `cu126` ビルドは Blackwell（RTX 5090, sm_120）非対応。** 5090 を使うなら PyPI 既定（CUDA 13.0）か `cu130`/`cu132` を使い、Vast.ai のホストは `cuda_max_good >= 13.0`（ドライバ 580 系以上）で絞り込むこと（4090 の出品 64 件中 8 件は 13.0 未満だった）。
-6. **[解消・再確認対象]** 初回の空き9.2 GiBは現在の不足ではない。2026-10-26は約33 GiB。追加のキャッシュ削除は行わず、M3の依存導入直前に容量を再確認する。
+6. **[解消・再確認対象]** 初回の空き9.2 GiBは現在の不足ではない。今回の取得記録は約32 GiB。追加のキャッシュ削除は行わず、M3の依存導入直前に容量を再確認する。
 
 ---
 
@@ -91,7 +91,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 ### 1.2 wasm-pack（0.15.0）— 保守状況と代替 [確認済]
 
-- **保守状況**: 一時期「rustwasm org 解散で放置」と言われたが、**現在は `github.com/wasm-bindgen/wasm-pack` で保守継続中**（0.14.0: 2026-01-20、0.15.0: 2026-05-15、2026-10-24 にも commit あり、未アーカイブ）。0.14 で macOS ARM ネイティブバイナリ対応、0.15 で npm インストーラの 404 問題修正・wasm64 対応・`--panic-unwind` 追加。open issue は 389 件と多い。
+- **保守状況**: 一時期「rustwasm org 解散で放置」と言われたが、**初回調査時点では `github.com/wasm-bindgen/wasm-pack` で保守継続中**（0.14.0: 2026-01-20、0.15.0: 2026-05-15、2026-10-24 にも commit あり、未アーカイブ）。0.14 で macOS ARM ネイティブバイナリ対応、0.15 で npm インストーラの 404 問題修正・wasm64 対応・`--panic-unwind` 追加。open issue は 389 件と多い。
 - **代替**:
   - **wasm-bindgen-cli 直接**: `cargo build --target wasm32-unknown-unknown --release` → `wasm-bindgen --target web --out-dir pkg ...` → （任意）`wasm-opt -O3`。ツールの数は減り、バージョン固定が明示的。ただし `package.json` 生成や `wasm-opt` の取得は自前。
   - **trunk（0.22.0）**: Yew/Leptos 等「Rust 製フロントエンド」の HTML 起点バンドラ。**本プロジェクトのフロントは Vite + React（TS）なので用途が合わない**。MSRV も 1.96.1 と高い。→ 不採用。
@@ -148,7 +148,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 #### 3.4.1 版・ビルド構成 [確認済]
 
-- npm `latest` = 1.30.0（2026-09-18）、`dev` = 1.31.0-dev。Python 版 `onnxruntime` は 1.31.0（2026-10-09）が出ているが **Web は 1.30.0 が最新**。
+- npm `latest` = 1.30.0（2026-09-18）、`dev` = 1.31.0-dev。Python 版 `onnxruntime` は 1.31.0（2026-10-09）が出ているが **初回調査時点のWeb latestは1.30.0**。
 - 1.30.0 の `exports` と同梱 wasm（`dist/`）:
 
 | import パス | WebGPU 実装 | 使用する wasm | サイズ | 25 MiB 以下? |
@@ -196,7 +196,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 #### 3.4.3 WebGPU のブラウザ対応 [記憶ベース・要再確認]
 
-- Chrome / Edge 113+（デスクトップ）で既定有効、Android Chrome 121+。Safari 26（macOS/iOS）で既定有効、Firefox は 141 で Windows 既定有効、macOS/Linux は段階展開中。本日一次情報では未検証のため、**`navigator.gpu?.requestAdapter()` で機能検出し、失敗時は WASM EP** という実装を必須とする。
+- Chrome / Edge 113+（デスクトップ）で既定有効、Android Chrome 121+。Safari 26（macOS/iOS）で既定有効、Firefox は 141 で Windows 既定有効、macOS/Linux は段階展開中。初回調査では一次情報未検証のため、**`navigator.gpu?.requestAdapter()` で機能検出し、失敗時は WASM EP** という実装を必須とする。
 - Dedicated Worker 内での `navigator.gpu` 利用は Chrome 系で可（他ブラウザは [未確認]）。
 
 #### 3.4.4 Web Worker 内での使い方 [確認済: exports / 記憶ベース: API 詳細]
@@ -321,14 +321,14 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 ### 5.3 huggingface_hub 2.3.0 / `hf` CLI [確認済]
 - 2.0（2026-09-24）で破壊的変更: HTTP スタックが `httpx` → `httpx2`、**1.x で非推奨だった `upload_large_folder` が削除され `upload_folder` に統合**（CLI の `upload_large_folder` モジュールも 2.3.0 には存在しない）。古い記事の `huggingface-cli` / `hf upload-large-folder` は使えない前提で。
 - 使い方: `hf auth login` → `hf upload <user>/<repo> ./local_dir . --repo-type=dataset`（データセット）/ `--repo-type=model`（モデル）。Vast.ai 上ではトークンを環境変数 `HF_TOKEN` で渡し、イメージに焼き込まない。
-- **注意点**: 大量の小ファイルは Hub の制限（ファイル数・コミットあたりの操作数）に当たりやすい → 自己対局データは Parquet にまとめて数百 MB 単位のシャードで上げる。Private repo のストレージ無料枠・課金条件は本日 [未確認]（public は無料）。
+- **注意点**: 大量の小ファイルは Hub の制限（ファイル数・コミットあたりの操作数）に当たりやすい → 自己対局データは Parquet にまとめて数百 MB 単位のシャードで上げる。Private repo のストレージ無料枠・課金条件は初回調査では [未確認]。公開repoも容量・利用条件を確認し、無制限無料とは仮定しない。
 
 ### 5.4 pyarrow 26.0.0 / Parquet [確認済]
 - **採用理由**: 自己対局局面（盤面テンソル・方策分布・価値）の列指向保存、圧縮（zstd）、HF Datasets / DuckDB / polars と互換。
 - **注意点**: Python `>=3.11`。729 マス×チャネルの密テンソルを 1 行 1 局面の `FixedSizeList` で持つと読み込みが速い。行グループ 128〜512 MB 程度、zstd。学習時は Parquet → 事前に NumPy memmap / WebDataset 風シャードに変換した方が DataLoader が速い場合がある（実測）。1 局面あたりのバイト数は見積もりに直結するので要計測。
 
 ### 5.5 Gymnasium 1.4.0 [確認済: 版のみ]
-- **評価**: 単一エージェント RL 用 API。AlphaZero 型の自己対局（MCTS + NN）では環境ラッパとしての必要性は低く、2 人対戦なら PettingZoo（AEC API）の方が適合（PettingZoo の版は本日未確認）。**採用は任意・低優先**。外部研究者向けに Gymnasium 互換ラッパを後から用意する程度で良い。
+- **評価**: 単一エージェント RL 用 API。AlphaZero 型の自己対局（MCTS + NN）では環境ラッパとしての必要性は低く、2 人対戦なら PettingZoo（AEC API）の方が適合（PettingZooの版は初回調査時点で未確認）。初回調査では任意・低優先としたが、現行ROADMAPではM4の行動マスク付きGymnasium環境を完了条件に含める。PyO3と同じRustルールを使い、先にM4の必要なAPI・Python3.14対応を検証する。
 
 ## 6. ローカル開発機（Apple M1 / 8 GB RAM）の初回調査
 
@@ -348,7 +348,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 | 大きなデータセット（数十 GB の Parquet） | × | HF / R2 / Vast.ai 上のみ。ローカルはサンプル数 MB |
 | 学習のメモリ | △ 8 GB 共有メモリ | 極小モデル・小バッチでスモークのみ |
 
-- **現在の判断**: 2026-10-26に空き約33 GiBを確認した。初回のキャッシュ削除案は現在の必須作業ではない。
+- **現在の判断**: 2026-10-26に空き約32 GiBを再確認した（取得時刻とbytesはSTATUSの記録）。初回のキャッシュ削除案は現在の必須作業ではない。
 
 ## 7. 未確認事項（要フォローアップ）
 
@@ -356,7 +356,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 2. Vite 8 + `onnxruntime-web/webgpu` で `dist/` に 25.54 MiB の wasm が出力されるか（実ビルドで確認）、`wasmPaths` の `{mjs, wasm}` 個別指定の挙動。
 3. ~~`_headers` の `/*` が SPA フォールバックの `index.html` 応答にも適用されるか~~ → **解決（2026-10-25）**: 公開 URL の存在しないパスへの `curl -I` で、`X-Content-Type-Options` などが付くことを確認した。
 4. Static Assets の 25 MiB が非圧縮サイズ基準か。
-5. WebGPU / JSPI / COEP credentialless の各ブラウザ対応状況（本日一次情報未確認）。
+5. WebGPU / JSPI / COEP credentialless の各ブラウザ対応状況（初回調査時点で一次情報未確認）。
 6. torch 2.14 での `torch.compile` × DDP の推奨順序、MPS での BF16/compile 対応。
 7. Hugging Face private repo のストレージ無料枠。
 8. ~~`getrandom` 0.4 の wasm32-unknown-unknown での設定方法~~ → **不要（2026-10-25）**: コアの依存は serde と serde_json だけで、`getrandom` に依存していない（Zobrist は固定シードの SplitMix64）。
@@ -364,7 +364,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 ## 出典
 
-外部ライブラリ調査は以下のとおり2026-10-25取得。2026-10-26はローカル設定・公開配信のサイズ／ヘッダー／全6棋譜のSHAと、Cloudflareの [Static Assets料金](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)・[上限](https://developers.cloudflare.com/workers/platform/limits/)・[R2料金](https://developers.cloudflare.com/r2/pricing/) を照合した。記録した公開SHAは `73f4cdc63c44afca80d785bee8281689c0218933`。将来のモデル・runtimeの速度や互換性は未実測。
+外部ライブラリ調査は以下のとおり2026-10-25取得。2026-10-26はローカル設定・公開配信のサイズ／ヘッダー／全6棋譜のSHAと、Cloudflareの [Static Assets料金](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)・[上限](https://developers.cloudflare.com/workers/platform/limits/)・[R2料金](https://developers.cloudflare.com/r2/pricing/) を照合した。今回再取得した公開SHAは `2405e86a0313d4b454119bd472937f2e10622bf5`。将来のモデル・runtimeの速度や互換性は未実測。
 
 - crates.io API: `https://crates.io/api/v1/crates/{wasm-bindgen,wasm-bindgen-cli,wasm-pack,serde,serde-wasm-bindgen,pyo3,maturin,trunk,js-sys,web-sys,getrandom}`（`max_stable_version`, `rust_version`）
 - npm registry: `npm view <pkg> version / time / peerDependencies / engines / exports`（vite, react, react-dom, three, @types/three, @react-three/fiber, @react-three/drei, onnxruntime-web, vitest, @playwright/test, wrangler, typescript, typescript-eslint, @vitejs/plugin-react）
