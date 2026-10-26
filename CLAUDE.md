@@ -10,7 +10,7 @@
 - 設計判断: `docs/ARCHITECTURE_DECISIONS.md`、エンジン: `docs/GAME_ENGINE.md`、デプロイ: `docs/DEPLOYMENT.md`
 - M1 前の CI/CD 強化計画と検証記録: `docs/CI_CD_PLAN.md`（M0。完了）
 - ルール・観戦表示の試作結果: `docs/NINE_KINGS_EXPERIMENT.md`（R0。正式採用は保留）
-- 次の探索AIの実装手順と完了条件: `docs/M1_PLAN.md`（未着手）
+- 探索AIの実装手順と完了条件: `docs/M1_PLAN.md`（M1完了）、検証・Native計測: `docs/M1_VALIDATION.md`
 
 ## 構成
 
@@ -20,6 +20,7 @@
 | `crates/voxelshogi-wasm` | wasm-bindgen による薄いラッパー（`Game`／`ExperimentReplay` クラス）。ルールを再実装しない |
 | `apps/web` | VoxelShogi Arena（Vite + React + three/R3F）。エンジンの出力をデコードして表示するだけ |
 | `docs/` | 仕様・ADR・調査・見積もり・`experiments/` の固定集計 |
+| `crates/voxelshogi-core/src/search.rs` | M1の標準1王・全幅αβ探索。WASM公開API／WorkerはM2で追加 |
 | `scripts/experiment-pack.mjs` | R0のJSONLをWASMで再生照合し、集計と代表棋譜を作成 |
 | `apps/web/public/experiments` | 400／800手の代表棋譜6件と配信用manifest。学習モデルではない |
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
@@ -42,7 +43,7 @@
 ## コマンド
 
 ```bash
-cargo test --locked --workspace            # Rust（116件、プロファイル test は opt-level 2）
+cargo test --locked --workspace            # Rust（150件、プロファイル test は opt-level 2）
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
 cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度
@@ -88,11 +89,11 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
   - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、隔離復旧訓練、全758変異の調査と分類を確認済み。PR #3の最終文書も取り込み済みで、統合コミット `1ff4e2f` の本番公開・配信SHA・公開E2E 6件まで2026-10-26（JST）に成功した（`docs/M0_VALIDATION.md` の完了時記録）
   - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）
+  - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M1: 探索AI（Rust、未着手）。`docs/M1_PLAN.md` の7段階で、状態遷移・評価・参照探索・戦術・最適化・上限・計測の順に進める
-  2. M2: Web で探索AI同士を観戦（Normal 難易度、Web Worker。人間対AIも補助機能として利用）
-  3. M3: ブラウザでのモデル推論の検証
-  4. M4: Python バインディングとデータ生成
-  5. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
-  6. M6: Transformer-S の学習
+  1. M2: Web で探索AI同士を観戦（Normal 難易度、Web Worker。人間対AIも補助機能として利用）
+  2. M3: ブラウザでのモデル推論の検証
+  3. M4: Python バインディングとデータ生成
+  4. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
+  5. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

@@ -20,7 +20,7 @@ Python は3.14系を基本、依存が未対応の場合のみ3.13系とする�
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
 | Web / WASM | 下記の採用パッケージは完全固定、wasm-bindgenとCLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| 検証 | Rust116、Web36、Node42、既知変異14、E2E9件 | 通常CI・Quality・公開CI。M0時点の件数とは区別 |
+| 検証 | M1でRust150、Web36、Node46、既知変異21、E2E9件 | [M1検証記録](M1_VALIDATION.md)。以下の公開サイズはR0時点の値として保持 |
 | 公開WASM | 283,618 bytes（約284 kB） | 2026-10-26、公開版73f4cdcから取得した非圧縮バイト数 |
 | 公開入口JS / 比較室JS | 1,196,200 / 11,389 bytes（約1.20 MB / 11.4 kB） | 同上。比較室JSは遅延ロード、重い共通JS分割はM2で継続 |
 | R0 | 1,052局を照合、代表6棋譜を公開 | [実測報告](NINE_KINGS_EXPERIMENT.md)。モデル推論ではない |

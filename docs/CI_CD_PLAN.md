@@ -4,19 +4,19 @@
 
 **M1（探索AI）の前に、M0 として CI/CD と品質基盤を整えた。** 調査開始時の不足と、実装後の状態を分けて記録する。
 
-本書は調査結果・実装計画・検証記録。M0-1〜5は最終文書の取り込み・公開後検証まで完了した（[M0_VALIDATION.md](M0_VALIDATION.md)）。現行のデプロイ手順は [DEPLOYMENT.md](DEPLOYMENT.md)、実行順と進捗は [ROADMAP.md](ROADMAP.md#実行計画マイルストーン)、次の探索AIの実装手順は [M1_PLAN.md](M1_PLAN.md) に記録する。
+本書は調査結果・実装計画・検証記録。M0-1〜5は最終文書の取り込み・公開後検証まで完了した（[M0_VALIDATION.md](M0_VALIDATION.md)）。現行のデプロイ手順は [DEPLOYMENT.md](DEPLOYMENT.md)、実行順と進捗は [ROADMAP.md](ROADMAP.md#実行計画マイルストーン)、M1探索の実装手順は [M1_PLAN.md](M1_PLAN.md)、検証結果は [M1_VALIDATION.md](M1_VALIDATION.md) に記録する。
 
 ## 現在の状態
 
-2026-10-26（JST）、R0追加後の公開版 `73f4cdc63c44afca80d785bee8281689c0218933` と照合した。
+2026-10-26（JST）。公開・設定行はR0追加直後の公開版 `73f4cdc63c44afca80d785bee8281689c0218933` の確認記録。品質・進捗はM1のPR #10時点へ更新した。最新の配信SHAは `build-info.json` で確認する。
 
 | 項目 | 現在の確認結果 |
 |---|---|
-| mainのCI・公開 | [CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で通常CI・deploy・配信SHA・公開E2E **9件**が成功。[Security 40254365229](https://github.com/ayutaz/voxelshogi/actions/runs/40254365229) の3言語解析も成功 |
-| 品質の継続検証 | Rust **116件**、Web単体 **36件**、CI制御Node **42件**、既知変異 **14件**。直前の文書PR #8でも [Quality 40252580699](https://github.com/ayutaz/voxelshogi/actions/runs/40252580699) が成功。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
+| R0直後のmain CI・公開記録 | [CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で通常CI・deploy・配信SHA・公開E2E **9件**が成功。[Security 40254365229](https://github.com/ayutaz/voxelshogi/actions/runs/40254365229) の3言語解析も成功 |
+| 品質の継続検証 | Rust **150件**、Web単体 **36件**、CI制御Node **46件**、既知変異 **21件**。M1の最新検証は [記録](M1_VALIDATION.md) を参照。直前の文書PR #8でも [Quality 40252580699](https://github.com/ayutaz/voxelshogi/actions/runs/40252580699) が成功。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
 | main保護 | ruleset **25816100** はactive、bypassなし、PR必須・最新main検証・必須7チェック・CodeQL error/high以上・force push/削除禁止。他者承認0。チェック発行元はGitHub Actions App **15368** |
 | 認証・セキュリティ設定 | repository Secretsは空。productionにCloudflareの2件、許可元mainのみ。Secret scanning・Push protection・非公開脆弱性報告・Dependabot security updatesは有効。名前・設定だけを再確認し、秘密値は取得していない |
-| 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1完成版は未着手。R0の幅制限探索をM1完了と数えない。Dependabot PR #1は未マージ |
+| 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1全幅探索も完了（PR #10統合後）。全1,172変異を1,075 caught・89 unviable・8 equivalentに分類した。R0の幅制限探索とは別API。Dependabot PR #1は未マージ |
 
 公開版は固定されないため、以後は `build-info.json` と対応する成功runを確認する。CI取得は最短10分間隔でまとめ、短いwaitも反復しない。
 
@@ -34,7 +34,7 @@
 | main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
 | PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェック成功後、bypass なしで squash merge 済み（main `e3f7f7a`）。未完了時の通常 merge 拒否と正常時の取り込みを確認 |
 | 復旧訓練 | 成功runの旧 `web-dist` を再ビルドせず loopback 配信し、Chrome E2E 6件が成功。本番は変更していない。[証拠と手順](M0_VALIDATION.md) |
-| 次の作業 | M0-1〜5は取り込み・公開後検証まで完了。[M1実装計画](M1_PLAN.md) の段階1から進める（未着手）。fork実検証は外部からの開発参加時に追加する |
+| 次の作業 | M0-1〜5は取り込み・公開後検証まで完了。当時はM1未着手。その後のM1完了と次のM2は [検証記録](M1_VALIDATION.md)・[ROADMAP](ROADMAP.md) を参照。fork実検証は外部からの開発参加時に追加する |
 
 人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
 
@@ -135,7 +135,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | タイミング | 実行内容 | 役割 |
 |---|---|---|
 | PR / main push | lint、Rust、WASM、Web、ローカル E2E、依存監査、CodeQL。dependency-review は PR のみ | 取り込み前と統合後の検証 |
-| PR | Rust/Web カバレッジ、既知の14変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認 |
+| PR | Rust/Web カバレッジ、既知の21変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認 |
 | main の検証成功後 | 同じ artifact を deploy、配信 SHA 確認、公開 E2E | 公開版の動作確認 |
 | 週次 / 手動 | 依存監査、CodeQL、カバレッジ、変異テスト。Dependabot の更新確認 | コード更新がなくても問題を検出 |
 
@@ -187,6 +187,8 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 
 ### M0-3 初回計測
 
+2026-10-26（M1）: 全体変異のテスト段階は `scripts/ci/mutation-cargo.sh` で座標契約を先に確認し、成功時は元の全テストへ進む。座標変異による飛び駒ループのメモリ増加を防ぐためで、caughtの判定基準は変えない。固定Rust toolchainと実Cargoを明示して起動する。詳細は [M1の検証記録](M1_VALIDATION.md)。
+
 2026-10-25: `quality.yml` に Rust/Web カバレッジと既知の変異9件を週次・手動実行として追加。一般的な変異の調査は cargo-mutants 27.1.0 で core 全体を8分割し、週次または `full_mutations: true` で実行する。これらは PR の必須 Gate から分離する。
 
 | ローカル実測 | 結果 | 対象 |
@@ -233,4 +235,4 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
 - PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
 
-2026-10-26（JST）: PR #3の最終文書 `ee7b102` も必須7チェック（通常CI・CodeQL・[Quality 40194273928](https://github.com/ayutaz/voxelshogi/actions/runs/40194273928)）が成功し、通常取り込み後のmain `1ff4e2f` で配信SHA・公開E2E 6件まで成功した。Cloudflare version IDは `ce499132-9c06-4a0c-aea6-8491a10fbfa7`。これをもってM0を完了した。[最終証拠](M0_VALIDATION.md)。その後のR0は冒頭の現況を参照し、次の本格探索は [M1のTDD手順](M1_PLAN.md) へ進む。CIの状態取得は最短10分間隔、報告は状態変更時とし、CI待ちだけの短いwaitの反復も行わない。スキルとhookの運用は [開発手順](../CONTRIBUTING.md#ci-確認のスキルとhook) に従う。
+2026-10-26（JST）: PR #3の最終文書 `ee7b102` も必須7チェック（通常CI・CodeQL・[Quality 40194273928](https://github.com/ayutaz/voxelshogi/actions/runs/40194273928)）が成功し、通常取り込み後のmain `1ff4e2f` で配信SHA・公開E2E 6件まで成功した。Cloudflare version IDは `ce499132-9c06-4a0c-aea6-8491a10fbfa7`。これをもってM0を完了した。[最終証拠](M0_VALIDATION.md)。その後のR0は冒頭の現況を参照し、当時は次の本格探索を [M1のTDD手順](M1_PLAN.md) とした。M1完了後はM2へ進む。CIの状態取得は最短10分間隔、報告は状態変更時とし、CI待ちだけの短いwaitの反復も行わない。スキルとhookの運用は [開発手順](../CONTRIBUTING.md#ci-確認のスキルとhook) に従う。

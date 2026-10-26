@@ -1,0 +1,382 @@
+{
+  "arch": "aarch64",
+  "engine": "91f4c62c773d43559870242f21a8a1ca9b339513",
+  "measurements": [
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 1,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 117909.51152447566,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial",
+      "result": {
+        "bestMove": "171161",
+        "depth": 1,
+        "lastIterationNodes": 425,
+        "nodes": 425,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.003604459,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 2,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 5123.746509534495,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 1697,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.331202958,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 4,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 294620.7709298678,
+      "options": {
+        "iterativeDeepening": false,
+        "moveOrdering": false,
+        "tableCapacity": 0,
+        "transpositionTable": false
+      },
+      "position": "two-kings",
+      "result": {
+        "bestMove": "999888",
+        "depth": 4,
+        "lastIterationNodes": 356,
+        "nodes": 356,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.001208333,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 4,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 435551.8825254351,
+      "options": {
+        "iterativeDeepening": false,
+        "moveOrdering": false,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "two-kings",
+      "result": {
+        "bestMove": "999888",
+        "depth": 4,
+        "lastIterationNodes": 273,
+        "nodes": 273,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 166
+      },
+      "seconds": 0.000626791,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 4,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 279252.262845408,
+      "options": {
+        "iterativeDeepening": false,
+        "moveOrdering": true,
+        "tableCapacity": 0,
+        "transpositionTable": false
+      },
+      "position": "two-kings",
+      "result": {
+        "bestMove": "999888",
+        "depth": 4,
+        "lastIterationNodes": 356,
+        "nodes": 356,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.001274833,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 4,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 416673.3897566684,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "two-kings",
+      "result": {
+        "bestMove": "999888",
+        "depth": 4,
+        "lastIterationNodes": 273,
+        "nodes": 439,
+        "score": 0,
+        "stopReason": "Depth",
+        "ttHits": 249
+      },
+      "seconds": 0.001053583,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 2,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 60838.94948797156,
+      "options": {
+        "iterativeDeepening": false,
+        "moveOrdering": false,
+        "tableCapacity": 0,
+        "transpositionTable": false
+      },
+      "position": "capture-and-promotion",
+      "result": {
+        "bestMove": "545535+",
+        "depth": 2,
+        "lastIterationNodes": 31,
+        "nodes": 31,
+        "score": 1550,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.000509542,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/4r4/4P4/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 2,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": null
+      },
+      "nodesPerSecond": 48995.59039686429,
+      "options": {
+        "iterativeDeepening": false,
+        "moveOrdering": true,
+        "tableCapacity": 0,
+        "transpositionTable": false
+      },
+      "position": "capture-and-promotion",
+      "result": {
+        "bestMove": "545535+",
+        "depth": 2,
+        "lastIterationNodes": 25,
+        "nodes": 25,
+        "score": 1550,
+        "stopReason": "Depth",
+        "ttHits": 0
+      },
+      "seconds": 0.00051025,
+      "vsfen": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/4r4/4P4/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 64,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": 1000
+      },
+      "nodesPerSecond": 14143.078659126453,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial-one-second",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 14152,
+        "score": 0,
+        "stopReason": "Time",
+        "ttHits": 300
+      },
+      "seconds": 1.000630792,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 64,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": 1000
+      },
+      "nodesPerSecond": 14204.79757102999,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial-one-second",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 14212,
+        "score": 0,
+        "stopReason": "Time",
+        "ttHits": 300
+      },
+      "seconds": 1.000507042,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 64,
+        "maxGamePly": null,
+        "nodes": null,
+        "timeMs": 1000
+      },
+      "nodesPerSecond": 14222.021389516283,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial-one-second",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 14226,
+        "score": 0,
+        "stopReason": "Time",
+        "ttHits": 300
+      },
+      "seconds": 1.00027975,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 64,
+        "maxGamePly": null,
+        "nodes": 10000,
+        "timeMs": null
+      },
+      "nodesPerSecond": 13513.67027208867,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial-fixed-nodes",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 10000,
+        "score": 0,
+        "stopReason": "Nodes",
+        "ttHits": 153
+      },
+      "seconds": 0.739991416,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    },
+    {
+      "history": "starts at this position",
+      "limits": {
+        "depth": 64,
+        "maxGamePly": null,
+        "nodes": 10000,
+        "timeMs": null
+      },
+      "nodesPerSecond": 13606.973340885821,
+      "options": {
+        "iterativeDeepening": true,
+        "moveOrdering": true,
+        "tableCapacity": 65536,
+        "transpositionTable": true
+      },
+      "position": "initial-fixed-nodes",
+      "result": {
+        "bestMove": "171161",
+        "depth": 2,
+        "lastIterationNodes": 1272,
+        "nodes": 10000,
+        "score": 0,
+        "stopReason": "Nodes",
+        "ttHits": 153
+      },
+      "seconds": 0.734917292,
+      "vsfen": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1"
+    }
+  ],
+  "os": "macos",
+  "rulesetId": "voxelshogi-standard-v1",
+  "rust": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "schema": "voxelshogi-search-benchmark-v1",
+  "threads": 1,
+  "hardware": {
+    "cpu": "Apple M1",
+    "memoryBytes": 8589934592,
+    "osVersion": "27.0.1"
+  },
+  "measuredDate": "2026-10-26",
+  "conditions": "Native release, one thread; no other task-owned build/self-play ran during measurement. Browser WASM and GPU training not measured."
+}

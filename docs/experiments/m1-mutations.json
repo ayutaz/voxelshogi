@@ -1,0 +1,143 @@
+{
+  "schema": "voxelshogi-m1-mutation-audit-v1",
+  "engine": "b45fb90b6265ca5f4e62e3245a9ee0bd9899c01f",
+  "run": 40306644146,
+  "artifacts": [
+    {
+      "artifact": "full-mutations-0",
+      "id": 12643272646,
+      "digest": "sha256:7e170b604c056104ca1f6133399e3680caedb4d6cb5e5c8dcddbf5731e77d111",
+      "caught": 135,
+      "unviable": 12,
+      "equivalent": 0,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-1",
+      "id": 12643546549,
+      "digest": "sha256:f45371b7a1ed84f54e1f4a6441a3b3bd55342afae7521254756ab985ad6a57fb",
+      "caught": 135,
+      "unviable": 12,
+      "equivalent": 0,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-2",
+      "id": 12642543455,
+      "digest": "sha256:3570933e81f3372b56cdccd6f9926310a23defcd049d45f936c4f107763c0fe7",
+      "caught": 128,
+      "unviable": 19,
+      "equivalent": 0,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-3",
+      "id": 12643422076,
+      "digest": "sha256:0e10cd2a206028af0897dc81f00f1736918a26743f68b3366d7c7e187ecf83c0",
+      "caught": 126,
+      "unviable": 18,
+      "equivalent": 3,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-4",
+      "id": 12643855135,
+      "digest": "sha256:0c8c73387a787ad8849f86b7708e173762af3298f6a03274902f18ea8e116b5f",
+      "caught": 140,
+      "unviable": 4,
+      "equivalent": 3,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-5",
+      "id": 12642799233,
+      "digest": "sha256:49129db6785c8050e44f34bed1899e6c223c1a022f9726fb92399cfeb4ba5152",
+      "caught": 137,
+      "unviable": 10,
+      "equivalent": 0,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-6",
+      "id": 12644085996,
+      "digest": "sha256:f8ee5d3d623e28364889139782817a5901b9d56214380330b62bef2b88254e56",
+      "caught": 143,
+      "unviable": 4,
+      "equivalent": 0,
+      "total": 147
+    },
+    {
+      "artifact": "full-mutations-7",
+      "id": 12643328271,
+      "digest": "sha256:276e5fd842ead4faaef8a62cc88922a89d8bef33c1b01b301c834fbfd1bdc201",
+      "caught": 131,
+      "unviable": 10,
+      "equivalent": 2,
+      "total": 143
+    }
+  ],
+  "counts": {
+    "total": 1172,
+    "caught": 1075,
+    "unviable": 89,
+    "equivalent": 8
+  },
+  "missing": [],
+  "inventorySha256": "be7d731a8655df9cfb26676e65cdcf4dc4a4744029afa5f746f7ec63a49de875",
+  "files": {
+    "crates/voxelshogi-core/src/board.rs": {
+      "Unviable": 4,
+      "CaughtMutant": 30
+    },
+    "crates/voxelshogi-core/src/capture.rs": {
+      "CaughtMutant": 100,
+      "Unviable": 8
+    },
+    "crates/voxelshogi-core/src/coord.rs": {
+      "CaughtMutant": 83,
+      "Unviable": 6
+    },
+    "crates/voxelshogi-core/src/experiment.rs": {
+      "CaughtMutant": 184,
+      "Unviable": 16
+    },
+    "crates/voxelshogi-core/src/movegen.rs": {
+      "Unviable": 28,
+      "CaughtMutant": 226,
+      "MissedMutant": 6
+    },
+    "crates/voxelshogi-core/src/moves.rs": {
+      "Unviable": 1,
+      "CaughtMutant": 1
+    },
+    "crates/voxelshogi-core/src/notation.rs": {
+      "Unviable": 2,
+      "CaughtMutant": 72
+    },
+    "crates/voxelshogi-core/src/piece.rs": {
+      "Unviable": 6,
+      "CaughtMutant": 66
+    },
+    "crates/voxelshogi-core/src/record.rs": {
+      "CaughtMutant": 16,
+      "Unviable": 2
+    },
+    "crates/voxelshogi-core/src/search.rs": {
+      "CaughtMutant": 90,
+      "Unviable": 6
+    },
+    "crates/voxelshogi-core/src/session.rs": {
+      "CaughtMutant": 49
+    },
+    "crates/voxelshogi-core/src/state.rs": {
+      "CaughtMutant": 138,
+      "Unviable": 5,
+      "MissedMutant": 2
+    },
+    "crates/voxelshogi-core/src/zobrist.rs": {
+      "Unviable": 5,
+      "CaughtMutant": 20
+    }
+  },
+  "verification": "All 8 archive SHA-256 digests and workflow heads verified; inventory/outcomes exact bijection, no duplicates or missing mutations, positive build/test baselines. Caught requires successful build and executed test Failure(101); unviable requires build Failure(101); 8 equivalent mutants require reviewed source fingerprints. No timeouts or interrupted scenarios accepted."
+}

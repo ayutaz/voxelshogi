@@ -25,13 +25,13 @@
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-M0（CI/CD と品質基盤）は、PRの取り込み・公開後検証まで完了しました。固定ツールチェーン、依存監査、CodeQL、品質計測、配信 SHA と公開 E2E、main 保護、旧成果物の隔離復旧訓練を確認済みです。M0時点の全758変異を調査し、692件を検出、58件をビルド不能、8件を根拠付きの同値として分類しました。R0追加後の全体調査結果と混同しません。次は M1（探索AI、未着手）です。[M1の実装手順](docs/M1_PLAN.md)・[CI/CDの計画](docs/CI_CD_PLAN.md)・[M0の検証記録](docs/M0_VALIDATION.md)
+M0（CI/CD と品質基盤）は、PRの取り込み・公開後検証まで完了しました。固定ツールチェーン、依存監査、CodeQL、品質計測、配信 SHA と公開 E2E、main 保護、旧成果物の隔離復旧訓練を確認済みです。M0時点の全758変異を調査し、692件を検出、58件をビルド不能、8件を根拠付きの同値として分類しました。R0追加後の全体調査結果と混同しません。M1（標準1王の全幅探索）は完了し、次はM2のWebでの探索AI観戦です。全1,172変異の分類とNativeの深さ2・約0.33秒を確認しました。[検証記録](docs/M1_VALIDATION.md)。[M1の実装手順](docs/M1_PLAN.md)・[CI/CDの計画](docs/CI_CD_PLAN.md)・[M0の検証記録](docs/M0_VALIDATION.md)
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
 通常画面のライブ対局・観戦はランダムAIです。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)では、幅を制限したCPU探索AIが生成した棋譜を再生し、400手／800手と全体／注目表示を比較できます。計1,052局を生成・照合し、代表棋譜6件を公開しました。ブラウザ内のライブ探索と学習モデルは未実装です。[実測結果と再現手順](docs/NINE_KINGS_EXPERIMENT.md)
 
-検証はRust 116件、Web単体36件、NodeのCI制御42件、既知変異14件、E2E 9件です（2026-10-26）。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
+検証はRust 150件、Web単体36件、NodeのCI制御46件、既知変異21件、E2E 9件です（2026-10-26）。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
 
 M3・M6では、実機のブラウザで動く変換済みモデルをデモに組み込みます。公開する FP16・量子化版なども個別に選択して対局・観戦できるようにし、配信する同じモデルで精度・棋力・速度・サイズを評価します。
 
@@ -58,7 +58,8 @@ pnpm dev                        # http://localhost:5173
 |---|---|
 | [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | 目的・スコープ・横断的な要件 |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
-| [docs/M1_PLAN.md](docs/M1_PLAN.md) | 次の探索AIの実装順・テスト・完了条件 |
+| [docs/M1_PLAN.md](docs/M1_PLAN.md) | 探索AIの実装順・契約・完了条件 |
+| [docs/M1_VALIDATION.md](docs/M1_VALIDATION.md) | M1の参照探索・戦術・変異・Native計測・統合の証拠 |
 | [docs/RULESET.md](docs/RULESET.md) | 標準ルールと、別IDの9王試作3ルール |
 | [docs/RULE_VARIANTS_RESEARCH.md](docs/RULE_VARIANTS_RESEARCH.md) | 9層同一配置・複数王の先行調査、試作後の実測への案内 |
 | [docs/NINE_KINGS_EXPERIMENT.md](docs/NINE_KINGS_EXPERIMENT.md) | R0の1,052局・表示比較・再現と公開検証の記録 |

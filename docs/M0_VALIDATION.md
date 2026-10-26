@@ -18,7 +18,7 @@ M0-1〜5は完了した。[PR #3](https://github.com/ayutaz/voxelshogi/pull/3) �
 | 公開記録 artifact | `production-1ff4e2fe76b60c470ed57c75c984620dcc8fc7c2`。commit・version・run ID を取得して照合 |
 | 独立した配信確認 | 公開 URL の `build-info.json` が HTTP 200 を返し、上記の完全長 commit SHA と一致 |
 
-この表は M0 完了時のスナップショット。以後の文書更新でも自動デプロイされるため、現在の公開版は配信中の `build-info.json` と対応する main の CI で確認する。次の M1 は未着手で、[実装計画](M1_PLAN.md) に従う。
+この表は M0 完了時のスナップショット。以後の文書更新でも自動デプロイされるため、現在の公開版は配信中の `build-info.json` と対応する main の CI で確認する。当時はM1未着手だった。その後の実装・検証は [M1の記録](M1_VALIDATION.md)、今後の順序は [ROADMAP](ROADMAP.md) を参照。
 
 ## PR と取り込み制御
 
