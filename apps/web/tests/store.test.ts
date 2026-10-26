@@ -84,4 +84,29 @@ describe('GameStore', () => {
       s.redo();
     }
   });
+
+  it('invalidates AI roots even when undo, import or new game return to the same board', () => {
+    const s = new GameStore();
+    const root = s.searchState();
+    expect(root).toMatchObject({ revision: 0, hash: '043b66e12f6b84fd', cursor: 0, side: 'b', ruleset: 'voxelshogi-standard-v1' });
+    expect(JSON.parse(root.recordJson).moves).toEqual([]);
+    for (const reset of [() => { s.play('577567'); s.undo(); }, () => s.importRecord(root.recordJson), () => s.newGame(), () => s.goto(0)]) {
+      reset();
+      expect(s.snapshot().hash).toBe(root.hash);
+      expect(s.snapshot().revision).toBeGreaterThan(root.revision);
+      expect(s.applyAiMove(root, '577567').ok).toBe(false);
+      expect(s.snapshot().ply).toBe(0);
+    }
+    const current = s.searchState();
+    expect(s.applyAiMove({ ...current, side: 'w' }, '577567').ok).toBe(false);
+    expect(s.applyAiMove({ ...current, hash: '0000000000000000' }, '577567').ok).toBe(false);
+    expect(s.applyAiMove({ ...current, ruleset: 'other' }, '577567').ok).toBe(false);
+    expect(s.applyAiMove({ ...current, cursor: 1 }, '577567').ok).toBe(false);
+    expect(s.applyAiMove(current, '555554').ok).toBe(false);
+    expect(s.snapshot().revision).toBe(current.revision);
+    expect(s.applyAiMove(current, '577567')).toEqual({ ok: true });
+    expect(s.applyAiMove(current, '577567').ok).toBe(false);
+    expect(s.snapshot().ply).toBe(1);
+    expect(s.snapshot().revision).toBe(current.revision + 1);
+  });
 });

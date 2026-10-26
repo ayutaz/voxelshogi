@@ -13,7 +13,7 @@
 
 Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。今回のディスク再確認は約32GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。標準1王のM1全幅探索はNativeまで完了し、次は [M2](M2_PLAN.md)。標準ルールのライブ対局はランダムAI、R0は幅制限CPU探索による生成棋譜再生。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリはプロジェクトに未導入で、M3/M4/M6の候補である。WASMの初期化・再生は現在メインスレッドで行い、Web WorkerはM2以降。COOP/COEPもまだ付与していない。
+2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。下表の公開サイズはこの固定版。M2の作業差分では標準1王の全幅探索を専用module Workerへ接続し、観戦・両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを実装した。固定SHAの計測と公開確認は [M2記録](M2_VALIDATION.md) で追う。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリは未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
 
 | 現在の構成 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
@@ -96,7 +96,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
   - **wasm-bindgen-cli 直接**: `cargo build --target wasm32-unknown-unknown --release` → `wasm-bindgen --target web --out-dir pkg ...` → （任意）`wasm-opt -O3`。ツールの数は減り、バージョン固定が明示的。ただし `package.json` 生成や `wasm-opt` の取得は自前。
   - **trunk（0.22.0）**: Yew/Leptos 等「Rust 製フロントエンド」の HTML 起点バンドラ。**本プロジェクトのフロントは Vite + React（TS）なので用途が合わない**。MSRV も 1.96.1 と高い。→ 不採用。
 - **初回の候補**: `wasm-pack build --target web`（0.15.0）を検討したが、ADR-007 で不採用。ローカル・CI とも wasm-bindgen-cli 0.2.129 を直接呼び出す。
-  - `--target web` を推奨（`bundler` ターゲットは ESM の wasm import 提案に依存し、Vite では追加プラグインが必要になりがち）。現在は `main.tsx` で生成された `init()` を呼ぶ。Worker内での初期化はM2以降に追加する。
+  - `--target web` を採用（`bundler` ターゲットは ESM の wasm import 提案に依存する）。`main.tsx` とM2の専用Workerで、それぞれ生成された `init()` を呼ぶ。Worker側は初期化を1回にまとめ、探索用Gameを要求ごとに解放する。中断時はWorker自体を終了する。
   - `wasm-opt` は wasm-pack が binaryen を自動ダウンロードする。オフライン/CI でキャッシュするなら `[package.metadata.wasm-pack.profile.release] wasm-opt = ["-O3"]` 等で明示。
 
 ### 1.3 serde / serde-wasm-bindgen [確認済]
@@ -245,7 +245,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 - **注意点**: Node 要件 `^22.12 || ^24 || >=26`。ブラウザモードは `@vitest/browser-playwright` を別途インストール（バージョンは vitest と完全一致）。WebGPU を要するテストは CI（GPU なしランナー）では動かないので WASM EP でのテストに限定。
 
 #### Playwright 1.64.1 [確認済]
-- **採用理由**: 現在は通常対局・R0再生・破損拒否・配信SHAの全9件を検証。Worker起動・COOP/COEP・WebGPU推論はM2/M3以降の検証項目。
+- **採用理由**: M2では通常対局・R0再生・破損拒否・配信SHAにWorker観戦を加えて全21件を検証する。思考中の2D/3D・カメラ操作、中断、読込・履歴、エラー回復も含む。COOP/COEP・WebGPU推論はM3の別検証項目。
 - **注意点**:
   - ブラウザバイナリで数百 MB（ローカルの `~/Library/Caches/ms-playwright` は既に 520 MB）。現在のローカルE2Eはインストール済みChromeを使い、追加ダウンロードは不要。CIは `PW_CHANNEL=''` と `pnpm exec playwright install --with-deps chromium` を使う。
   - ヘッドレス Chromium の WebGPU は GPU のない CI では基本的に使えない（SwiftShader 等のソフトウェア実装やフラグが必要で、挙動はバージョン依存 [未確認]）。WebGPU 経路はローカル手動テスト＋WASM 経路を CI で、と分ける。

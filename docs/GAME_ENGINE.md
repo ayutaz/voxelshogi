@@ -54,6 +54,8 @@ fn main() -> Result<(), MoveError> {
 
 `GameRecord::replay()` が返す `GameState` 自体にはMaxPlies／Abandonedの外部打ち切りを保存しない。M2-1から `Session` は外部終局情報を保持し、`result()` は自然な終局を優先して規定手数の引き分けも返す。`is_finished()` は結果のないAbandonedも終了とする。終局情報は全棋譜の末尾でのみ有効で、undo先では未終了、redoで終了に戻る。分岐した手を指すと未来の終局情報を破棄する。`to_record_json()` はカーソルにかかわらず未来の手と終局情報も保存する。終了後の着手は拒否し、再投了で結果を上書きしない。
 
+投了棋譜のインポートでは、`GameRecord::replay()` が検証して受け入れた末尾状態をそのまま復元する。既存の検証が受け入れる「詰みの盤面で投了を記録した棋譜」も、検証済みの投了理由と結果を保持して再保存する。インタラクティブな `resign()` の終了後ガードを再生処理へ流用して終局理由を変えない。
+
 ## M1：標準1王の探索API
 
 ```rust
@@ -81,11 +83,11 @@ fn main() -> Result<(), &'static str> {
 - `search_with_clock` は単調な経過時間の関数を受け取る。Nativeの `search` は必要なときだけ `Instant` を使い、M2のWASMアダプタにはブラウザの時計を渡す。
 - 全合法手を保持する。置換表は呼び出しごとに新規作成し、同じ深さ・上限までの残り手数を区別する。履歴の最大同一ハッシュ出現数＋残り探索深さが4未満のノードだけ履歴を省略して再利用し、それ以外では再利用を止める。EXACT/LOWER/UPPERを区別し、中断ノードは保存しない。
 - 同じ局面・履歴・設定・深さ／ノード上限で再現可能。時間だけの上限では完了深さが変わり得る。仕様・戦術・同値性と計測は [M1計画](M1_PLAN.md)・[検証記録](M1_VALIDATION.md) を参照。
-- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` は下記、Web Workerへの接続は [M2計画](M2_PLAN.md) のM2-2で追加する。
+- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` は下記、専用Web Workerから呼ぶ（[M2計画](M2_PLAN.md)）。
 
 ### WASM探索API
 
-`Game.bestMove(configJson: string): string` は同期CPU探索で、表示中カーソルまでの `Session` の履歴を使う。局面・カーソル・redo先・棋譜を変更しない。ブラウザでは `performance.now()` の経過時間を `search_with_clock` に渡す。インタラクティブな画面からは専用Worker内で呼ぶ（WorkerはM2-2で追加予定）。
+`Game.bestMove(configJson: string): string` は同期CPU探索で、表示中カーソルまでの `Session` の履歴を使う。局面・カーソル・redo先・棋譜を変更しない。ブラウザでは `performance.now()` の経過時間を `search_with_clock` に渡す。インタラクティブな画面からは専用Worker内で呼ぶ（Worker契約は[M2計画](M2_PLAN.md#wasmとworkerの契約)）。
 
 設定はcamelCaseのJSONで、必須 `maxDepth` は0〜64。任意の `maxNodes` は0〜9,007,199,254,740,991の整数、`maxTimeMs` は同上限以下の有限・非負のミリ秒（小数可）、`maxGamePly` はu32範囲の絶対ply上限。省略・nullは上限なし。初期VSFENが42手目なら絶対plyは41で、表示カーソル0とは区別する。設定JSONは4,096 bytes以下。未知フィールド・不正型・範囲外を終了局面でも拒否する。
 
@@ -154,7 +156,7 @@ fn main() -> Result<(), String> {
 
 `ExperimentReplay.snapshot` のJSONは `board`（729要素）、`hands`（2×7）、`side`、`ply`、`hash`、`captured`、`lastMove`、`kingCapture`（この手で王を取ったか）、`outcome`。標準の `Game.hands()` のフラット配列とは形が違う。9王再生には `Game` の王手表示を流用しない。UIの [比較室](../apps/web/src/experiment/ExperimentViewer.tsx) が表示だけを行う。
 
-`Game.recordJson()` はundo先のカーソルだけでなくredo先を含む全着手列を保存する。探索へ渡す場合は `ply()` のカーソルを併せて扱い、表示中の局面までの履歴を復元する。単独VSFENやhashでは千日手・連続王手の履歴を復元できない（[M2の契約案](M2_PLAN.md#wasmとworkerの契約案)）。
+`Game.recordJson()` はundo先のカーソルだけでなくredo先を含む全着手列を保存する。探索へ渡す場合は `ply()` のカーソルを併せて扱い、表示中の局面までの履歴を復元する。単独VSFENやhashでは千日手・連続王手の履歴を復元できない（[M2の契約案](M2_PLAN.md#wasmとworkerの契約)）。
 
 ## ハッシュ・ファイル照合・再現性
 

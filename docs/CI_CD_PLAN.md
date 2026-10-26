@@ -135,7 +135,7 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | タイミング | 実行内容 | 役割 |
 |---|---|---|
 | PR / main push | lint、Rust、WASM、Web、ローカル E2E、依存監査、CodeQL。dependency-review は PR のみ | 取り込み前と統合後の検証 |
-| PR | Rust/Web カバレッジ、既知の32変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認。M2-1からSession5件・WASM境界6件を追加 |
+| PR | Rust/Web カバレッジ、既知のcore/WASM33変異とWeb29変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認。Web変異は必須のWebカバレッジjobで実行 |
 | main の検証成功後 | 同じ artifact を deploy、配信 SHA 確認、公開 E2E | 公開版の動作確認 |
 | 週次 / 手動 | 依存監査、CodeQL、カバレッジ、変異テスト。Dependabot の更新確認 | コード更新がなくても問題を検出 |
 
@@ -162,7 +162,7 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 
 全体変異のテスト段階は `scripts/ci/mutation-cargo.sh` で有限の座標契約を先に確認し、成功時は元の全テストへ進む。座標変異による飛び駒ループのメモリ増加を防ぐためで、caughtの判定基準は変えない。固定Rust toolchainと実Cargoを明示して起動する。CIのShellCheckは `scripts/*.sh scripts/ci/*.sh` を対象とし、既知21変異・全1,172変異の分類は [M1記録](M1_VALIDATION.md) を参照。
 
-M2-1で実WASM探索の15件とGameStore1件を追加し、Web単体は52件、Rustはcore152件＋WASM境界5件。Webジョブは12個の固定fixtureでNativeと実WASMの全探索結果を照合する。追加11変異を含む既知32件も必須品質チェックで実行する。[検証記録](M2_VALIDATION.md)。Worker・観戦E2Eは引き続き [M2計画](M2_PLAN.md) に従って追加し、公開テストの件数とコマンドも更新する。
+M2ではWeb単体115件、Rustはcore153件＋WASM境界5件、CI制御Node48件、E2E21件。Webジョブは12個の固定fixtureでNativeと実WASMの全探索結果を照合する。既知core/WASM33変異とWeb29変異も必須品質チェックで実行する。[検証記録](M2_VALIDATION.md)。Web・deployのrunnerはubuntu-24.04とし、Chromium本体をPlaywrightから導入する。既存ライブラリ／追加フォントのapt取得が15分上限で中断したため、runnerにある実行ライブラリを使い、実際の起動と全E2Eの成功を必須とする。公開確認は [M2計画](M2_PLAN.md) に従って完了させる。
 
 ## 実装と検証の記録
 

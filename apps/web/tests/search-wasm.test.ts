@@ -76,4 +76,23 @@ describe('real WASM search (shared native, hand-counted fixtures)', () => {
       } finally { g.free(); }
     }
   });
+
+  it('imports the exact validated resignation reason on a mating final position', () => {
+    for (const [side, move, winner] of [['b', '232222', 'Black'], ['w', '878888', 'White']] as const) {
+      const f = fixtures.find((fixture) => fixture.name === `mate-in-one-${side}`)!;
+      const g = Game.fromRecordJson(JSON.stringify(f.record));
+      let record: Record<string, unknown>;
+      try {
+        g.play(move);
+        expect(JSON.parse(g.result()!)).toEqual({ Win: { winner, reason: 'Checkmate' } });
+        record = { ...JSON.parse(g.recordJson()), termination: 'Resignation', result: { Win: { winner, reason: 'Resignation' } } };
+      } finally { g.free(); }
+      const imported = Game.fromRecordJson(JSON.stringify(record));
+      try {
+        expect(JSON.parse(imported.result()!)).toEqual(record.result);
+        expect(JSON.parse(imported.recordJson())).toEqual(record);
+        expect(JSON.parse(imported.bestMove('{"maxDepth":0}'))).toMatchObject({ bestMove: null, score: -1_000_000, stopReason: 'terminal' });
+      } finally { imported.free(); }
+    }
+  });
 });

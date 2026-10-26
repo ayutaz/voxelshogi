@@ -17,10 +17,10 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 `.github/workflows/ci.yml` の流れは次のとおり。トリガーは main への push、PR、手動実行（workflow_dispatch）。
 
 1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査。PR では dependency-review も行う
-2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、9件）
+2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、21件、Native/WASM照合も実行）
 3. `CI Gate`: 必須ジョブの成功を集約する。main/手動での PR 専用ジョブの省略だけを許容する
 4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する
-5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 9件を実行する
+5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 21件を実行する
 
 CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR では CodeQL 3種類、Rust/Web カバレッジと既知変異の3種類も必須とする。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
 
@@ -80,7 +80,7 @@ published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
 E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm e2e
 ```
 
-現在は通常対局5件・配信SHA1件・R0比較室3件の計9件。ローカルは既存Chrome、CIはインストールしたChromiumを使う。今回の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
+現在の実装では通常対局5件・配信SHA1件・R0比較室3件にWorker観戦12件を加え、計21件。ローカルは既存Chrome、CIはubuntu-24.04の実行ライブラリとPlaywrightのChromium本体を使う。以下の2405e86では当時の9件を検証した。M2の公開確認は [別記録](M2_VALIDATION.md) で追う。今回の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
 
 以下は過去の公開検証の記録。2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 
@@ -104,7 +104,7 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
    # 次の手順で、復旧先コミットに対応するテストを実行する。
    ```
 
-4. 復旧先のソースとlockfileを新しい一時ディレクトリへ展開し、その版のE2Eと配信SHAを確認する。現在の9件をR0以前の版にそのまま実行しない。`recovery_commit` がローカルにない場合は、まずoriginからその版を取得する。
+4. 復旧先のソースとlockfileを新しい一時ディレクトリへ展開し、その版のE2Eと配信SHAを確認する。現在の21件をM2以前の版にそのまま実行しない。`recovery_commit` がローカルにない場合は、まずoriginからその版を取得する。
 
    ```bash
    verification_dir=$(mktemp -d "${TMPDIR:-/tmp}/voxelshogi-recovery-tests.XXXXXX")

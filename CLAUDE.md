@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M2_PLAN.md`（M2-1のWASM探索APIを実装・検証中。Worker／観戦UIは未実装）
+- 次の実行計画: `docs/M2_PLAN.md`（M2-1取り込み済み。Worker／観戦UI／表示分割をローカル検証中、公開確認は未完了）
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -22,7 +22,8 @@
 | `crates/voxelshogi-wasm` | wasm-bindgen による薄いラッパー（`Game`／`ExperimentReplay` クラス）。ルールを再実装しない |
 | `apps/web` | VoxelShogi Arena（Vite + React + three/R3F）。エンジンの出力をデコードして表示するだけ |
 | `docs/` | 仕様・ADR・調査・見積もり・`experiments/` の固定集計 |
-| `crates/voxelshogi-core/src/search.rs` | M1の標準1王・全幅αβ探索。M2-1でWASM `Game.bestMove` を追加。WorkerはM2-2 |
+| `crates/voxelshogi-core/src/search.rs` | M1の標準1王・全幅αβ探索。WASM `Game.bestMove` を専用Workerで実行 |
+| `apps/web/src/ai` | 履歴付きWorker・応答照合・観戦制御。Normalは深さ6／50,000ノード／約1秒が既定 |
 | `scripts/experiment-pack.mjs` | R0のJSONLをWASMで再生照合し、集計と代表棋譜を作成 |
 | `apps/web/public/experiments` | 400／800手の代表棋譜6件と配信用manifest。学習モデルではない |
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
@@ -45,7 +46,7 @@
 ## コマンド
 
 ```bash
-cargo test --locked --workspace            # Rust（core152件＋WASM境界5件、testはopt-level 2）
+cargo test --locked --workspace            # Rust（core153件＋WASM境界5件、testはopt-level 2）
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
 cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度
@@ -56,7 +57,7 @@ pnpm wasm          # WASM ビルド（wasm32 target と wasm-bindgen-cli 0.2.129
 pnpm test          # Vitest（実 WASM を Node で読み込む）
 pnpm typecheck
 pnpm build
-E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e # 全9件。ローカルはChrome、CIはPW_CHANNEL=''でChromium
+E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e # 全21件。ローカルはChrome、CIはPW_CHANNEL=''でChromium
 pnpm dev
 
 # 以下はリポジトリのルートで実行する
