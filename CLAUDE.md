@@ -17,9 +17,11 @@
 | パス | 役割 |
 |---|---|
 | `crates/voxelshogi-core` | 純粋Rustのルールエンジン。ブラウザ・Python・GPUには依存しない。**ルールはここにだけ実装する** |
-| `crates/voxelshogi-wasm` | wasm-bindgen による薄いラッパー（`Game` クラス）。ルールを再実装しない |
+| `crates/voxelshogi-wasm` | wasm-bindgen による薄いラッパー（`Game`／`ExperimentReplay` クラス）。ルールを再実装しない |
 | `apps/web` | VoxelShogi Arena（Vite + React + three/R3F）。エンジンの出力をデコードして表示するだけ |
-| `docs/` | 仕様・ADR・調査・見積もり |
+| `docs/` | 仕様・ADR・調査・見積もり・`experiments/` の固定集計 |
+| `scripts/experiment-pack.mjs` | R0のJSONLをWASMで再生照合し、集計と代表棋譜を作成 |
+| `apps/web/public/experiments` | 400／800手の代表棋譜6件と配信用manifest。学習モデルではない |
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
 | `scripts/cf.sh` | プロジェクト専用ログイン（`.cloudflare-cli/`、git管理外）で wrangler を起動する（ADR-010） |
 | 予定 | `crates/voxelshogi-python`（PyO3）、`training/`、`export/`、`infrastructure/` |
@@ -33,24 +35,25 @@
   - 新しいテストを足したら、実装にバグを注入して検出できるか確認する（変異テスト）。
 - 参照実装 `crates/voxelshogi-core/tests/common/mod.rs` は、ルール文を素朴に書き写したもの。本実装とアルゴリズムを共有させない。
 - ルールの変更・追加は、`docs/RULESET.md` を先に更新する。変更すると既存データと互換性がなくなる場合は、`ruleset_id` を変える。
-- Zobrist ハッシュの固定値（`zobrist::tests::INITIAL_HASH`）を変えると、公開データセットのハッシュがすべて変わる。変えないこと。
+- Zobristの固定シードとテストの期待値（標準初期値 `043b66e12f6b84fd`）を変えない。棋譜・公開試料・将来のデータセットの再現性に関わる。
 - 第三者コード（将棋ったー、tomikan/3D_shogi など）はコピーしない。ライセンスは `docs/RELATED_WORK.md` を参照。
 - 秘密情報はコミットしない（`.env*`, `.dev.vars` は gitignore 済み）。費用が発生する操作（GPU レンタル、有料プランなど）は、見積もりを示してユーザーの承認を得てから行う。
 
 ## コマンド
 
 ```bash
-cargo test --workspace                     # Rust（約8秒、プロファイル test は opt-level 2）
-cargo clippy --workspace --all-targets -- -D warnings
+cargo test --locked --workspace            # Rust（116件、プロファイル test は opt-level 2）
+cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
-cargo run --release -p voxelshogi-core --example bench   # 合法手生成の速度
+cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度
 
 cd apps/web
-pnpm install
+pnpm install --frozen-lockfile
 pnpm wasm          # WASM ビルド（wasm32 target と wasm-bindgen-cli 0.2.129 が必要）
 pnpm test          # Vitest（実 WASM を Node で読み込む）
 pnpm typecheck
-pnpm build && pnpm e2e   # 型検査と配信 SHA を含む build。ローカルは Chrome、CI は PW_CHANNEL='' で Chromium
+pnpm build
+E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e # 全9件。ローカルはChrome、CIはPW_CHANNEL=''でChromium
 pnpm dev
 
 # 以下はリポジトリのルートで実行する
@@ -70,7 +73,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
-- ルールは将棋ったー三次元将棋の 10/17 改定後版。未記載の終局条件は将棋ったーの既定を継承する。
+- 標準ルールは将棋ったー三次元将棋の10/17改定後版を独立実装し、未記載の終局条件は同サイトの既定を継承する。実棋譜との互換性検証はM5で未実施。R0の9王試作3ルールは別IDで管理し、標準ルールへ正式採用していない。
 - 公開 URL はまず workers.dev を使う。デプロイは GitHub Actions から行う（Cloudflare 側の Git 連携は使わない）。理由は `docs/DEPLOYMENT.md` を参照。
 - Cloudflare は、ユーザーの個人アカウント（ka1357amnbpdr@gmail.com）を使う。このマシンの wrangler はグローバルには別アカウントでログインしているため、**必ず `scripts/cf.sh`（プロジェクト専用ログイン）経由で wrangler を使う**。素の `wrangler` は使わない（`apps/web` の `pnpm run deploy` も `scripts/cf.sh` を経由する。`pnpm deploy` は pnpm の組み込みコマンドなので使わない）。
 - 将棋ったーの公開棋譜による互換性検証は、ローカルでのみ行う（棋譜はコミットしない）。
@@ -81,7 +84,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 
 - 完了
   - Phase 0: 調査と設計
-  - Phase 1: ルールエンジン（全ルール、VSFEN、棋譜、セッション）
+  - Phase 1: ルールエンジン（標準ルール、VSFEN、棋譜、セッション）
   - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
   - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、隔離復旧訓練、全758変異の調査と分類を確認済み。PR #3の最終文書も取り込み済みで、統合コミット `1ff4e2f` の本番公開・配信SHA・公開E2E 6件まで2026-10-26（JST）に成功した（`docs/M0_VALIDATION.md` の完了時記録）
   - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）

@@ -2,7 +2,9 @@
 
 対象: main `e3f7f7a` からの作業ブランチ `chore/finish-m0-validation`。検証開始: 2026-10-25、公開確認完了: 2026-10-26（JST）。
 
-M0-1〜5は完了した。[PR #3](https://github.com/ayutaz/voxelshogi/pull/3) の最終文書コミットも必須7チェックが成功し、保護を迂回せず通常の squash merge を行った。統合後の main の CI・CodeQL・本番公開・配信 SHA・公開 E2E の成功も確認済み。ソース・テスト・CI設定は全体変異調査時点の `5a14c0d` と同じ。
+M0-1〜5は完了した。[PR #3](https://github.com/ayutaz/voxelshogi/pull/3) の最終文書コミットも必須7チェックが成功し、保護を迂回せず通常の squash merge を行った。統合後の main の CI・CodeQL・本番公開・配信 SHA・公開 E2E の成功も確認済み。M0完了時のソース・テスト・CI設定は全体変異調査時点の `5a14c0d` と同じ。
+
+本書は**M0時点の履歴**を保持する。2026-10-26のR0追加後はRust116件・Web36件・既知変異14件・E2E9件となった。[現在のCI状況](CI_CD_PLAN.md#現在の状態) と [R0報告](NINE_KINGS_EXPERIMENT.md) を参照し、以下の旧件数・カバレッジ・全758変異を現在の実測値と混同しない。
 
 ## M0 完了時の取り込みと公開
 
@@ -47,16 +49,16 @@ APIの再確認では repository Secrets は空、Cloudflare の2件は producti
 | ローカル配信先 | `http://127.0.0.1:4181` |
 | 実ブラウザの検証 | Chrome E2E 6件成功（9.8秒）。配信 SHA、初期表示、人間先手・後手のAI対局、undo、AI観戦、棋譜入出力 |
 
-`deployment-info.json` の commit と `web-dist/build-info.json` が一致した。対象 SHA を `E2E_COMMIT` に指定して、現在のリポジトリの6件を実行した。本番 Worker・デプロイ履歴は変更していない。これは計画どおり旧成果物を隔離配信する訓練であり、Cloudflare の本番 rollback コマンド自体を実行した記録ではない。
+`deployment-info.json` の commit と `web-dist/build-info.json` が一致した。対象SHAを `E2E_COMMIT` に指定して、訓練当時のリポジトリの6件を実行した。本番 Worker・デプロイ履歴は変更していない。これは計画どおり旧成果物を隔離配信する訓練であり、Cloudflare の本番 rollback コマンド自体を実行した記録ではない。
 
-再現手順（取得先は新しい一時ディレクトリを使う）:
+当時の再現手順（配信artifactは7日・metadataは30日で期限切れになる。取得不能なら別の検証済み成功runを選び、[現行の復旧手順](DEPLOYMENT.md#復旧手順) に従う）:
 
 ```bash
 gh run download 40170836102 -R ayutaz/voxelshogi -n web-dist -D /tmp/voxelshogi-recovery/web-dist
 gh run download 40170836102 -R ayutaz/voxelshogi -n production-0e29eb42229ef111494d8d5b73f254729e4df38f -D /tmp/voxelshogi-recovery/production
 # commit / version / run と build-info.json を照合した後、別ターミナルで配信
 pnpm --dir apps/web exec vite preview --outDir /tmp/voxelshogi-recovery/web-dist --host 127.0.0.1 --port 4181 --strictPort
-E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e4df38f pnpm --dir apps/web e2e
+E2E_BASE_URL=http://127.0.0.1:4181 E2E_COMMIT=0e29eb42229ef111494d8d5b73f254729e4df38f pnpm --dir apps/web exec playwright test e2e/game.spec.ts e2e/build-info.spec.ts
 ```
 
 ## 変異テストの生き残り分類
@@ -134,7 +136,7 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 | 7 | 83 | 8 | 2 | 93 |
 | **全体** | **692** | **58** | **8** | **758** |
 
-全8件のartifact `full-mutations-0`〜`full-mutations-7` を新しい一時ディレクトリへ取得して監査した。各baselineのbuild/test成功、空でないinventoryと全outcomesの1対1対応、実行されたテスト失敗によるcaught、ソース指紋を含む同値の根拠を照合した。CI保存の `review.json` と再集計は全分割で一致し、現在の `cargo mutants --list --json` の全758件と各分割の和集合も一致した。欠落・重複・timeout・未分類の生き残りは0件。ビルド不能58件と同値8件をcaughtには含めない。rawレポート・diff・log・reviewは同runで7日保存する。
+全8件のartifact `full-mutations-0`〜`full-mutations-7` を新しい一時ディレクトリへ取得して監査した。各baselineのbuild/test成功、空でないinventoryと全outcomesの1対1対応、実行されたテスト失敗によるcaught、ソース指紋を含む同値の根拠を照合した。CI保存の `review.json` と再集計は全分割で一致し、当時の `cargo mutants --list --json` の全758件と各分割の和集合も一致した。欠落・重複・timeout・未分類の生き残りは0件。ビルド不能58件と同値8件をcaughtには含めない。rawレポート・diff・log・reviewは同runで7日保存する。
 
 ### 同値変異の根拠（移動生成）
 
@@ -154,7 +156,7 @@ core全体の758件は別範囲として、[8分割の手動実行40184455263](h
 | 同じ箇所の `sc > 0` → `sc >= 0` | `sc` は±1だけなので条件が一致する |
 | 香の利きの `dy < 0` → `dy <= 0` | x/zの差が0という条件下で追加されるdy=0は始点=終点。関数先頭で既にfalseを返すため結果は変わらない |
 
-片側選択の変異は、コピー上の空盤中央の角で調べ、Vecの順序は異なるが、重複のない移動先集合が一致することを確認した。既存の独立参照実装との集合比較もこの変異を通過している。`targets` / `legal_moves` のバージョン間の順序互換性は元の仕様に含まれず、再現性の記録はエンジンコミットを含む。[API契約](GAME_ENGINE.md#主な-api) に明記した。M1の順序が必要な処理では明示的に定義する。
+片側選択の変異は、コピー上の空盤中央の角で調べ、Vecの順序は異なるが、重複のない移動先集合が一致することを確認した。既存の独立参照実装との集合比較もこの変異を通過している。`targets` / `legal_moves` のバージョン間の順序互換性は元の仕様に含まれず、再現性の記録はエンジンコミットを含む。[API契約](GAME_ENGINE.md#標準ルールのrust-api) に明記した。M1の順序が必要な処理では明示的に定義する。
 
 ### 継続実行での同値変異の扱い
 

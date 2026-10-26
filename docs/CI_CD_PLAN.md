@@ -8,6 +8,20 @@
 
 ## 現在の状態
 
+2026-10-26（JST）、R0追加後の公開版 `73f4cdc63c44afca80d785bee8281689c0218933` と照合した。
+
+| 項目 | 現在の確認結果 |
+|---|---|
+| mainのCI・公開 | [CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で通常CI・deploy・配信SHA・公開E2E **9件**が成功。[Security 40254365229](https://github.com/ayutaz/voxelshogi/actions/runs/40254365229) の3言語解析も成功 |
+| 品質の継続検証 | Rust **116件**、Web単体 **36件**、CI制御Node **42件**、既知変異 **14件**。直前の文書PR #8でも [Quality 40252580699](https://github.com/ayutaz/voxelshogi/actions/runs/40252580699) が成功。全758変異・旧カバレッジの数値は下記M0当時の記録で、R0追加後の全体調査結果ではない |
+| main保護 | ruleset **25816100** はactive、bypassなし、PR必須・最新main検証・必須7チェック・CodeQL error/high以上・force push/削除禁止。他者承認0。チェック発行元はGitHub Actions App **15368** |
+| 認証・セキュリティ設定 | repository Secretsは空。productionにCloudflareの2件、許可元mainのみ。Secret scanning・Push protection・非公開脆弱性報告・Dependabot security updatesは有効。名前・設定だけを再確認し、秘密値は取得していない |
+| 進捗 | M0完了に加え、[R0の比較計測・観戦試作・公開検証](NINE_KINGS_EXPERIMENT.md) が完了。M1完成版は未着手。R0の幅制限探索をM1完了と数えない。Dependabot PR #1は未マージ |
+
+公開版は固定されないため、以後は `build-info.json` と対応する成功runを確認する。CI取得は最短10分間隔でまとめ、短いwaitも反復しない。
+
+## M0完了時の記録
+
 2026-10-26（JST）更新。PR #3の最終コミット `ee7b102` は必須7チェックが成功し、通常の squash merge 後の `1ff4e2f` で本番公開まで成功した。下表は各検証時点の記録であり、現在の公開版の識別には配信中の `build-info.json` と対応する main の CI を使う。
 
 | 項目 | 現況・証拠 |
@@ -60,6 +74,8 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | M0-3 | テストの抜けを見えるようにする | `quality.yml`、計測・変異テスト設定 | Rust/Web の計測結果を保存し、既知のバグを再現可能な手順で検出する | ✅ CI計測・既知の9変異・全758件の調査と分類が成功。保存した全結果を照合済み |
 | M0-4 | 公開版を検証し、復旧できるようにする | deploy ジョブ、公開 E2E、ビルド情報、`DEPLOYMENT.md` | 公開版の SHA と対局操作を確認し、設定漏れ・配信障害が失敗になる | ✅ 本番 SHA・公開 E2E・環境 Secrets 移行・隔離復旧訓練・古い候補の公開省略・統合後の公開を確認 |
 | M0-5 | 失敗した変更の取り込みを防ぐ | main ruleset、`CONTRIBUTING.md`、PR テンプレート | 正常な PR は取り込め、必須チェック失敗の PR は取り込めない | ✅ PR #2で拒否と全必須チェック成功後の通常取り込みを確認。有効な保護ルールも再確認済み |
+
+以下のM0各節は実装時の計画と検証の履歴を保存したもの。現在の必須チェック数・テスト件数は上記の現況と [開発手順](../CONTRIBUTING.md) を使う。
 
 ### M0-1 CI の再現性と静的検査
 
@@ -119,11 +135,11 @@ M0-1〜5 を順番に、小さな変更単位で進める。GitHub の設定変�
 | タイミング | 実行内容 | 役割 |
 |---|---|---|
 | PR / main push | lint、Rust、WASM、Web、ローカル E2E、依存監査、CodeQL。dependency-review は PR のみ | 取り込み前と統合後の検証 |
-| PR | Rust/Web カバレッジ、既知の9変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認 |
+| PR | Rust/Web カバレッジ、既知の14変異の回帰検証 | レポート保存と既知の検出力を取り込み前に確認 |
 | main の検証成功後 | 同じ artifact を deploy、配信 SHA 確認、公開 E2E | 公開版の動作確認 |
 | 週次 / 手動 | 依存監査、CodeQL、カバレッジ、変異テスト。Dependabot の更新確認 | コード更新がなくても問題を検出 |
 
-PR の通常 CI は、既存の実行時間（最新 run は Rust 約26秒、Web 約84秒。キュー待ちを除く）を基準に、追加後の時間を計測する。重い品質計測は別 workflow とし、初期の通常 CI は5分程度を目安にする。これは実測前の目標であり、5分を超えたことだけでテストを省略しない。
+M0計画時には通常CIのRust約26秒・Web約84秒（キュー待ちを除く）を基準にした。R0以後はソース・テストが増えており、現在の所要時間は対象runの実行時間とキュー待ちを分けて確認する。重い品質計測は別 workflow とし、初期の通常 CI は5分程度を目安にする。これは実測前の目標であり、5分を超えたことだけでテストを省略しない。
 
 GitHub Actions の **Public リポジトリの標準 GitHub-hosted runner** は無料で利用できる。M0 は標準 Ubuntu runner を使い、有料の larger runner、外部カバレッジサービス、GPU、R2 を追加しない。artifact は原則7日、重い計測結果は必要なものだけ保存する。[GitHub の料金条件](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 
@@ -144,7 +160,7 @@ M0 の完了は、設定ファイルが存在することではなく、正常�
 
 ## 実装と検証の記録
 
-以下は各段階の記録。テスト件数・設定の現況は冒頭の「現在の状態」と末尾の再確認記録を優先する。
+以下は各段階の記録。テスト件数・設定の現況は冒頭の「現在の状態」を優先する。末尾を含む以下の記録はM0当時の値。
 
 各段階の「未実施」「確認後に追記」はその時点の状態を示す。復旧訓練・全体変異分類・最終取り込み・公開確認の完了結果は [M0_VALIDATION.md](M0_VALIDATION.md) に集約した。fork の実検証は引き続き未実施。
 
@@ -217,4 +233,4 @@ LCOV・HTML・JSON と変異ログを7日保存し、レポート欠落や計測
 - [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) の初回コミット `5b66f9a` で通常 CI・CodeQL・品質計測の起動を確認。品質計測を一度中断し、同じ run を再実行した。必須チェック未完了時に、リポジトリで許可された通常の squash merge を API へ要求したところ、7チェック未成功と CodeQL 結果待ちのため HTTP 405 で拒否され、`merged: false` と `mergeable_state: blocked` を確認した。失敗結果を Gate が拒否することは、ローカルの20テストでも検証済み。最新コミットの実行結果は PR の Checks に記録する。
 - PR 更新時に、中断済みの上流ジョブを集約する `always()` Gate だけがキューに残り、新実行が workflow のロックを待つことを確認した。失敗・中断の検出を保つため Gate は維持し、通常 CI 全体の concurrency を外した。本番 deploy の production ロックと最新 SHA 確認は維持している。
 
-2026-10-26（JST）: PR #3の最終文書 `ee7b102` も必須7チェック（通常CI・CodeQL・[Quality 40194273928](https://github.com/ayutaz/voxelshogi/actions/runs/40194273928)）が成功し、通常取り込み後のmain `1ff4e2f` で配信SHA・公開E2E 6件まで成功した。Cloudflare version IDは `ce499132-9c06-4a0c-aea6-8491a10fbfa7`。これをもってM0を完了した。[最終証拠](M0_VALIDATION.md)。次は [M1のTDD手順](M1_PLAN.md) へ進む。CIの状態取得は最短10分間隔、報告は状態変更時とし、CI待ちだけの短いwaitの反復も行わない。スキルとhookの運用は [開発手順](../CONTRIBUTING.md#ci-確認のスキルとhook) に従う。
+2026-10-26（JST）: PR #3の最終文書 `ee7b102` も必須7チェック（通常CI・CodeQL・[Quality 40194273928](https://github.com/ayutaz/voxelshogi/actions/runs/40194273928)）が成功し、通常取り込み後のmain `1ff4e2f` で配信SHA・公開E2E 6件まで成功した。Cloudflare version IDは `ce499132-9c06-4a0c-aea6-8491a10fbfa7`。これをもってM0を完了した。[最終証拠](M0_VALIDATION.md)。その後のR0は冒頭の現況を参照し、次の本格探索は [M1のTDD手順](M1_PLAN.md) へ進む。CIの状態取得は最短10分間隔、報告は状態変更時とし、CI待ちだけの短いwaitの反復も行わない。スキルとhookの運用は [開発手順](../CONTRIBUTING.md#ci-確認のスキルとhook) に従う。

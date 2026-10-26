@@ -1,57 +1,127 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
-ルールの正は `docs/RULESET.md` である。本書は、エンジンの API と内部表現を説明する。
+更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。PythonバインディングとM1完成版の探索は未実装。
 
 ## モジュール
 
 | モジュール | 責務 |
 |---|---|
 | `coord` | `Square`（`z*81 + y*9 + x`）、表示座標（`5五V`）、ASCII座標（`555`） |
-| `piece` | `Color`（= `Player`）、`PieceKind`（14種）、`Piece`（コードは `1 + kind + 14*color`、0は空） |
-| `board` | `Board`（729バイト）、初期配置 |
-| `movegen` | 擬似合法な移動先 `targets`、利きの判定 `attacks`（飛角は動的計画法、ADR-004） |
-| `moves` | `Move::{Normal, Drop}`、文字列表記 |
-| `state` | `GameState`: 合法手、`apply_move`（純粋関数）、王手、終局、千日手の履歴、`validate` |
-| `zobrist` | 固定シードの Zobrist ハッシュ |
-| `notation` | `parse_move`、VSFEN の入出力（入力長の上限あり、局面を検証する） |
-| `record` | `GameRecord`（`ruleset_id`、初期 VSFEN、指し手、結果、終局理由）。JSON 入出力、再生による検証 |
-| `session` | UI 向け: 指し手リストとカーソル、undo/redo/goto、投了、棋譜の入出力 |
+| `piece` | `Color`（= `Player`）、14種の `PieceKind`、`Piece`。コードは `1 + kind + 14*color`、0は空 |
+| `board` | 729バイトの `Board`、標準初期配置 |
+| `movegen` | 移動先 `targets`、利き `attacks`。飛角は動的計画法（ADR-004） |
+| `state` | 標準の `GameState`、合法手・`apply_move`・王手・終局・履歴・`validate` |
+| `moves` / `notation` | `Move::{Normal, Drop}`、指し手文字列、標準VSFENの入出力・検証 |
+| `zobrist` | 固定シードの局面ハッシュ |
+| `record` | 標準の `GameRecord`、ルールID・初期VSFEN・着手・結果・終局理由、再生検証 |
+| `session` | 標準の棋譜カーソル、undo/redo/goto、投了、入出力 |
+| `capture` | 9王試作の `CaptureGame` / `CaptureRule` / `Outcome`。立体移動は `movegen` を共用 |
+| `experiment` | 幅制限探索、実験棋譜、検証済み `Replay`、標準1王の比較対照 |
 
-## 主な API
+## 標準ルールのRust API
 
 ```rust
-let g = GameState::new();
-let moves: Vec<Move> = g.legal_moves();
-let next = g.apply_move(&moves[0])?;          // Result<GameState, MoveError>
-next.is_in_check(Color::Black);
-next.result();                                 // Option<GameResult>
-voxelshogi_core::notation::to_vsfen(&next);
-GameRecord::from_moves(&g, &moves[..1]).to_json();
+use voxelshogi_core::{Color, GameState, MoveError};
+use voxelshogi_core::record::GameRecord;
+
+fn main() -> Result<(), MoveError> {
+    let game = GameState::new();
+    let moves = game.legal_moves();
+    let next = game.apply_move(&moves[0])?;
+    assert_eq!(next.side_to_move(), Color::White);
+    assert_eq!(next.ply(), 1);
+    let record = GameRecord::from_moves(&game, &moves[..1]);
+    assert_eq!(record.replay().unwrap().hash(), next.hash());
+    Ok(())
+}
 ```
 
-`targets()` と `legal_moves()` は移動先・指し手の集合を返すAPIで、列挙順序のバージョン間互換性は保証しない。乱数で要素を選ぶ処理や探索の同点処理を再現する際は、シード・設定に加えてエンジンのコミットを固定する。ルールの正しさを調べる比較は集合として行い、順序が要件になる処理はその処理側で順序を定義する。
+`GameState::apply_move` は外部入力を検証する。`GameState::from_parts` 自体は検証済み局面を保証しないので、任意入力には `validate` が必要。VSFENインポートは検証を行う。標準の王は捕獲せず、王手回避・詰み・連続王手を処理する。
 
-## VSFEN
+`targets` と `legal_moves` の列挙順はバージョン間の契約ではない。正しさは集合で比較し、探索の同点処理では順序を別途定義する。再現条件にはエンジンコミットも含める。
+
+### VSFENと標準棋譜
 
 `<盤> <手番 b|w> <持ち駒 or -> <手数>`
 
-- 盤: 9つの層（`z = 0..8`）を `|` でつなぐ。各層は9つの段（`y = 0..8`）を `/` でつなぐ。各段は、9筋から1筋の順に駒を並べる。
-- 駒の文字: `P L N S G B R K`。先手は大文字、後手は小文字。成り駒には `+` を付ける。数字は連続する空きマスの数。
-- 持ち駒: 先手の分、後手の分の順に、それぞれ `R B G S N L P` の順で書く（例: `R12P2g`）。
-- 読み込み時に `GameState::validate` で検証する内容: 玉が各1枚、駒の総数が372枚の構成以内、行き所のない駒がない、二歩がない、手番でない側が王手されていない。
+- 盤は9層（`z=0..8`）を `|`、各層の9段（`y=0..8`）を `/` でつなぐ。各段は9筋→1筋。
+- 駒は `P L N S G B R K`。先手は大文字、後手は小文字、成駒は `+` を前置する。空マスの連続数は単独の1〜9。
+- 持ち駒は先手→後手、それぞれ `R B G S N L P` 順（例 `R12P2g`）。手数は1始まり。
+- VSFENは4,096 bytes以下、手数番号は1〜1,000,000。各1王、総駒数、行き所、二歩、手番でない側の王手を検証する。
+- `GameRecord` は `ruleset_id = voxelshogi-standard-v1` と初期VSFENを持つ。JSONは4 MiB以下、20,000手以下。`from_json` は形式・サイズを読み、`replay` が全着手と結果を再検証する。UIの `Session` / WASMの `Game.fromRecordJson` は再生検証まで行う。
+- ルール外の終局は `Termination::{Resignation, MaxPlies, Abandoned}`。標準の上限打ち切りと9王の規定手数採点を混同しない。
 
-## ハッシュと再現性
+## 9王試作と探索のRust API
 
-- Zobrist の鍵は SplitMix64（シード `voxelshg`）から生成する。初期局面のハッシュ `043b66e12f6b84fd` をテストで固定している。
-- 千日手は、局面の履歴（ハッシュ、手番、王手かどうか）から判定する。
+```rust
+use voxelshogi_core::capture::{CaptureGame, CaptureRule};
+use voxelshogi_core::experiment::{SearchConfig, choose_move};
 
-## 性能（2026-10-25 実測、Apple M1 CPU、release）
+fn main() -> Result<(), String> {
+    let game = CaptureGame::new(CaptureRule::FirstFive, 400)?;
+    assert_eq!(game.board().count(), 360);
+    assert_eq!(game.legal_moves().len(), 554);
+    let (mv, nodes) = choose_move(&game, SearchConfig { depth: 2, width: 8 }, 42)?;
+    let next = game.after_move(&mv)?;
+    assert_eq!(next.ply(), 1);
+    assert!(nodes > 0);
+    Ok(())
+}
+```
 
-| 項目 | 値 |
+| API | 契約 |
 |---|---|
-| 初期局面の合法手数 | 424（参照実装と一致） |
-| `legal_moves()`（初期局面） | 1.18 ms |
-| ランダム自己対局（生成と適用） | 0.66 ms/手、約1,500手/秒 |
-| WASM サイズ（release） | 227 KB |
+| `CaptureGame::new(rule, max_plies)` | 各9王・計360枚、先手番。上限は2〜2,000の偶数ply |
+| `CaptureRule::{FirstFive, AllKings, ScoreLimit}` | `id()` が各 `voxelshogi-nine-kings-…-v0` を返す |
+| `board` / `hands` / `side` / `ply` / `hash` | 盤・両者の持ち駒・手番・着手数・局面ハッシュ |
+| `captured()` | `[先手が取った王数, 後手が取った王数]`。王は持ち駒にしない |
+| `legal_moves()` / `after_move(&mv)` | 王手回避なしの合法手、検証付き適用。終局後の着手は拒否 |
+| `outcome()` | `None` または `Outcome { winner: Option<Color>, reason }`。理由は `Target / ScoreLimit / MoveLimit / Repetition / NoMoves` |
+| `from_parts` | テストなどの任意局面。駒総数・二歩・行き所を検証し、欠けた相手王を捕獲済みとして数える。履歴はply 0から |
+| `choose_move` | 同じ局面・履歴・設定・seedで再現。深さ1〜3、候補幅1〜64。`(Move, ノード数)` またはエラー |
 
-計測: `cargo run --release -p voxelshogi-core --example bench`
+探索用の `after_generated` は同じ局面の生成済み合法手だけを渡すcrate内部の経路。外部には検証付きAPIを使う。R0探索は候補幅を切るため、全合法手のminimax値を保存する保証はない。反復深化・置換表・ノード／時間上限・M1の戦術契約は未実装。
+
+### 実験棋譜と比較対照
+
+- `ExperimentRecord::play(rule, max_plies, seed, swapped, search, engine)` が固定初期配置から終局まで対局する。schemaは `voxelshogi-capture-experiment-v1`。
+- フィールドは `schema`、`ruleset_id`、`max_plies`、`seed`、`swapped`、`search {depth,width}`、`engine`、`moves`、`outcome`、`final_hash`、`nodes`。`engine` は生成に使った実装コミットを呼び出し側で記録する。
+- `Replay::from_json` は4 MiB以下、既知schema／ID、有効な設定・上限、全着手、終局結果と最終ハッシュを検証する。未終局の棋譜は受け付けない。`state(ply)` は0〜`len()`の局面を読み出す。
+- 標準の `GameRecord` と実験棋譜は交換できない。9王を標準VSFENとしてインポートしない。
+- `play_baseline` が返す `BaselineRecord` は、既存の標準 `GameRecord` を `record` フィールドに入れ、探索・seed・上限・実装・ハッシュ・ノードを付けた比較用の包み。標準インポートには内側の `record` を使う。
+- [比較CLI](../crates/voxelshogi-core/examples/compare_rules.rs) と [集計器](../scripts/experiment-pack.mjs) の再現手順・1,052局の結果は [R0報告](NINE_KINGS_EXPERIMENT.md) を参照。集計器は配信seedがJSの安全な整数範囲であることも要求する。
+
+## WASM API（`crates/voxelshogi-wasm`）
+
+`scripts/build-wasm.sh` が `apps/web/src/wasm/pkg/` にJS・`.wasm`・型定義を生成する。`wasm-bindgen` とCLIは0.2.129で一致させる。
+
+| 公開API | 用途・返却値 |
+|---|---|
+| `rulesetId()` | 標準のID。実験IDの取得APIではない |
+| `new Game()` / `Game.fromVsfen(text)` / `Game.fromRecordJson(text)` | 標準セッションの生成・検証付きインポート |
+| `Game.board()` / `hands()` | 駒コード729要素の `Uint8Array`、先手7種→後手7種の持ち駒14要素 |
+| `sideToMove()` / `ply()` / `moveCount()` / `hash()` | `b/w`、表示カーソル、棋譜長、16桁hexの局面ハッシュ |
+| `legalMoves()` / `play(text)` / `isInCheck(black)` / `result()` | 合法手・着手・王手・結果JSON文字列（未終局は `undefined`） |
+| `undo()` / `redo()` / `goto(ply)` / `resign()` | 標準の局面移動・投了 |
+| `moveList()` / `lastMove()` / `vsfen()` / `recordJson()` | 棋譜、直前手、局面と棋譜の保存 |
+| `new ExperimentReplay(json)` / `snapshot(ply)` | 検証済み9王棋譜の読取専用再生。`snapshot` はJSON文字列 |
+| `free()` | 各WASMオブジェクトを使い終わったら解放する |
+
+`ExperimentReplay.snapshot` のJSONは `board`（729要素）、`hands`（2×7）、`side`、`ply`、`hash`、`captured`、`lastMove`、`kingCapture`（この手で王を取ったか）、`outcome`。標準の `Game.hands()` のフラット配列とは形が違う。9王再生には `Game` の王手表示を流用しない。UIの [比較室](../apps/web/src/experiment/ExperimentViewer.tsx) が表示だけを行う。
+
+## ハッシュ・ファイル照合・再現性
+
+- Zobristの鍵は固定SplitMix64（シード `voxelshg`）。標準初期ハッシュ `043b66e12f6b84fd` は不変。
+- 局面ハッシュは盤面・持ち駒・手番を表し、ルールID・上限・履歴・探索設定までは含まない。これだけで置換表の再利用可否を決めない。
+- 配信棋譜のSHA-256はファイルの照合値で、Zobristとは別物。公開manifestに記録し、ブラウザで照合後にRust/WASMの再生検証を行う。
+- 再現条件にはルール、実装、seed、探索設定、上限と必要な履歴を含める。R0の生成時間や再生速度は着手列に影響しない。
+
+## 性能とサイズ
+
+| 測定対象・時点 | 値・位置付け |
+|---|---|
+| 標準、Apple M1 CPU、2026-10-25 release | 初期合法手424、`legal_moves()` 1.18 ms、ランダム対局の生成＋適用0.66 ms/手（約1,500手/秒） |
+| R0、2026-10-26 | 主試験600局で6,307,152ノード、経過289.473秒。並行処理を含むためM1の単独探索速度ではない |
+| 現在のWASM・Web配信サイズ | [技術構成の実測表](TECH_STACK_RESEARCH.md#採用済みの構成と初回調査の区別)。初回WASM 227 KB・JS 1.17 MBからR0で増加 |
+
+標準の計測コマンドは `cargo run --locked --release -p voxelshogi-core --example bench`。Nativeの合法手生成、R0の幅制限探索、M1のNormal、GPU学習、ブラウザ描画の速度をそれぞれ区別する。

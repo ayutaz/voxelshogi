@@ -1,14 +1,20 @@
 # 関連研究・先行事例調査（Related Work）
 
-- 調査日: 2026-10-25
+- 外部資料の調査日: 2026-10-25。プロジェクト状況との照合: 2026-10-26
 - 対象: VoxelShogi（9×9×9 三次元将棋プラットフォーム。ルールは shogitter.com「三次元将棋」rule id 166 に準拠）
 - 方針:
   - 事実には出典 URL を付ける。リポジトリはファイル単位で確認した。
   - 一次情報で確かめられなかった点には **未確認** と書く。
   - shogitter のルール自体の分析は別ドキュメントの範囲なので、ここでは比較の基準として要約を使うだけにする。
-  - VoxelShogi 本体は **Apache-2.0**（リポジトリ直下の `LICENSE` / `NOTICE`）。GPL のコードは取り込めない。ライセンスのないコードはコピーしない。
+  - VoxelShogi 本体は **Apache-2.0**（リポジトリ直下の `LICENSE` / `NOTICE`）。本プロジェクトの配布方針としてGPLのコードは取り込まない。ライセンスのないコードはコピーしない。
 
 ---
+
+## 現在の実装との対応
+
+本書の先行リポジトリ・論文・ライセンスは2026-10-25の調査記録であり、外部リポジトリの現況を継続保証するものではない。「採用」は当時の将来設計候補を含む。実装済みのRust／WASM／Web、M0、R0の範囲と、未実装のPython・NN・自己対局学習を区別し、現在の進捗は [ROADMAP](ROADMAP.md) を正とする。
+
+R0では3つの9王ルールと現行1王をCPUの幅制限探索で比較し、同じ棋譜による観戦表示を公開した。[先行事例の調査](RULE_VARIANTS_RESEARCH.md)・[1,052局の実測](NINE_KINGS_EXPERIMENT.md)。Gumbel／Transformer／DDPの実装や棋力の実証とは別である。学習モデル・データセットのライセンスは公開前にユーザーと決め、コードのApache-2.0を自動適用しない。
 
 ## 0. 要約
 
@@ -236,7 +242,7 @@ URL: https://github.com/guille0/space-chess
 - 出典: Hubert et al., "Learning and Planning in Complex Action Spaces", [arXiv:2104.06303](https://arxiv.org/abs/2104.06303)（2021）
 - **注意**: 依頼文では 2104.06303 を「Policy improvement by planning with Gumbel」としていたが、**実際は Sampled MuZero の論文**である（arXiv の abstract ページで確認）。Gumbel の論文は 3.4 節に記載する。
 - **概要**: 行動の部分集合をサンプリングして方策を評価・改善する、汎用の枠組み。巨大な行動空間や連続行動空間に対応する。
-- **VoxelShogi への示唆**: 初期局面付近では合法手の数が数百〜数千規模になると見込まれる（**未計測**。Rust エンジンができたら perft で実測する）。根ノードで全合法手を展開するのが重い場合、サンプリングして探索するのが有効。
+- **VoxelShogi への示唆**: 実装後の初期合法手は標準424手、9王試作554手。対局全体の分岐数分布や深いperftは未確定であり、初期値だけで判断しない。根ノードで全合法手を展開するのが重い場合、サンプリングして探索するのが有効。
 - **採用・不採用**: **予備案**。Gumbel の Top-k サンプリングでも同じ問題をかなり緩和できるので、まず Gumbel を使う。
 
 ### 3.4 Gumbel AlphaZero / Gumbel MuZero
@@ -249,7 +255,7 @@ URL: https://github.com/guille0/space-chess
 - **実装**:
   - [google-deepmind/mctx](https://github.com/google-deepmind/mctx)（JAX、Apache-2.0）の `gumbel_muzero_policy`
   - [opendilab/LightZero](https://github.com/opendilab/LightZero)（PyTorch、Apache-2.0）も Gumbel/Sampled 系を実装している（Apache-2.0 は確認済み。収録アルゴリズムの詳細は**未確認**）
-- **VoxelShogi への示唆**: 3D 将棋は分岐数が非常に大きく、1 手あたりのシミュレーション数を多く取れない。Vast.ai の GPU 予算も限られている。**Gumbel 型の根ノード探索（例: 16〜64 シミュレーション）**が最も費用対効果が高い。gokaku（3.11 節）も Gumbel AlphaZero を参考にしている。
+- **VoxelShogi への示唆**: 3D 将棋は分岐数が非常に大きく、1 手あたりのシミュレーション数を多く取れない。Vast.ai の GPU 予算も限られている。**Gumbel 型の根ノード探索（例: 16〜64 シミュレーション）**を候補とする。VoxelShogiでの費用対効果は未計測。gokaku（3.11 節）も Gumbel AlphaZero を参考にしている。
 - **採用・不採用**: **採用（第一候補）**。Apache-2.0 の実装は参照・移植できる。ただし探索木は Rust 側に置くのが自然。
 
 ### 3.5 KataGo
@@ -263,7 +269,7 @@ URL: https://github.com/guille0/space-chess
   - 補助学習目標: 所有権、スコア、相手の次の手
 - **VoxelShogi への示唆**:
   - Playout cap randomization は Gumbel と併用でき、自己対戦のコストを大きく下げる。
-  - 補助ヘッドの候補: **W/D/L 価値**（千日手・持将棋・手数制限による引き分けがあるため）、**駒得（スコア）**、**王の周辺 3×3×3 の支配**など。
+  - 補助ヘッドの候補: **W/D/L 価値**（標準の千日手・上限打ち切り、9王試作の採点同点などを扱うため。持将棋は現行仕様に含めない）、**駒得（スコア）**、**王の周辺 3×3×3 の支配**など。
   - CNN を使う場合は global pooling バイアスを入れる（3D-CNN ベースラインの強化）。
 - **採用・不採用**: Playout cap randomization、W/D/L、補助ヘッドは**採用**。所有権ヘッドは囲碁固有なので**不採用**。
 
@@ -339,7 +345,7 @@ URL: https://github.com/guille0/space-chess
   - さらに、shogitter の飛・角は領域型の利きを持つので、差分更新の対象が広い。
   - 研究の焦点（Transformer の比較）とずれるので、**当面は不採用**。将来、ブラウザ（WASM）上の軽量 AI として αβ + 小さな NNUE を作る余地はある。
   - USI 互換のプロトコル設計（ShogiHome 等との接続）は、3D 座標の表記が必要なので直接は流用できない。
-- **採用・不採用**: コードは**不採用**（GPL-3.0 は Apache-2.0 本体に入れられない）。NNUE は将来の検討課題。
+- **採用・不採用**: コードは**不採用**（本プロジェクトの配布方針）。NNUE は将来の検討課題。
 
 ### 3.11 takedarts/gokaku
 
@@ -456,7 +462,7 @@ VoxelShogi の新規性は次の 2 点にある。
    - Cloudflare で配信するブラウザゲーム
    - Hugging Face でのモデルとデータセットの公開
 
-   これらを Apache-2.0 で一貫して公開する。先行する 3D 将棋の実装には、ライセンス、重み、データセット、強さの評価のいずれかが欠けている（tomikan 版はすべて欠けている）。
+   コードはApache-2.0で公開する。モデル・データのライセンスはM3/M4の初回公開前にユーザーと確定する。先行する 3D 将棋の実装には、ライセンス、重み、データセット、強さの評価のいずれかが欠けている（tomikan 版はすべて欠けている）。
 
 2. **729 トークンでのアーキテクチャ比較研究**
    - 同じルール、同じデータ、同じ学習予算のもとで、次の 4 つ（＋ハイブリッド）を**方策精度、価値精度、対局 Elo、FLOPs**で比較する。

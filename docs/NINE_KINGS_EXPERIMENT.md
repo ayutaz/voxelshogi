@@ -72,28 +72,46 @@
 
 ## 再現
 
-Node/Rustはリポジトリの固定版。Pythonは使用しない。`runs/` のファイルは上書き先を確認して生成する。
+Node/Rustはリポジトリの固定版。Pythonは使用しない。新しいgit管理外ディレクトリへ出力し、保存済みの集計・配信棋譜を上書きしない。エンジンの完全SHAは次のとおり。squash mergeによりmainの祖先とは限らないため、ローカルにオブジェクトがなければ最初に `git fetch origin b8999270bf2583ad589096aa5838388dcda8db88` で取得する。
 
 ```sh
 set -eu
-experiment_engine=$(git rev-parse b899927)
-# 将来coreが変更された場合は、このコミットの別worktreeで再現する。
+experiment_engine=b8999270bf2583ad589096aa5838388dcda8db88
+# 生成に関わるソース・固定環境が測定時点と同じか確認する。
 git diff --exit-code "$experiment_engine" -- Cargo.toml Cargo.lock rust-toolchain.toml crates/voxelshogi-core
 cargo build --locked --release -p voxelshogi-core --example compare_rules
-mkdir -p runs/nine-kings
-# 生成したバイナリが指定コミットと一致することを確認する（名前だけで版を付け替えない）。
-target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" > runs/nine-kings/main.jsonl
-target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" baseline > runs/nine-kings/baseline.jsonl
-target/release/examples/compare_rules 20 800 8 2 0 "$experiment_engine" > runs/nine-kings/long.jsonl
-target/release/examples/compare_rules 20 400 16 2 0 "$experiment_engine" > runs/nine-kings/wide.jsonl
-target/release/examples/compare_rules 2 400 1 1 1000 "$experiment_engine" > runs/nine-kings/greedy.jsonl
+mkdir -p runs
+experiment_output=$(mktemp -d "$PWD/runs/nine-kings-reproduce.XXXXXX")
+# バイナリの実装版を確認した上で、その版を棋譜に記録する。
+target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" > "$experiment_output/main.jsonl"
+target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" baseline > "$experiment_output/baseline.jsonl"
+target/release/examples/compare_rules 20 800 8 2 0 "$experiment_engine" > "$experiment_output/long.jsonl"
+target/release/examples/compare_rules 20 400 16 2 0 "$experiment_engine" > "$experiment_output/wide.jsonl"
+target/release/examples/compare_rules 2 400 1 1 1000 "$experiment_engine" > "$experiment_output/greedy.jsonl"
+node --input-type=module - "$experiment_output" <<'JS'
+import { readFileSync, writeFileSync } from 'node:fs';
+const dir = process.argv[2];
+const lines = readFileSync(`${dir}/main.jsonl`, 'utf8').trimEnd().split('\n');
+const paired = lines.filter(line => JSON.parse(line).seed < 20);
+if (paired.length !== 120) throw Error('expected 3 rules × 20 seed pairs');
+writeFileSync(`${dir}/short40.jsonl`, paired.join('\n') + '\n');
+JS
+pnpm --dir apps/web install --frozen-lockfile
 pnpm --dir apps/web wasm
-node scripts/experiment-pack.mjs runs/nine-kings/main.jsonl apps/web/public/experiments docs/experiments/nine-kings-main.json runs/nine-kings/baseline.jsonl
-node scripts/experiment-pack.mjs runs/nine-kings/long.jsonl apps/web/public/experiments/long docs/experiments/nine-kings-long.json
-node scripts/experiment-pack.mjs runs/nine-kings/wide.jsonl runs/nine-kings/wide-samples docs/experiments/nine-kings-wide.json
+node scripts/experiment-pack.mjs "$experiment_output/main.jsonl" "$experiment_output/public" "$experiment_output/nine-kings-main.json" "$experiment_output/baseline.jsonl"
+node scripts/experiment-pack.mjs "$experiment_output/long.jsonl" "$experiment_output/public/long" "$experiment_output/nine-kings-long.json"
+node scripts/experiment-pack.mjs "$experiment_output/wide.jsonl" "$experiment_output/wide-samples" "$experiment_output/nine-kings-wide.json"
+node scripts/experiment-pack.mjs "$experiment_output/short40.jsonl" "$experiment_output/short40-samples" "$experiment_output/nine-kings-short40.json"
+node scripts/experiment-pack.mjs "$experiment_output/greedy.jsonl" "$experiment_output/greedy-samples" "$experiment_output/nine-kings-greedy.json"
+for variant in main long wide short40 greedy; do
+  cmp "docs/experiments/nine-kings-$variant.json" "$experiment_output/nine-kings-$variant.json"
+done
+diff -r apps/web/public/experiments "$experiment_output/public"
 ```
 
-`main.jsonl` からseed<20の完全な先後交換組を抽出して `short40.jsonl` とし、同じ集計器で `nine-kings-short40.json` を生成する。生JSONLのSHA-256、各サンプルのSHA-256、深さ・幅・上限・seed集合は各集計に保存する。棋譜再生成では経過時間をJSONへ入れないため、同じ実装・条件でバイト列を比較できる。
+差分確認が失敗した場合は版を付け替えて続行しない。将来coreが変わった場合は測定コミットのソースを別の作業ディレクトリでビルドして生成し、集計器・Web側は本報告を含む版を使う。集計器は生成時のコミットにまだ存在しない。`short40` は主試験からの対応部分であり追加の120局ではない。
+
+生JSONLのSHA-256、各サンプルのSHA-256、深さ・幅・上限・seed集合は各集計に保存する。棋譜再生成では経過時間をJSONへ入れないため、同じ実装・条件でバイト列を比較できる。
 
 ## 検証と次の判断
 
@@ -103,7 +121,8 @@ node scripts/experiment-pack.mjs runs/nine-kings/wide.jsonl runs/nine-kings/wide
 - ローカル：Rust 116件、Web単体36件（実WASM、公開用6棋譜とSHA・捕獲イベント）、CI制御Node 42件、既知変異14件、fmt／clippy／actionlint／ShellCheck／Web lint／型検査／buildを実行した。実機Chromeの全9件E2E（配信SHA、A/B保持、再生・停止、全王捕獲の決着、破損拒否を含む）が成功した。
 - Mac実機Chrome 155.0.8059.85で、400手・seed0・先後交換なしの56手目をA/Bで目視確認した。局面ハッシュは両方 `d1f6004f594e20f0`。1440px幅と390px幅で横方向のはみ出しはない。全層を初期カメラ内に収める調整を行った。人の好みの実験を実施したとは扱わない。
 - [実装PR #7](https://github.com/ayutaz/voxelshogi/pull/7) は、必須7チェックすべての成功とCodeQL警告なしを確認し、通常のsquash mergeで統合した。[PR CI](https://github.com/ayutaz/voxelshogi/actions/runs/40248077708)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40248077596)・[Quality](https://github.com/ayutaz/voxelshogi/actions/runs/40248077726)。統合コミットは `92c57fdfeed8bf19669692a67edf5bac10d0b5f3`。
-- **公開確認完了（2026-10-26 JST）**：[main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40249850975) で通常CI・本番デプロイ・配信SHA照合・公開E2Eが成功し、[main Security](https://github.com/ayutaz/voxelshogi/actions/runs/40249850944) も成功した。Mac実機Chromeから公開URLへの全9件E2Eも成功。配信SHAは `92c57fdfeed8bf19669692a67edf5bac10d0b5f3`、公開manifestと全6棋譜のSHA-256は測定・保存したファイルと一致した。
+- **初回公開確認完了（2026-10-26 JST）**：[main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40249850975) で通常CI・本番デプロイ・配信SHA照合・公開E2Eが成功し、[main Security](https://github.com/ayutaz/voxelshogi/actions/runs/40249850944) も成功した。Mac実機Chromeから公開URLへの全9件E2Eも成功。配信SHAは `92c57fdfeed8bf19669692a67edf5bac10d0b5f3`、公開manifestと全6棋譜のSHA-256は測定・保存したファイルと一致した。
+- 文書の取り込み後は公開SHA `73f4cdc63c44afca80d785bee8281689c0218933` でも [main CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) の公開E2E 9件が成功。2026-10-26の独立取得で公開manifestと全6棋譜のSHAが保存版に一致した。以後の公開SHAは `build-info.json` で確認する。
 - R0の実装・比較計測・観戦試作・公開検証は完了。正式採用と観戦者による理解度・好みの評価は別の判断として残す。
 
 現段階では、長めの観戦を許すなら5王先取を中心に、一定時間で結果を見たい用途には得点比較を並べて試すのが妥当という**試作上の見通し**。全王捕獲は長期戦の候補として残す。弱い固定探索AIの成績だけで正式採用せず、観戦の理解度・好みと、M1の強い探索での再評価を次の判断材料にする。M1完成・M2ライブ探索・M3/M6実機モデル推論はこの試作では完了扱いにしない。

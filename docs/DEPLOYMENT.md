@@ -5,7 +5,8 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 ## 構成
 
 - `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
-- `apps/web/public/_headers`: `/assets/*` を immutable キャッシュにする設定と、基本的なセキュリティヘッダー。
+- `apps/web/public/_headers`: `/assets/*` はimmutable、`/build-info.json` はno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
+- R0の比較室: [9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)。実際のCPU探索棋譜を再生する。ライブ推論・学習モデルではない。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。
 - デプロイ先は、ユーザーの個人 Cloudflare アカウント（ka1357amnbpdr@gmail.com）。
 
@@ -14,10 +15,10 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 `.github/workflows/ci.yml` の流れは次のとおり。トリガーは main への push、PR、手動実行（workflow_dispatch）。
 
 1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査。PR では dependency-review も行う
-2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、6件）
+2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、9件）
 3. `CI Gate`: 必須ジョブの成功を集約する。main/手動での PR 専用ジョブの省略だけを許容する
 4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する
-5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 6件を実行する
+5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 9件を実行する
 
 CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR では CodeQL 3種類、Rust/Web カバレッジと既知変異の3種類も必須とする。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
 
@@ -61,7 +62,9 @@ CLI の OAuth ログインは期限付きで、API トークンを作る権限�
 scripts/cf.sh login --browser=false   # 初回のみ。表示された URL を、個人アカウントでログインしたブラウザで開く
 scripts/cf.sh whoami                  # ka1357amnbpdr@gmail.com であることを確認する
 
-cd apps/web && pnpm wasm && pnpm build && cd ../..
+pnpm --dir apps/web install --frozen-lockfile
+pnpm --dir apps/web wasm
+pnpm --dir apps/web build
 scripts/cf.sh deploy
 ```
 
@@ -75,7 +78,9 @@ published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
 E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm e2e
 ```
 
-2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
+現在は通常対局5件・配信SHA1件・R0比較室3件の計9件。ローカルは既存Chrome、CIはインストールしたChromiumを使う。2026-10-26には公開版 `73f4cdc63c44afca80d785bee8281689c0218933` の [main CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) で公開E2Eまで成功し、公開manifestと全6棋譜のSHAも独立照合した。これは確認時点の記録であり、以後の版は配信情報で確認する。
+
+以下は過去の公開検証の記録。2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 
 M0-4 では SHA 確認を加えた6件に拡張済み。`0e29eb4` の CI で公開 E2E 6件が成功し、公開 URL の `build-info.json` も同じ完全長 SHA と確認した。人間同士の対局・マルチプレイはなく、人間 vs AI と AI 観戦のみを検証する。`build-info.json` は `Cache-Control: no-store` で配信し、検証の取得にも対象 SHA の query を付ける。`E2E_COMMIT` を省略した手動実行は、SHA 確認だけが skip となるため、版の一致の証拠には使わない。
 
@@ -94,16 +99,26 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
    recovery_version='REPLACE_WITH_VERIFIED_VERSION_ID'
    recovery_commit='REPLACE_WITH_VERIFIED_COMMIT_SHA'
    scripts/cf.sh rollback "$recovery_version" --message "Restore verified commit:$recovery_commit"
-   E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$recovery_commit" pnpm --dir apps/web e2e
+   # 次の手順で、復旧先コミットに対応するテストを実行する。
    ```
 
-4. 復旧後に公開 E2E と配信 SHA を確認し、失敗 run・戻した version ID・確認結果を記録する。問題を直した PR の必須チェック成功後、通常の main の自動公開に戻す。
+4. 復旧先のソースとlockfileを新しい一時ディレクトリへ展開し、その版のE2Eと配信SHAを確認する。現在の9件をR0以前の版にそのまま実行しない。`recovery_commit` がローカルにない場合は、まずoriginからその版を取得する。
 
-復旧訓練は、本番を変更せず、成功 run の `web-dist` を一時ディレクトリへダウンロードしてローカルで配信し、同じ6件の E2E と SHA 確認を行う。本番での自動 rollback は導入しない。[Cloudflare の rollback 仕様](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
+   ```bash
+   verification_dir=$(mktemp -d "${TMPDIR:-/tmp}/voxelshogi-recovery-tests.XXXXXX")
+   git archive "$recovery_commit" | tar -x -C "$verification_dir"
+   # 対象版の .node-version / packageManager に合うツールを使う。
+   pnpm --dir "$verification_dir/apps/web" install --frozen-lockfile
+   E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$recovery_commit" pnpm --dir "$verification_dir/apps/web" e2e
+   ```
+
+5. 失敗run・戻したversion ID・検証に使ったソースSHA・結果を記録する。問題を直した PR の必須チェック成功後、通常の main の自動公開に戻す。
+
+復旧訓練は、本番を変更せず、成功 run の `web-dist` を一時ディレクトリへダウンロードしてローカルで配信し、**その成果物の版に対応するE2E**とSHA確認を行う。M0で実施した旧版の訓練は当時の6件。`web-dist` は7日、`production-<SHA>` は30日保存なので、期限切れの場合は別の検証済み成功runを選ぶ。本番での自動 rollback は導入しない。[Cloudflare の rollback 仕様](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
 
 ## 今後の拡張（M3 の推論検証から）
 
-- M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルドか R2 とカスタムドメインからの配信かを決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
+- M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルド・R2公開バケットとカスタムドメイン・Worker経由配信などを比較して決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
 - 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。
 - マルチスレッド WASM を使う場合は、`_headers` に COOP/COEP を追加する。
 - 詳細は `docs/TECH_STACK_RESEARCH.md` §3.4 と §4、`docs/COST_ESTIMATE.md` §5。
