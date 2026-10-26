@@ -2,6 +2,8 @@
 
 2026-10-26（JST）。目的はAI同士の対局を眺める用途に適した勝利条件と表示を探すこと。**ルールの実測と、同じ棋譜を見せる表示の検証を分けた。採用ルールや人の好みの結論はまだ出していない。**
 
+本書はR0の生成版・条件・当時の件数を固定した記録。標準1王のM1探索はその後完了したが、9王への対応・全幅探索による再比較は未実施。[現在地](STATUS.md) と [M2計画](M2_PLAN.md) を参照。
+
 ## 固定した条件
 
 - [ルール仕様](RULESET.md#10-比較実験用の9王ルールv0)。同一の9層配置（各9王、合計360枚）、立体移動、持ち駒、王手回避なしを共通にし、5王先取・全9王捕獲・規定手数での王捕獲数比較だけを変える。
@@ -77,17 +79,20 @@ Node/Rustはリポジトリの固定版。Pythonは使用しない。新しいgi
 ```sh
 set -eu
 experiment_engine=b8999270bf2583ad589096aa5838388dcda8db88
-# 生成に関わるソース・固定環境が測定時点と同じか確認する。
-git diff --exit-code "$experiment_engine" -- Cargo.toml Cargo.lock rust-toolchain.toml crates/voxelshogi-core
-cargo build --locked --release -p voxelshogi-core --example compare_rules
+# M1後のcoreを過去の生成版として記録しない。固定コミットを別ディレクトリでビルドする。
+experiment_source=$(mktemp -d "${TMPDIR:-/tmp}/voxelshogi-r0-source.XXXXXX")
+git archive "$experiment_engine" | tar -x -C "$experiment_source"
+CARGO_TARGET_DIR="$experiment_source/target" cargo build --locked --release \
+  --manifest-path "$experiment_source/Cargo.toml" -p voxelshogi-core --example compare_rules
+experiment_binary="$experiment_source/target/release/examples/compare_rules"
 mkdir -p runs
 experiment_output=$(mktemp -d "$PWD/runs/nine-kings-reproduce.XXXXXX")
 # バイナリの実装版を確認した上で、その版を棋譜に記録する。
-target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" > "$experiment_output/main.jsonl"
-target/release/examples/compare_rules 100 400 8 2 0 "$experiment_engine" baseline > "$experiment_output/baseline.jsonl"
-target/release/examples/compare_rules 20 800 8 2 0 "$experiment_engine" > "$experiment_output/long.jsonl"
-target/release/examples/compare_rules 20 400 16 2 0 "$experiment_engine" > "$experiment_output/wide.jsonl"
-target/release/examples/compare_rules 2 400 1 1 1000 "$experiment_engine" > "$experiment_output/greedy.jsonl"
+"$experiment_binary" 100 400 8 2 0 "$experiment_engine" > "$experiment_output/main.jsonl"
+"$experiment_binary" 100 400 8 2 0 "$experiment_engine" baseline > "$experiment_output/baseline.jsonl"
+"$experiment_binary" 20 800 8 2 0 "$experiment_engine" > "$experiment_output/long.jsonl"
+"$experiment_binary" 20 400 16 2 0 "$experiment_engine" > "$experiment_output/wide.jsonl"
+"$experiment_binary" 2 400 1 1 1000 "$experiment_engine" > "$experiment_output/greedy.jsonl"
 node --input-type=module - "$experiment_output" <<'JS'
 import { readFileSync, writeFileSync } from 'node:fs';
 const dir = process.argv[2];
@@ -109,7 +114,7 @@ done
 diff -r apps/web/public/experiments "$experiment_output/public"
 ```
 
-差分確認が失敗した場合は版を付け替えて続行しない。将来coreが変わった場合は測定コミットのソースを別の作業ディレクトリでビルドして生成し、集計器・Web側は本報告を含む版を使う。集計器は生成時のコミットにまだ存在しない。`short40` は主試験からの対応部分であり追加の120局ではない。
+差分確認が失敗した場合は版を付け替えて続行しない。生成器は固定した測定コミット、集計器・Web側は本報告を含む現在の版を使う。集計器は生成時のコミットにまだ存在しない。今回の文書更新では上記の隔離ビルドと2 plyの少数対局による起動確認を行い、1,052局全体は再生成していない。`short40` は主試験からの対応部分であり追加の120局ではない。
 
 生JSONLのSHA-256、各サンプルのSHA-256、深さ・幅・上限・seed集合は各集計に保存する。棋譜再生成では経過時間をJSONへ入れないため、同じ実装・条件でバイト列を比較できる。
 
@@ -125,4 +130,4 @@ diff -r apps/web/public/experiments "$experiment_output/public"
 - 文書の取り込み後は公開SHA `73f4cdc63c44afca80d785bee8281689c0218933` でも [main CI 40254365292](https://github.com/ayutaz/voxelshogi/actions/runs/40254365292) の公開E2E 9件が成功。2026-10-26の独立取得で公開manifestと全6棋譜のSHAが保存版に一致した。以後の公開SHAは `build-info.json` で確認する。
 - R0の実装・比較計測・観戦試作・公開検証は完了。正式採用と観戦者による理解度・好みの評価は別の判断として残す。
 
-現段階では、長めの観戦を許すなら5王先取を中心に、一定時間で結果を見たい用途には得点比較を並べて試すのが妥当という**試作上の見通し**。全王捕獲は長期戦の候補として残す。弱い固定探索AIの成績だけで正式採用せず、観戦の理解度・好みと、M1の強い探索での再評価を次の判断材料にする。M1完成・M2ライブ探索・M3/M6実機モデル推論はこの試作では完了扱いにしない。
+現段階では、長めの観戦を許すなら5王先取を中心に、一定時間で結果を見たい用途には得点比較を並べて試すのが妥当という**試作上の見通し**。全王捕獲は長期戦の候補として残す。弱い固定探索AIの成績だけで正式採用せず、観戦の理解度・好みと、M1の全幅探索を9王へ対応させた再評価を今後の判断材料にする。M1完成・M2ライブ探索・M3/M6実機モデル推論はこの試作では完了扱いにしない。

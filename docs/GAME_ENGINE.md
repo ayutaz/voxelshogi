@@ -1,6 +1,6 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
-更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・統合の状況は [M1検証記録](M1_VALIDATION.md)。PythonバインディングとWebのライブ探索は未実装。
+更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。現在地は [STATUS](STATUS.md)。PythonバインディングとWebのライブ探索は未実装。
 
 ## モジュール
 
@@ -52,6 +52,8 @@ fn main() -> Result<(), MoveError> {
 - `GameRecord` は `ruleset_id = voxelshogi-standard-v1` と初期VSFENを持つ。JSONは4 MiB以下、20,000手以下。`from_json` は形式・サイズを読み、`replay` が全着手と結果を再検証する。UIの `Session` / WASMの `Game.fromRecordJson` は再生検証まで行う。
 - ルール外の終局は `Termination::{Resignation, MaxPlies, Abandoned}`。標準の上限打ち切りと9王の規定手数採点を混同しない。
 
+現行実装では `MaxPlies` は棋譜の申告結果の検証で扱い、`GameRecord::replay()` が返す `GameState` に打ち切り結果を保存しない。`Session::from_record_json` が明示的に再適用する終局理由は投了だけで、保存し直すとMaxPlies／Abandonedのメタデータは維持されない。M2でゲーム手数上限を画面に導入する場合は、この境界も整合させる（[計画](M2_PLAN.md#wasmとworkerの契約案)）。自然な詰み・千日手・連続王手の履歴と、外部打ち切りのメタデータを区別する。
+
 ## M1：標準1王の探索API
 
 ```rust
@@ -79,7 +81,7 @@ fn main() -> Result<(), &'static str> {
 - `search_with_clock` は単調な経過時間の関数を受け取る。Nativeの `search` は必要なときだけ `Instant` を使い、M2のWASMアダプタにはブラウザの時計を渡す。
 - 全合法手を保持する。置換表は呼び出しごとに新規作成し、同じ深さ・上限までの残り手数を区別する。履歴の最大同一ハッシュ出現数＋残り探索深さが4未満のノードだけ履歴を省略して再利用し、それ以外では再利用を止める。EXACT/LOWER/UPPERを区別し、中断ノードは保存しない。
 - 同じ局面・履歴・設定・深さ／ノード上限で再現可能。時間だけの上限では完了深さが変わり得る。仕様・戦術・同値性と計測は [M1計画](M1_PLAN.md)・[検証記録](M1_VALIDATION.md) を参照。
-- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` やWeb WorkerはM2で追加する。
+- 標準の `GameState::after_generated` はcrate内部限定。R0の `experiment::choose_move` は別実装のまま。WASMの `bestMove` やWeb Workerは [M2計画](M2_PLAN.md) で追加する。
 
 ## 9王試作と探索のRust API
 
@@ -139,6 +141,8 @@ fn main() -> Result<(), String> {
 
 `ExperimentReplay.snapshot` のJSONは `board`（729要素）、`hands`（2×7）、`side`、`ply`、`hash`、`captured`、`lastMove`、`kingCapture`（この手で王を取ったか）、`outcome`。標準の `Game.hands()` のフラット配列とは形が違う。9王再生には `Game` の王手表示を流用しない。UIの [比較室](../apps/web/src/experiment/ExperimentViewer.tsx) が表示だけを行う。
 
+`Game.recordJson()` はundo先のカーソルだけでなくredo先を含む全着手列を保存する。探索へ渡す場合は `ply()` のカーソルを併せて扱い、表示中の局面までの履歴を復元する。単独VSFENやhashでは千日手・連続王手の履歴を復元できない（[M2の契約案](M2_PLAN.md#wasmとworkerの契約案)）。
+
 ## ハッシュ・ファイル照合・再現性
 
 - Zobristの鍵は固定SplitMix64（シード `voxelshg`）。標準初期ハッシュ `043b66e12f6b84fd` は不変。
@@ -152,6 +156,7 @@ fn main() -> Result<(), String> {
 |---|---|
 | 標準、Apple M1 CPU、2026-10-25 release | 初期合法手424、`legal_moves()` 1.18 ms、ランダム対局の生成＋適用0.66 ms/手（約1,500手/秒） |
 | R0、2026-10-26 | 主試験600局で6,307,152ノード、経過289.473秒。並行処理を含むためM1の単独探索速度ではない |
-| 現在のWASM・Web配信サイズ | [技術構成の実測表](TECH_STACK_RESEARCH.md#採用済みの構成と初回調査の区別)。初回WASM 227 KB・JS 1.17 MBからR0で増加 |
+| M1 Native、2026-10-26 | 初期局面・反復込み深さ2は1,697ノード・約0.33秒。[全条件](M1_VALIDATION.md) |
+| 現在のWASM・Web配信サイズ | [技術構成の実測表](TECH_STACK_RESEARCH.md#採用済みの構成と初回調査の区別)。今回の確認元は2405e86、WASM284,605 bytes・入口JS1,196,200 bytes。過去のサイズと区別 |
 
 標準の計測コマンドは `cargo run --locked --release -p voxelshogi-core --example bench`。Nativeの合法手生成、R0の幅制限探索、M1のNormal、GPU学習、ブラウザ描画の速度をそれぞれ区別する。

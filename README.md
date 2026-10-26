@@ -15,17 +15,20 @@
 
 ## 現在の状態
 
-| Phase | 内容 | 状態 |
+| 区分 | 内容 | 状態 |
 |---|---|---|
 | 0 | 調査と設計 | ✅ |
 | 1 | Rust ルールエンジン | ✅ |
 | 2 | Web ゲーム Alpha | ✅ 公開済み（main への push で自動デプロイ） |
+| M0 | CI/CD・main保護・品質基盤 | ✅ |
+| M1 | Rustの全幅探索AI | ✅ [検証・実測](docs/M1_VALIDATION.md) |
+| M2 | Web Workerによる探索AI観戦 | ⬜ [次の実行計画](docs/M2_PLAN.md) |
 | R0 | 9王ルール比較・同一棋譜のA/B観戦試作 | ✅ [比較室を公開](https://voxelshogi.yousan-apps.workers.dev/?experiment=1) |
 | 3〜7 | データセット、Transformer、自己対局、研究比較、正式公開 | ⬜ |
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-M0（CI/CD と品質基盤）は、PRの取り込み・公開後検証まで完了しました。固定ツールチェーン、依存監査、CodeQL、品質計測、配信 SHA と公開 E2E、main 保護、旧成果物の隔離復旧訓練を確認済みです。M0時点の全758変異を調査し、692件を検出、58件をビルド不能、8件を根拠付きの同値として分類しました。R0追加後の全体調査結果と混同しません。M1（標準1王の全幅探索）は完了し、次はM2のWebでの探索AI観戦です。全1,172変異の分類とNativeの深さ2・約0.33秒を確認しました。[検証記録](docs/M1_VALIDATION.md)。[M1の実装手順](docs/M1_PLAN.md)・[CI/CDの計画](docs/CI_CD_PLAN.md)・[M0の検証記録](docs/M0_VALIDATION.md)
+M0・R0・M1は通常PRの取り込みと公開後検証まで完了しました。M1は全1,172変異の分類と、Apple M1 Nativeで初期局面の深さ2・約0.33秒を確認済みです。[現在地と確認元](docs/STATUS.md)・[M1検証記録](docs/M1_VALIDATION.md)。次は [M2のWeb探索AI観戦](docs/M2_PLAN.md) です。
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
@@ -42,7 +45,7 @@ M3・M6では、実機のブラウザで動く変換済みモデルをデモに�
 Python を使う計測・今後の学習環境は3.14系を基本とし、依存が未対応の場合は3.13系を使います。現在の固定値は `.python-version`（3.14.9）です。
 
 ```bash
-cargo test --locked --workspace # 標準・実験ルールと探索試作のテスト
+cargo test --locked --workspace # 標準・実験ルール・M1全幅探索のテスト
 
 cd apps/web
 pnpm install --frozen-lockfile
@@ -56,6 +59,8 @@ pnpm dev                        # http://localhost:5173
 
 | 文書 | 内容 |
 |---|---|
+| [docs/STATUS.md](docs/STATUS.md) | 現在の実装・公開・CIと文書の役割 |
+| [docs/M2_PLAN.md](docs/M2_PLAN.md) | 次のWeb探索AI観戦の実装順・TDD・完了条件 |
 | [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | 目的・スコープ・横断的な要件 |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |
 | [docs/M1_PLAN.md](docs/M1_PLAN.md) | 探索AIの実装順・契約・完了条件 |
