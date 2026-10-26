@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { checkGate } from './gate.mjs';
 
-const passing = () => Object.fromEntries(['lint', 'rust', 'msrv', 'web', 'audit', 'dependency-review'].map((name) => [name, { result: 'success' }]));
+const passing = () => Object.fromEntries(['lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review'].map((name) => [name, { result: 'success' }]));
 
 test('all required checks must succeed', () => {
   assert.deepEqual(checkGate(passing(), 'pull_request'), []);
@@ -20,7 +20,18 @@ test('missing and empty results cannot pass', () => {
   const needs = passing();
   delete needs.rust;
   assert.deepEqual(checkGate(needs, 'push'), ['rust: missing result']);
-  assert.equal(checkGate({}, 'push').length, 6);
+  assert.equal(checkGate({}, 'push').length, 7);
+});
+
+test('public E2E runtime handoff must exist and succeed before deployment', () => {
+  for (const result of ['failure', 'cancelled', 'skipped', undefined]) {
+    const needs = passing();
+    needs['e2e-runtime'].result = result;
+    assert.deepEqual(checkGate(needs, 'pull_request'), [`e2e-runtime: ${result ?? 'missing result'}`]);
+  }
+  const needs = passing();
+  delete needs['e2e-runtime'];
+  assert.deepEqual(checkGate(needs, 'push'), ['e2e-runtime: missing result']);
 });
 
 test('a failed dependency audit blocks the gate', () => {
