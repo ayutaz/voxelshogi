@@ -2,7 +2,7 @@
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
-更新: 2026-10-26。確認元 `2405e86` の [main CI 40318499296](https://github.com/ayutaz/voxelshogi/actions/runs/40318499296) は通常検証・deploy・配信SHA・公開E2E9件が成功した。最新配信を固定する値ではなく、本更新の確認元である。[現在地と取得記録](STATUS.md)。
+更新: 2026-10-27。M2完了時の確認元 `3a500cd` の [main CI 40380474249](https://github.com/ayutaz/voxelshogi/actions/runs/40380474249) は通常検証・WASM受け渡し・deploy・配信SHA・公開E2Eが成功した。実機Chromeでも公開E2E21件を確認。CIでの再試行と観測競合の修正は [M2記録](M2_VALIDATION.md) に記載する。最新配信を固定する値ではなく、本更新の確認元である。[現在地](STATUS.md)。
 
 ## 構成
 
@@ -111,6 +111,9 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
    git archive "$recovery_commit" | tar -x -C "$verification_dir"
    # 対象版の .node-version / packageManager に合うツールを使う。
    pnpm --dir "$verification_dir/apps/web" install --frozen-lockfile
+   # M2以降は、同じ成功runの検証用WASMも復元する。
+   recovery_run='REPLACE_WITH_SUCCESSFUL_RUN_ID'
+   gh run download "$recovery_run" --repo ayutaz/voxelshogi --name web-e2e-wasm --dir "$verification_dir/apps/web/src/wasm/pkg"
    E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$recovery_commit" pnpm --dir "$verification_dir/apps/web" e2e
    ```
 
@@ -118,17 +121,15 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
 
 復旧訓練は、本番を変更せず、成功 run の `web-dist` を一時ディレクトリへダウンロードしてローカルで配信し、**その成果物の版に対応するE2E**とSHA確認を行う。M0で実施した旧版の訓練は当時の6件。`web-dist` は7日、`production-<SHA>` は30日保存なので、期限切れの場合は別の検証済み成功runを選ぶ。本番での自動 rollback は導入しない。[Cloudflare の rollback 仕様](https://developers.cloudflare.com/workers/wrangler/commands/workers/#rollback)
 
-## 今後の拡張（M2の探索、M3の推論検証）
+## M2の公開E2E用WASM受け渡し
 
-- M2は単一スレッドのM1探索をブラウザの専用Workerで実行する。Worker・WASMの配信、操作中の中断、バンドル分割を通常CI／公開E2Eで検証する。COOP/COEPやR2はM2の必須条件にせず、[M2計画](M2_PLAN.md) に従う。
+M2のE2Eは、実Workerが保存した棋譜をNode側のRust/WASMでも再検証するため、Web buildのdistだけでなく生成pkgも必要である。CIの `Public E2E runtime handoff` はPR／mainの新しいcheckoutで、同じrunの `web-e2e-wasm` だけを復元して実際の全テストを収集する。失敗・中断・欠落はCI Gateを失敗にする。deployでも公開前に同じ収集を行い、公開後に全21件を実行する。
+
+artifactの取得元は同じworkflow runに限定し、digest不一致はエラーとする。PR／forkの成果物をproductionへ渡さず、生成pkgに認証情報を含めない。配信用 `web-dist` の構造は維持し、検証用pkgを公開サイトへ重複配置しない。復旧訓練でM2版のE2Eを使う場合も、対象runの検証用WASMを同様に復元する。
+
+## M3以降の推論配信の拡張
 
 - M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルド・R2公開バケットとカスタムドメイン・Worker経由配信などを比較して決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
 - 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。
 - マルチスレッド WASM を使う場合は、`_headers` に COOP/COEP を追加する。
 - 詳細は `docs/TECH_STACK_RESEARCH.md` §3.4 と §4、`docs/COST_ESTIMATE.md` §5。
-
-### M2の公開E2E用WASM受け渡し
-
-M2のE2Eは、実Workerが保存した棋譜をNode側のRust/WASMでも再検証するため、Web buildのdistだけでなく生成pkgも必要である。CIの `Public E2E runtime handoff` はPR／mainの新しいcheckoutで、同じrunの `web-e2e-wasm` だけを復元して実際の全テストを収集する。失敗・中断・欠落はCI Gateを失敗にする。deployでも公開前に同じ収集を行い、公開後に全21件を実行する。
-
-artifactの取得元は同じworkflow runに限定し、digest不一致はエラーとする。PR／forkの成果物をproductionへ渡さず、生成pkgに認証情報を含めない。配信用 `web-dist` の構造は維持し、検証用pkgを公開サイトへ重複配置しない。復旧訓練でM2版のE2Eを使う場合も、対象runの検証用WASMを同様に復元する。

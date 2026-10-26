@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M2_PLAN.md`（M2-1取り込み済み。Worker／観戦UI／表示分割をローカル検証中、公開確認は未完了）
+- 次の実行計画: `docs/ROADMAP.md` のM3（ブラウザ推論検証）。M2は完了し、`docs/M2_PLAN.md` と `docs/M2_VALIDATION.md` に契約・検証・公開実測を記録
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -93,10 +93,10 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、隔離復旧訓練、全758変異の調査と分類を確認済み。PR #3の最終文書も取り込み済みで、統合コミット `1ff4e2f` の本番公開・配信SHA・公開E2E 6件まで2026-10-26（JST）に成功した（`docs/M0_VALIDATION.md` の完了時記録）
   - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
+  - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13・#14・#15の必須CIと通常取り込み、main `3a500cd` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M2: Web で探索AI同士を観戦（Normal 難易度、Web Worker。人間対AIも補助機能として利用）。`docs/M2_PLAN.md` のM2-1〜5に従い、履歴復元・中断・古い応答の破棄・実機計測も検証
-  2. M3: ブラウザでのモデル推論の検証
-  3. M4: Python バインディングとデータ生成
-  4. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
-  5. M6: Transformer-S の学習
+  1. M3: ブラウザでのモデル推論の検証
+  2. M4: Python バインディングとデータ生成
+  3. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
+  4. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

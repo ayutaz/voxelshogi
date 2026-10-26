@@ -1,0 +1,862 @@
+{
+  "schema": "voxelshogi-m2-public-e2e-v1",
+  "sourceCommit": "3a500cdcdd020cbc3e632a4cb56229d3a305edd7",
+  "publishedCommit": "3a500cdcdd020cbc3e632a4cb56229d3a305edd7",
+  "command": "E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT=3a500cdcdd020cbc3e632a4cb56229d3a305edd7 pnpm --dir apps/web e2e --reporter=json",
+  "report": {
+    "config": {
+      "argv": [
+        "/private/tmp/voxelshogi-m0-tools/node-v24.22.1-darwin-arm64/bin/node",
+        "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/node_modules/.pnpm/@playwright+test@1.64.1/node_modules/@playwright/test/cli.js",
+        "test",
+        "--reporter=json"
+      ],
+      "configFile": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/playwright.config.ts",
+      "rootDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/e2e",
+      "failOnFlakyTests": false,
+      "forbidOnly": false,
+      "fullyParallel": true,
+      "globalSetup": null,
+      "globalTeardown": null,
+      "globalTimeout": 0,
+      "grep": {},
+      "grepInvert": null,
+      "maxFailures": 0,
+      "metadata": {
+        "actualWorkers": 4
+      },
+      "preserveOutput": "always",
+      "projects": [
+        {
+          "outputDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/test-results",
+          "repeatEach": 1,
+          "retries": 0,
+          "metadata": {
+            "actualWorkers": 4
+          },
+          "id": "chrome",
+          "name": "chrome",
+          "testDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/e2e",
+          "testIgnore": [],
+          "testMatch": [
+            "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+          ],
+          "timeout": 30000
+        }
+      ],
+      "filteredProjects": [
+        {
+          "grep": {},
+          "grepInvert": null,
+          "outputDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/test-results",
+          "repeatEach": 1,
+          "retries": 0,
+          "metadata": {
+            "actualWorkers": 4
+          },
+          "name": "chrome",
+          "testDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/e2e",
+          "snapshotDir": "/private/tmp/voxelshogi-m2-public-5b5b3c5/apps/web/e2e",
+          "testIgnore": [],
+          "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+          "timeout": 30000,
+          "use": {
+            "baseURL": "https://voxelshogi.yousan-apps.workers.dev",
+            "trace": "retain-on-failure",
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "viewport": {
+              "width": 1280,
+              "height": 720
+            },
+            "screen": {
+              "width": 1920,
+              "height": 1080
+            },
+            "deviceScaleFactor": 1,
+            "isMobile": false,
+            "hasTouch": false,
+            "defaultBrowserType": "chromium",
+            "channel": "chrome"
+          },
+          "dependencies": [],
+          "ignoreSnapshots": false,
+          "__projectId": "chrome"
+        }
+      ],
+      "quiet": false,
+      "reporter": [
+        [
+          "json"
+        ]
+      ],
+      "reportSlowTests": {
+        "max": 5,
+        "threshold": 300000
+      },
+      "shard": null,
+      "tags": [],
+      "updateSnapshots": "default",
+      "updateSourceMethod": "patch",
+      "version": "1.64.1",
+      "workers": 4,
+      "webServer": null
+    },
+    "suites": [
+      {
+        "title": "ai.spec.ts",
+        "file": "ai.spec.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "spectator starts paused with independent Normal settings and steps exactly once through a real Worker",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 5715,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:12.512Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-53f497fa9d37b695dc0f",
+            "file": "ai.spec.ts",
+            "line": 7,
+            "column": 1
+          },
+          {
+            "title": "automatic spectator progresses with easy/easy",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 1,
+                    "parallelIndex": 1,
+                    "status": "passed",
+                    "duration": 3578,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:12.510Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-e1bba587694d17102e31",
+            "file": "ai.spec.ts",
+            "line": 28,
+            "column": 3
+          },
+          {
+            "title": "automatic spectator progresses with easy/normal",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 3562,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:12.502Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-57e56bfd2f0534d4caa4",
+            "file": "ai.spec.ts",
+            "line": 28,
+            "column": 3
+          },
+          {
+            "title": "automatic spectator progresses with normal/easy",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 3,
+                    "parallelIndex": 3,
+                    "status": "passed",
+                    "duration": 3577,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:12.512Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-cda0bbb3ae5ad09c6a3b",
+            "file": "ai.spec.ts",
+            "line": 28,
+            "column": 3
+          },
+          {
+            "title": "automatic spectator progresses with normal/normal",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 3891,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:19.264Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-b01e4f31aded20feee71",
+            "file": "ai.spec.ts",
+            "line": 28,
+            "column": 3
+          },
+          {
+            "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 60000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 3,
+                    "parallelIndex": 3,
+                    "status": "passed",
+                    "duration": 11453,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:19.265Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-0ee379d0e65292777a5b",
+            "file": "ai.spec.ts",
+            "line": 46,
+            "column": 1
+          },
+          {
+            "title": "Worker load failures are visible and retry recreates the worker",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 1,
+                    "parallelIndex": 1,
+                    "status": "passed",
+                    "duration": 3003,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:19.264Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-6808e448523290b488ad",
+            "file": "ai.spec.ts",
+            "line": 119,
+            "column": 1
+          },
+          {
+            "title": "2D initial load defers the 3D module until it is selected",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 1546,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:21.412Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-bd8c1ebce89c18d8b683",
+            "file": "ai.spec.ts",
+            "line": 131,
+            "column": 1
+          },
+          {
+            "title": "new game, difficulty, undo/redo, goto and import invalidate a pending search",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 1,
+                    "parallelIndex": 1,
+                    "status": "passed",
+                    "duration": 8015,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:22.322Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-e3f8565a190294294aa7",
+            "file": "ai.spec.ts",
+            "line": 143,
+            "column": 1
+          },
+          {
+            "title": "human promotion, pawn drop and record round-trip remain available alongside AI spectator",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 3358,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:22.985Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-9294748d47eb58663865",
+            "file": "ai.spec.ts",
+            "line": 189,
+            "column": 1
+          },
+          {
+            "title": "an asynchronous file read cannot replace a newer game",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 2134,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:23.169Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-5b1ccd262e2f0dd85d41",
+            "file": "ai.spec.ts",
+            "line": 216,
+            "column": 1
+          },
+          {
+            "title": "humans can play either color against Normal search",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 4842,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:25.367Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "f4c16ad2df3b1859900b-237f6a546ecad9a254b6",
+            "file": "ai.spec.ts",
+            "line": 236,
+            "column": 1
+          }
+        ]
+      },
+      {
+        "title": "build-info.spec.ts",
+        "file": "build-info.spec.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "serves the tested build commit",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 562,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:26.626Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "22ccc78c2af694864799-5eeaf7564fcbfe3f1e5b",
+            "file": "build-info.spec.ts",
+            "line": 3,
+            "column": 1
+          }
+        ]
+      },
+      {
+        "title": "experiment.spec.ts",
+        "file": "experiment.spec.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "same record and position survive presentation switches and playback controls",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 2882,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:27.246Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "46dcba3ff919c7312c3d-f719bc5591d8eb2da768",
+            "file": "experiment.spec.ts",
+            "line": 3,
+            "column": 1
+          },
+          {
+            "title": "record corruption is rejected before replay",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 986,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:30.137Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "46dcba3ff919c7312c3d-5663cd5de6b222f5ce4d",
+            "file": "experiment.spec.ts",
+            "line": 42,
+            "column": 1
+          },
+          {
+            "title": "800-ply trial can replay a complete all-kings capture",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 1709,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:30.254Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "46dcba3ff919c7312c3d-6b855f3d340d37a89f52",
+            "file": "experiment.spec.ts",
+            "line": 49,
+            "column": 1
+          }
+        ]
+      },
+      {
+        "title": "game.spec.ts",
+        "file": "game.spec.ts",
+        "column": 0,
+        "line": 0,
+        "specs": [
+          {
+            "title": "shows the initial position in 2D and 3D",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 1,
+                    "parallelIndex": 1,
+                    "status": "passed",
+                    "duration": 1869,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:30.384Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "8b1bb1493a64c9fc3ab6-fa961529c65753cac6b3",
+            "file": "game.spec.ts",
+            "line": 22,
+            "column": 1
+          },
+          {
+            "title": "human vs AI: select, see targets, move, inspect history, undo",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 3,
+                    "parallelIndex": 3,
+                    "status": "passed",
+                    "duration": 2068,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:30.745Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "8b1bb1493a64c9fc3ab6-567445e1df7e53e123ab",
+            "file": "game.spec.ts",
+            "line": 34,
+            "column": 1
+          },
+          {
+            "title": "human as White: the AI opens and answers automatically",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 0,
+                    "parallelIndex": 0,
+                    "status": "passed",
+                    "duration": 2542,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:31.141Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "8b1bb1493a64c9fc3ab6-d2f00269e2a43599cd4e",
+            "file": "game.spec.ts",
+            "line": 57,
+            "column": 1
+          },
+          {
+            "title": "AI vs AI can be watched and paused",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 2,
+                    "parallelIndex": 2,
+                    "status": "passed",
+                    "duration": 4491,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:31.982Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "8b1bb1493a64c9fc3ab6-a54e0aed90daf6169fac",
+            "file": "game.spec.ts",
+            "line": 67,
+            "column": 1
+          },
+          {
+            "title": "records round-trip through save and load, and invalid files are rejected",
+            "ok": true,
+            "tags": [],
+            "tests": [
+              {
+                "timeout": 30000,
+                "annotations": [],
+                "expectedStatus": "passed",
+                "projectId": "chrome",
+                "projectName": "chrome",
+                "results": [
+                  {
+                    "workerIndex": 1,
+                    "parallelIndex": 1,
+                    "status": "passed",
+                    "duration": 1608,
+                    "errors": [],
+                    "stdout": [],
+                    "stderr": [],
+                    "retry": 0,
+                    "startTime": "2026-10-26T18:58:32.284Z",
+                    "annotations": [],
+                    "attachments": []
+                  }
+                ],
+                "status": "expected"
+              }
+            ],
+            "id": "8b1bb1493a64c9fc3ab6-eed86912421836960a14",
+            "file": "game.spec.ts",
+            "line": 85,
+            "column": 1
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "stats": {
+      "startTime": "2026-10-26T18:58:12.063Z",
+      "duration": 24671.349000000002,
+      "expected": 21,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  }
+}

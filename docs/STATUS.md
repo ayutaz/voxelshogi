@@ -1,6 +1,6 @@
 # 現在の状態と文書の案内
 
-確認: **2026-10-26（JST）**。公開アセットの取得時刻は下記JSONに記録。本更新を始めたmainと公開版は `2405e86a0313d4b454119bd472937f2e10622bf5`。以下はこの版を照合した記録であり、以後の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。
+確認: **2026-10-27（JST）**。M2の完了時に照合したmain／公開版は `3a500cdcdd020cbc3e632a4cb56229d3a305edd7`。これは固定した検証対象であり、後続の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。M1時点の `2405e86` の記録は後半に保持する。
 
 ## 完了したものと次の作業
 
@@ -9,13 +9,27 @@
 | Phase 0〜2、M0 | 調査・標準ルール・Web Alpha・CI/CDを完了。[M0記録](M0_VALIDATION.md) |
 | R0 | 9王3ルール＋標準対照など1,052局を比較し、400／800手の代表6棋譜を公開。正式な9王採用と観戦者の好みの評価は保留。[結果](NINE_KINGS_EXPERIMENT.md) |
 | M1 | 標準1王の全幅αβ、評価、反復深化・手の並べ替え・履歴を区別する置換表、深さ／ノード／時間上限を完了。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10)・[#11](https://github.com/ayutaz/voxelshogi/pull/11)、[検証・計測](M1_VALIDATION.md) |
-| 現在の公開画面 | 通常画面はランダムAI対局・観戦。比較室はCPUで生成した固定棋譜を再生。M1のブラウザ内ライブ探索、Worker、学習モデルは未実装 |
-| 次の実装 | **M2：探索AI同士のWeb観戦**。[具体的な実装順・TDD・完了条件](M2_PLAN.md) |
+| 現在の公開画面 | 通常画面は履歴付きWorkerによる探索AI同士の観戦。両AIのEasy/Normal、一時停止・1手送り・速度変更・中断／再試行、人間対AIを利用できる。比較室は固定棋譜の再生で、学習モデルは未導入 |
+| M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
+| 次の実装 | **M3：ブラウザでのモデル推論検証**。[目的・ゴール・準備](ROADMAP.md) |
 | M3〜M6 | 未着手。モデル推論の先行検証→Python／データ生成→小型モデルの学習・配信。M5の実棋譜互換性は独立して挿入できる。[フェーズごとの目的・ゴール](ROADMAP.md) |
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
-## 実装・公開・品質の確認元
+## M2の実装・公開・品質の確認元
+
+| 項目 | 固定した確認元 |
+|---|---|
+| 通常PR | #13・#14・#15の必須7チェック成功後にsquash merge。保護のbypassなし |
+| 統合後の自動公開 | [main CI 40380474249](https://github.com/ayutaz/voxelshogi/actions/runs/40380474249)：通常検証・生成WASMのジョブ間受け渡し・公開・配信SHA・公開E2Eが成功。CodeQLは [40380473933](https://github.com/ayutaz/voxelshogi/actions/runs/40380473933) |
+| 現在のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件 |
+| 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。[結果](experiments/m2-public-e2e.json)。CIでの1件の再試行と観測競合の修正も [検証記録](M2_VALIDATION.md) に記載 |
+| 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
+| 対象外 | NN runtime・R2・COOP/COEP・有料GPUは導入しない。9王の正式採用は保留。次はM3 |
+
+## 文書整備時の旧固定記録（M1・2026-10-26）
+
+以下は `2405e86` を照合した当時の値で、現在のテスト数・サイズ・公開SHAではない。
 
 | 項目 | 今回照合した値・一次資料 |
 |---|---|
@@ -29,19 +43,15 @@
 | 未取り込み依存更新 | [Dependabot PR #1](https://github.com/ayutaz/voxelshogi/pull/1) はopen。mainに採用済みとは扱わず、本更新で依存を変更しない |
 | 配信 | WorkerスクリプトなしのStatic Assets。COOP/COEP・R2・NN runtimeは未導入。公開SHA、JS/WASMのサイズ・hash、2 manifestと全6棋譜の照合は [取得記録](experiments/documentation-baseline-2026-10-26.json) |
 
-M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒、1秒予算で3回とも深さ2を完了。R0の幅制限探索・ブラウザ・GPU学習の速度へ一律換算しない。M2で実機のWASM/Workerを測り、M4で生成対象のpilot、M6で学習速度を測る。
-
-## M2の進行中の差分（2026-10-27 JST）
-
-上記はM1完了時点の固定記録。M2-1の `Game.bestMove`・時計・Sessionの終局保持は [PR #13](https://github.com/ayutaz/voxelshogi/pull/13) の必須7チェック成功後に通常取り込み済み。統合後のCIはaptダウンロードで中断し、この版の公開確認は未完了。`feat/m2-worker-client` では履歴付きWorker・観戦制御・3D分割を実装し、Web単体と実機ChromeのE2E21件を検証中。[計画](M2_PLAN.md)・[段階別検証](M2_VALIDATION.md)。固定SHAの計測・必須CI・M2の本番反映の証拠は後続で追記する。
+M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒、1秒予算で3回とも深さ2を完了。R0の幅制限探索・ブラウザ・GPU学習の速度へ一律換算しない。WASM/WorkerはM2で公開実測済み。M4で生成対象のpilot、M6で学習速度を測る。
 
 ## 文書の役割と更新範囲
 
 | 文書 | 用途・今回の扱い |
 |---|---|
-| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M1完了、次のM2、固定ツールとコマンドへそろえる |
+| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M2完了、次のM3、固定ツールとコマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
-| [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。[M2_PLAN](M2_PLAN.md) が次の作業手順 |
+| [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、次のM3はROADMAP |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies等のメタデータ再保存の制約も明記。M5互換性は未実施 |
 | [CI_CD_PLAN](CI_CD_PLAN.md)、[DEPLOYMENT](DEPLOYMENT.md) | 現行のCI・main保護・認証の配置・配信・復旧手順。過去のrunは固定記録として保持 |
 | [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |

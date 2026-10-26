@@ -1,0 +1,74 @@
+{
+  "schema": "voxelshogi-m2-artifact-match-v1",
+  "publishedCommit": "3a500cdcdd020cbc3e632a4cb56229d3a305edd7",
+  "runId": 40380474249,
+  "artifactId": 12679012024,
+  "archiveSha256": "24d787399b564e3d5cfb14becda0d6a0ac58fe9f14c5fc91c2da81aaa6a6ddbf",
+  "buildInfoCommitMatched": true,
+  "matchedAssets": [
+    {
+      "path": "/assets/index-BuMZ1Hlh.js",
+      "bytes": 255096,
+      "sha256": "cf7398a4dcb6492384897a0e0431c5a76d8b52981532f398e2fc93c509dc2bed",
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+      "bytes": 361183,
+      "sha256": "f0ff6f99d6482f4d40da757503a43c46a3e1e4953c440f35fe6d1b2b86e5881d",
+      "contentType": "application/wasm"
+    },
+    {
+      "path": "/assets/Board3D-Dvwp3CeF.js",
+      "bytes": 952067,
+      "sha256": "08b2b8cbd83454521f3fa4884610554097cffbc87e4ab2aab1a16dd7d6496a4d",
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/assets/search.worker-B1wHbOjO.js",
+      "bytes": 11784,
+      "sha256": "cd6937275f4e9432bf0bdc82378c86257067bab40b55b485a56b99b4c00a0eb9",
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/experiments/long/manifest.json",
+      "bytes": 4862,
+      "sha256": "5aaf36fb4a0f012921dbc20dbbf8d4c2130896b1f560e71a744b7c7201ecc7ab"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 11483,
+      "sha256": "71403a23c49649cae2b17ceb56f42d530328b1c19d62c13e5587a362b9ac31a3"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 7466,
+      "sha256": "0b728de53d2794cbe4c8901611450c83c480a84ca14a2c5315dd30f731fc529b"
+    },
+    {
+      "path": "/experiments/long/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 11664,
+      "sha256": "80a69c1091e5995c45bf5e08816459db0edd91879fdcfcf86b5a1d50bbba93a6"
+    },
+    {
+      "path": "/experiments/manifest.json",
+      "bytes": 6036,
+      "sha256": "cbb4ba3dc55ccace51f33ba6060b1255d8977e387ee3d17b3eaa7a72e91f2b60"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-all-v0.record.json",
+      "bytes": 6033,
+      "sha256": "f668d1baebbf806c5ffe6af8512805421f68d128bcbbf2cf16a9ab68e15f1b78"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-first5-v0.record.json",
+      "bytes": 6036,
+      "sha256": "1a19cf7571a726c21a501f79488f63148c2cfc745460a6286b82925bb27c22bd"
+    },
+    {
+      "path": "/experiments/voxelshogi-nine-kings-score-v0.record.json",
+      "bytes": 6036,
+      "sha256": "2fa616c542a32640c1fdfa0c8fcf16687e644e7b5869d324387b69d3984be8da"
+    }
+  ]
+}
