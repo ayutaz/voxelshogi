@@ -19,7 +19,7 @@ it('ignores an obsolete file read but accepts a fresh import under StrictMode', 
   let finish!: (text: string) => void;
   const lateFile = { size: 1000, text: () => new Promise<string>((resolve) => { finish = resolve; }) };
   fireEvent.change(screen.getByTestId('import'), { target: { files: [lateFile] } });
-  fireEvent.click(screen.getByRole('button', { name: '新規対局', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: '新規対局' }));
   await act(async () => { finish(JSON.stringify(fixtures[0]!.record)); });
   expect(pawn()).toBe('歩');
   expect(screen.queryByRole('alert')).toBeNull();
