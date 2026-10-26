@@ -17,9 +17,9 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 `.github/workflows/ci.yml` の流れは次のとおり。トリガーは main への push、PR、手動実行（workflow_dispatch）。
 
 1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査。PR では dependency-review も行う
-2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、21件、Native/WASM照合も実行）
+2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、21件、Native/WASM照合も実行）。配信用 `web-dist` と、E2EがNodeで棋譜を再検証する生成WASM `web-e2e-wasm` を別artifactに保存
 3. `CI Gate`: 必須ジョブの成功を集約する。main/手動での PR 専用ジョブの省略だけを許容する
-4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する
+4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する。`web-e2e-wasm` も同じrunからdigest照合付きで復元し、公開前に `pnpm e2e --list` で全テストのimportを確認する
 5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 21件を実行する
 
 CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR では CodeQL 3種類、Rust/Web カバレッジと既知変異の3種類も必須とする。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
@@ -126,3 +126,9 @@ M0 完了時の公開確認は2026-10-26 00:53 JST。[main CI 40201319748](https
 - 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。
 - マルチスレッド WASM を使う場合は、`_headers` に COOP/COEP を追加する。
 - 詳細は `docs/TECH_STACK_RESEARCH.md` §3.4 と §4、`docs/COST_ESTIMATE.md` §5。
+
+### M2の公開E2E用WASM受け渡し
+
+M2のE2Eは、実Workerが保存した棋譜をNode側のRust/WASMでも再検証するため、Web buildのdistだけでなく生成pkgも必要である。CIの `Public E2E runtime handoff` はPR／mainの新しいcheckoutで、同じrunの `web-e2e-wasm` だけを復元して実際の全テストを収集する。失敗・中断・欠落はCI Gateを失敗にする。deployでも公開前に同じ収集を行い、公開後に全21件を実行する。
+
+artifactの取得元は同じworkflow runに限定し、digest不一致はエラーとする。PR／forkの成果物をproductionへ渡さず、生成pkgに認証情報を含めない。配信用 `web-dist` の構造は維持し、検証用pkgを公開サイトへ重複配置しない。復旧訓練でM2版のE2Eを使う場合も、対象runの検証用WASMを同様に復元する。
