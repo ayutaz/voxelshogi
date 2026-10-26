@@ -1,0 +1,320 @@
+.experiment {
+  max-width: 1800px;
+  margin: auto;
+}
+.experiment header {
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 28px;
+}
+.experiment header h1 {
+  font-size: 22px;
+  letter-spacing: 0.03em;
+  margin-top: 4px;
+}
+.experiment-eyebrow {
+  color: #91a5c8;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+.experiment-intro {
+  padding: 24px 28px 8px;
+}
+.experiment-intro p {
+  font-size: clamp(23px, 3vw, 36px);
+  margin: 0 0 8px;
+  font-weight: 650;
+}
+.experiment-intro span {
+  color: #9ba5b7;
+  font-size: 13px;
+}
+.experiment-rule {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 12px 28px 20px;
+}
+.experiment-rule label {
+  width: 250px;
+  flex-shrink: 0;
+}
+.experiment-rule select {
+  margin-top: 6px;
+}
+.experiment-rule p {
+  color: #c2cbd9;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.experiment-rule small {
+  color: #8b93a3;
+}
+.experiment-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(360px, 1fr) 290px;
+  border-block: 1px solid var(--line);
+}
+.experiment-sidebar,
+.experiment-detail {
+  padding: 24px 20px;
+  background: var(--panel);
+}
+.experiment-sidebar {
+  border-right: 1px solid var(--line);
+}
+.experiment-detail {
+  border-left: 1px solid var(--line);
+}
+.experiment-tag {
+  color: #a7ba96;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.experiment-sidebar h2 {
+  margin: 8px 0 16px;
+  font-size: 23px;
+}
+.experiment-goal {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+.experiment-sidebar p {
+  line-height: 1.7;
+}
+.experiment-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+.experiment-score {
+  padding: 14px;
+  border: 1px solid #56492f;
+  border-radius: 8px;
+  background: #252219;
+  color: #ead7ae;
+}
+.experiment-score.side-1 {
+  background: #1b2431;
+  border-color: #37485e;
+  color: #b9cbe4;
+}
+.experiment-score > span {
+  font-size: 12px;
+}
+.experiment-score strong {
+  display: block;
+  font-size: 40px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.experiment-score strong small {
+  font-size: 16px;
+  font-weight: normal;
+  opacity: 0.6;
+}
+.experiment-score > small {
+  font-size: 11px;
+  opacity: 0.7;
+}
+.king-track {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0;
+}
+.king-track i {
+  flex: 1;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+  opacity: 0.25;
+}
+.king-track .taken {
+  background: currentColor;
+  opacity: 1;
+}
+.experiment-result {
+  border-block: 1px solid var(--line);
+  padding: 12px 0;
+  font-size: 13px;
+}
+.experiment-measure {
+  font-size: 12px;
+  color: #a8b1c1;
+}
+.experiment-measure h3,
+.experiment-detail h3 {
+  font-size: 12px;
+  color: #8b93a3;
+  font-weight: 500;
+  margin: 22px 0 12px;
+}
+.experiment-measure small {
+  display: block;
+  line-height: 1.7;
+  color: #8b93a3;
+}
+.experiment-stage {
+  min-width: 0;
+  padding: 16px;
+}
+.experiment-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.experiment-display label {
+  width: 230px;
+  margin: 0 0 12px;
+}
+.experiment-display select {
+  margin-top: 6px;
+}
+.experiment-display span {
+  color: #9ca9bf;
+  font-size: 12px;
+}
+.experiment-stage .board3d {
+  height: min(56vw, 590px);
+  min-height: 420px;
+}
+.experiment-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 45px;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 12px;
+}
+.experiment-caption strong {
+  color: #ffd485;
+  background: #392e1b;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.experiment-controls {
+  padding: 12px;
+  background: #181b22;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.experiment-controls button {
+  font-size: 12px;
+}
+.experiment-controls > label:last-of-type {
+  max-width: 190px;
+}
+.experiment-controls small {
+  font-size: 10px;
+  color: #8b93a3;
+  line-height: 1.8;
+}
+.experiment-detail .board2d-grid {
+  grid-template-columns: 16px repeat(9, minmax(0, 1fr));
+}
+.experiment-detail .cell {
+  font-size: 14px;
+}
+.experiment-detail p {
+  line-height: 1.8;
+}
+.experiment details {
+  margin-top: 20px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #a1adc0;
+}
+.experiment details code,
+.experiment details small {
+  overflow-wrap: anywhere;
+}
+.experiment summary {
+  cursor: pointer;
+}
+.experiment footer {
+  padding: 20px 28px;
+  color: #8b93a3;
+  font-size: 11px;
+  line-height: 1.8;
+}
+@media (max-width: 1100px) {
+  .experiment-layout {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+  .experiment-detail {
+    grid-column: 1 / -1;
+    border: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+  }
+  .experiment-detail .board2d {
+    grid-column: 1;
+    grid-row: 2 / 6;
+    max-width: 360px;
+  }
+  .experiment-detail > label {
+    grid-column: 1;
+  }
+  .experiment-detail details {
+    grid-column: 2;
+  }
+}
+@media (max-width: 700px) {
+  .experiment header,
+  .experiment-intro,
+  .experiment-rule {
+    padding-inline: 16px;
+  }
+  .experiment header a {
+    font-size: 11px;
+  }
+  .experiment-rule {
+    display: block;
+  }
+  .experiment-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .experiment-sidebar {
+    border: 0;
+  }
+  .experiment-scores {
+    flex-direction: row;
+  }
+  .experiment-score {
+    flex: 1;
+  }
+  .experiment-stage .board3d {
+    height: 480px;
+    min-height: 360px;
+  }
+  .experiment-detail {
+    display: block;
+  }
+  .experiment-detail .board2d {
+    margin: auto;
+  }
+  .experiment-display span {
+    max-width: 120px;
+  }
+  .experiment-caption {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experiment * {
+    scroll-behavior: auto;
+  }
+}
+.experiment-study {
+  padding: 0 28px;
+  max-width: 440px;
+}
+.experiment-study select {
+  margin-top: 6px;
+}

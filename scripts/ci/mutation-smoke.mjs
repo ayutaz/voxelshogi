@@ -23,6 +23,11 @@ const mutations = [
   { name: 'error-message', file: 'state.rs', before: 'match self {\n            MoveError::Illegal(why)', after: 'return Ok(());\n        match self {\n            MoveError::Illegal(why)', args: ['--test', 'rules', 'move_errors_display_the_reason_for_users'] },
   { name: 'hand-count', file: 'state.rs', before: 'kind.hand_index()\n            .map_or(0, |i| self.hands[color.index()][i])', after: '0', args: ['--test', 'rules', 'hand_count_returns_each_sides_count_and_zero_for_undroppable_kinds'] },
   { name: 'all-hand-kinds', file: 'state.rs', before: 'hand.iter().all(|&n| n == 0)', after: 'hand.iter().all(|&n| n != 0)', args: ['--test', 'rules', 'every_hand_kind_can_be_dropped_when_all_seven_are_held'] },
+  { name: 'capture-target-boundary', file: 'capture.rs', before: 'self.captured[color.index()] >= target', after: 'self.captured[color.index()] > target', args: ['--test', 'capture_experiment', 'fifth_king_wins_without_going_to_hand'] },
+  { name: 'capture-score-winner', file: 'capture.rs', before: 'std::cmp::Ordering::Greater => Some(Color::Black)', after: 'std::cmp::Ordering::Greater => Some(Color::White)', args: ['--test', 'capture_experiment', 'score_rule_only_uses_kings_at_the_even_move_limit'] },
+  { name: 'capture-repetition', file: 'capture.rs', before: '.count() >= 4', after: '.count() >= 3', args: ['--test', 'capture_experiment', 'repetition_is_fourfold'] },
+  { name: 'capture-record-hash', file: 'experiment.rs', before: 'format!("{:016x}", g.hash()) != r.final_hash', after: 'false', args: ['--test', 'experiment_record', 'complete_record_replays_and_rejects_forgery'] },
+  { name: 'capture-king-value', file: 'experiment.rs', before: '25_000 *', after: '0 *', args: ['--lib', 'experiment::tests::finds_immediate_target_and_evaluation_has_hand_calculated_sign'] },
 ];
 
 function main() {
@@ -58,7 +63,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 9);
+    assert.equal(results.length, 14);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

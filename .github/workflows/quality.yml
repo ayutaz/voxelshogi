@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       full_mutations:
-        description: Run all core mutations in addition to the nine known regressions
+        description: Run all core mutations in addition to the known regressions
         type: boolean
         default: false
 
