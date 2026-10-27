@@ -1,7 +1,7 @@
 # VoxelShogi 技術スタック調査（デューデリジェンス）
 
-- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-27**（公式料金の最終照合は2026-10-26）
-- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内 NN 推論（ONNX Runtime Web: WebGPU、WASM フォールバック、Web Worker 内）、Cloudflare Workers Static Assets + R2、PyTorch DDP 学習（Vast.ai）、Hugging Face（モデル・データセット）
+- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-28**（公式料金の最終照合は2026-10-26）
+- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch DDP 学習（Vast.ai）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。
 - 凡例: **[確認済]** = 各節の取得日に一次情報で確認 / **[記憶ベース]** = 取得日に一次情報で未検証 / **[未確認]** = 確認できなかった・実測が必要
 
@@ -11,23 +11,27 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次の実装は [M3_PLAN.md](M3_PLAN.md)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO3のABI対象とデータ生成依存はM4、CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次は [ROADMAPのM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリはプロジェクトへ未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
+2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・学習／データ生成の追加依存、COOP/COEP・R2は未導入。
 
-| 現在の構成 | 固定値・実績 | 正となる設定・証拠 |
+| 採用構成／固定記録 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
 | Web / WASM | 主要runtimeの直依存は完全固定、開発依存はlockfileで固定。wasm-bindgen/CLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| 検証 | Rust core153＋WASM5、Web115、Node49、core/WASM33変異＋Web29変異、E2E21件 | [M2検証](M2_VALIDATION.md)。Native/WASM12fixtureもCIで照合 |
-| 公開WASM | 361,183 bytes | [公開計測](experiments/m2-search-browser-public.json)・[最終版照合](experiments/m2-final-publication.json) |
-| 初回JS / 3D JS / Worker JS | 255,096 / 952,067 / 11,784 bytes（非圧縮） | 初期2Dでは3D・探索Workerを取得しない。選択／探索開始時にロード |
+| 現在の検証 | Rust core153＋WASM5、Web172、Python48、Node67。既知core/WASM33・Web50・Python16・制御14変異、既存21＋モデル6 E2E | [M3検証](M3_VALIDATION.md)。Native/WASM12fixtureとC0追加3件もCIで照合 |
+| NN runtime | ORT Web／Python ORTとも1.31.1、opset18、WASM 1 thread | `apps/web/package.json`・`uv.lock`、[モデル契約](MODEL_CONTRACT.md) |
+| Pythonの導入済み依存 | torch2.14.1（Linuxは+cpu）、numpy2.5.4、onnx1.23.2、onnxscript0.7.2、onnxconverter-common1.16.0、safetensors0.8.0 | `pyproject.toml`・`uv.lock`。実行は`uv run --locked`、追加は`uv add` |
+| M2公開WASM（固定記録） | 361,183 bytes | [公開計測](experiments/m2-search-browser-public.json)・[最終版照合](experiments/m2-final-publication.json) |
+| M2初回JS / 3D JS / Worker JS（固定記録） | 255,096 / 952,067 / 11,784 bytes（非圧縮） | 初期2Dでは3D・探索Workerを取得しない。選択／探索開始時にロード |
 | R0 | 1,052局を照合、代表6棋譜を公開 | [実測報告](NINE_KINGS_EXPERIMENT.md)。モデル推論ではない |
 
 M2の固定コミット `63a4716` では、実Chromeの2D初回JSは255,096 bytes、3D選択後は累計1,207,163 bytes。WASMは探索追加で361,171 bytes、専用Workerは11,784 bytes。初回2Dの軽量化と3D利用時の全体量を分けて扱う。[固定SHAのNetwork・GPU・探索計測](experiments/m2-search-browser-local.json)・[旧公開版の実取得](experiments/m2-initial-load-before.json)。Normalは1秒予算で初期局面の深さ2を3回とも完了し、3Dを実際に描画したMetal/Apple M1上で計測した。公開版 `3a500cd` はWASM361,183 bytesで、[公開計測](experiments/m2-search-browser-public.json) と [同じCI成果物とのSHA照合](experiments/m2-public-artifact-match.json) を保存した。MacとLinuxのWASMは別のSHAで記録する。静止中の3Dはdemand描画、移動軌跡は連続描画とする。
 
 WASMサイズはビルド環境でも差が出るため、配信バイト数とローカル生成物の値を混ぜない。以下の外部版・公開日・サイズは、特記がなければ2026-10-25の調査記録。将来の推論・学習の採用版や性能を確定したものではない。
+
+M3は未学習モデル3形式を [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で実行できる。採用版はORT Web／Python ORT 1.31.1、opset18、専用Worker、WASM 1 thread。Asyncify WASM 28,747,738 bytesを16 MiB単位に分割する同一originのStatic Assetsを採用し、R2は追加していない。FP32／INT8重みのM1 WebGPUと全3形式のWASMが数値基準内、FP16×M1 WebGPUは不合格を表示する。3DありFP32 WebGPU中央値55.00〜56.95msは基準公開版`dd3762c`の固定測定であり、一般端末の保証値ではない。[最終公開・測定の区別](M3_VALIDATION.md)・[ADR-019](ARCHITECTURE_DECISIONS.md#adr-019-m3の精度形式backend配信方式2026-10-27)
 
 ## 0. 結論サマリ
 
@@ -73,7 +77,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 1. **[確認済・最重要] ONNX Runtime Web の WebGPU 用 `.wasm` が Workers Static Assets の 25 MiB 上限を超える。**
    `onnxruntime-web@1.30.0` の `ort-wasm-simd-threaded.jsep.wasm` = 28,312,028 B（27.0 MiB）、`ort-wasm-simd-threaded.asyncify.wasm` = 26,781,914 B（25.54 MiB）。どちらも 1 ファイル 25 MiB 上限を超えるため、**Vite が自動でこれらを `dist/` に出力すると `wrangler deploy` が失敗する**。対策は §3.4.5 参照（R2 カスタムドメインから配信、または JSPI 版 16.0 MiB を使う、WASM 専用版 13.6 MiB はそのまま可）。
 2. **[確認済] Conv3d は WebGPU で「動くが naive 実装」。グループ化（depthwise 含む）Conv3d は非対応。** 1.30.0 タグの WebGPU EP（C++）に `Conv3DNaiveProgram` があり 5 次元入力の Conv を実行できる（PR #27917、2026-04-03 マージ）。ただし `group != 1` はエラー、性能最適化はされていない（自動生成の演算子表にも "conv3d is not supported" の古い注記が残っており、ドキュメントと実装がずれている）。**9×9×9 盤面の主力演算に Conv3d を使う設計は、ブラウザ推論速度を早期に実測すべき最大リスク**。
-3. **[確認済] ONNX 標準 `Attention`（opset 23）は WebGPU EP に登録がなく CPU にフォールバックする。** WebGPU で動くのは `com.microsoft` ドメインの `Attention` / `MultiHeadAttention` で、しかも mask・past/present 入力があると CPU フォールバック。→ opset 18でMatMul/Softmaxに分解する構成をM3の候補にする。実際の変換グラフ・対応演算・backend割当は未検証。
+3. **[確認済] ONNX 標準 `Attention`（opset 23）は WebGPU EP に登録がなく CPU にフォールバックする。** WebGPU で動くのは `com.microsoft` ドメインの `Attention` / `MultiHeadAttention` で、しかも mask・past/present 入力があると CPU フォールバック。→ opset 18でMatMul/Softmaxに分解する構成をM3の候補にする。M3ではopset18のMatMul／Softmax等への分解と、FP32／INT8重みの全GPU配置を実測した。上記1.30.0の全演算表を再検証したという意味ではない。
 4. **[確認済] TypeScript 7.0.2 が `latest` だが typescript-eslint は `typescript <6.1.0` を要求。** 当面 TS 6.0.3 に固定。
 5. **[確認済] PyTorch の `cu126` ビルドは Blackwell（RTX 5090, sm_120）非対応。** 5090 を使うなら PyPI 既定（CUDA 13.0）か `cu130`/`cu132` を使い、Vast.ai のホストは `cuda_max_good >= 13.0`（ドライバ 580 系以上）で絞り込むこと（4090 の出品 64 件中 8 件は 13.0 未満だった）。
 6. **[解消・再確認対象]** 初回の空き9.2 GiBは現在の不足ではない。今回の取得記録は約32 GiB。追加のキャッシュ削除は行わず、M3の依存導入直前に容量を再確認する。
@@ -146,7 +150,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
   - drei は依存が多い（`@mediapipe/tasks-vision`, `hls.js` 等）。tree-shaking は効くが、使うヘルパーを限定しバンドルサイズを確認する。
   - 描画（WebGL）と NN 推論（WebGPU, Worker）が同じ GPU を取り合う。推論中はフレームレートを落とす等の制御を検討。
 
-### 3.4 onnxruntime-web 1.30.0（最重要コンポーネント）
+### 3.4 ORT Web：初回1.30.0調査とM3採用版1.31.1
 
 #### 3.4.1 版・ビルド構成 [確認済]
 
@@ -161,7 +165,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 | `onnxruntime-web/wasm` | なし（CPU のみ） | `ort-wasm-simd-threaded.wasm` | 14,239,897 B（13.6 MiB） | ○ |
 
   （`build.ts` の `DISABLE_JSEP` / `ENABLE_JSPI` 定義と `wasm-utils-import.ts` の分岐で確認）
-- **M3の候補（未実装）**: `onnxruntime-web/webgpu`（ネイティブ WebGPU EP。ORT の今後の主流で、Conv3D・3D ConvTranspose・新しい演算子の追加はこちらが先行）をメインにし、WebGPUの機能・セッション作成を検証し、利用できない場合はWASM用セッションを明示的に作る。EPの並びだけで初期化失敗時の再試行を保証したとは扱わない。JSPI 版はブラウザの JSPI 対応状況次第（Chrome 系は対応済み、Safari/Firefox は [未確認]）なので、当面は機能検出して使う「オプション」扱い。
+- **初回案（以下の1.30.0比較は当時の記録）**: `onnxruntime-web/webgpu`（ネイティブ WebGPU EP。ORT の今後の主流で、Conv3D・3D ConvTranspose・新しい演算子の追加はこちらが先行）をメインにし、WebGPUの機能・セッション作成を検証し、利用できない場合はWASM用セッションを明示的に作る。EPの並びだけで初期化失敗時の再試行を保証したとは扱わない。JSPI 版はブラウザの JSPI 対応状況次第（Chrome 系は対応済み、Safari/Firefox は [未確認]）なので、当面は機能検出して使う「オプション」扱い。
 
 #### 3.4.2 WebGPU EP の状態と演算子サポート [確認済: 1.30.0 タグのソースと main の自動生成表]
 
@@ -187,27 +191,27 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 - **M3で最初に試すopset候補: 18**。以下は調査した版の想定で、生成グラフと実際のノード割当を検証して確定する。
   - `torch.onnx.export`（torch 2.14 の既定は `dynamo=True`、torchlib の実装 opset = 18 [確認済]）の既定と一致し、変換経路が最も枯れている。
   - LayerNormalization（17+）が単一ノードで出る。
-  - SDPAがopset 18でMatMul＋Softmaxへ分解される構成を試す。全ノードがWebGPUに割り当たるかはM3で検証する。opset 23 にすると ONNX `Attention` が出て CPU フォールバックするので避ける。
+  - 初回案はSDPAのopset18分解だった。M3では明示的なMatMul＋SoftmaxのFull Attentionを実装し、FP32／INT8重みの全GPU配置を確認した。SDPAやopset23のAttention全般を検証済みとは扱わない。
   - 必要なら `onnxruntime.transformers` の optimizer で mask なし `MultiHeadAttention` に融合（要検証）。
 - **モデル設計への提言（Conv3d リスク回避）**:
   1. 9×9×9 を **729 トークンの Transformer**（各マス=トークン、学習可能 3D 位置埋め込み）にする → MatMul/Softmax/LayerNorm 中心で WebGPU 最適化の恩恵が大きい。729² は1 headあたり531,441要素で、batch・head数・dtype・中間bufferでメモリ量が変わる。実行可能性はM3の代表構造の実測で判定する。
   2. Conv を使うなら **"2.5D" 化**（深さ軸をチャネルに畳み込み Conv2d を使う、または Conv3d を unfold + MatMul で表現）を検討。
   3. Conv3d を使う場合は depthwise（group≠1）を使わない。
-  4. いずれもM3で、学習前に同規模の候補をORT Web（WebGPU/WASM）で計測する。初回案の「1〜2週間」は実測済みの工期ではない。
+  4. M3では代表Full Attentionを計測した。Conv系や他構造の比較は未実施で、M6／Phase 6以降に同条件で検証する。初回案の「1〜2週間」は実測済みの工期ではない。
 - **合法手マスク**: ポリシー出力への合法手マスクはグラフ外（JS/WASM 側）で行い、ScatterND 等をグラフに入れない方が単純。
 
 #### 3.4.3 WebGPU のブラウザ対応 [記憶ベース・要再確認]
 
-- Chrome / Edge 113+（デスクトップ）で既定有効、Android Chrome 121+。Safari 26（macOS/iOS）で既定有効、Firefox は 141 で Windows 既定有効、macOS/Linux は段階展開中。初回調査では一次情報未検証のため、**`navigator.gpu?.requestAdapter()` で機能検出し、失敗時は WASM EP** という実装を必須とする。
+- Chrome / Edge 113+（デスクトップ）で既定有効、Android Chrome 121+。Safari 26（macOS/iOS）で既定有効、Firefox は 141 で Windows 既定有効、macOS/Linux は段階展開中。初回調査では一次情報未検証のため、初回案は`navigator.gpu?.requestAdapter()`で機能検出してWASMへ切り替える方針だった。M3の採用実装は要求したbackendの失敗理由を表示し、利用者がWASMを明示選択する。無言の自動fallbackで成功扱いにしない。
 - Dedicated Worker 内での `navigator.gpu` 利用は Chrome 系で可（他ブラウザは [未確認]）。
 
 #### 3.4.4 Web Worker 内での使い方 [確認済: exports / 記憶ベース: API 詳細]
 
-- M3で自前のWorkerにORTを置く設計を試す場合は **`ort.env.wasm.proxy = false`（既定）のまま**にする（proxy worker の二重化を避ける）。
-- `ort.env.wasm.numThreads`: cross-origin isolated（`self.crossOriginIsolated === true`）でなければ自動的に 1 スレッド。WebGPU EP 使用時も一部 CPU 演算は wasm スレッドを使う。
-- 推論セッションはページ寿命中 1 回だけ作成（作成コストが大きい）。
+- M3は自前のmodule WorkerへORTを置き、`ort.env.wasm.proxy = false`で動作を確認済み。JSもhash検証したbytesからblob importし、未照合の別URLを再取得しない。
+- `ort.env.wasm.numThreads = 1`に固定し、COOP/COEPは不要。WebGPUはCPU fallbackを無効にし、実profileで全nodeのGPU配置を照合する。
+- 初回案の「ページ寿命中1 session」は未採用。M3は要求ごとにsessionを作成・解放し、Worker／runtimeを再利用する。40回モードは同session内で準備10＋測定30回。中断・変更・エラーではWorkerを終了し、古い応答を破棄する。
 
-#### 3.4.5 Cloudflare での ORT wasm ファイルの配信方法 [確認済: サイズ制限 / 推奨案]
+#### 3.4.5 CloudflareでのORT配信：初回候補と採用結果
 
 - Workers Static Assets の 1 ファイル上限 25 MiB（§4.1）に対し、WebGPU 版 wasm が超過する（上表）。選択肢:
 
@@ -217,8 +221,11 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 | B | `onnxruntime-web/jspi`（16.0 MiB）を Static Assets に同居 | 同一オリジンで単純 | JSPI 非対応ブラウザでは使えない → A か WASM 版との併用が必要 |
 | C | jsDelivr 等の公開 CDN から読む | 設定最小 | 外部依存、COEP 下では CORP/CORS ヘッダ次第 [未確認]、オフライン・改ざん耐性 |
 | D | ORT を必要演算子だけで**カスタムビルド**（`--include_ops_by_config` の reduced build）して 25 MiB 未満に | 単一オリジン、軽量化 | Emscripten ビルド環境の保守コストが高い（ローカル8 GBではメモリ制約が大きく、必要容量・ビルド環境を再確認する） |
+| E（M3採用） | 1.31.1 Asyncify WASMを16 MiB単位に分割し、部分と全体のhashを照合して再結合 | 同一originのStatic Assetsで公開確認済み、R2不要 | 起動時に再結合bufferが必要。全WASMのサイズを小さくする方式ではない |
 
-- 実装メモ:
+A〜Dと以下のメモは初回候補。現在はEを採用し、JS／bootstrap／WASMの組み合わせ・配信hash・MIME・cacheを公開版で確認した。
+
+- 初回候補の実装メモ:
   - `ort.env.wasm.wasmPaths` には URL プレフィックス、または `{ mjs: URL, wasm: URL }` の個別指定を渡せる（1.19 以降の機能として記憶 [未確認]）。`.mjs`（グルーコード）は同一オリジン、`.wasm` だけ R2 という分離が可能なら COEP 周りが単純になる。
   - **Vite に巨大 wasm をコピーさせない**: `onnxruntime-web/webgpu` の既定エクスポート（`ort.webgpu.bundle.min.mjs`）は wasm を `new URL(..., import.meta.url)` で参照するため、Vite が `dist/assets/` に 25.54 MiB の wasm を出力する可能性が高い [要ビルド確認]。`onnxruntime-web-use-extern-wasm` 条件（exports に定義あり）か `ort.webgpu.min.mjs` を使い、`wasmPaths` を明示。デプロイ前に `find dist -size +25M` を CI でチェックする。
   - R2 カスタムドメイン側: CORS ポリシーで `AllowedOrigins` に本番オリジン、`AllowedMethods: GET, HEAD`。`.wasm`/`.onnx` は **Cloudflare の既定キャッシュ対象拡張子に含まれない可能性が高い**ため、Cache Rule（Cache Everything + 長い Edge TTL）を設定。ファイル名にバージョン/ハッシュを含めて immutable 扱いにする。
@@ -249,7 +256,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 #### Playwright 1.64.1 [確認済]
 - **採用理由**: M2では通常対局・R0再生・破損拒否・配信SHAにWorker観戦を加えて全21件を検証する。思考中の2D/3D・カメラ操作、中断、読込・履歴、エラー回復も含む。COOP/COEP・WebGPU推論はM3の別検証項目。
 - **注意点**:
-  - ブラウザバイナリで数百 MB（ローカルの `~/Library/Caches/ms-playwright` は既に 520 MB）。現在のローカルE2Eはインストール済みChromeを使い、追加ダウンロードは不要。CIは `PW_CHANNEL=''` と `pnpm exec playwright install --with-deps chromium` を使う。
+  - ブラウザバイナリで数百 MB（ローカルの `~/Library/Caches/ms-playwright` は既に 520 MB）。現在のローカルE2Eはインストール済みChromeを使い、追加ダウンロードは不要。CIはUbuntu24.04の実行ライブラリを使い、`PW_CHANNEL=''`と`pnpm exec playwright install chromium`で実際に起動・検証する。
   - ヘッドレス Chromium の WebGPU は GPU のない CI では基本的に使えない（SwiftShader 等のソフトウェア実装やフラグが必要で、挙動はバージョン依存 [未確認]）。WebGPU 経路はローカル手動テスト＋WASM 経路を CI で、と分ける。
 
 ## 4. デプロイ（Cloudflare）
@@ -305,7 +312,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 ### 5.1 PyTorch 2.14.1 [確認済]
 
-- 初回調査の候補は2.14.1（2026-09-30）。Python 3.14を基本に、M3/M6着手時に必要なOS・Python ABIのwheelとONNX依存の組み合わせを確認する。未対応の依存に限り3.13へ切り替える。
+- 初回候補2.14.1はM3で採用済み。Python3.14.9／uvからMac arm64・Linux x86_64のCPUで生成・ONNX比較が成功した。Linuxは公式CPU indexを使い、CUDA一式をCIへ入れない。以下のCUDA・学習の候補は初回調査であり、M6で有料GPU利用前に再確認する。未対応の依存に限り3.13へ切り替える。
 - **CUDA**: PyPI 既定の Linux ホイールは **CUDA 13.0**（`cuda-toolkit==13.0.3`, cuDNN 9.24, NCCL 2.30.7 に依存、x86_64 cp313 で 555 MB）。`download.pytorch.org` に `cu126` / `cu130` / `cu132` 版あり。
   - 公式サポート表（2.12/2.13 時点の記載）: CUDA 12.6 ビルドは Maxwell〜Hopper のみ（**Blackwell 非対応**）、CUDA 13.0/13.2 ビルドは Turing〜Hopper + Blackwell（10.0, 12.0+PTX）。→ RTX 5090（sm_120）、H100（sm_90）、RTX 4090（sm_89、sm_86 バイナリ互換）すべて CUDA 13.0 ビルドで可。
   - CUDA 13 ランタイムは NVIDIA ドライバ 580 系以上が必要（記憶ベース）。Vast.ai の検索で `cuda_max_good >= 13.0` を条件にする。
@@ -330,7 +337,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 - **注意点**: Python `>=3.11`。729 マス×チャネルの密テンソルを 1 行 1 局面の `FixedSizeList` で持つと読み込みが速い。行グループ 128〜512 MB 程度、zstd。学習時は Parquet → 事前に NumPy memmap / WebDataset 風シャードに変換した方が DataLoader が速い場合がある（実測）。1 局面あたりのバイト数は見積もりに直結するので要計測。
 
 ### 5.5 Gymnasium 1.4.0 [確認済: 版のみ]
-- **評価**: 単一エージェント RL 用 API。AlphaZero 型の自己対局（MCTS + NN）では環境ラッパとしての必要性は低く、2 人対戦なら PettingZoo（AEC API）の方が適合（PettingZooの版は初回調査時点で未確認）。初回調査では任意・低優先としたが、現行ROADMAPではM4の行動マスク付きGymnasium環境を完了条件に含める。PyO3と同じRustルールを使い、先にM4の必要なAPI・Python3.14対応を検証する。
+- **評価**: 単一エージェント RL 用 API。AlphaZero 型の自己対局（MCTS + NN）では環境ラッパとしての必要性は低く、2エージェントの対戦環境ならPettingZoo（AEC API）が候補（PettingZooの版は初回調査時点で未確認）。初回調査では任意・低優先としたが、現行ROADMAPではM4の行動マスク付きGymnasium環境を完了条件に含める。PyO3と同じRustルールを使い、先にM4の必要なAPI・Python3.14対応を検証する。
 
 ## 6. ローカル開発機（Apple M1 / 8 GB RAM）の初回調査
 
@@ -344,21 +351,21 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 | Node 依存（vite/react/three/drei/ORT/wrangler） | ○ だが ORT だけで展開 145 MB、合計 1 GB 近く | pnpm でストア共有を推奨 |
 | PyTorch（macOS arm64, 127 MB ホイール） | ○（CPU/MPS） | **CUDA 不可。DDP/BF16/compile/FlashAttention の検証はローカル不可** |
 | PyTorch CUDA 版（Linux 555 MB + CUDA 依存で数 GB） | × | Vast.ai 上でのみ |
-| ORT Web の WebGPU | ○（Chrome/Safari の Metal 経由） | M1 の GPU で推論速度の目安は取れる（実ユーザー端末とは別） |
+| ORT Web の WebGPU | Chromeで確認済み／Safari未測定 | M1／Chrome156で実配信モデルを計測済み。Safari／他端末へ一般化しない |
 | ORT のカスタムビルド（Emscripten） | × 実質不可（ディスク・メモリ不足） | 必要なら CI / クラウドで |
 | Playwright | ○ | ローカルは既存Chrome、CIはChromium。全ブラウザ展開は未実施 |
 | 大きなデータセット（数十 GB の Parquet） | × | HF / R2 / Vast.ai 上のみ。ローカルはサンプル数 MB |
 | 学習のメモリ | △ 8 GB 共有メモリ | 極小モデル・小バッチでスモークのみ |
 
-- **現在の判断**: 2026-10-26に空き約32 GiBを再確認した（取得時刻とbytesはSTATUSの記録）。初回のキャッシュ削除案は現在の必須作業ではない。
+- **容量の扱い**: 初回約9.2 GiB、2026-10-26約32 GiB、2026-10-27約27.2 GiBは各時点の記録。M4の依存導入・データ生成前に再確認する。初回の一律キャッシュ削除案は現在の必須作業ではない。
 
 ## 7. 未確認事項（要フォローアップ）
 
 1. ORT Web WebGPU の Conv3d naive 実装の実速度（M1 / 一般的な Windows iGPU / dGPU）と、Transformer 案との比較。
-2. Vite 8 + `onnxruntime-web/webgpu` で `dist/` に 25.54 MiB の wasm が出力されるか（実ビルドで確認）、`wasmPaths` の `{mjs, wasm}` 個別指定の挙動。
+2. **M3で解決**: ORT1.31.1の実bundleに対応するAsyncify bootstrap／WASMを配信準備で取得し、WASM分割＋再結合bufferを設定する。巨大WASMを1ファイルでViteに出力させず、実公開55ファイルを照合済み。
 3. ~~`_headers` の `/*` が SPA フォールバックの `index.html` 応答にも適用されるか~~ → **解決（2026-10-25）**: 公開 URL の存在しないパスへの `curl -I` で、`X-Content-Type-Options` などが付くことを確認した。
 4. Static Assets の 25 MiB が非圧縮サイズ基準か。
-5. WebGPU / JSPI / COEP credentialless の各ブラウザ対応状況（初回調査時点で一次情報未確認）。
+5. M1／Chrome156のnative WebGPUは実機確認済み。JSPI・COEP credentialless・Safari／他GPUは未採用／未測定で、将来必要になった時点で再検証する。
 6. torch 2.14 での `torch.compile` × DDP の推奨順序、MPS での BF16/compile 対応。
 7. Hugging Face private repo のストレージ無料枠。
 8. ~~`getrandom` 0.4 の wasm32-unknown-unknown での設定方法~~ → **不要（2026-10-25）**: コアの依存は serde と serde_json だけで、`getrandom` に依存していない（Zobrist は固定シードの SplitMix64）。
@@ -366,7 +373,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
 
 ## 出典
 
-外部ライブラリ調査は以下のとおり2026-10-25取得。2026-10-26はローカル設定・公開配信のサイズ／ヘッダー／全6棋譜のSHAと、Cloudflareの [Static Assets料金](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)・[上限](https://developers.cloudflare.com/workers/platform/limits/)・[R2料金](https://developers.cloudflare.com/r2/pricing/) を照合した。今回再取得した公開SHAは `2405e86a0313d4b454119bd472937f2e10622bf5`。将来のモデル・runtimeの速度や互換性は未実測。
+外部ライブラリ調査は以下のとおり2026-10-25取得。2026-10-26はローカル設定・公開配信のサイズ／ヘッダー／全6棋譜のSHAと、Cloudflareの [Static Assets料金](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)・[上限](https://developers.cloudflare.com/workers/platform/limits/)・[R2料金](https://developers.cloudflare.com/r2/pricing/) を照合した。当時再取得した公開SHAは `2405e86a0313d4b454119bd472937f2e10622bf5`。その後のM3の実測・採用版は冒頭と [検証記録](M3_VALIDATION.md) を参照。今回の文書更新で外部バージョン・価格の再調査はしていない。
 
 - crates.io API: `https://crates.io/api/v1/crates/{wasm-bindgen,wasm-bindgen-cli,wasm-pack,serde,serde-wasm-bindgen,pyo3,maturin,trunk,js-sys,web-sys,getrandom}`（`max_stable_version`, `rust_version`）
 - npm registry: `npm view <pkg> version / time / peerDependencies / engines / exports`（vite, react, react-dom, three, @types/three, @react-three/fiber, @react-three/drei, onnxruntime-web, vitest, @playwright/test, wrangler, typescript, typescript-eslint, @vitejs/plugin-react）

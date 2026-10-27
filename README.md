@@ -42,7 +42,7 @@ PRでは必須8チェックを実行し、main統合後にも配信SHAと公開E
 
 必要なもの: Rust 1.97.1（`rust-toolchain.toml` から rustup が導入）、`wasm-bindgen-cli` 0.2.129、Node.js 24.22.1（`.node-version`）、pnpm 10.32.1。
 
-Python を使う計測・今後の学習環境は3.14系を基本とし、依存が未対応の場合は3.13系を使います。現在の固定値は `.python-version`（3.14.9）です。
+Pythonを使うモデル検証・今後のデータ生成／学習は3.14系を基本とし、依存が未対応の場合は3.13系を使います。現在の固定値は `.python-version`（3.14.9）。Pythonは`uv run --locked`から実行し、依存追加は`uv add`で管理します。
 
 ```bash
 cargo test --locked --workspace # 標準・実験ルール・M1全幅探索のテスト
@@ -54,6 +54,16 @@ pnpm dev                        # http://localhost:5173
 ```
 
 ローカルの比較室は `http://localhost:5173/?experiment=1`。E2Eでは `pnpm build` 後に `E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e` を実行すると、配信SHAの確認も省略されません。ブラウザとCLIの準備・検証コマンドは [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+モデル推論ラボは `/?models=1`。モデルはgitに含めないため、ローカルで動かす場合はリポジトリのルートから次を実行します。通常の探索観戦だけならモデル生成は不要です。
+
+```bash
+uv sync --locked
+uv run --locked python -m export.generate runs/m3/local
+node scripts/prepare-inference.mjs runs/m3/local apps/web/public/models/m3 --local
+```
+
+その後、上記のWeb開発サーバーを起動します。`--local`はlocalhost専用の配布物を作り、公開済みモデルと区別します。公開版のhash・完了時SHA・参照値の差は [M3最終記録](docs/M3_VALIDATION.md#m3完了時の統合後公開確認bca5532) を参照してください。
 
 ## ドキュメント
 

@@ -2,7 +2,7 @@
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
-更新: 2026-10-28 JST。M3基準版 `dd3762c` の [main CI 40521101341](https://github.com/ayutaz/voxelshogi/actions/runs/40521101341) はモデル生成・通常検証・WASM受け渡し・公開・配信SHA・公開21件＋モデル6件・配信55ファイル照合が成功。実機の公開ファイル照合・全48組・切替も [M3最終記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) に保存した。M2の旧確認元 `e212ec7` と観測競合の修正は [M2記録](M2_VALIDATION.md) に保持。現在配信されるSHAはbuild-info.jsonで確認する。[現在地](STATUS.md)。
+更新: 2026-10-28 JST。M3完了時公開版 `bca5532` の [main CI 40530800389](https://github.com/ayutaz/voxelshogi/actions/runs/40530800389) はモデル生成・通常検証・WASM受け渡し・公開・配信SHA・公開21件＋モデル6件・配信55ファイル照合が成功。実機の公開ファイル照合・全48組・切替も [M3最終記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) に保存した。M2の旧確認元 `e212ec7` と観測競合の修正は [M2記録](M2_VALIDATION.md) に保持。現在配信されるSHAはbuild-info.jsonで確認する。[現在地](STATUS.md)。
 
 ## 構成
 
@@ -80,7 +80,7 @@ published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
 E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm e2e
 ```
 
-現在の実装では通常対局5件・配信SHA1件・R0比較室3件にWorker観戦12件を加え、計21件。ローカルは既存Chrome、CIはubuntu-24.04の実行ライブラリとPlaywrightのChromium本体を使う。以下の2405e86では当時の9件を検証した。M2の公開確認は [別記録](M2_VALIDATION.md) で追う。今回の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
+既存の対局E2Eは通常対局5件・配信SHA1件・R0比較室3件とWorker観戦12件の計21件。M3の実モデル6件は別設定で実行し、公開後にも両方とC0追加3件を確認する。ローカルは既存Chrome、CIはubuntu-24.04の実行ライブラリとPlaywrightのChromium本体を使う。以下の2405e86では当時の9件を検証した。M2の公開確認は [別記録](M2_VALIDATION.md) で追う。当時の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
 
 以下は過去の公開検証の記録。2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 

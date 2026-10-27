@@ -28,7 +28,7 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - Pythonの実行は `uv run --locked`、依存追加は `uv add`（開発用は `uv add --dev`）。`uv.lock` をcommitし、CIで `uv sync --locked`・`uv audit --locked`・Pythonテストと既知変異を実行する。LinuxのtorchはCPU専用indexを使う。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
-文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次の具体的な実装手順は [M3_PLAN.md](docs/M3_PLAN.md) を参照する。
+文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次のM4の目的・作業・完了条件は [ROADMAP.md](docs/ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
 
 変更に関連する検証を実行する。Rust、Node、pnpm、wasm-bindgenの版は固定値に合わせる（`rust-toolchain.toml`、`.node-version`、Webの `packageManager` / lockfile）。Pythonは `.python-version` を使う。ローカルE2Eは既存Chrome、CIは `PW_CHANNEL=''` でChromiumを使う。
 

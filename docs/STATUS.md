@@ -1,6 +1,6 @@
 # 現在の状態と文書の案内
 
-確認: **2026-10-28（JST）**。M3は基準公開版 `dd3762c` の技術検証を完了。[最新の公開・実機記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)。
+確認: **2026-10-28（JST）**。M3はPR #29の統合・公開確認まで完了し、次はM4。性能計測は `dd3762c`、M3完了時の公開確認は `bca5532` を固定した証拠として保持する。[計測・完了時公開の区別](M3_VALIDATION.md#m3完了時の統合後公開確認bca5532)・[終了時のJSON](experiments/m3-completion-publication.json)。文書PRでも再公開されるため、配信中のSHAは `build-info.json` と対応する成功CIから確認する。
 
 M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903d96fbc2`（[最終公開記録](experiments/m2-final-publication.json)）。性能計測の対象 `3a500cd` と最終版の実行ファイルは同一であり、計測JSONの元SHAは保持する。これは固定した検証対象であり、後続の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。M1時点の `2405e86` の記録は後半に保持する。
 
@@ -11,7 +11,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | Phase 0〜2、M0 | 調査・標準ルール・Web Alpha・CI/CDを完了。[M0記録](M0_VALIDATION.md) |
 | R0 | 9王3ルール＋標準対照など1,052局を比較し、400／800手の代表6棋譜を公開。正式な9王採用と観戦者の好みの評価は保留。[結果](NINE_KINGS_EXPERIMENT.md) |
 | M1 | 標準1王の全幅αβ、評価、反復深化・手の並べ替え・履歴を区別する置換表、深さ／ノード／時間上限を完了。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10)・[#11](https://github.com/ayutaz/voxelshogi/pull/11)、[検証・計測](M1_VALIDATION.md) |
-| 現在の公開画面 | 通常画面は履歴付きWorkerによる探索AI同士の観戦。両AIのEasy/Normal、一時停止・1手送り・速度変更・中断／再試行、人間対AIを利用できる。比較室は固定棋譜の再生で、学習モデルは未導入 |
+| 現在の公開画面 | 通常画面はEasy/Normalの探索観戦と人間対AI、比較室は9王の固定棋譜再生、推論ラボは未学習モデル3形式の実行。学習済みモデルによる対局はM6の対象 |
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
@@ -21,19 +21,37 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
+## M3完了時の公開・品質の確認元
+
+| 項目 | 固定した確認元 |
+|---|---|
+| 通常PR・公開 | PR #28・#29を必須8チェック成功後に通常merge。完了時公開 `bca5532` の [main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40530800389)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40530800258) が成功 |
+| 公開後の回帰 | 既存公開21件（33.5秒、flakyなし）、C0追加3件（44.7秒）、モデル6件（47.6秒）。追加3件・モデル6件はretries=0 |
+| 実機の最終確認 | 最終公開モデル6 E2Eが55.1秒・retries=0、M1実WebGPUのFP32／INT8×4局面の全出力8件も成功 |
+| 同一性 | 55応答と最終CI artifactの実バイト列を照合。ONNX3形式・checkpoint・入力・ORT・アプリ実行ファイルは性能計測版と同じhash。参照値の一部は再生成で微小に変わったため、最終参照値と再照合した |
+| 固定環境・検証 | Rust1.97.1／MSRV1.85、Node24.22.1、pnpm10.32.1、Python3.14.9／uv。Rust core153＋WASM5、Web172、Python48、Node67。既知変異はcore／WASM33・Web50・Python16・CI制御14件 |
+
+## 次のM4と残る判断
+
+M4は未着手。[ROADMAPの目的・完了条件](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)に従い、Rustのルールを呼ぶPyO3／maturin境界、行動マスク付き環境、探索教師の小規模生成と全件検証から進める。その後、固定seed・エンジン・深さ／ノードで約10万局面のParquetを生成し、同一対局をまたがないtrain/val/test分割と再生成hashを検証する。M3の入力43ch／Policy1,067,985／scalar Valueの契約を引き継ぎ、Pythonへルールを再実装しない。
+
+M4のデータセット公開ライセンス・公開方法は未確定。M3のApache-2.0承認は検証用未学習モデルだけで、データやM6学習済みモデルへ拡大しない。R2はM3では不要、GPUレンタルは未使用。M5の実棋譜互換性は棋譜がそろい次第独立して実施できる。M6の学習・棋力・費用は別途検証し、有料GPUは見積もり承認後に使う。
+
 ## M2の実装・公開・品質の確認元
 
 | 項目 | 固定した確認元 |
 |---|---|
 | 通常PR | #13〜#16の必須7チェック成功後にsquash merge。保護のbypassなし |
 | 統合後の自動公開 | [最終main CI 40385647318](https://github.com/ayutaz/voxelshogi/actions/runs/40385647318)：通常検証・生成WASMのジョブ間受け渡し・公開・配信SHA・公開E2E21件が再試行なしで成功。CodeQLは [40385647367](https://github.com/ayutaz/voxelshogi/actions/runs/40385647367) |
-| M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。M3ではWeb172・Node67・Python48、Web50／Python16／制御14変異とモデルE2E6件を追加 |
+| M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。現在の確認元は上のM3表を参照 |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
 | 未導入・保留 | M3の未学習モデル推論は公開済み。学習済みAI対局はM6の対象。R2・COOP/COEP・有料GPUは未導入、9王の正式採用は保留 |
 | ローカル準備 | 空き容量は2026-10-27確認で約27.2 GiB。[取得記録](experiments/documentation-baseline-2026-10-27.json)。Pythonは3.14.9、依存導入直前に容量と互換性を再確認 |
 
-## 次の着手前に確認する残課題
+## 過去の課題：C0で対応済み
+
+以下はM3着手前の履歴で、現在のM4着手を妨げる未解決課題ではない。公開後もC0の追加3回・retries=0を継続している。
 
 文書更新 [PR #17](https://github.com/ayutaz/voxelshogi/pull/17) のCIは必須7チェック・E2E21件が成功したが、統合後のmain `b6cfc93` の [公開CI 40432366163](https://github.com/ayutaz/voxelshogi/actions/runs/40432366163) は20 passed＋1 flaky（1件は再試行で成功）だった。公開SHA照合とdeployは成功し、失敗・skipされた必須チェックはない。M2完了時の `e212ec7` の再試行なしの記録とは別に扱う。
 
@@ -71,10 +89,10 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3の実機結果と公開確認による形式・backend・配信の採用はADR-019。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
 | [RULE_VARIANTS_RESEARCH](RULE_VARIANTS_RESEARCH.md) | ルールの先行調査と未実施の継続評価。標準のM1完了と9王への未適用を区別 |
-| [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。Gumbel・モデル構造・DDPを実装済み／確定採用と扱わない |
+| [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。M3の未学習Transformerと、未実施のGumbel・構造比較・DDP学習を区別する |
 | [TECH_STACK_RESEARCH](TECH_STACK_RESEARCH.md)、[COST_ESTIMATE](COST_ESTIMATE.md) | 固定済み構成と公開実測を更新。初回の外部版・GPU相場・為替・ドメイン価格は取得日付き参考値で、採用／課金時に再取得する |
 | [AGENTS](../AGENTS.md)、[CONTRIBUTING](../CONTRIBUTING.md)、[SECURITY](../SECURITY.md)、[PRテンプレート](../.github/pull_request_template.md)、[ci-checks](../.agents/skills/ci-checks/SKILL.md) | ブランチ・TDD・PR・秘密情報・最短10分間隔のCI確認という現行方針と整合を確認。追加の承認フローや人間同士の対局は導入しない |
 
-外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M3以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M2までの作業にユーザー側の追加準備はなく、モデル／データのライセンスや有料GPUはROADMAP記載の時点で確定する。
+外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M3は完了し、M4の実装開始にユーザー側の追加準備はなく、モデル／データのライセンスや有料GPUはROADMAP記載の時点で確定する。
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。

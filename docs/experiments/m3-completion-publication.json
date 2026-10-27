@@ -1,0 +1,536 @@
+{
+  "schema": 1,
+  "verifiedAt": "2026-10-27T15:47:43.109Z",
+  "finalCommit": "bca5532aba6e351d9690ec51a8593eb270e44495",
+  "mainCI": "https://github.com/ayutaz/voxelshogi/actions/runs/40530800389",
+  "security": "https://github.com/ayutaz/voxelshogi/actions/runs/40530800258",
+  "publicDemo": "https://voxelshogi.yousan-apps.workers.dev/?models=1",
+  "deployment": {
+    "commit": "bca5532aba6e351d9690ec51a8593eb270e44495",
+    "version": "54e104de-57d2-4258-b861-9167f67079aa",
+    "run": "40530800389"
+  },
+  "exactArtifactFilesVerified": 55,
+  "modelEquivalence": {
+    "schema": 1,
+    "verifiedAt": "2026-10-27T15:42:05.390Z",
+    "measuredCommit": "dd3762cf2bef0e86aa34448cb220618fcbbc9629",
+    "finalCommit": "bca5532aba6e351d9690ec51a8593eb270e44495",
+    "finalModelManifestSha256": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+    "identicalModels": [
+      {
+        "path": "fp32.onnx",
+        "bytes": 20427330,
+        "sha256": "142ca39efda9d8c2e183c06cf75245960ab93c31f0605784a0cd930521a1a075"
+      },
+      {
+        "path": "fp16.onnx",
+        "bytes": 10398313,
+        "sha256": "6cb2345ad5b658e104b37b0283e5b4332a04579898eb76131ddf0b5761b5678f"
+      },
+      {
+        "path": "int8.onnx",
+        "bytes": 5433774,
+        "sha256": "e512cbe716808b1c21f1a15aa679b40b6ab84457430a840631969c86921ff149"
+      }
+    ],
+    "identicalRuntime": true,
+    "identicalApplicationFiles": true,
+    "identicalModelSource": true,
+    "identicalInputs": true,
+    "identicalCheckpoint": true,
+    "references": [
+      {
+        "variant": "fp32",
+        "fixture": "initial-b",
+        "output": "policy",
+        "oldSha256": "7c2430cb5e6a26a3dd6ea5135224809fba3d64185509abc22a2cb8c71300a044",
+        "finalSha256": "9eb0fbe3c0172ac3ea0b4d2a3d712762835165008f0ef0c63ecc218910ad28fb",
+        "maxAbs": 0.0000012405216693878174,
+        "oldWorstBrowserError": 0.0000016391277313232422,
+        "conservativeFinalErrorBound": 0.0000028796494007110596,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "initial-b",
+        "output": "value",
+        "oldSha256": "f32e752db70f8c6a874601e1cfbd0b53231e81920389571f517b143982a4c971",
+        "finalSha256": "8762fc9f1e26decfbfcf48599c47c3020ce9d2e758017cf7e3d9970c6daa30b7",
+        "maxAbs": 1.4901161193847656e-8,
+        "oldWorstBrowserError": 4.470348358154297e-8,
+        "conservativeFinalErrorBound": 5.960464477539063e-8,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "after-one-w",
+        "output": "policy",
+        "oldSha256": "e421682bf5f46e51a61362200b0319ae01a046b2408b48bcce86f8c3986bcbd2",
+        "finalSha256": "21cee1f672157f084c78ad2ede84ab9b0cd9c5cb8939aa2ec44bf29de5b6cb1e",
+        "maxAbs": 0.0000012516975402832031,
+        "oldWorstBrowserError": 0.0000016093254089355469,
+        "conservativeFinalErrorBound": 0.00000286102294921875,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "after-one-w",
+        "output": "value",
+        "oldSha256": "20a35b516c043f5b28475d361905a160a8508905c4ce66c67a0638e2fa053239",
+        "finalSha256": "a57dca64b2df33b2825a833142f2e4dbd0a7ddf583e6fe1f7c04e591d43ff48a",
+        "maxAbs": 7.450580596923828e-8,
+        "oldWorstBrowserError": 2.2351741790771484e-7,
+        "conservativeFinalErrorBound": 2.980232238769531e-7,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "mate-in-one-b",
+        "output": "policy",
+        "oldSha256": "c7d98132dad4d3d91dd09b619dee4d4dbd434694bf53684568ce7fd0fffe3f82",
+        "finalSha256": "d2680a7bd959bd34d0ecaaada67559459097b75555294d2349e9c79c4523841e",
+        "maxAbs": 0.0000011324882507324219,
+        "oldWorstBrowserError": 0.000001817941665649414,
+        "conservativeFinalErrorBound": 0.000002950429916381836,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "mate-in-one-b",
+        "output": "value",
+        "oldSha256": "35d3e85240d1cddc88f9788ed48cb0c9ca999447e653afe7185700ace4a0f26c",
+        "finalSha256": "c0739a4839dd171cefa3b7e8cfa453f66bb5a84f7f8d55308ee1e0f78c799acd",
+        "maxAbs": 1.1920928955078125e-7,
+        "oldWorstBrowserError": 1.7881393432617188e-7,
+        "conservativeFinalErrorBound": 2.980232238769531e-7,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "material-b",
+        "output": "policy",
+        "oldSha256": "01d270a45a85e420f763725f0e41d2dfcce855b95cd2b2ce39e805f49070416b",
+        "finalSha256": "ba4f8439f198be1199bd8461dae7a31e5d47af493df1de6318fdb2a16b2997e4",
+        "maxAbs": 0.0000012367963790893555,
+        "oldWorstBrowserError": 0.0000018328428268432617,
+        "conservativeFinalErrorBound": 0.000003069639205932617,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp32",
+        "fixture": "material-b",
+        "output": "value",
+        "oldSha256": "1eb3ef94d694c56a5ca2a9df82dd9225e133ba4de45be9a0d856e16d5526ba33",
+        "finalSha256": "6597da456be162ac59eca56ec835c2531cb6ee6d3762f08cbda65b37df534d34",
+        "maxAbs": 7.450580596923828e-8,
+        "oldWorstBrowserError": 1.1920928955078125e-7,
+        "conservativeFinalErrorBound": 1.9371509552001953e-7,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "initial-b",
+        "output": "policy",
+        "oldSha256": "8c3267d4ce458afe837631bae29e873426481a3d5fb3527cb982981e348328be",
+        "finalSha256": "8c3267d4ce458afe837631bae29e873426481a3d5fb3527cb982981e348328be",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.0009765625,
+        "conservativeFinalErrorBound": 0.0009765625,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "initial-b",
+        "output": "value",
+        "oldSha256": "5e18175cb79478ed49c173857a10ac7fc0470a49945fd5d64cae94053fa58900",
+        "finalSha256": "5e18175cb79478ed49c173857a10ac7fc0470a49945fd5d64cae94053fa58900",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 4.023313522338867e-7,
+        "conservativeFinalErrorBound": 4.023313522338867e-7,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "after-one-w",
+        "output": "policy",
+        "oldSha256": "a5b61183212556f56e6ed691ac114e4a5f589683c0bd938ba74513ed18af942f",
+        "finalSha256": "a5b61183212556f56e6ed691ac114e4a5f589683c0bd938ba74513ed18af942f",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.0009765625,
+        "conservativeFinalErrorBound": 0.0009765625,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "after-one-w",
+        "output": "value",
+        "oldSha256": "5771eb60d275390bba8f9e355f9d9e4cc601fb78a09f2588e07d814f785bae0d",
+        "finalSha256": "5771eb60d275390bba8f9e355f9d9e4cc601fb78a09f2588e07d814f785bae0d",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.000004202127456665039,
+        "conservativeFinalErrorBound": 0.000004202127456665039,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "mate-in-one-b",
+        "output": "policy",
+        "oldSha256": "3979495db5bd5efd272c0677143a41ef2a5d8f9776b6c05549211640723075e7",
+        "finalSha256": "3979495db5bd5efd272c0677143a41ef2a5d8f9776b6c05549211640723075e7",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.0010986328125,
+        "conservativeFinalErrorBound": 0.0010986328125,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "mate-in-one-b",
+        "output": "value",
+        "oldSha256": "0d8a588fb0697a2e6e6f0a6a925e0f3465c19f2909d1eca3464f9e46b377f8e6",
+        "finalSha256": "0d8a588fb0697a2e6e6f0a6a925e0f3465c19f2909d1eca3464f9e46b377f8e6",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.000015810132026672363,
+        "conservativeFinalErrorBound": 0.000015810132026672363,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "material-b",
+        "output": "policy",
+        "oldSha256": "62242e008f524692e4d1f888f4b43f3c5312b1f36a8ad01395f80dfe61b3fd7d",
+        "finalSha256": "62242e008f524692e4d1f888f4b43f3c5312b1f36a8ad01395f80dfe61b3fd7d",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.0009765625,
+        "conservativeFinalErrorBound": 0.0009765625,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "fp16",
+        "fixture": "material-b",
+        "output": "value",
+        "oldSha256": "be474e55c190afd2117c946c50fba2dde0bac67b0205ff04cb0e4a38cf9535ee",
+        "finalSha256": "be474e55c190afd2117c946c50fba2dde0bac67b0205ff04cb0e4a38cf9535ee",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 0.000009134411811828613,
+        "conservativeFinalErrorBound": 0.000009134411811828613,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "int8",
+        "fixture": "initial-b",
+        "output": "policy",
+        "oldSha256": "b7218f39fd8803b609aa5ef30f6aabf355bcc0fa6375cf274196269841751f26",
+        "finalSha256": "187fa470b910d9efbb8d4bf18f5ed5cf2c5ddd85e04ea4f78c14091c192a7981",
+        "maxAbs": 0.0000010132789611816406,
+        "oldWorstBrowserError": 0.0000017881393432617188,
+        "conservativeFinalErrorBound": 0.0000028014183044433594,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "int8",
+        "fixture": "initial-b",
+        "output": "value",
+        "oldSha256": "6a45b1eed8a4886dbff8afa31b9c287c1cf2f7cf98a1a3f474517e3d427ca6d9",
+        "finalSha256": "6a45b1eed8a4886dbff8afa31b9c287c1cf2f7cf98a1a3f474517e3d427ca6d9",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 1.043081283569336e-7,
+        "conservativeFinalErrorBound": 1.043081283569336e-7,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "int8",
+        "fixture": "after-one-w",
+        "output": "policy",
+        "oldSha256": "8b8fc5261a5c0b1bc037c5fe383fe6de838a6ac436d155c64db934a60ce251ff",
+        "finalSha256": "f92abcf4927300ff7aae6b3cedd4155d53a3719b6daac0b6f6bec766f4f7051b",
+        "maxAbs": 8.940696716308594e-7,
+        "oldWorstBrowserError": 0.0000018477439880371094,
+        "conservativeFinalErrorBound": 0.0000027418136596679688,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "int8",
+        "fixture": "after-one-w",
+        "output": "value",
+        "oldSha256": "d2fa951d7ceb62f2425d382ad113410a2f7b8204111b2b08b1c1607ed2de285c",
+        "finalSha256": "d2fa951d7ceb62f2425d382ad113410a2f7b8204111b2b08b1c1607ed2de285c",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 1.043081283569336e-7,
+        "conservativeFinalErrorBound": 1.043081283569336e-7,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "int8",
+        "fixture": "mate-in-one-b",
+        "output": "policy",
+        "oldSha256": "41298019a30707ae9eb310cbe9f2e7596a068ee96961afc9fb1d4eef70c53123",
+        "finalSha256": "5fc3baab26c20bc8dea32e08fc0646eb440aa9cbe51cabe0c0b789005eff2d39",
+        "maxAbs": 0.0000010132789611816406,
+        "oldWorstBrowserError": 0.0000018477439880371094,
+        "conservativeFinalErrorBound": 0.00000286102294921875,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "int8",
+        "fixture": "mate-in-one-b",
+        "output": "value",
+        "oldSha256": "4b6a654543a49ff5056006d0078ace6f0467144d8521453f575f3ffc8a60bf2c",
+        "finalSha256": "4b6a654543a49ff5056006d0078ace6f0467144d8521453f575f3ffc8a60bf2c",
+        "maxAbs": 0,
+        "oldWorstBrowserError": 8.940696716308594e-8,
+        "conservativeFinalErrorBound": 8.940696716308594e-8,
+        "proof": "identical reference bytes"
+      },
+      {
+        "variant": "int8",
+        "fixture": "material-b",
+        "output": "policy",
+        "oldSha256": "9199201e6eb1e5c87cc2d911619a043918585e3d0c12574d5497bd2d485381d2",
+        "finalSha256": "0bd95b36e6502d0bb4d71decf774c7bc4b81f541c219fe7da70e4ad583693c73",
+        "maxAbs": 0.0000010132789611816406,
+        "oldWorstBrowserError": 0.0000016689300537109375,
+        "conservativeFinalErrorBound": 0.000002682209014892578,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      },
+      {
+        "variant": "int8",
+        "fixture": "material-b",
+        "output": "value",
+        "oldSha256": "8ae68de2eeecc5138c918cfb97fc6641b2171337a89b9e52e510f6a010d177e6",
+        "finalSha256": "2ad0aa0786617ab406319ede7d2eab07df3d65bddd22fdd8382d635fbbed255f",
+        "maxAbs": 7.450580596923828e-8,
+        "oldWorstBrowserError": 7.450580596923828e-8,
+        "conservativeFinalErrorBound": 1.4901161193847656e-7,
+        "proof": "triangle bound below the unchanged absolute tolerance 1e-5"
+      }
+    ]
+  },
+  "finalGpu": {
+    "passed": true,
+    "requests": [
+      {
+        "variant": "fp32",
+        "fixture": "initial-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.000001817941665649414,
+          "maxRelative": 2.904593162945219,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 2.9802322387695312e-8,
+          "maxRelative": 1.217545265593498e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 276
+        }
+      },
+      {
+        "variant": "fp32",
+        "fixture": "after-one-w",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000015497207641601562,
+          "maxRelative": 3.161170401214078,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 1.4901161193847656e-7,
+          "maxRelative": 6.087676296822678e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 276
+        }
+      },
+      {
+        "variant": "fp32",
+        "fixture": "mate-in-one-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000016391277313232422,
+          "maxRelative": 0.000044192290315804274,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 5.960464477539063e-8,
+          "maxRelative": 2.582004795041105e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 276
+        }
+      },
+      {
+        "variant": "fp32",
+        "fixture": "material-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000017434358596801758,
+          "maxRelative": 0.00003417889571206595,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 4.470348358154297e-8,
+          "maxRelative": 1.975900859306111e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 276
+        }
+      },
+      {
+        "variant": "int8",
+        "fixture": "initial-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000016391277313232422,
+          "maxRelative": 2.94564090356719,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 1.043081283569336e-7,
+          "maxRelative": 4.263142079441338e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 308
+        }
+      },
+      {
+        "variant": "int8",
+        "fixture": "after-one-w",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000014901161193847656,
+          "maxRelative": 1.1242060744885811,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 1.043081283569336e-7,
+          "maxRelative": 4.2631005384052375e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 308
+        }
+      },
+      {
+        "variant": "int8",
+        "fixture": "mate-in-one-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000017881393432617188,
+          "maxRelative": 0.00004341643963486774,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 8.940696716308594e-8,
+          "maxRelative": 3.892529845972594e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 308
+        }
+      },
+      {
+        "variant": "int8",
+        "fixture": "material-b",
+        "packageHash": "412f9e6877f7138be9e205d42e8f27558b0766a1408d84c803bb3640c7598f80",
+        "policy": {
+          "elements": 1067985,
+          "maxAbs": 0.0000016093254089355469,
+          "maxRelative": 0.00004557358529321146,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "value": {
+          "elements": 1,
+          "maxAbs": 8.940696716308594e-8,
+          "maxRelative": 3.971671391852381e-7,
+          "exceeded": 0,
+          "atol": 0.00001,
+          "rtol": 0.0001
+        },
+        "providers": {
+          "WebGpuExecutionProvider": 308
+        }
+      }
+    ]
+  },
+  "finalE2E": {
+    "ciPublicExisting": {
+      "passed": 21,
+      "seconds": 33.5,
+      "flaky": 0
+    },
+    "ciPublicCamera": {
+      "passed": 3,
+      "seconds": 44.7,
+      "retries": 0
+    },
+    "ciPublicModels": {
+      "passed": 6,
+      "seconds": 47.6,
+      "retries": 0
+    },
+    "macPublicModels": {
+      "passed": 6,
+      "seconds": 55.1,
+      "retries": 0
+    }
+  },
+  "completion": {
+    "G1": "Fixed model/contracts/lock/conversions and model-byte identity",
+    "G2": "All supported format/backend comparisons, plus final-reference full GPU and Mac WASM rechecks",
+    "G3": "Actual M1 GPU placement, 3D interaction, cancellation/recovery, twenty changes on each backend",
+    "G4": "Fifty-five actual served files match exact final CI artifact bytes",
+    "G5": "Approved Apache-2.0, all three runnable formats on the public demo, public E2E",
+    "G6": "Committed raw measurements, preserved failures, ADR/cost/roadmap/status/contracts and M4/M6 handoff; final protected PR and main publication passed"
+  }
+}

@@ -1,6 +1,6 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
-更新: 2026-10-27。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。現在地は [STATUS](STATUS.md)。M2の `Game.bestMove` と履歴付き専用Workerによるライブ探索も公開済み（[M2検証](M2_VALIDATION.md)）。PythonバインディングとNN推論は未実装で、次は [M3計画](M3_PLAN.md)。
+更新: 2026-10-28。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。M2の `Game.bestMove` と履歴付き専用Workerによるライブ探索も公開済み（[M2検証](M2_VALIDATION.md)）。M3の未学習モデル推論は別のブラウザWorkerで実装・公開済みで、Rustのルール／探索エンジンへNN依存は加えていない（[M3検証](M3_VALIDATION.md)）。Pythonバインディングは未実装、次は [ROADMAPのM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)。現在地は [STATUS](STATUS.md)。
 
 ## モジュール
 
