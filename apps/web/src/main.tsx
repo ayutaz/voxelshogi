@@ -6,7 +6,9 @@ import { App } from './App';
 import './styles.css';
 
 const ExperimentViewer = lazy(() => import('./experiment/ExperimentViewer'));
+const ModelDemo = lazy(() => import('./inference/ModelDemo'));
 const experiment = new URLSearchParams(location.search).has('experiment');
+const models = new URLSearchParams(location.search).has('models');
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -14,7 +16,7 @@ init({ module_or_path: wasmUrl })
   .then(() =>
     root.render(
       <StrictMode>
-        <Suspense fallback={<p className="fatal">観戦画面を読み込み中…</p>}>{experiment ? <ExperimentViewer /> : <App />}</Suspense>
+        <Suspense fallback={<p className="fatal">画面を読み込み中…</p>}>{models ? <ModelDemo /> : experiment ? <ExperimentViewer /> : <App />}</Suspense>
       </StrictMode>,
     ),
   )

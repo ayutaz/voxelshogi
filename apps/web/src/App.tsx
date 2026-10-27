@@ -140,6 +140,7 @@ export function App() {
         <h1>VoxelShogi Arena</h1>
         <span className="subtitle">9×9×9 三次元将棋</span>
         <a href="/?experiment=1">9王ルール比較室</a>
+        <a href="/?models=1">モデル推論ラボ</a>
         <span className="status" data-testid="status" role="status">
           {status}
         </span>
