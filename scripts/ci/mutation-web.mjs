@@ -55,6 +55,10 @@ const mutations = [
   { name: 'inference-stale-callback', file: 'inference/client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'inference-client' },
   { name: 'inference-terminate', file: 'inference/client.ts', before: 'worker.terminate();', after: '', test: 'inference-client' },
   { name: 'inference-repeat-worst-error', file: 'inference/engine.ts', before: 'Math.max(current[name].maxAbs, comparison[name].maxAbs)', after: 'current[name].maxAbs', test: 'inference-engine' },
+  { name: 'model-ui-stale-success', file: 'inference/ModelDemo.tsx', before: "if (current !== generation.current) return;\n      setResult(reply);", after: 'setResult(reply);', test: 'model-demo', extension: 'tsx' },
+  { name: 'model-ui-stale-progress', file: 'inference/ModelDemo.tsx', before: 'if (current === generation.current) setState(phase);', after: 'setState(phase);', test: 'model-demo', extension: 'tsx' },
+  { name: 'model-ui-cancel-change', file: 'inference/ModelDemo.tsx', before: 'generation.current++; revision.current++; client.current?.cancel();', after: 'generation.current++; revision.current++;', test: 'model-demo', extension: 'tsx' },
+  { name: 'model-ui-dispose', file: 'inference/ModelDemo.tsx', before: 'instance.dispose();', after: '', test: 'model-demo', extension: 'tsx' },
 ];
 
 function main() {
@@ -84,6 +88,8 @@ function main() {
     const fixtures = join(work, 'crates/voxelshogi-wasm/tests/fixtures');
     mkdirSync(fixtures, { recursive: true });
     cpSync(join(root, 'crates/voxelshogi-wasm/tests/fixtures/search.json'), join(fixtures, 'search.json'));
+    mkdirSync(join(work, 'export/fixtures'), { recursive: true });
+    cpSync(join(root, 'export/fixtures/positions.json'), join(work, 'export/fixtures/positions.json'));
     symlinkSync(join(web, 'node_modules'), join(copy, 'node_modules'), 'dir');
     assert.equal(run('baseline'), 'passed', 'Original web tests must pass before mutation');
     for (const mutation of mutations) {
@@ -98,7 +104,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 40);
+    assert.equal(results.length, 44);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

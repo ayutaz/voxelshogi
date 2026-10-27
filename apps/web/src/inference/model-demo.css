@@ -1,0 +1,22 @@
+.model-demo { width: min(1500px, 100%); margin: 0 auto; padding: 24px; }
+.model-demo header { display: flex; gap: 24px; align-items: center; justify-content: space-between; }
+.model-demo h1 { font-size: 26px; }
+.model-demo h2 { font-size: 18px; margin-top: 24px; }
+.model-demo nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.model-intro { max-width: 850px; margin: 24px 0; line-height: 1.8; }
+.model-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 28px; }
+.model-controls, .model-result { background: #162231; border: 1px solid #31445a; border-radius: 12px; padding: 20px; }
+.model-controls label { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.model-controls select { width: 100%; }
+.model-controls code { overflow-wrap: anywhere; font-size: 11px; }
+.model-controls small { line-height: 1.8; }
+.model-local { color: #eac58b; }
+.model-stage { min-width: 0; }
+.model-stage .board3d { height: 520px; }
+.model-stage .board2d { max-width: 390px; margin: 20px auto; }
+.model-result { margin-top: 28px; }
+.model-result table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+.model-result caption { text-align: left; margin-bottom: 12px; }
+.model-result th, .model-result td { text-align: left; padding: 12px; border-bottom: 1px solid #31445a; }
+.model-result pre { overflow: auto; max-height: 500px; font-size: 12px; }
+@media (max-width: 800px) { .model-demo { padding: 14px; } .model-layout { grid-template-columns: 1fr; } .model-demo header { align-items: flex-start; flex-direction: column; } .model-stage .board3d { height: 420px; } .model-result { overflow-x: auto; } }
