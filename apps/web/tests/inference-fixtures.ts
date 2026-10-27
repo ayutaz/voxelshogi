@@ -11,4 +11,3 @@ export const deploymentFixture = () => ({ schema: 1, publication: true, model: r
     wasm: { path: 'runtime.wasm', bytes: 6, sha256: 'b'.repeat(64), parts: [ref('runtime/part0.bin'), ref('runtime/part1.bin')] },
     notices: [ref('runtime/LICENSE'), ref('runtime/ThirdPartyNotices.txt')] },
 });
-
