@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "acceptedForPerformance": false,
+  "reason": "Mac Idle Sleep interrupted the attempt; the raw local JSON is retained without editing.",
+  "rawLocalPath": "runs/m3/browser-measurement-local.json",
+  "rawBytes": 1247626,
+  "rawSha256": "3656869d31be9b1f6ef73421f576c2cdf6b5b4a2e52b4d791006f935051feacf",
+  "measurementSource": {
+    "commit": "23e656017bc31e0dbb9dca463c3ba6a8f51c57c4",
+    "dirty": false
+  },
+  "startedAt": "2026-10-27T05:32:19.669Z",
+  "finishedAt": "2026-10-27T05:50:49.222Z",
+  "counts": {
+    "passed": 39,
+    "numeric-rejected": 8,
+    "failed": 1
+  },
+  "failures": [
+    {
+      "backend": "wasm",
+      "variant": "fp16",
+      "fixture": "material-b",
+      "show3D": false,
+      "error": "TimeoutError: page.waitForFunction: Timeout 120000ms exceeded."
+    }
+  ],
+  "samplingGaps": [
+    {
+      "from": "2026-10-27T05:34:44.337Z",
+      "to": "2026-10-27T05:43:03.866Z",
+      "gapMs": 499529
+    }
+  ],
+  "pmset": {
+    "sleepUtc": "2026-10-27T05:34:42Z",
+    "wakeUtc": "2026-10-27T05:43:02Z",
+    "reason": "Idle Sleep",
+    "seconds": 500
+  },
+  "switchLifecycle": {
+    "created": 20,
+    "closed": 20,
+    "live": 0,
+    "afterClose": {
+      "at": "2026-10-27T05:50:49.222Z",
+      "mainHeap": null,
+      "residentSet": {
+        "scope": "sum of dedicated Chrome process RSS; shared pages may be counted more than once",
+        "processes": [
+          {
+            "pid": 80475,
+            "type": "browser",
+            "rssBytes": 130613248
+          },
+          {
+            "pid": 80483,
+            "type": "GPU",
+            "rssBytes": 67796992
+          },
+          {
+            "pid": 80484,
+            "type": "network.mojom.NetworkService",
+            "rssBytes": 37421056
+          },
+          {
+            "pid": 80485,
+            "type": "storage.mojom.StorageService",
+            "rssBytes": 16646144
+          }
+        ],
+        "totalRssBytes": 252477440,
+        "missingProcessIds": []
+      },
+      "gpuTotal": null,
+      "gpuTotalReason": "native ORT WebGPU allocation totals are not exposed by this browser API"
+    }
+  },
+  "correction": "Twenty Worker loads included the initial fp32 load: nineteen actual model changes. The follow-up m3-browser-switches-local.json proves twenty real changes."
+}

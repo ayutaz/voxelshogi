@@ -12,8 +12,10 @@
 | 現在の公開画面 | 通常画面は履歴付きWorkerによる探索AI同士の観戦。両AIのEasy/Normal、一時停止・1手送り・速度変更・中断／再試行、人間対AIを利用できる。比較室は固定棋譜の再生で、学習モデルは未導入 |
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
-| 次の実装 | C0は [PR #19](https://github.com/ayutaz/voxelshogi/pull/19)・main `aa8fe52` の公開／実機確認まで完了。M3-0／1は [PR #20](https://github.com/ayutaz/voxelshogi/pull/20)・[#21](https://github.com/ayutaz/voxelshogi/pull/21) で取り込み済み。M3-2のWorker・配信基盤は [PR #22](https://github.com/ayutaz/voxelshogi/pull/22) で検証中、選択画面を追加中。[段階別検証](M3_VALIDATION.md) |
-| M3〜M6 | M3は代表モデル・FP32変換からブラウザ推論へ進行中、全体は未完了。低精度版・最終実機計測・モデル公開が残る。M4〜M6は実装未着手。モデル推論の先行検証→Python／データ生成→小型モデルの学習・配信。M5の実棋譜互換性は独立して挿入できる。[フェーズごとの目的・ゴール](ROADMAP.md) |
+| 次の実装 | C0は [PR #19](https://github.com/ayutaz/voxelshogi/pull/19)で完了。M3のPR #20〜#26を取り込み済み。全3形式の変換・Worker・画面・通常PR実モデルCI、ローカル固定48組と初回を除く20回の切替を確認。[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)で公開準備と記録を検証中。[段階別検証](M3_VALIDATION.md) |
+| M3〜M6 | M3全体は未完了。モデルライセンス回答、CI生成した実公開ファイルの全配信照合・実機再計測・公開E2Eが残る。公開設定はfalse/null。M4〜M6は実装未着手。モデル推論の先行検証→Python／データ生成→小型モデルの学習・配信。M5の実棋譜互換性は独立して挿入できる。[フェーズごとの目的・ゴール](ROADMAP.md) |
+
+M3の実機はApple M1・8 GiB・Chrome156。WebGPUのFP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否した。3DありのFP32 WebGPU中央値は53〜54ms。M3のモデルは未学習で、現在の通常対局AIへは接続していない。有料GPU・R2は未使用。[固定JSON・限界](M3_VALIDATION.md#ローカル固定配布物の実機計測)
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
@@ -23,10 +25,10 @@
 |---|---|
 | 通常PR | #13〜#16の必須7チェック成功後にsquash merge。保護のbypassなし |
 | 統合後の自動公開 | [最終main CI 40385647318](https://github.com/ayutaz/voxelshogi/actions/runs/40385647318)：通常検証・生成WASMのジョブ間受け渡し・公開・配信SHA・公開E2E21件が再試行なしで成功。CodeQLは [40385647367](https://github.com/ayutaz/voxelshogi/actions/runs/40385647367) |
-| 現在のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件 |
+| M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。M3の現況はWeb172・Node65・Python48、Web50／Python16／制御11変異、モデルE2E6件も追加（PR #27のローカル検証） |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
-| 未導入・保留 | NN runtime・R2・COOP/COEP・有料GPUは未導入。9王の正式採用は保留。次はM3 |
+| 未導入・保留 | M3のNN runtimeは実装・ローカル実機確認済み、モデル本体公開は未承認。R2・COOP/COEP・有料GPUは未導入。9王の正式採用は保留 |
 | ローカル準備 | 空き容量は2026-10-27確認で約27.2 GiB。[取得記録](experiments/documentation-baseline-2026-10-27.json)。Pythonは3.14.9、依存導入直前に容量と互換性を再確認 |
 
 ## 次の着手前に確認する残課題
@@ -64,7 +66,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、次の具体的な手順は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5互換性は未実施 |
 | [CI_CD_PLAN](CI_CD_PLAN.md)、[DEPLOYMENT](DEPLOYMENT.md) | 現行のCI・main保護・認証の配置・配信・復旧手順。過去のrunは固定記録として保持 |
-| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
+| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3のローカル実機結果による形式・backend・配信候補はADR-019。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
 | [RULE_VARIANTS_RESEARCH](RULE_VARIANTS_RESEARCH.md) | ルールの先行調査と未実施の継続評価。標準のM1完了と9王への未適用を区別 |
 | [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。Gumbel・モデル構造・DDPを実装済み／確定採用と扱わない |

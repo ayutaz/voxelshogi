@@ -119,3 +119,11 @@
 - **決定**: WASMはブラウザの単調時計を注入する薄い `bestMove` APIとする。専用のmodule Workerが全棋譜とカーソルを検証・復元し、通常の連続着手では再利用する。中断時はterminateし、request ID・revision・ruleset・カーソル・hash・手番・難易度を照合する。表示側でもrevisionと根を再確認し、検証付きplayを使う。
 - **理由**: 同期WASM実行中はcancelメッセージを処理できない。メッセージ・エラーの古い通知も破棄し、通信不正は表示して再試行する。Normalからランダムへ無言で切り替えない。[Worker terminate仕様](https://developer.mozilla.org/en-US/docs/Web/API/Worker/terminate)・[Viteのmodule Worker](https://vite.dev/guide/features.html#web-workers)。
 - **影響**: 初期モードはNormal同士の観戦・一時停止・2D。明示的な再開／1手送りを入口とし、3Dを選ぶまでそのコードを取得しない。3Dの準備完了は[rendererの描画統計](https://threejs.org/docs/pages/WebGLRenderer.html#WebGLRenderer~InfoRender)で実際のフレームを確認する。静止中はdemand描画、比較室の移動軌跡は連続描画とし、カメラ操作・盤面変更で再描画する。待ち時間と探索予算を分け、Normalは深さ6・50,000ノード・約1秒を基本とする。時間制限は引き続きsoft deadline。R0の固定9王棋譜、標準ルールID、Cloudflareのassets-only配信を維持し、SAB・COOP/COEP・NN推論・有料GPUは追加しない。実測と公開確認は [M2記録](M2_VALIDATION.md)。
+
+## ADR-019: M3の精度形式・backend・配信方式（2026-10-27）
+
+- **状況**: 729トークン・約502万パラメータの未学習Transformerを、3D盤面と同時に実機ブラウザで実行する。配布容量だけでモデルを縮小せず、数値・速度・転送・メモリを固定ファイルで比較する必要がある。[固定条件と全48組](M3_VALIDATION.md#ローカル固定配布物の実機計測)。
+- **決定**: 専用module Worker＋ORT Web1.31.1を採用候補とする。Apple M1／Chrome156ではFP32・INT8重み版はWebGPUとWASM、FP16はWASMを数値検証済みとする。FP16×WebGPUは事前閾値未達で出力を採用しない。全3形式を公開デモの選択肢にし、要求と異なる形式・backendへ無言で差し替えない。未測定端末の対応は保証せず、その端末で全出力照合を行う。
+- **配信**: すべて同一originのCloudflare Static Assetsを使い、モデルmanifest／各ファイルとruntimeをSHA付きで管理する。モデルは各20.42／10.39／5.43 MBで、25 MiBの個別ファイル上限内。実bundleに対応するAsyncify WASMは28,747,738 bytesのため16 MiB単位に分割し、部分と再結合後を検証する。JSEP版との混用は初期化失敗を実測したため採用しない。JSPIや独自の小型runtime buildは今回未評価。R2はこの配布規模では追加せず、現行の分割方式で実配信確認後に確定する。indexはno-store、hash付きのファイルはimmutable。アプリWorkerはbuild manifestで列挙し、公開後にMIME・cacheを含めて全ファイルを照合する。
+- **理由**: WebGPUのFP32は3Dありで中央値53〜54ms、WASMは320〜334ms。INT8重みのWebGPUは約54〜55msで高速化は確認できないが、配布サイズを約73%減らせる。FP16は小さくてもこの端末のWASMでは約392〜396msで遅く、WebGPUは基準未達だった。INT8はfloat32へ逆量子化して計算する方式で、整数演算の高速化とは呼ばない。GPU総メモリは取得不可であり、RSS観測最大約1.44 GiBをGPUメモリ量へ読み替えない。
+- **影響**: M4へ特徴量43chと行動番号1,067,985の契約、M6へ6層・幅256・8head・FFN1024の構造と変換／backendの制約を渡す。M6の学習・棋力評価・探索との接続は別途行う。現在のバッチは1固定で、batch8は対象外。GPUレンタル・R2の費用は発生させない。モデル初回配信のライセンスはユーザー回答待ちで、公開条件分岐を無効のまま準備する。CIが生成する実公開bytesによる配信・数値・実機再計測が残り、本ADRだけではM3を完了にしない。
