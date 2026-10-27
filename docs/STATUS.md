@@ -25,7 +25,7 @@ M3の実機はApple M1・8 GiB・Chrome156。WebGPUのFP32・INT8重みと、WAS
 |---|---|
 | 通常PR | #13〜#16の必須7チェック成功後にsquash merge。保護のbypassなし |
 | 統合後の自動公開 | [最終main CI 40385647318](https://github.com/ayutaz/voxelshogi/actions/runs/40385647318)：通常検証・生成WASMのジョブ間受け渡し・公開・配信SHA・公開E2E21件が再試行なしで成功。CodeQLは [40385647367](https://github.com/ayutaz/voxelshogi/actions/runs/40385647367) |
-| M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。M3の現況はWeb172・Node65・Python48、Web50／Python16／制御11変異、モデルE2E6件も追加（PR #27のローカル検証） |
+| M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。M3の現況はWeb172・Node66・Python48、Web50／Python16／制御13変異、モデルE2E6件も追加（PR #27のローカル検証） |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
 | 未導入・保留 | M3のNN runtimeは実装・ローカル実機確認済み、モデル本体公開は未承認。R2・COOP/COEP・有料GPUは未導入。9王の正式採用は保留 |

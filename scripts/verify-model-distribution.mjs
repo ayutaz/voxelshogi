@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, posix, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-export async function verifyDistribution(base, expectedCommit, fetcher = fetch) {
+export async function verifyDistribution(base, expectedCommit, fetcher = fetch, expectedArtifact = null) {
   assert.match(expectedCommit, /^[0-9a-f]{40}$/, 'expected published commit required');
   const origin = new URL(base).origin, modelBase = new URL('/models/m3/', origin).href, records = [];
   const path = name => {
@@ -32,11 +32,14 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch) 
   };
   const build = await read(new URL('/build-info.json', origin).href, null, true);
   assert.equal(build.commit, expectedCommit, 'wrong public build');
+  if (expectedArtifact) assert.deepEqual(build, expectedArtifact.build, 'served build differs from tested artifact');
   const application = await read(new URL('/inference-build.json', origin).href, null, true);
   assert.equal(application.schema, 1); assert.equal(application.commit, expectedCommit);
+  if (expectedArtifact) assert.deepEqual(application, expectedArtifact.application, 'served files differ from tested application artifact');
   assert.ok(application.files.some(f => /^assets\/inference\.worker-.*\.js$/.test(f.path)), 'application Worker manifest missing');
   for (const file of application.files) await read(new URL(path(file.path), origin + '/').href, file);
   const indexUrl = modelBase + 'index.json', index = await read(indexUrl, null, true);
+  if (expectedArtifact) assert.deepEqual(index, expectedArtifact.deployment, 'served files differ from tested model artifact');
   assert.match(records.at(-1).cache, /no-store/, 'model index must bypass cache');
   assert.equal(index.schema, 1); assert.equal(index.publication, true, 'model publication is not approved');
   const model = await read(new URL(path(index.model.path), modelBase).href, index.model, true);
@@ -60,9 +63,11 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch) 
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const [, , base, output] = process.argv;
-  assert.ok(base && output, 'usage: E2E_COMMIT=SHA node scripts/verify-model-distribution.mjs BASE_URL OUTPUT.json');
-  const report = await verifyDistribution(base, process.env.E2E_COMMIT);
+  const [, , base, output, artifactDirectory = 'apps/web/dist'] = process.argv;
+  assert.ok(base && output, 'usage: E2E_COMMIT=SHA node scripts/verify-model-distribution.mjs BASE_URL OUTPUT.json [TESTED_DIST_DIRECTORY]');
+  const local = file => JSON.parse(readFileSync(resolve(artifactDirectory, file), 'utf8'));
+  const expected = { build: local('build-info.json'), application: local('inference-build.json'), deployment: local('models/m3/index.json') };
+  const report = await verifyDistribution(base, process.env.E2E_COMMIT, fetch, expected);
   mkdirSync(dirname(resolve(output)), { recursive: true }); writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify({ commit: report.expectedCommit, modelId: report.modelId, verifiedFiles: report.records.length }));
 }

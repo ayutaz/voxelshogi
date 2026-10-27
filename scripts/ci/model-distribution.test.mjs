@@ -50,3 +50,20 @@ test('published audit verifies application, model, references, notices and whole
   const pending = distribution({ publication: false });
   await assert.rejects(verifyDistribution('https://example.test', commit, pending.fetcher), /not approved/);
 });
+
+test('public manifests must match the tested artifact even when their commit still matches', async () => {
+  const d = distribution();
+  const expected = {
+    build: JSON.parse(d.bodies.get('https://example.test/build-info.json')),
+    application: JSON.parse(d.bodies.get('https://example.test/inference-build.json')),
+    deployment: JSON.parse(d.bodies.get('https://example.test/models/m3/index.json')),
+  };
+  await verifyDistribution('https://example.test', commit, d.fetcher, expected);
+  d.bodies.set('https://example.test/assets/inference.worker-abc.js', 'abd');
+  d.bodies.set('https://example.test/inference-build.json', JSON.stringify({ ...expected.application,
+    files: [{ ...expected.application.files[0], sha256: hash('abd') }] }));
+  await assert.rejects(verifyDistribution('https://example.test', commit, d.fetcher, expected), /tested application artifact/);
+  const changed = distribution();
+  changed.bodies.set('https://example.test/models/m3/index.json', JSON.stringify({ ...expected.deployment, extra: 'different artifact' }));
+  await assert.rejects(verifyDistribution('https://example.test', commit, changed.fetcher, expected), /tested model artifact/);
+});

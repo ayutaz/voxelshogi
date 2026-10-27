@@ -110,7 +110,7 @@ Macでの計測プロセスに限り `caffeinate -i -w <自プロセスPID>` を
 
 PR #22〜#26は必須8チェック成功後に通常取り込み済み。PR #26のhead `c19fb59` は [CI](https://github.com/ayutaz/voxelshogi/actions/runs/40462994498)・[CodeQL](https://github.com/ayutaz/voxelshogi/actions/runs/40462994451)・[品質](https://github.com/ayutaz/voxelshogi/actions/runs/40462994406) が成功し、mainは `2cfac44`。PR #25統合後の [main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40462552399) も公開確認まで成功した。これはモデル本体公開の証拠ではない。
 
-[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)では公開設定を `export/publication.json` に固定し、未承認のfalse/nullを維持する。承認後の経路用に、ライセンス・Model Card、アプリWorkerを含むbuild manifest、実配信全ファイルのhash／bytes／MIME／cacheの監査と公開6 E2Eを用意した。ローカルではWeb172単体・既知50変異、Node65単体・制御11変異、型・lint・build・actionlint、実機モデル6 E2Eが47.9秒・再試行なしで成功した。公開条件分岐は未実行で、成功扱いにしない。
+[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)では公開設定を `export/publication.json` に固定し、未承認のfalse/nullを維持する。承認後の経路用に、ライセンス・Model Card、アプリWorkerを含むbuild manifest、実配信全ファイルのhash／bytes／MIME／cacheの監査と公開6 E2Eを用意した。ローカルではWeb172単体・既知50変異、Node66単体・制御13変異、型・lint・build・actionlint、実機モデル6 E2Eが47.9秒・再試行なしで成功した。公開条件分岐は未実行で、成功扱いにしない。
 
 | ゴール | 現在の根拠・残り |
 |---|---|
@@ -119,5 +119,7 @@ PR #22〜#26は必須8チェック成功後に通常取り込み済み。PR #26�
 | G4 | ローカルの固定SHAは一致。CIが作成する実公開ファイルの全配信照合は残る |
 | G5 | ライセンス回答待ち。未学習モデルの全実行可能版を公開して各版を実ロードする検証は残る |
 | G6 | [ADR-019](ARCHITECTURE_DECISIONS.md#adr-019-m3の精度形式backend配信方式2026-10-27)と[費用](COST_ESTIMATE.md)へローカルの判断を記録。公開バイト列の実機再計測と最終CI／公開確認は残る |
+
+配信監査は公開サイトのmanifestだけで自己照合せず、ダウンロードした検証済みCI artifactのbuild／アプリ／モデルmanifestと一致させる。同じcommit名を保ったまま実Workerとmanifestを差し替える負例を先に失敗させ、検証を追加した。Worker照合・モデル照合を消す変異も検出。既存の探索観戦等の全21 E2Eも実機Chromeで23.7秒・再試行なしで成功した。
 
 LinuxのCIで生成するONNXや参照値は、producer metadata等によりMacで生成したファイルとhashが異なる可能性がある。公開後は実配信された同じbytesでWebGPUを再測定し、このローカル結果を最終公開結果へ読み替えない。有料GPU・R2は利用していない。
