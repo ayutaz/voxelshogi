@@ -68,6 +68,51 @@ def test_export_files_are_reproducible_in_the_same_environment(package, tmp_path
     )
 
 
+def test_all_low_precision_variants_have_same_file_references_and_separate_fp32_differences(
+    package,
+):
+    manifest = validate_package(package)
+    assert [v["id"] for v in manifest["variants"]] == ["fp32", "fp16", "int8"]
+    fp32_bytes = manifest["variants"][0]["model"]["bytes"]
+    for variant in manifest["variants"][1:]:
+        assert variant["model"]["bytes"] < fp32_bytes
+        graph = onnx.load(package / variant["model"]["path"])
+        onnx.checker.check_model(graph)
+        options = ort.SessionOptions()
+        options.graph_optimization_level = (
+            ort.GraphOptimizationLevel.ORT_ENABLE_BASIC
+            if variant["id"] == "int8"
+            else ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        )
+        session = ort.InferenceSession(
+            graph.SerializeToString(), options, providers=["CPUExecutionProvider"]
+        )
+        assert variant["referenceEngine"]["graphOptimization"] == (
+            "basic" if variant["id"] == "int8" else "all"
+        )
+        assert len(variant["fp32Difference"]) == 4
+        for fixture in manifest["fixtures"]:
+            inputs = np.fromfile(
+                package / fixture["input"]["path"], dtype="<f4"
+            ).reshape(1, 729, 43)
+            actual = session.run(["policy", "value"], {"features": inputs})
+            for name, values in zip(["policy", "value"], actual, strict=True):
+                saved = np.fromfile(
+                    package / variant["references"][fixture["name"]][name]["path"],
+                    dtype="<f4",
+                ).reshape(values.shape)
+                compare_outputs(saved, values, precision=variant["id"])
+                assert values.size == (ACTIONS if name == "policy" else 1)
+                assert np.isfinite(values).all()
+                stats = variant["fp32Difference"][fixture["name"]][name]
+                assert stats["elements"] == values.size
+                assert stats["maxAbs"] >= stats["mae"] >= 0
+                assert stats["rmse"] >= 0
+        assert any(
+            v["policy"]["maxAbs"] > 0 for v in variant["fp32Difference"].values()
+        )
+
+
 def test_manifest_and_hash_validation_rejects_changed_files(package, tmp_path):
     import shutil
 
@@ -86,7 +131,18 @@ def test_manifest_and_hash_validation_rejects_changed_files(package, tmp_path):
         validate_package(copy)
 
 
-@pytest.mark.parametrize("field", ["shape", "duplicate", "empty-variants", "dtype"])
+@pytest.mark.parametrize(
+    "field",
+    [
+        "shape",
+        "duplicate",
+        "empty-variants",
+        "dtype",
+        "variant-precision",
+        "missing-difference",
+        "nonfinite-difference",
+    ],
+)
 def test_corrupt_manifest_contract_is_rejected(package, tmp_path, field):
     import shutil
 
@@ -99,8 +155,16 @@ def test_corrupt_manifest_contract_is_rejected(package, tmp_path, field):
         manifest["fixtures"].append(manifest["fixtures"][0])
     elif field == "empty-variants":
         manifest["variants"] = []
-    else:
+    elif field == "dtype":
         manifest["inputs"]["features"]["dtype"] = "float16"
+    elif field == "variant-precision":
+        manifest["variants"][1]["precision"] = "fp32"
+    elif field == "missing-difference":
+        del manifest["variants"][1]["fp32Difference"]
+    else:
+        manifest["variants"][1]["fp32Difference"]["initial-b"]["policy"]["rmse"] = (
+            float("nan")
+        )
     (copy / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         validate_package(copy)

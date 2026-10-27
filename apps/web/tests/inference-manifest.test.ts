@@ -35,3 +35,15 @@ it('rejects runtime version mismatch, missing/reordered-part metadata and unappr
   expect(() => parseDeployment(index)).toThrow();
   expect(parseDeployment(index, true).publication).toBe(false);
 });
+
+it('requires finite, complete FP32 differences separately from same-format reference data', () => {
+  const m = modelFixture(), v = m.variants[0]!;
+  v.id = v.precision = 'int8';
+  expect(() => parseModel(m)).toThrow();
+  const stats = { elements: 1067985, maxAbs: .02, mae: .003, rmse: .004, maxRelative: 5, argmaxEqual: false };
+  const difference = { 'initial-b': { policy: stats, value: { ...stats, elements: 1 } } };
+  Reflect.set(v, 'fp32Difference', difference);
+  expect(parseModel(m).variants[0]!.fp32Difference?.['initial-b']?.policy.maxAbs).toBe(.02);
+  difference['initial-b'].policy.rmse = NaN;
+  expect(() => parseModel(m)).toThrow();
+});

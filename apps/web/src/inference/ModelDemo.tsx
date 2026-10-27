@@ -99,6 +99,10 @@ export default function ModelDemo() {
           <h2>配布モデル</h2>
           <p>{pkg.model.id}<br />{pkg.model.parameters.toLocaleString()} parameters / seed {pkg.model.seed}</p>
           <p>{labels[variant]}：{selected ? (selected.model.bytes / 1024 / 1024).toFixed(2) : '—'} MiB</p>
+          {selected?.fp32Difference?.[fixtureName] ? <details><summary>FP32からの変化</summary><p>同じ変換版の実行誤差とは別の値です。未学習モデルの数値差で、棋力の比較ではありません。</p>{(['policy', 'value'] as const).map(name => {
+            const difference = selected.fp32Difference![fixtureName]![name];
+            return <p key={name}>{name}：最大絶対差 {difference.maxAbs.toExponential(3)} / 平均絶対差 {difference.mae.toExponential(3)} / RMSE {difference.rmse.toExponential(3)}</p>;
+          })}</details> : null}
           {!pkg.index.publication ? <p className="model-local">ローカル検証用・公開前の配布物</p> : null}
           <details><summary>照合情報</summary><p>モデル情報 SHA-256<br /><code data-testid="model-hash">{pkg.packageHash}</code></p><p>選択モデル SHA-256<br /><code data-testid="variant-hash">{selected?.model.sha256}</code></p><p>ORT {pkg.index.runtime.version} / {pkg.model.license ?? '公開ライセンス未確定'}</p></details>
         </aside>

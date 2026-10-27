@@ -4,7 +4,8 @@ export const POLICY_ELEMENTS = 1_067_985;
 export type Precision = 'fp32' | 'fp16' | 'int8';
 export type Backend = 'wasm' | 'webgpu';
 export interface ModelFixture { name: string; side: 'b' | 'w'; record: Record<string, unknown>; input: FileRef }
-export interface Variant { id: Precision; precision: Precision; model: FileRef; references: Record<string, { policy: FileRef; value: FileRef }> }
+export interface Difference { elements: number; maxAbs: number; mae: number; rmse: number; maxRelative: number; argmaxEqual: boolean }
+export interface Variant { id: Precision; precision: Precision; model: FileRef; references: Record<string, { policy: FileRef; value: FileRef }>; fp32Difference?: Record<string, { policy: Difference; value: Difference }> }
 export interface ModelManifest {
   schema: 1; id: string; trained: false; license: string | null; inputSchema: string; ruleset: string;
   seed: number; parameters: number; fixtures: ModelFixture[]; variants: Variant[];
@@ -54,6 +55,14 @@ export function parseModel(value: unknown, publication = true): ModelManifest {
     for (const outputs of Object.values(references)) {
       const r = record(outputs);
       if (file(r.policy).bytes !== POLICY_ELEMENTS * 4 || file(r.value).bytes !== 4) throw new Error('reference byte length mismatch');
+    }
+    if (v.precision !== 'fp32') {
+      const differences = record(v.fp32Difference);
+      if (Object.keys(differences).length !== names.length || !names.every(name => Object.hasOwn(differences, name))) throw new Error('incomplete FP32 differences');
+      for (const outputs of Object.values(differences)) for (const name of ['policy', 'value'] as const) {
+        const stats = record(record(outputs)[name]);
+        if (stats.elements !== (name === 'policy' ? POLICY_ELEMENTS : 1) || typeof stats.argmaxEqual !== 'boolean' || ['maxAbs', 'mae', 'rmse', 'maxRelative'].some(key => typeof stats[key] !== 'number' || !Number.isFinite(stats[key]) || stats[key] < 0)) throw new Error('invalid FP32 difference');
+      }
     }
     return v as unknown as Variant;
   });

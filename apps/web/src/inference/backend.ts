@@ -1,6 +1,7 @@
 import { loadRuntime, type ModelPackage } from './runtime';
 import { type Backend, type Precision, POLICY_ELEMENTS } from './manifest';
 import { profileNode } from './profile';
+import { inferenceOptions } from './options';
 
 export interface OutputData { policy: Float32Array; value: Float32Array; dispose: () => void }
 export interface SessionPort { run: (features: Float32Array) => Promise<OutputData>; release: () => Promise<void> }
@@ -10,7 +11,7 @@ export interface RuntimeInfo {
   features: string[]; runtimeBytes: number;
 }
 export interface BackendPort {
-  createSession: (model: Uint8Array<ArrayBuffer>) => Promise<SessionPort>;
+  createSession: (model: Uint8Array<ArrayBuffer>, precision: Precision) => Promise<SessionPort>;
   profile: () => Profile; resetProfile: () => void; dispose: () => Promise<void>;
   info: RuntimeInfo; buffers?: () => { created: number; liveBytes: number; peakBytes: number } | null;
 }
@@ -56,9 +57,8 @@ export async function openBackend(pkg: ModelPackage, backend: Backend, precision
       info: { backend, adapter: adapterInfo, features, runtimeBytes: loaded.runtimeBytes },
       buffers: () => backend === 'webgpu' && buffers.created === 0 ? null : { ...buffers }, profile: () => structuredClone(evidence), resetProfile: () => { evidence = { providers: {}, operators: {} }; },
       dispose: async () => { loaded.dispose(); device?.destroy(); console.log = originalLog; },
-      createSession: async (model) => {
-        const session = await ort.InferenceSession.create(model, { executionProviders: [backend], enableProfiling: true, logSeverityLevel: 2,
-          extra: { session: { disable_cpu_ep_fallback: backend === 'webgpu' ? '1' : '0' } } });
+      createSession: async (model, sessionPrecision) => {
+        const session = await ort.InferenceSession.create(model, inferenceOptions(backend, sessionPrecision));
         ort.env.wasm.wasmBinary = undefined;
         return {
           release: () => session.release(),

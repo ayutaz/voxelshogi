@@ -28,7 +28,15 @@ Valueはfloat32、shape `[batch,1]`、手番側の勝ちを+1・負けを−1と
 
 729 token、幅256、6層、8 head、FFN幅1024のpre-norm Full Attentionを第一の代表構造とする。入力projectionと位置embedding、通常手のfrom/toの2組の射影・内積、駒打ちhead、Value headを含め5,021,064パラメータになった。seed314159・opset18・固定batch1のFP32変換をM3-1で実装し、5〜10Mの条件と6層の実行をテストする。正確な演算・ファイルhashと各比較値は生成manifestへ記録する。browserのために無記録で小さくしない。
 
-全出力のshape・有限性を必須とし、空出力・NaN/Infを拒否する。各要素で `abs(actual-reference) <= atol+rtol*abs(reference)` を確認する。FP32はatol=1e-5／rtol=1e-4、FP16は1e-3／1e-2を事前の基準とする。量子化版のscale・zero point・丸めと誤差の基準は、対象の量子化方式を決めて実測比較する前に追記する。
+全出力のshape・有限性を必須とし、空出力・NaN/Infを拒否する。各要素で `abs(actual-reference) <= atol+rtol*abs(reference)` を確認する。FP32はatol=1e-5／rtol=1e-4、FP16は1e-3／1e-2を事前の基準とする。以下の低精度変換条件も、各変換版の最初の実測前に固定する。
+
+### M3-3で比較する変換方式
+
+- FP16：同じFP32 ONNXからonnxconverter-commonで変換し、入出力はfloat32のまま保つ。非ゼロの最小値はIEEE FP16 subnormalの2^-24、最大は65504を指定する。converterの既定の非対応演算block listを記録し、その演算はfloat32を保つ。グラフ内の型とCastをmanifestへ記録し、すべての演算がFP16になったとは仮定しない。[ORT公式の変換設定](https://onnxruntime.ai/docs/performance/model-optimizations/float16.html)
+- INT8（重み）：rankが2以上のfloat32 initializerをtensorごとに対称量子化する。`scale=float32(max(max(abs(w))/127, float32の最小正規値))`、すべて0ならscale=1、zero pointはint8の0。`q=int8(clip(roundTiesToEven(w/scale),-127,127))` とし、[ONNX DequantizeLinear](https://onnx.ai/onnx/operators/onnx__DequantizeLinear.html) の `(q-zero_point)*scale` でfloat32へ復元して既存の演算へ渡す。bias・normの1次元重み、activation・演算自体はfloat32。転送ファイルの重み圧縮であり、INT8演算による高速化・実行メモリ削減は保証しない。
+- INT8版の同じ変換ファイルの基準実装対browserは、float32計算のatol=1e-5／rtol=1e-4で全出力を照合する。FP32からの変化は、FP16・INT8とも別の記述統計（最大絶対／相対誤差、平均絶対誤差・RMSE・Policyのargmax一致）として保存し、runtime合否の誤差に混ぜない。未学習のため、その差を棋力低下とは呼ばない。
+- INT8のgraph optimizationは基準実装・browserとも **basic** に固定する。小行列の手計算テストで、ORT1.31.1のextended/allがDQ→MatMulを `MatMulNBits` へ変換し、期待 `[-126,4,257]` に対して `[-127,3.984253,256.99994]` を返すことを検出した。basic/disabledでは期待値と完全一致した。INT8の圧縮形式を保ち、近似が追加される最適化を使用しない。FP32／FP16はallを使い、設定差を測定記録に残す。
+- 各形式の基準値はそのONNXを基準実装で実行して保存する。実行不能の場合は理由を記録し、FP32の別モデルで基準値を代用しない。browser未対応の形式×backendも理由を表示する。
 
 変換前PyTorch対FP32 ONNX、各変換版の基準実装対browser、FP32対各低精度版を分ける。最大絶対／相対誤差・超過件数と全要素数を保存する。Top-1だけで成功扱いにしない。閾値変更は原因と根拠を先に記録し、該当比較を再実行する。
 

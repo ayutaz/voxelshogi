@@ -40,7 +40,7 @@ function compare(reference: Float32Array, actual: Float32Array, count: number, p
     maxAbs = Math.max(maxAbs, delta); maxRelative = Math.max(maxRelative, delta / Math.max(Math.abs(ref), 1.1754943508222875e-38));
     if (delta > atol! + rtol! * Math.abs(ref)) exceeded++;
   }
-  if (exceeded) throw new Error(`${exceeded}/${count} outputs exceed ${precision} tolerance`);
+  if (exceeded) throw new Error(`${exceeded}/${count} outputs exceed ${precision} tolerance; maxAbs=${maxAbs}; maxRelative=${maxRelative}; atol=${atol}; rtol=${rtol}`);
   return { elements: count, maxAbs, maxRelative, exceeded, atol: atol!, rtol: rtol! };
 }
 
@@ -84,7 +84,7 @@ export class InferenceEngine {
       const loaded = this.deps.now();
       port.resetProfile();
       this.onPhase('initializing');
-      const session = await port.createSession(model);
+      const session = await port.createSession(model, variant.precision);
       const initialized = this.deps.now();
       let comparison: InferenceResult['comparison'] | null = null, outputValue = 0;
       const times: number[] = [];

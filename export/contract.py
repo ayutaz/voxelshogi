@@ -10,7 +10,7 @@ FEATURES = 43
 NORMAL_ACTIONS = SQUARES * SQUARES * 2
 ACTIONS = NORMAL_ACTIONS + 7 * SQUARES
 HAND_TOTALS = np.array([162, 64, 48, 32, 16, 24, 24], dtype=np.float32)
-TOLERANCES = {"fp32": (1e-5, 1e-4), "fp16": (1e-3, 1e-2)}
+TOLERANCES = {"fp32": (1e-5, 1e-4), "fp16": (1e-3, 1e-2), "int8": (1e-5, 1e-4)}
 
 
 def _side(side: str) -> None:

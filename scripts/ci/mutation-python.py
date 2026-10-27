@@ -55,6 +55,42 @@ MUTATIONS = [
         "or False",
         "test_generate.py",
     ),
+    ("quant-rounding", "variants.py", "np.rint(", "np.floor(", "test_variants.py"),
+    (
+        "quant-scale",
+        "variants.py",
+        "maximum / 127",
+        "maximum / 128",
+        "test_variants.py",
+    ),
+    (
+        "quant-zero-point",
+        "variants.py",
+        "return quantized, scale, np.int8(0)",
+        "return quantized, scale, np.int8(1)",
+        "test_variants.py",
+    ),
+    (
+        "quant-missing-dequant",
+        "variants.py",
+        "[weight.name],",
+        '[prefix + "__unused"],',
+        "test_variants.py",
+    ),
+    (
+        "fp16-io-types",
+        "variants.py",
+        "keep_io_types=True",
+        "keep_io_types=False",
+        "test_variants.py",
+    ),
+    (
+        "quant-extra-approximation",
+        "generate.py",
+        'if precision == "int8"\n        else',
+        "if False\n        else",
+        "test_generate.py",
+    ),
 ]
 
 
