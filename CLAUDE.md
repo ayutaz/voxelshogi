@@ -95,7 +95,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M3: `docs/M3_PLAN.md` に従い、Python3.14の環境・入出力契約の確認から始める。モデル実装は未着手
+  1. C0→M3: `docs/M3_PLAN.md` に従い、既存3D E2Eの観測競合を切り分けてからPython3.14の環境・入出力契約へ進む。モデル実装は未着手
   2. M4: Python バインディングとデータ生成
   3. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   4. M6: Transformer-S の学習
