@@ -79,7 +79,7 @@ jobs:
     name: CI Gate
     # Keep fail/cancel detection; do not serialize workflows behind a queued gate.
     if: always()
-    needs: [lint, rust, msrv, web, e2e-runtime, audit, dependency-review]
+    needs: [lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -90,6 +90,22 @@ jobs:
       - run: node scripts/ci/gate.mjs
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
+
+  python:
+    name: Python model contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.11.23'
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run --locked ruff check export scripts/ci/mutation-python.py
+      - run: uv run --locked ruff format --check export scripts/ci/mutation-python.py
+      - run: uv run --locked pytest -q
+      - run: uv run --locked python scripts/ci/mutation-python.py
 
   rust:
     name: Rust (fmt, clippy, test)

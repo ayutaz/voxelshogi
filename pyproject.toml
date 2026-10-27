@@ -1,0 +1,38 @@
+[project]
+name = "voxelshogi-ml"
+version = "0.1.0"
+description = "Reproducible VoxelShogi model export and numerical validation"
+requires-python = ">=3.14,<3.15"
+license = "Apache-2.0"
+dependencies = [
+    "numpy>=2.5.4",
+    "onnx>=1.23.2",
+    "onnxconverter-common>=1.16.0",
+    "onnxruntime>=1.31.1",
+    "onnxscript>=0.7.2",
+    "torch>=2.14.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["export/tests"]
+pythonpath = ["."]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "PLW1510"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.3",
+]
