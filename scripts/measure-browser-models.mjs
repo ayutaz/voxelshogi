@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -49,9 +49,13 @@ async function main() {
     machine: { platform: os.platform(), release: os.release(), architecture: os.arch(), cpu: os.cpus()[0].model, memoryBytes: os.totalmem(), chrome: browser.version() },
     method: { batch: 1, batch8: { status: 'not-applicable', reason: 'this exact ONNX export has fixed batch=1' }, warmup: 10, measured: 30,
       cold: 'new browser context and Worker; OS and driver shader caches are uncontrolled', reuse: 'same Worker/runtime; each request creates/releases its session and tensors',
-      memory: 'sample dedicated browser RSS and main JS heap once per second during repeat; observed maxima, not guaranteed peaks', gpuCompletion: 'await CPU output readback before stopping the inference timer',
+      memory: 'sample dedicated browser RSS and main JS heap once per second during repeat; observed maxima, not guaranteed peaks', maximumSamplingGapMs: 5000,
+      idleSleep: os.platform() === 'darwin' ? 'caffeinate -i only while this measurement process is alive' : 'not applicable', gpuCompletion: 'await CPU output readback before stopping the inference timer',
       display: 'real demo 3D on/off; a trusted camera drag during the repeated inference triggers real demand frames' }, rows: [], switches: [], errors: [] };
   const save = () => { mkdirSync(dirname(output), { recursive: true }); writeFileSync(output, JSON.stringify(report, null, 2) + '\n'); };
+  const awake = os.platform() === 'darwin' ? spawn('/usr/bin/caffeinate', ['-i', '-w', String(process.pid)], { stdio: 'ignore' }) : null;
+  awake?.unref();
+  awake?.on('error', error => { report.errors.push(`idle-sleep assertion failed: ${String(error)}`); });
   let requiredFailure = false;
   try {
     const context = await browser.newContext(), page = await context.newPage(); await page.goto(base + '/?models=1');
@@ -93,6 +97,9 @@ async function main() {
         row.memory.push({ stage: 'after-session-release', ...await browserMemory(browserCdp, page) });
         const probe = await page.evaluate(() => window.modelMeasurement);
         row.display = { frameGapsMs: summary(probe.gaps), drawsDuringInference: probe.draws, inputs: probe.inputs };
+        const memoryTicks = row.memory.filter(m => m.stage === 'repeat').map(m => Date.parse(m.at));
+        row.samplingGapMs = memoryTicks.length > 1 ? Math.max(...memoryTicks.slice(1).map((at, i) => at - memoryTicks[i])) : null;
+        assert.ok(row.samplingGapMs === null || row.samplingGapMs <= report.method.maximumSamplingGapMs, 'measurement interrupted: memory sampling gap exceeded five seconds');
         if (show3D) { assert.ok(probe.draws > 0, 'no real draw during model inference'); assert.ok(probe.inputs.some(e => e.kind === 'pointerdown' && e.running && e.trusted), 'no real input during model inference'); }
         assert.equal(row.samplingErrors.length, 0, 'memory sampling failed');
         assert.equal(row.repeat.metrics.samples.length, 30); assert.equal(row.repeat.comparison.policy.exceeded, 0);
@@ -130,6 +137,6 @@ async function main() {
     report.complete = !smoke && !requiredFailure; report.finishedAt = new Date().toISOString(); save();
     if (requiredFailure) process.exitCode = 1;
   } catch (e) { report.errors.push(String(e)); save(); throw e; }
-  finally { await browserCdp.detach(); await browser.close(); }
+  finally { await browserCdp.detach(); await browser.close(); awake?.kill(); }
 }
 if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();

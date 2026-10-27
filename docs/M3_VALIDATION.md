@@ -74,3 +74,11 @@ Pythonは48テストへ拡充し、INT8の手計算、符号・scale・ties-to-e
 - Node制御は58テスト。Gateの実モデルCI依存、RSS単位、公開ライセンス、clean source、配布hashの既知5変異も別プロセスの実行済みassertion失敗として検出し、通常CIへ追加する。
 - `scripts/measure-browser-models.mjs` は全48組の初回／warm-up10＋測定30回、3Dの実入力／描画、main JS heapと専用Chrome process RSS、モデル20回切替とWorkerのcloseを記録する。RSS合計は共有ページの重複を含みうる観測値であり、実メモリの厳密なpeakとは呼ばない。native ORTのGPU総使用量はこのAPIから取得できないためN/Aと理由を保存する。
 - 短い `--smoke` で実GPUの40推論、3Dの実操作・描画とメモリ取得、Workerの終了を確認した。`smoke=true, complete=false` を出力し、この値は正式な性能記録には採用しない。最終固定SHAによる全計測と公開後照合を別途実施する。
+
+### 転送量と休止を含む計測の補強
+
+WorkerのResource Timingから、取得URL・時間・HTTPヘッダーを含むtransferSize・圧縮されたbodyのencodedBodySize・展開後のdecodedBodySizeを区別して結果へ保存する。キャッシュ時の転送0とファイルサイズ0を混同しない。実モデルE2Eは各形式の実ONNX転送も確認し、休止を抑止した実行で6件が42.3秒・再試行なしで成功した。Webは169単体・既知48変異が成功している。
+
+最初の全48組＋20回切替では、39組が合格、FP16×WebGPUの8組が事前基準に届かず拒否、FP16×WASMのmaterial-b・3Dなしの反復がタイムアウトした。`pmset -g log` で2026-10-27 05:34:42 UTCのIdle Sleepと05:43:02 UTCのWake、500秒の休止を確認。メモリ観測も05:34:44.337から05:43:03.866まで途切れており、この試行を正式な性能結果に採用しない。失敗ログと未完了扱いのJSONを保持する。20回のWorkerは全てcloseし、残存は0だった。
+
+Macでの計測プロセスに限り `caffeinate -i -w <自プロセスPID>` を起動し、終了時に解除する。画面や恒久設定は変更しない。1秒ごとのメモリ観測が5秒を超えて途切れた場合も、計測中断として合格にしない。休止をまたいだ実モデルE2E・変異検証のタイムアウトも成功へ数えず、休止抑止下での成功を別に保存した。正式な全組計測は固定ビルドで再実行する。

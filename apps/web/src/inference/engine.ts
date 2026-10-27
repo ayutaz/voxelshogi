@@ -2,6 +2,7 @@ import { assetUrl, fetchVerified, type FileRef } from './assets';
 import { openBackend, type BackendPort, type Profile, type RuntimeInfo } from './backend';
 import { loadPackage, type ModelPackage } from './runtime';
 import { POLICY_ELEMENTS, type Backend, type Precision } from './manifest';
+import { collectResourceTimings, type AssetTiming } from './resources';
 
 export interface InferenceRequest {
   schema: 1; kind: 'infer'; requestId: number; revision: number; packageHash: string;
@@ -10,7 +11,7 @@ export interface InferenceRequest {
 export interface Comparison { elements: number; maxAbs: number; maxRelative: number; exceeded: number; atol: number; rtol: number }
 export interface InferenceResult {
   request: InferenceRequest; value: number; comparison: { policy: Comparison; value: Comparison };
-  metrics: { samples: number[]; warmup: number; medianMs: number; p95Ms: number; loadMs: number; initMs: number; totalMs: number; tensorBytes: number };
+  metrics: { samples: number[]; warmup: number; medianMs: number; p95Ms: number; loadMs: number; initMs: number; totalMs: number; tensorBytes: number; resources: AssetTiming[] };
   information: RuntimeInfo; profile: Profile;
   buffers: { created: number; liveBytes: number; peakBytes: number } | null;
 }
@@ -19,6 +20,7 @@ interface Dependencies {
   open: (pkg: ModelPackage, backend: Backend, precision: Precision) => Promise<BackendPort>;
   read: (base: string, file: FileRef) => Promise<Uint8Array<ArrayBuffer>>;
   now: () => number;
+  resources?: (since: number) => AssetTiming[];
 }
 
 export function parseInferenceRequest(value: unknown): InferenceRequest {
@@ -52,7 +54,7 @@ export class InferenceEngine {
   private backend: Backend | null = null;
   constructor(private readonly deps: Dependencies = {
     load: () => loadPackage(new URL('/models/m3/index.json', location.origin).href), open: openBackend,
-    read: (base, file) => fetchVerified(assetUrl(base, file.path), file), now: () => performance.now(),
+    read: (base, file) => fetchVerified(assetUrl(base, file.path), file), now: () => performance.now(), resources: collectResourceTimings,
   }, private readonly onPhase: (phase: 'loading' | 'initializing' | 'running') => void = () => {}) {}
 
   async infer(value: unknown): Promise<InferenceResult> {
@@ -113,7 +115,7 @@ export class InferenceEngine {
       const warmup = request.iterations === 40 ? 10 : 0, samples = times.slice(warmup), sorted = [...samples].sort((a, b) => a - b);
       return { request, value: outputValue, comparison: comparison!, information: port.info, profile, buffers: port.buffers?.() ?? null,
         metrics: { samples, warmup, medianMs: (sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.ceil((sorted.length - 1) / 2)]!) / 2, p95Ms: sorted[Math.ceil(sorted.length * .95) - 1]!,
-          loadMs: loaded - start, initMs: initialized - loaded, totalMs: this.deps.now() - start, tensorBytes: features.byteLength + POLICY_ELEMENTS * 4 + 4 } };
+          loadMs: loaded - start, initMs: initialized - loaded, totalMs: this.deps.now() - start, tensorBytes: features.byteLength + POLICY_ELEMENTS * 4 + 4, resources: this.deps.resources?.(start) ?? [] } };
     } finally {
       this.busy = false;
       if (this.disposed) { await this.port?.dispose(); this.port = null; }
