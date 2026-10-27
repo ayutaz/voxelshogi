@@ -62,3 +62,5 @@ PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレ�
 GitHub Actions が発行したチェックだけを受理し、CodeQL の error と high/critical セキュリティ警告も取り込みを止める。カバレッジは測定とレポートの保存を必須とし、一律の割合基準は設けない。全体の cargo-mutants 調査は週次・手動で行う。
 
 PR・fork・Dependabot には production の Cloudflare Secrets を渡さず、本番 deploy は実行しない。main の push では統合後の通常 CI が成功した後、同じ run のビルド成果物を公開し、配信 SHA と公開 E2E を検証する。[デプロイと復旧手順](docs/DEPLOYMENT.md)
+
+C0のカメラ／探索回帰は通常Web CIと公開後に各3回・1 worker・retries=0で追加検証する。通常E2Eの再試行成功だけでこの反復検証の失敗を取り込まない。診断JSONは対象テストのattachmentとCIログに記録する（[原因・再現手順](docs/C0_VALIDATION.md)）。

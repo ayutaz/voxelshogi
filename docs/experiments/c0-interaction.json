@@ -1,0 +1,5980 @@
+{
+  "recorded_at": "2026-10-27T02:27:17.313566+00:00",
+  "runtime_base_commit": "c9d046c329a54f07ea7c94c3199519b7b6815910",
+  "product_sources_changed": false,
+  "purpose": "C0 observation race; bounded repetitions, raw browser event timestamps retained",
+  "repeat_contract": {
+    "repeat_each": 3,
+    "workers": 1,
+    "retries": 0
+  },
+  "reports": [
+    {
+      "name": "red-observer-delay",
+      "started_at": "2026-10-27T02:21:13.320Z",
+      "stats": {
+        "startTime": "2026-10-27T02:21:13.320Z",
+        "duration": 9216.767,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "failed",
+          "retry": 0,
+          "duration_ms": 7198,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 974.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 1022.6000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 1040.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2483.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2490.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2540.3000000715256,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2543.100000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2557,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2641.9000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2658.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2709.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2710.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2723.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2906.600000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2907.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 2923.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3002.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3004.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3023.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3023.9000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3039.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3040.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3044.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "reply",
+                "at": 5307.700000047684,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 2.4000000953674316,
+                  "replayMs": 1.0999999046325684,
+                  "searchMs": 2390,
+                  "totalMs": 2393.5
+                }
+              }
+            ],
+            "frames": 133,
+            "observedAt": 6356
+          },
+          "errors": [
+            "Error: expect(received).toMatch(expected)"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "green-observer-delay",
+      "started_at": "2026-10-27T02:22:15.700Z",
+      "stats": {
+        "startTime": "2026-10-27T02:22:15.700Z",
+        "duration": 14015.731,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 11848,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 795.6000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 857.1000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 868.9000000953674,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2646.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2652.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2701.9000000953674,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2704.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2718.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2803.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2819.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2871.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2871.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2884.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2952,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2984.3000000715256,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2985.2000000476837,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 3001.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 3094.600000023842,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 2.200000047683716,
+                  "replayMs": 1,
+                  "searchMs": 101.09999990463257,
+                  "totalMs": 104.29999995231628
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 3098.3000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3186,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3201.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3335.2000000476837,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 3336.2000000476837,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 3352,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3456.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3459.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3467.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3468.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3484.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3484.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3487.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 3488.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 3488.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 3488.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 6952.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 7120.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7120.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 7169.200000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 7527.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7527.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 10919.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 11030.100000023842,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 2.399999976158142,
+                  "replayMs": 1.5,
+                  "searchMs": 100.79999995231628,
+                  "totalMs": 104.69999992847443
+                }
+              }
+            ],
+            "frames": 148,
+            "camera": {
+              "kind": "camera-end",
+              "at": 3488.100000023842,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 11089.600000023842,
+            "timeOrigin": 1793067738313.4,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "green-repeat-metal-local",
+      "started_at": "2026-10-27T02:23:42.794Z",
+      "stats": {
+        "startTime": "2026-10-27T02:23:42.794Z",
+        "duration": 38913.631,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 11704,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 718.8999999761581,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 766.1000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 782.2000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2553.2000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2563.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2615.399999976158,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2617.7999999523163,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2631.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2718.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2734.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2784.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2785.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2798.899999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2863.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2896.600000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2897.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 2913.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 3008,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 3.5,
+                  "replayMs": 0.3999999761581421,
+                  "searchMs": 101,
+                  "totalMs": 104.89999997615814
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 3011.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3098.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3113.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3246.7999999523163,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 3247.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 3263.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3369.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3373.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3381.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3381.7999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3396.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3397,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3404.2999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 3404.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 3404.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 3404.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 6881.799999952316,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 7050.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7050.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 7098.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 7469.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7470.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 10849.399999976158,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 10961,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 2.5999999046325684,
+                  "replayMs": 0.5,
+                  "searchMs": 100.60000002384186,
+                  "totalMs": 103.69999992847443
+                }
+              }
+            ],
+            "frames": 148,
+            "camera": {
+              "kind": "camera-end",
+              "at": 3404.600000023842,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 11018,
+            "timeOrigin": 1793067825222.1,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)"
+          }
+        },
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 11159,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 600.3999999761581,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 645.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 653.1000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2428.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2436.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2486.1999999284744,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2488.2999999523163,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2503.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2589.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2604.6999999284744,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2656.1999999284744,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2656.7999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2669.6999999284744,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2736.1999999284744,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2769,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2769.899999976158,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 2786.2999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 2880,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 2.1999999284744263,
+                  "replayMs": 1,
+                  "searchMs": 100.60000002384186,
+                  "totalMs": 103.79999995231628
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 2883.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2969.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2986.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3119.399999976158,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 3120.2999999523163,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 3136.1999999284744,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3238.7999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3241.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3252.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3252.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3269.2999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3269.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3274.2999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 3274.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 3274.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 3274.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 6753.799999952316,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 6905.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 6905.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 6953.299999952316,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 7305.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7305.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 10687.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 10802,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 2.600000023841858,
+                  "replayMs": 1.600000023841858,
+                  "searchMs": 100.5,
+                  "totalMs": 104.70000004768372
+                }
+              }
+            ],
+            "frames": 148,
+            "camera": {
+              "kind": "camera-end",
+              "at": 3274.5,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 10856.699999928474,
+            "timeOrigin": 1793067837572.4,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)"
+          }
+        },
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 11409,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 617.6000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 683.1000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 701.6000000238419,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2476.9000000953674,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2485.2000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2536.100000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2538.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2551.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2641,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2682.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2721,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2721.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2736.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2802.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2834.2000000476837,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2835.100000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 2852.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 2948,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 3.100000023841858,
+                  "replayMs": 1.2999999523162842,
+                  "searchMs": 101.30000007152557,
+                  "totalMs": 105.70000004768372
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 2951.9000000953674,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3052.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3069.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3202.600000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 3203.7000000476837,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 3219.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3320.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3323.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3335.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3336.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3352.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3352.8000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3357,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 3357.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 3357.3000000715256,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 3357.4000000953674,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 6835.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 7004.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7004.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 7052.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 7419.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7419.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 10803.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 10916.200000047684,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 2.8000000715255737,
+                  "replayMs": 1.6999999284744263,
+                  "searchMs": 100.89999997615814,
+                  "totalMs": 105.39999997615814
+                }
+              }
+            ],
+            "frames": 148,
+            "camera": {
+              "kind": "camera-end",
+              "at": 3357.2000000476837,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 10979.300000071526,
+            "timeOrigin": 1793067850121.8,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "green-repeat-swift-public",
+      "started_at": "2026-10-27T02:25:02.439Z",
+      "stats": {
+        "startTime": "2026-10-27T02:25:02.439Z",
+        "duration": 54244.792,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 17560,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 3767.3000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 4236.300000071526,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 4241.400000095367,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6026.400000095367,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6041.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6091.600000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6094.200000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6107.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 6182.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 6246.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 6377.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 6378.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6391.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6513.300000071526,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6524.800000071526,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6590.900000095367,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6591.900000095367,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 6649.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 6700.900000095367,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 2.299999952316284,
+                  "replayMs": 1.2000000476837158,
+                  "searchMs": 101,
+                  "totalMs": 104.5
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 6714.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6907.700000047684,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6924.200000047684,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 7257.600000023842,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 7258.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 7274.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 7382.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 7385.300000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 7390.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 7391.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 7407.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 7407.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 7413.900000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 7414.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 7414.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7414.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 11248,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 11695.900000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 11696,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 11758.100000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 12678.300000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 12678.400000095367,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 16069.800000071526,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 16179.600000023842,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 1.600000023841858,
+                  "replayMs": 1.1999999284744263,
+                  "searchMs": 100.5,
+                  "totalMs": 103.29999995231628
+                }
+              }
+            ],
+            "frames": 111,
+            "camera": {
+              "kind": "camera-end",
+              "at": 7414.200000047684,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 16240,
+            "timeOrigin": 1793067905091.6,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        },
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 16453,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 3472.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3927.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3935.8000000715256,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5714.399999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5719,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5792.700000047684,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 5794.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 5802.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 5913.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 5939.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 6087.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 6088.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6102.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6219.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6276.700000047684,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6277.800000071526,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 6285.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 6389.5,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 2.700000047683716,
+                  "replayMs": 1.5999999046325684,
+                  "searchMs": 100.90000009536743,
+                  "totalMs": 105.20000004768372
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 6393.399999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6519.100000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6535.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6835.700000047684,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6836.700000047684,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 6851.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 6964.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 6968,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 6973.300000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6973.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 6984.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6985.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 6997.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 6998,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 6998,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 6998.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 10920.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 11289.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 11289.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 11352.800000071526,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 12308.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 12308.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 15696,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 15807.800000071526,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 1.8000000715255737,
+                  "replayMs": 1.399999976158142,
+                  "searchMs": 101,
+                  "totalMs": 104.20000004768372
+                }
+              }
+            ],
+            "frames": 111,
+            "camera": {
+              "kind": "camera-end",
+              "at": 6998,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 15867.899999976158,
+            "timeOrigin": 1793067923355.2,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        },
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 16251,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 3531.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3984.399999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3987.2000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5772.899999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5786.200000047684,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 5836.399999976158,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 5838.399999976158,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 5854.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 5926.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 6004.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 6138.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 6139,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 6153.300000071526,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6304,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6360.5,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6361.5,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 6368.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 6472.100000023842,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 1.7999999523162842,
+                  "replayMs": 0.3999999761581421,
+                  "searchMs": 102.89999997615814,
+                  "totalMs": 105.09999990463257
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 6475.899999976158,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6603.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6619.700000047684,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 6920.399999976158,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 6921.300000071526,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 6935.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 7049.700000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 7052.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 7060.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 7061.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 7070.200000047684,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 7070.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 7074.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 7074.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 7074.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7074.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 10994.100000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 11323.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 11323.899999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 11386.300000071526,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 12289.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 12289.800000071526,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 15680.600000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 15790.5,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 1.600000023841858,
+                  "replayMs": 1.1999999284744263,
+                  "searchMs": 100.80000007152557,
+                  "totalMs": 103.60000002384186
+                }
+              }
+            ],
+            "frames": 109,
+            "camera": {
+              "kind": "camera-end",
+              "at": 7074.600000023842,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 15846.700000047684,
+            "timeOrigin": 1793067940440.4,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "full-metal-public",
+      "started_at": "2026-10-27T02:26:18.279Z",
+      "stats": {
+        "startTime": "2026-10-27T02:26:18.279Z",
+        "duration": 30666.441,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "spectator starts paused with independent Normal settings and steps exactly once through a real Worker",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 4327
+        },
+        {
+          "title": "automatic spectator progresses with easy/easy",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 3044
+        },
+        {
+          "title": "automatic spectator progresses with easy/normal",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2661
+        },
+        {
+          "title": "automatic spectator progresses with normal/easy",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2559
+        },
+        {
+          "title": "automatic spectator progresses with normal/normal",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2533
+        },
+        {
+          "title": "2D/3D and camera remain interactive during real search, and cancel prevents a late move",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 11586,
+          "timeline": {
+            "events": [
+              {
+                "kind": "draw",
+                "at": 819.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 868.2000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 874,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2645.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2655.600000023842,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2689,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2690.7999999523163,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 1,
+                "requestId": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2705.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2797.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "draw",
+                "at": 2823,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "cancel",
+                "at": 2858,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 2858.399999976158,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 1
+              },
+              {
+                "kind": "draw",
+                "at": 2872.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2922.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 2955.5,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 2956.399999976158,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 2
+              },
+              {
+                "kind": "draw",
+                "at": 2972.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "reply",
+                "at": 3064.2999999523163,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2,
+                "requestId": 2,
+                "metrics": {
+                  "initMs": 1.7000000476837158,
+                  "replayMs": 0.2999999523162842,
+                  "searchMs": 100.70000004768372,
+                  "totalMs": 102.70000004768372
+                }
+              },
+              {
+                "kind": "draw",
+                "at": 3068.5,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3172.2999999523163,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3205.7000000476837,
+                "pending": false,
+                "phase": "一時停止中"
+              },
+              {
+                "kind": "draw",
+                "at": 3388.7999999523163,
+                "pending": false,
+                "phase": "次の着手待ち"
+              },
+              {
+                "kind": "request",
+                "at": 3389.899999976158,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 2,
+                "requestId": 3
+              },
+              {
+                "kind": "draw",
+                "at": 3405.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3517.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "pointerdown",
+                "at": 3522,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "pointermove",
+                "at": 3530.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3531.5,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointermove",
+                "at": 3538.600000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 1
+              },
+              {
+                "kind": "draw",
+                "at": 3538.7999999523163,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "pointerup",
+                "at": 3552.7000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "camera-end",
+                "at": 3553,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "trusted": true,
+                "buttons": 0
+              },
+              {
+                "kind": "cancel",
+                "at": 3553.100000023842,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 3553.2000000476837,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 2
+              },
+              {
+                "kind": "request",
+                "at": 7106.299999952316,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 3,
+                "requestId": 4
+              },
+              {
+                "kind": "cancel",
+                "at": 7308.799999952316,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7308.799999952316,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 3
+              },
+              {
+                "kind": "request",
+                "at": 7405.799999952316,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 4,
+                "requestId": 5
+              },
+              {
+                "kind": "cancel",
+                "at": 7845.299999952316,
+                "pending": true,
+                "phase": "先手 Normal 思考中…"
+              },
+              {
+                "kind": "terminate",
+                "at": 7845.299999952316,
+                "pending": true,
+                "phase": "先手 Normal 思考中…",
+                "worker": 4
+              },
+              {
+                "kind": "request",
+                "at": 11223.100000023842,
+                "pending": true,
+                "phase": "次の着手待ち",
+                "worker": 5,
+                "requestId": 6
+              },
+              {
+                "kind": "reply",
+                "at": 11335.5,
+                "pending": false,
+                "phase": "先手 Normal 思考中…",
+                "worker": 5,
+                "requestId": 6,
+                "metrics": {
+                  "initMs": 3.899999976158142,
+                  "replayMs": 0.5,
+                  "searchMs": 100.60000002384186,
+                  "totalMs": 105
+                }
+              }
+            ],
+            "frames": 148,
+            "camera": {
+              "kind": "camera-end",
+              "at": 3553,
+              "pending": true,
+              "phase": "先手 Normal 思考中…",
+              "trusted": true,
+              "buttons": 0
+            },
+            "observedAt": 11396.200000047684,
+            "timeOrigin": 1793067986858.3,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)"
+          }
+        },
+        {
+          "title": "Worker load failures are visible and retry recreates the worker",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1808
+        },
+        {
+          "title": "2D initial load defers the 3D module until it is selected",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1373
+        },
+        {
+          "title": "new game, difficulty, undo/redo, goto and import invalidate a pending search",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 5047
+        },
+        {
+          "title": "human promotion, pawn drop and record round-trip remain available alongside AI spectator",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 811
+        },
+        {
+          "title": "an asynchronous file read cannot replace a newer game",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 528
+        },
+        {
+          "title": "humans can play either color against Normal search",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 3151
+        },
+        {
+          "title": "serves the tested build commit",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 211
+        },
+        {
+          "title": "same record and position survive presentation switches and playback controls",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2698
+        },
+        {
+          "title": "record corruption is rejected before replay",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1411
+        },
+        {
+          "title": "800-ply trial can replay a complete all-kings capture",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1481
+        },
+        {
+          "title": "shows the initial position in 2D and 3D",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 876
+        },
+        {
+          "title": "human vs AI: select, see targets, move, inspect history, undo",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1688
+        },
+        {
+          "title": "human as White: the AI opens and answers automatically",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2287
+        },
+        {
+          "title": "AI vs AI can be watched and paused",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 4229
+        },
+        {
+          "title": "records round-trip through save and load, and invalid files are rejected",
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1459
+        }
+      ]
+    }
+  ],
+  "baseline": [
+    {
+      "file": "baseline-delayed-metal-local.json",
+      "mode": "metal",
+      "base": "http://localhost:4173",
+      "reports": [
+        {
+          "attempt": 0,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)",
+          "phase": "一時停止中",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067598620
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067598668
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067598668
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067598675
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067598675
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067598679
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067598679
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067598709
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067598709
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067598710
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067602011
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067602012
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 218.29999995231628,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 222.20000004768372,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 224.10000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 224.20000004768372,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2403.399999976158,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2442.899999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2443.100000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2444.100000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2444.100000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2459.100000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2459.100000023842,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2477.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2481.7999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2508.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2508.2999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2508.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2508.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2508.899999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2674.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2674.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2674.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2674.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2690.899999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2690.899999976158,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2706.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2707.100000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2708.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2723,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2723.7000000476837,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2739.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2739.899999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2741.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2742,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-reply",
+              "t": 5067.200000047684,
+              "phase": "先手 Normal 思考中…",
+              "result": {
+                "bestMove": "171161",
+                "completedDepth": 2,
+                "lastIterationNodes": "1272",
+                "nodes": "50000",
+                "schema": 1,
+                "score": 0,
+                "stopReason": "nodes",
+                "ttHits": "5879"
+              },
+              "metrics": {
+                "initMs": 2.100000023841858,
+                "replayMs": 0.3999999761581421,
+                "searchMs": 2367.2000000476837,
+                "totalMs": 2369.7000000476837
+              }
+            }
+          ],
+          "timeOrigin": 1793067595968.4
+        }
+      ]
+    },
+    {
+      "file": "baseline-metal-local.json",
+      "mode": "metal",
+      "base": "http://localhost:4173",
+      "reports": [
+        {
+          "attempt": 0,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067535469
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067535519
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067535519
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067535525
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067535525
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067535529
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067535529
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067535559
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067535559
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067535560
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067535560
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067535563
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 349.60000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 355.39999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 357.89999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 358.10000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2629.100000023842,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2670.3000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2670.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2671.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2671.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2687.100000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2687.100000023842,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2700.8000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2707,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2736.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2736.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2736.8000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2736.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2737.3000000715256,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2902.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2902.8000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2902.899999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2902.899999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2918.899999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2918.899999976158,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2934.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2935,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2937,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2951.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2951.8000000715256,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2967.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2968,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2969.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2970.3000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2971.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2971.899999976158,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067532590.3
+        },
+        {
+          "attempt": 1,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067538202
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067538251
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067538251
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067538260
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067538260
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067538262
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067538262
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067538294
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067538294
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067538295
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067538295
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067538296
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 123,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 123.5,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 123.70000004768372,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 123.70000004768372,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2204.100000023842,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2239.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2239.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2239.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2239.7000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2256.100000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2256.100000023842,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2267.2000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2272.8000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2305.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2305.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2305.8000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2305.8000000715256,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2306.3000000715256,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2455,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2455.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2455.3000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2455.3000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2471.5,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2471.5,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2486.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2487.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2488.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2503.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2504.2000000476837,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2520.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2520.7000000476837,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2522.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2522.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2523.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2523.5,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067535772.1
+        },
+        {
+          "attempt": 2,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067540892
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067540941
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067540941
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067540950
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067540950
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067540951
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067540951
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067540984
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067540984
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067540985
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067540985
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067540986
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 111.10000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 111.5,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 111.69999992847443,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 111.69999992847443,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2193.6999999284744,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2227.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2227.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2227.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2227.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2243.899999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2244,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2263.2999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2267.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2309.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2309.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2310,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2310,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2310.399999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2459.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2459.6999999284744,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2459.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2459.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2476,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2476,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2491.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2492.100000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2492.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2507.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2508.399999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2524.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2525,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2526.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2527.1999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2527.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2528.100000023842,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067538457.8
+        }
+      ]
+    },
+    {
+      "file": "baseline-metal-public.json",
+      "mode": "metal",
+      "base": "https://voxelshogi.yousan-apps.workers.dev",
+      "reports": [
+        {
+          "attempt": 0,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067490419
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067490475
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067490475
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067490482
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067490482
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067490486
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067490486
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067490515
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067490515
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067490516
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067490516
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067490518
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 2494.399999976158,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2495.100000023842,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2496.2000000476837,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2496.399999976158,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 4620.899999976158,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 4676.899999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 4678.700000047684,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 4680.200000047684,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 4680.300000071526,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 4689.899999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 4690,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 4709.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 4714.300000071526,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 4752.800000071526,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 4753,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 4753.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 4753.200000047684,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 4754.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 4936.300000071526,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 4936.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 4936.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 4936.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 4952.600000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 4952.600000023842,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 4968.200000047684,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 4969.100000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 4970.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 4984,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 4984.800000071526,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 5001,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 5001.300000071526,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 5002.700000047684,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 5003,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 5004.300000071526,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 5004.399999976158,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067485513.3
+        },
+        {
+          "attempt": 1,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067493611
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067493661
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067493661
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067493668
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067493668
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067493670
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067493670
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067493701
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067493701
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067493702
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067493702
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067493703
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 277.89999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 278.39999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 278.5,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 278.60000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2377.6999999284744,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2410.1999999284744,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2410.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2410.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2410.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2427.399999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2427.5,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2438.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2443.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2476.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2476.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2476.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2476.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2477.1999999284744,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2627.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2627.6999999284744,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2627.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2627.7999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2642.7999999523163,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2642.7999999523163,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2658.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2659.100000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2660.2999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2674.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2675.399999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2690.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2691,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2692.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2692.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2693.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2693.600000023842,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067491009.4
+        },
+        {
+          "attempt": 2,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067496567
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067496617
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067496617
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067496625
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067496625
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067496627
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067496627
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067496659
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067496659
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067496660
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067496660
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067496661
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 344.7999999523163,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 345.10000002384186,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 345.2999999523163,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 345.39999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2431.5,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2460.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2460.2999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2460.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2460.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2477.100000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2477.2000000476837,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2489.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2494.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2526.7999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2527,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2527.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2527.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2527.600000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2693.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2693.2999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2693.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2693.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2709.2999999523163,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2709.2999999523163,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 2725.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 2725.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2726.2000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 2741.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2741.899999976158,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2758.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 2758.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 2759.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2760.2000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2760.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2761,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067493899.7
+        }
+      ]
+    },
+    {
+      "file": "baseline-swift-public.json",
+      "mode": "swift",
+      "base": "https://voxelshogi.yousan-apps.workers.dev",
+      "reports": [
+        {
+          "attempt": 0,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067511792
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067511841
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067511841
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067511853
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067511853
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067511857
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067511857
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067511886
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067511886
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067511887
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067511887
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067511889
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 954.5,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 955.1999999284744,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 955.2999999523163,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 955.3999999761581,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 5503.699999928474,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 5537.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 5537.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 5537.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 5537.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 5554.600000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 5554.600000023842,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 5569.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 5574.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 5677.699999928474,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 5677.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 5678.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 5678.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 5678.600000023842,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 5969.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 5969.699999928474,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 5969.799999952316,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 5969.799999952316,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 5986.899999976158,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 5986.899999976158,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 6006.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 6007,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 6009.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 6018.299999952316,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 6018.699999928474,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 6039.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 6039.699999928474,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 6041.100000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 6041.399999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 6042.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 6042.600000023842,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067505846.1
+        },
+        {
+          "attempt": 1,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067515170
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067515232
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067515232
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067515236
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067515236
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067515238
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067515238
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067515271
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067515271
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067515271
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067515271
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067515273
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 319.7000000476837,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 320,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 320.3000000715256,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 320.3000000715256,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2712,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2745.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2745.600000023842,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2745.8000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2745.8000000715256,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2761.100000023842,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2761.100000023842,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2776.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2781,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2880.4000000953674,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2880.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2880.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2880.7000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2881.2000000476837,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 3128.2000000476837,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 3128.4000000953674,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 3128.4000000953674,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3128.4000000953674,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 3143.4000000953674,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 3143.4000000953674,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 3160,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 3160.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 3161.5,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 3176.4000000953674,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 3176.9000000953674,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 3193.2000000476837,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 3193.5,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 3195.4000000953674,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3195.600000023842,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3196.4000000953674,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 3196.5,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067512076.1
+        },
+        {
+          "attempt": 2,
+          "build": {
+            "commit": "c9d046c329a54f07ea7c94c3199519b7b6815910"
+          },
+          "phase": "先手 Normal 思考中…",
+          "node": [
+            {
+              "name": "begin",
+              "event": "start",
+              "t": 1793067518520
+            },
+            {
+              "name": "begin",
+              "event": "end",
+              "t": 1793067518578
+            },
+            {
+              "name": "mouse-move",
+              "event": "start",
+              "t": 1793067518578
+            },
+            {
+              "name": "mouse-move",
+              "event": "end",
+              "t": 1793067518585
+            },
+            {
+              "name": "mouse-down",
+              "event": "start",
+              "t": 1793067518585
+            },
+            {
+              "name": "mouse-down",
+              "event": "end",
+              "t": 1793067518588
+            },
+            {
+              "name": "mouse-drag",
+              "event": "start",
+              "t": 1793067518588
+            },
+            {
+              "name": "mouse-drag",
+              "event": "end",
+              "t": 1793067518645
+            },
+            {
+              "name": "mouse-up",
+              "event": "start",
+              "t": 1793067518645
+            },
+            {
+              "name": "mouse-up",
+              "event": "end",
+              "t": 1793067518647
+            },
+            {
+              "name": "observe-cancel",
+              "event": "start",
+              "t": 1793067518647
+            },
+            {
+              "name": "observe-cancel",
+              "event": "end",
+              "t": 1793067518648
+            }
+          ],
+          "events": [
+            {
+              "kind": "pointermove",
+              "t": 264.6999999284744,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 265.09999990463257,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 265.2999999523163,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 265.39999997615814,
+              "phase": "一時停止中",
+              "target": "BUTTON",
+              "buttons": 0
+            },
+            {
+              "kind": "input",
+              "t": 2660.899999976158,
+              "phase": "一時停止中",
+              "target": "thinking-budget"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2696.2999999523163,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2696.399999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2696.5,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2696.5999999046326,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 2713.5,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 2713.5,
+              "phase": "次の着手待ち",
+              "requestId": 1
+            },
+            {
+              "kind": "input",
+              "t": 2726.2999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "move-delay"
+            },
+            {
+              "kind": "input",
+              "t": 2731.7999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "slice-index"
+            },
+            {
+              "kind": "pointermove",
+              "t": 2835.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 2836.0999999046326,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 2836.1999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 2836.2999999523163,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 2836.6999999284744,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 3095.899999976158,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "pointerdown",
+              "t": 3096.0999999046326,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 1
+            },
+            {
+              "kind": "pointerup",
+              "t": 3096.1999999284744,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3096.1999999284744,
+              "phase": "一時停止中",
+              "target": "ai-step",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-create",
+              "t": 3112.5999999046326,
+              "phase": "次の着手待ち"
+            },
+            {
+              "kind": "worker-post",
+              "t": 3112.5999999046326,
+              "phase": "次の着手待ち",
+              "requestId": 2
+            },
+            {
+              "kind": "pointermove",
+              "t": 3128.0999999046326,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "frame",
+              "t": 3128.7999999523163,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerdown",
+              "t": 3129.899999976158,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "pointermove",
+              "t": 3144.5999999046326,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 3145.0999999046326,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointermove",
+              "t": 3185.0999999046326,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 1
+            },
+            {
+              "kind": "frame",
+              "t": 3186,
+              "phase": "先手 Normal 思考中…"
+            },
+            {
+              "kind": "pointerup",
+              "t": 3189.6999999284744,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3190,
+              "phase": "先手 Normal 思考中…",
+              "target": "CANVAS",
+              "buttons": 0
+            },
+            {
+              "kind": "click",
+              "t": 3191,
+              "phase": "先手 Normal 思考中…",
+              "target": "cancel-search",
+              "buttons": 0
+            },
+            {
+              "kind": "worker-terminate",
+              "t": 3191.1999999284744,
+              "phase": "先手 Normal 思考中…"
+            }
+          ],
+          "timeOrigin": 1793067515456.9
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "name": "camera-disabled",
+      "outcome": "caught",
+      "expected_failure": "draw after drag"
+    },
+    {
+      "name": "main-thread-blocked",
+      "outcome": "caught",
+      "expected_failure": "camera-end must be pending"
+    }
+  ],
+  "trace_scope": "Browser events retained; draw/clear samples retained through camera pointerup. Post-cancel damping frames omitted; full local raw reports remain in ignored runs/c0.",
+  "harness_sha256": {
+    "apps/web/e2e/ai.spec.ts": "bdad7b38cfbba4d031857eb1fb6fd1f286760d040a15d98da97b5a27064663c2",
+    "apps/web/e2e/interaction-probe.ts": "8d8fad5a6b657dc2213fbf7744789c9b9b1d59f32ec930270ff40741d7136dab"
+  }
+}
