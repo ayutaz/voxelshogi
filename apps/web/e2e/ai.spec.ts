@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { loadWasm } from '../tests/loadWasm';
 import { Game } from '../src/wasm/pkg/voxelshogi_wasm.js';
+import { installInteractionProbe, readInteractionProbe } from './interaction-probe';
 
 loadWasm();
 
@@ -43,89 +44,99 @@ for (const b of ['easy', 'normal']) for (const w of ['easy', 'normal']) {
   });
 }
 
-test('2D/3D and camera remain interactive during real search, and cancel prevents a late move', async ({ page }) => {
+test('2D/3D and camera remain interactive during real search, and cancel prevents a late move', async ({ page }, testInfo) => {
   // Software-GL screenshots can take seconds in CI. Capture outside searches;
   // every actual control operation must still finish before its real reply.
   test.setTimeout(60_000);
   const workers: string[] = [];
   page.on('worker', (worker) => workers.push(worker.url()));
-  await page.addInitScript(() => {
-    const state = window as unknown as { renderedFrames: number };
-    state.renderedFrames = 0;
-    const original = WebGL2RenderingContext.prototype.clear;
-    WebGL2RenderingContext.prototype.clear = function (mask: number) {
-      state.renderedFrames++;
-      return original.call(this, mask);
+  await installInteractionProbe(page);
+  try {
+    await page.goto('/');
+    await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+    const canvas = page.getByTestId('board3d').locator('canvas');
+    await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
+    await page.waitForTimeout(1000); // allow initial layout and camera damping to settle
+    const frames = (await readInteractionProbe(page)).frames;
+    expect(frames).toBeGreaterThan(0);
+    await page.waitForTimeout(250);
+    expect((await readInteractionProbe(page)).frames).toBe(frames);
+    await page.getByTestId('thinking-budget').selectOption('3000');
+    const begin = async (reuse = false) => {
+      const previousWorkers = workers.length;
+      await page.getByTestId('ai-step').click();
+      // The public module fetch and Playwright's worker event are asynchronous.
+      await expect.poll(() => workers.length).toBe(previousWorkers + (reuse ? 0 : 1));
+      await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
     };
-  });
-  await page.goto('/');
-  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
-  const canvas = page.getByTestId('board3d').locator('canvas');
-  await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
-  await page.waitForTimeout(1000); // allow initial layout and camera damping to settle
-  const frames = await page.evaluate(() => (window as unknown as { renderedFrames: number }).renderedFrames);
-  expect(frames).toBeGreaterThan(0);
-  await page.waitForTimeout(250);
-  expect(await page.evaluate(() => (window as unknown as { renderedFrames: number }).renderedFrames)).toBe(frames);
-  await page.getByTestId('thinking-budget').selectOption('3000');
-  const begin = async () => {
-    const previousWorkers = workers.length;
-    await page.getByTestId('ai-step').click();
-    // The public module fetch and Playwright's worker event are asynchronous.
-    await expect.poll(() => workers.length).toBe(previousWorkers + 1);
+    const cancel = async () => {
+      await page.getByTestId('cancel-search').click();
+      await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+      await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+    };
+    await begin();
+    await page.getByTestId('move-delay').fill('50');
+    await expect(page.getByTestId('move-delay')).toHaveValue('50');
+    await page.getByTestId('slice-index').fill('5');
+    await expect(page.getByTestId('slice-index')).toHaveValue('5');
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  };
-  const cancel = async () => {
-    await page.getByTestId('cancel-search').click();
+    expect(workers).toHaveLength(1); // display speed did not restart the search
+    await cancel();
+
+    await canvas.scrollIntoViewIfNeeded();
+    // Warm the second real Worker before measuring camera/search overlap. This
+    // avoids mistaking an in-flight module download for WASM computation.
+    await page.getByTestId('thinking-budget').selectOption('100');
+    await page.getByTestId('ai-step').click();
+    await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+    await page.getByTestId('undo').click();
+    await page.getByTestId('thinking-budget').selectOption('3000');
+    const beforeCamera = await canvas.screenshot();
+    const box = (await canvas.boundingBox())!;
+    await page.evaluate(() => window.interactionProbe.armCamera());
+    await begin(true);
+    await page.waitForTimeout(100); // warmed Worker is inside the actual search
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30, { steps: 2 });
+    await page.mouse.up();
+    // Regression: observing from the driver can be delayed beyond a real reply.
+    await page.waitForTimeout(3300);
+    const timeline = await readInteractionProbe(page);
+    const camera = timeline.camera!;
+    expect(camera).toMatchObject({ kind: 'camera-end', pending: true, trusted: true });
+    expect(camera.phase).toMatch(/思考中/);
+    const request = timeline.events.filter((e) => e.kind === 'request' && e.at <= camera.at).at(-1)!;
+    expect(timeline.events.some((e) => e.kind === 'reply' && e.worker === request.worker && e.at < request.at)).toBe(true);
+    const input = timeline.events.find((e) => e.kind === 'pointermove' && e.buttons === 1 && e.at > request.at)!;
+    expect(input).toMatchObject({ pending: true, trusted: true });
+    expect(timeline.events.some((e) => e.kind === 'draw' && e.pending && e.at > input.at && e.at <= camera.at)).toBe(true);
+    expect(timeline.events.some((e) => e.kind === 'terminate' && e.worker === request.worker && e.at >= camera.at)).toBe(true);
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
     await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-  };
-  await begin();
-  await page.getByTestId('move-delay').fill('50');
-  await expect(page.getByTestId('move-delay')).toHaveValue('50');
-  await page.getByTestId('slice-index').fill('5');
-  await expect(page.getByTestId('slice-index')).toHaveValue('5');
-  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  expect(workers).toHaveLength(1); // display speed did not restart the search
-  await cancel();
+    expect((await canvas.screenshot()).equals(beforeCamera)).toBe(false);
 
-  await canvas.scrollIntoViewIfNeeded();
-  const beforeCamera = await canvas.screenshot();
-  const box = (await canvas.boundingBox())!;
-  await begin();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 + 30, { steps: 2 });
-  await page.mouse.up();
-  // OrbitControls damping keeps drawing. Playwright click actionability waits
-  // for animation frames, which can outlast the real search on software GL.
-  // Observe and click atomically; keep the actual mouse drag and real Worker.
-  const cameraPhase = await page.evaluate(() => {
-    const phase = document.querySelector('[data-testid="ai-phase"]')?.textContent ?? '';
-    if (phase.includes('思考中')) document.querySelector<HTMLButtonElement>('[data-testid="cancel-search"]')?.click();
-    return phase;
-  });
-  expect(cameraPhase).toMatch(/思考中/);
-  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-  await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-  expect((await canvas.screenshot()).equals(beforeCamera)).toBe(false);
-
-  await begin();
-  await page.getByRole('button', { name: '2D', exact: true }).click();
-  await expect(page.getByTestId('board3d')).toHaveCount(0);
-  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  await cancel();
-  await begin();
-  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
-  await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
-  await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
-  await cancel();
-  await page.waitForTimeout(3300);
-  await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-  await page.getByTestId('thinking-budget').selectOption('100');
-  await page.getByTestId('ai-step').click();
-  await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
-  expect(workers).toHaveLength(5); // explicit cancellations recreated it
+    await begin();
+    await page.getByRole('button', { name: '2D', exact: true }).click();
+    await expect(page.getByTestId('board3d')).toHaveCount(0);
+    await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+    await cancel();
+    await begin();
+    await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+    await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
+    await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
+    await cancel();
+    await page.waitForTimeout(3300);
+    await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+    await page.getByTestId('thinking-budget').selectOption('100');
+    await page.getByTestId('ai-step').click();
+    await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+    expect(workers).toHaveLength(5); // explicit cancellations recreated it
+  } finally {
+    const timeline = await readInteractionProbe(page);
+    console.info('C0 interaction timeline:', JSON.stringify(timeline));
+    await testInfo.attach('interaction-timeline', { body: JSON.stringify(timeline, null, 2), contentType: 'application/json' });
+  }
 });
 
 test('Worker load failures are visible and retry recreates the worker', async ({ page }) => {

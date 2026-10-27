@@ -140,6 +140,11 @@ jobs:
         env:
           PW_CHANNEL: ''
           E2E_COMMIT: ${{ github.sha }}
+      - name: Repeat search and camera regression without retries
+        run: pnpm e2e ai.spec.ts --grep '2D/3D and camera' --repeat-each=3 --workers=1 --retries=0
+        env:
+          PW_CHANNEL: ''
+          E2E_COMMIT: ${{ github.sha }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: failure()
         with:
@@ -247,6 +252,13 @@ jobs:
         id: e2e
         if: steps.candidate.outputs.current == 'true'
         run: pnpm e2e
+        working-directory: apps/web
+        env:
+          PW_CHANNEL: ''
+          E2E_COMMIT: ${{ github.sha }}
+      - name: Repeat public search and camera regression without retries
+        if: steps.candidate.outputs.current == 'true'
+        run: pnpm e2e ai.spec.ts --grep '2D/3D and camera' --repeat-each=3 --workers=1 --retries=0
         working-directory: apps/web
         env:
           PW_CHANNEL: ''
