@@ -47,3 +47,11 @@ it('requires finite, complete FP32 differences separately from same-format refer
   difference['initial-b'].policy.rmse = NaN;
   expect(() => parseModel(m)).toThrow();
 });
+
+it('requires model license and card descriptors for public packages while allowing local drafts', () => {
+  const index = deploymentFixture();
+  Reflect.set(index, 'modelNotices', []);
+  expect(() => parseDeployment(index)).toThrow();
+  index.publication = false;
+  expect(parseDeployment(index, true).modelNotices).toEqual([]);
+});

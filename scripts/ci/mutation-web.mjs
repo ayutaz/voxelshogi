@@ -63,6 +63,8 @@ const mutations = [
   { name: 'inference-fp32-difference', file: 'inference/manifest.ts', before: "v.precision !== 'fp32'", after: 'false', test: 'inference-manifest' },
   { name: 'inference-cached-precision', file: 'inference/engine.ts', before: 'port.createSession(model, variant.precision)', after: "port.createSession(model, 'fp32')", test: 'inference-engine' },
   { name: 'inference-decoded-transfer', file: 'inference/resources.ts', before: 'decodedBytes: e.decodedBodySize', after: 'decodedBytes: e.encodedBodySize', test: 'inference-resources' },
+  { name: 'inference-model-notices', file: 'inference/manifest.ts', before: 'index.publication && modelNotices.length < 2', after: 'false', test: 'inference-manifest' },
+  { name: 'inference-notice-verification', file: 'inference/runtime.ts', before: 'await Promise.all(index.modelNotices.map(file => fetchVerified(assetUrl(assetBase, file.path), file, signal)));', after: '', test: 'inference-runtime' },
 ];
 
 function main() {
@@ -108,7 +110,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 48);
+    assert.equal(results.length, 50);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

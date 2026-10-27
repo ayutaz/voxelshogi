@@ -31,7 +31,7 @@ function pkg() {
   const base = model.variants[0]!;
   const references = Object.fromEntries(model.fixtures.map(f => [f.name, base.references['initial-b']!]));
   model.variants = (['fp32', 'fp16', 'int8'] as const).map(id => ({ ...base, id, precision: id, references }));
-  return { model, index: deploymentFixture(), packageHash: 'a'.repeat(64) } as unknown as ModelPackage;
+  return { model, index: deploymentFixture(), packageHash: 'a'.repeat(64), assetBase: 'https://example.test/models/m3/', modelBase: 'https://example.test/models/m3/models/hash/' } as unknown as ModelPackage;
 }
 async function mount() {
   fake.load.mockResolvedValue(pkg());
@@ -47,6 +47,8 @@ it('shows the untrained model and every executable precision, with no claim of p
   expect(precision.querySelectorAll('option')).toHaveLength(3);
   expect(precision.textContent).toContain('INT8（重み）');
   expect(screen.getByTestId('model-hash').textContent).toBe('a'.repeat(64));
+  expect(screen.getByRole('link', { name: 'モデルのライセンス' }).getAttribute('href')).toBe('https://example.test/models/m3/models/hash/LICENSE.txt');
+  expect(screen.getByRole('link', { name: 'Model Card' }).getAttribute('href')).toBe('https://example.test/models/m3/models/hash/MODEL_CARD.md');
   expect(screen.getByTestId('fixture-side').textContent).toContain('先手');
   fireEvent.change(screen.getByLabelText('検証局面'), { target: { value: 'after-one-w' } });
   expect(screen.getByTestId('fixture-side').textContent).toContain('後手');

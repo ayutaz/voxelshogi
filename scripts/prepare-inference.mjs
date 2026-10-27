@@ -24,6 +24,8 @@ export function prepareInference(modelDirectory, outputDirectory, runtimeDirecto
   if (publication) {
     assert.equal(manifest.license, 'Apache-2.0', 'model license must be approved before publication');
     assert.equal(manifest.sourceDirty, false, 'publication requires clean source');
+    assert.ok(typeof manifest.sourceCommit === 'string' && /^[0-9a-f]{40}$/.test(manifest.sourceCommit), 'publication requires a source commit');
+    assert.equal(manifest.trained, false, 'M3 approval does not cover trained models');
   }
   const runtimePackage = JSON.parse(readFileSync(resolve(runtimeDirectory, 'package.json'), 'utf8'));
   assert.equal(runtimePackage.version, '1.31.1', 'runtime files and pinned API must match');
@@ -58,7 +60,13 @@ export function prepareInference(modelDirectory, outputDirectory, runtimeDirecto
   }
   const noticesDirectory = existsSync(resolve(runtimeDirectory, 'LICENSE')) ? runtimeDirectory : resolve(root, 'third_party/onnxruntime-1.31.1');
   const notices = ['LICENSE', 'ThirdPartyNotices.txt'].map((name) => write(runtimePrefix + name, readFileSync(resolve(noticesDirectory, name))));
-  const index = { schema: 1, publication,
+  const modelNotices = [];
+  if (manifest.license === 'Apache-2.0') {
+    const license = readFileSync(resolve(root, 'LICENSE'));
+    const card = Buffer.from(`# Untrained VoxelShogi model\n\nModel ID: ${manifest.id}\n\nUntrained, fixed-seed technical validation only. This is not a playing-strength or win-probability estimate.\n\n- Parameters: ${manifest.parameters}\n- Seed: ${manifest.seed}\n- License: Apache-2.0 (see the accompanying LICENSE file)\n- Source commit: ${manifest.sourceCommit}\n- Source dirty: ${manifest.sourceDirty}\n- Input: float32 [1,729,43], standard single-king rules\n- Outputs: float32 Policy [1,1067985] and Value [1,1]\n\n| Variant | Precision | Bytes | SHA-256 |\n|---|---|---:|---|\n${manifest.variants.map(v => `| ${v.id} | ${v.precision} | ${v.model.bytes} | ${v.model.sha256} |`).join('\n')}\n\nINT8 stores quantized weights and computes in float32 with graph optimization basic. FP16 WebGPU did not meet the numerical criteria on the tested Apple M1; the FP16 WASM path is verified. Other devices must pass runtime comparison before an output is accepted.\n\nFull conversion settings, same-format reference files and FP32 differences are in manifest.json. The original checkpoint and fixed inputs belong to the same package.\n\n[Validation records](https://github.com/ayutaz/voxelshogi/blob/main/docs/M3_VALIDATION.md)\n`);
+    modelNotices.push(write(`${modelPrefix}LICENSE-${sha(license)}.txt`, license), write(`${modelPrefix}MODEL_CARD-${sha(card)}.md`, card));
+  }
+  const index = { schema: 1, publication, modelNotices,
     model: write(modelPrefix + 'manifest.json', manifestBytes),
     runtime: { version: runtimePackage.version, license: runtimePackage.license, bundle: write(runtimePrefix + bundleName, bundle),
       bootstrap: write(runtimePrefix + bootstrapName, bootstrap), wasm: { path: wasmName, bytes: wasm.length, sha256: sha(wasm), parts }, notices },

@@ -55,13 +55,15 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）・Web48変異・Python16変異・CI制御5変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）・Web50変異・Python16変異・CI制御11変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
 - `Rust core coverage`、`Web unit coverage`、`Known mutation regressions`
 
 M3の `Browser model inference (real WASM)` もCI Gateへ必須の依存として含める。uvから3形式を生成してlocalhostで実際に読み込み、専用Worker・全出力照合・描画と中断・破損／未対応表示の6 E2Eを行う。GPUを持たないCIは実機GPUの証拠にはしない。モデルのライセンス確定までは、生成物をこのジョブ内だけに置き、モデルやtraceをartifactへ公開しない。
+
+モデル公開の設定は `export/publication.json`。ユーザーのライセンス回答を得るまで `approved=false`・`license=null` を維持する。承認の対象はこのIDの未学習モデルだけで、M6の学習済みモデルへ拡大しない。公開時はclean source・全3形式・ライセンスとModel Cardを検証し、実モデルE2Eを通った同じ配布物を公開する。公開後は `scripts/verify-model-distribution.mjs` がアプリのWorker・モデル・参照値・ORT全ファイルの実配信SHA、サイズ、MIME、cacheを確認する。アプリの実ファイル一覧はbuild時の `inference-build.json` に保存する。承認待ちの条件分岐がskipされたことを、公開経路の成功とは数えない。
 
 実機検証の再現コマンド（事前にWASMビルド・依存導入を行う）：
 
@@ -75,6 +77,8 @@ node scripts/measure-browser-models.mjs runs/m3/browser-measurement.json
 ```
 
 計測は3Dあり／なし・各4入力・3形式・WASM／WebGPUを対象に、初回、準備10回＋測定30回、20回のモデル切替を保存する。取得可能なmain JS heapとChrome所有プロセスのRSS、管理tensor量を区別し、GPU総量は取得不可の理由を残す。Macでは計測プロセスの実行中だけアイドル休止を抑止する。観測が5秒を超えて途切れた試行は成功に含めない。`--smoke` は短い動作確認であり、M3完了の計測には数えない。公開前のモデル生成に `--license` を勝手に追加しない。
+
+切替は初回ロードを除き、直前と異なる形式を20回選ぶ。`--switches-only` はこの資源解放の追加検証だけを行い、全48組の性能計測完了とは表示しない。
 
 GitHub Actions が発行したチェックだけを受理し、CodeQL の error と high/critical セキュリティ警告も取り込みを止める。カバレッジは測定とレポートの保存を必須とし、一律の割合基準は設けない。全体の cargo-mutants 調査は週次・手動で行う。
 
