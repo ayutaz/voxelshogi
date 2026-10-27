@@ -1,0 +1,664 @@
+{
+  "schema": 1,
+  "id": "voxelshogi-transformer-s-untrained-314159-v1",
+  "trained": false,
+  "license": "Apache-2.0",
+  "inputSchema": "voxelshogi-standard-features-v1",
+  "seed": 314159,
+  "ruleset": "voxelshogi-standard-v1",
+  "config": {
+    "width": 256,
+    "layers": 6,
+    "heads": 8,
+    "ffn": 1024,
+    "policy_rank": 64
+  },
+  "parameters": 5021064,
+  "inputs": {
+    "features": {
+      "shape": [
+        1,
+        729,
+        43
+      ],
+      "dtype": "float32"
+    }
+  },
+  "outputs": {
+    "policy": {
+      "shape": [
+        1,
+        1067985
+      ],
+      "dtype": "float32"
+    },
+    "value": {
+      "shape": [
+        1,
+        1
+      ],
+      "dtype": "float32"
+    }
+  },
+  "sourceFiles": {
+    "export/contract.py": "e7ecee6baa353155167aa2484d514525a83da112be31172fde1c19a62e806fcb",
+    "export/model.py": "e975acdd9178a54c6270e6a1c7666246086abf46dd6d4d0e24953df9503248e1",
+    "export/generate.py": "3d62d4cea876af0fa2a2e6ee18158867e823e6d7195d8bd76242d1d3b6b2a9ec",
+    "export/variants.py": "1eb1e36030426ca2e00c94ec203c74450f87284f176cdccc9986fc4c46a7f112",
+    "export/fixtures/positions.json": "8308b5a26e22bc0c730fbefd3b8c4edac589e6fc14c3895595fa3b6cd8702897",
+    "uv.lock": "debbadb9b2ff80c51b009f2a839eaa0f8fe833f1c3f3cf93bfb994d0e523e118"
+  },
+  "sourceCommit": "dd3762cf2bef0e86aa34448cb220618fcbbc9629",
+  "sourceDirty": false,
+  "environment": {
+    "python": "3.14.9",
+    "system": "Linux",
+    "machine": "x86_64",
+    "packages": {
+      "torch": "2.14.1+cpu",
+      "onnx": "1.23.2",
+      "onnxruntime": "1.31.1",
+      "numpy": "2.5.4",
+      "onnxscript": "0.7.2",
+      "safetensors": "0.8.0",
+      "onnxconverter-common": "1.16.0"
+    }
+  },
+  "checkpoint": {
+    "path": "model.safetensors",
+    "bytes": 20092056,
+    "sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c"
+  },
+  "fixtures": [
+    {
+      "name": "initial-b",
+      "side": "b",
+      "record": {
+        "ruleset_id": "voxelshogi-standard-v1",
+        "initial": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1",
+        "moves": [],
+        "result": null,
+        "termination": null
+      },
+      "input": {
+        "path": "inputs/initial-b.f32",
+        "bytes": 125388,
+        "sha256": "e45e6524437c01d7ad4d61db1faded24a2b1d0aaaf814fbbbcb42aa198f0642a"
+      }
+    },
+    {
+      "name": "after-one-w",
+      "side": "w",
+      "record": {
+        "ruleset_id": "voxelshogi-standard-v1",
+        "initial": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1",
+        "moves": [
+          "577567"
+        ],
+        "result": null,
+        "termination": null
+      },
+      "input": {
+        "path": "inputs/after-one-w.f32",
+        "bytes": 125388,
+        "sha256": "fea43477b26cf5b66d8da7c9123309a2bb4a20821952e0ab47c845347135d1b6"
+      }
+    },
+    {
+      "name": "mate-in-one-b",
+      "side": "b",
+      "record": {
+        "ruleset_id": "voxelshogi-standard-v1",
+        "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b - 1",
+        "moves": [],
+        "result": null,
+        "termination": null
+      },
+      "input": {
+        "path": "inputs/mate-in-one-b.f32",
+        "bytes": 125388,
+        "sha256": "c817286c328d398fe4026bc5ac9c888c6aab963fd19314d527e473e82d80c3b6"
+      }
+    },
+    {
+      "name": "material-b",
+      "side": "b",
+      "record": {
+        "ruleset_id": "voxelshogi-standard-v1",
+        "initial": "8k/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/4+p4/4+R4/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/K8 b 2Ps 1",
+        "moves": [],
+        "result": null,
+        "termination": null
+      },
+      "input": {
+        "path": "inputs/material-b.f32",
+        "bytes": 125388,
+        "sha256": "9f98fdc7ba475e87e9128faeded6254a3b809ab0c96d1d7e50d80be5b8dfc5ca"
+      }
+    }
+  ],
+  "variants": [
+    {
+      "id": "fp32",
+      "precision": "fp32",
+      "model": {
+        "path": "fp32.onnx",
+        "bytes": 20427330,
+        "sha256": "142ca39efda9d8c2e183c06cf75245960ab93c31f0605784a0cd930521a1a075"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Concat",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/fp32/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "7c2430cb5e6a26a3dd6ea5135224809fba3d64185509abc22a2cb8c71300a044"
+          },
+          "value": {
+            "path": "reference/fp32/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "f32e752db70f8c6a874601e1cfbd0b53231e81920389571f517b143982a4c971"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/fp32/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "e421682bf5f46e51a61362200b0319ae01a046b2408b48bcce86f8c3986bcbd2"
+          },
+          "value": {
+            "path": "reference/fp32/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "20a35b516c043f5b28475d361905a160a8508905c4ce66c67a0638e2fa053239"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/fp32/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "c7d98132dad4d3d91dd09b619dee4d4dbd434694bf53684568ce7fd0fffe3f82"
+          },
+          "value": {
+            "path": "reference/fp32/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "35d3e85240d1cddc88f9788ed48cb0c9ca999447e653afe7185700ace4a0f26c"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/fp32/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "01d270a45a85e420f763725f0e41d2dfcce855b95cd2b2ce39e805f49070416b"
+          },
+          "value": {
+            "path": "reference/fp32/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "1eb3ef94d694c56a5ca2a9df82dd9225e133ba4de45be9a0d856e16d5526ba33"
+          }
+        }
+      },
+      "torchComparison": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 1.6093254089355469e-06,
+            "max_relative": 5.629569188724141,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 4.470348358154297e-08,
+            "max_relative": 1.826318120752745e-07,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 1.4007091522216797e-06,
+            "max_relative": 0.8907929157876131,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 1.341104507446289e-07,
+            "max_relative": 5.478907332987837e-07,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 1.6391277313232422e-06,
+            "max_relative": 3.1575886664334085e-05,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 1.1920928955078125e-07,
+            "max_relative": 5.16400959008221e-07,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 1.430511474609375e-06,
+            "max_relative": 3.913422525088752e-05,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 4.470348358154297e-08,
+            "max_relative": 1.9759011195850925e-07,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        }
+      }
+    },
+    {
+      "id": "fp16",
+      "precision": "fp16",
+      "model": {
+        "path": "fp16.onnx",
+        "bytes": 10398313,
+        "sha256": "6cb2345ad5b658e104b37b0283e5b4332a04579898eb76131ddf0b5761b5678f"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Cast",
+        "Concat",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "conversion": {
+        "method": "onnxconverter-common-float16",
+        "keepIoTypes": true,
+        "minPositive": 5.960464477539063e-08,
+        "maxFinite": 65504,
+        "blockedOperators": [
+          "ArrayFeatureExtractor",
+          "Binarizer",
+          "CastMap",
+          "CategoryMapper",
+          "DictVectorizer",
+          "FeatureVectorizer",
+          "Imputer",
+          "LabelEncoder",
+          "LinearClassifier",
+          "LinearRegressor",
+          "Normalizer",
+          "OneHotEncoder",
+          "RandomUniformLike",
+          "SVMClassifier",
+          "SVMRegressor",
+          "Scaler",
+          "TreeEnsembleClassifier",
+          "TreeEnsembleRegressor",
+          "ZipMap",
+          "NonMaxSuppression",
+          "TopK",
+          "RoiAlign",
+          "Resize",
+          "Range",
+          "CumSum",
+          "Min",
+          "Max",
+          "Upsample"
+        ],
+        "initializerTypes": {
+          "7": 9,
+          "10": 70
+        },
+        "castNodes": 3
+      },
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/fp16/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "8c3267d4ce458afe837631bae29e873426481a3d5fb3527cb982981e348328be"
+          },
+          "value": {
+            "path": "reference/fp16/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "5e18175cb79478ed49c173857a10ac7fc0470a49945fd5d64cae94053fa58900"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/fp16/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "a5b61183212556f56e6ed691ac114e4a5f589683c0bd938ba74513ed18af942f"
+          },
+          "value": {
+            "path": "reference/fp16/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "5771eb60d275390bba8f9e355f9d9e4cc601fb78a09f2588e07d814f785bae0d"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/fp16/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "3979495db5bd5efd272c0677143a41ef2a5d8f9776b6c05549211640723075e7"
+          },
+          "value": {
+            "path": "reference/fp16/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "0d8a588fb0697a2e6e6f0a6a925e0f3465c19f2909d1eca3464f9e46b377f8e6"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/fp16/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "62242e008f524692e4d1f888f4b43f3c5312b1f36a8ad01395f80dfe61b3fd7d"
+          },
+          "value": {
+            "path": "reference/fp16/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "be474e55c190afd2117c946c50fba2dde0bac67b0205ff04cb0e4a38cf9535ee"
+          }
+        }
+      },
+      "fp32Difference": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.001583397388458252,
+            "mae": 0.00018669339642849695,
+            "rmse": 0.00023347906594324078,
+            "maxRelative": 1621.9162004993557,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 6.787478923797607e-05,
+            "mae": 6.787478923797607e-05,
+            "rmse": 6.787478923797607e-05,
+            "maxRelative": 0.0002772959173579026,
+            "argmaxEqual": true
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.0014797449111938477,
+            "mae": 0.0001844799891287512,
+            "rmse": 0.0002299946232523669,
+            "maxRelative": 14976.431694882447,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 6.528198719024658e-05,
+            "mae": 6.528198719024658e-05,
+            "rmse": 6.528198719024658e-05,
+            "maxRelative": 0.000266701179743324,
+            "argmaxEqual": true
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.0014448761940002441,
+            "mae": 0.0002665167610632748,
+            "rmse": 0.0003299259875738282,
+            "maxRelative": 0.057499443288317874,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 4.722177982330322e-05,
+            "mae": 4.722177982330322e-05,
+            "rmse": 4.722177982330322e-05,
+            "maxRelative": 0.00020455922425255196,
+            "argmaxEqual": true
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.00138777494430542,
+            "mae": 0.00023467782435998685,
+            "rmse": 0.0002837376874049117,
+            "maxRelative": 0.022672859875983213,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 4.0337443351745605e-05,
+            "mae": 4.0337443351745605e-05,
+            "rmse": 4.0337443351745605e-05,
+            "maxRelative": 0.00017829217958599989,
+            "argmaxEqual": true
+          }
+        }
+      },
+      "referenceEngine": {
+        "name": "onnxruntime",
+        "version": "1.31.1",
+        "provider": "CPUExecutionProvider",
+        "graphOptimization": "all"
+      }
+    },
+    {
+      "id": "int8",
+      "precision": "int8",
+      "model": {
+        "path": "int8.onnx",
+        "bytes": 5433774,
+        "sha256": "e512cbe716808b1c21f1a15aa679b40b6ab84457430a840631969c86921ff149"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Concat",
+        "DequantizeLinear",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "conversion": {
+        "method": "symmetric-per-tensor-weight-only-int8",
+        "range": [
+          -127,
+          127
+        ],
+        "zeroPoint": 0,
+        "rounding": "ties-to-even",
+        "minimumScale": 1.1754943508222875e-38,
+        "activations": "float32",
+        "compute": "float32",
+        "quantizedTensors": 31,
+        "quantizedElements": 5000000
+      },
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/int8/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "b7218f39fd8803b609aa5ef30f6aabf355bcc0fa6375cf274196269841751f26"
+          },
+          "value": {
+            "path": "reference/int8/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "6a45b1eed8a4886dbff8afa31b9c287c1cf2f7cf98a1a3f474517e3d427ca6d9"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/int8/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "8b8fc5261a5c0b1bc037c5fe383fe6de838a6ac436d155c64db934a60ce251ff"
+          },
+          "value": {
+            "path": "reference/int8/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "d2fa951d7ceb62f2425d382ad113410a2f7b8204111b2b08b1c1607ed2de285c"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/int8/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "41298019a30707ae9eb310cbe9f2e7596a068ee96961afc9fb1d4eef70c53123"
+          },
+          "value": {
+            "path": "reference/int8/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "4b6a654543a49ff5056006d0078ace6f0467144d8521453f575f3ffc8a60bf2c"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/int8/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "9199201e6eb1e5c87cc2d911619a043918585e3d0c12574d5497bd2d485381d2"
+          },
+          "value": {
+            "path": "reference/int8/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "8ae68de2eeecc5138c918cfb97fc6641b2171337a89b9e52e510f6a010d177e6"
+          }
+        }
+      },
+      "fp32Difference": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.010859610512852669,
+            "mae": 0.008608646804716657,
+            "rmse": 0.00864551732237647,
+            "maxRelative": 157253.34471474204,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 9.955465793609619e-05,
+            "mae": 9.955465793609619e-05,
+            "rmse": 9.955465793609619e-05,
+            "maxRelative": 0.00040672097121144835,
+            "argmaxEqual": true
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.010860372334718704,
+            "mae": 0.008609794579904495,
+            "rmse": 0.008646701577966638,
+            "maxRelative": 773004.1611372912,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 9.909272193908691e-05,
+            "mae": 9.909272193908691e-05,
+            "rmse": 9.909272193908691e-05,
+            "maxRelative": 0.0004048305969625895,
+            "argmaxEqual": true
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.011289417743682861,
+            "mae": 0.005931022513415364,
+            "rmse": 0.005944348120338387,
+            "maxRelative": 0.23047455931510766,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.001157909631729126,
+            "mae": 0.001157909631729126,
+            "rmse": 0.001157909631729126,
+            "maxRelative": 0.005015929024856044,
+            "argmaxEqual": true
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.01110464334487915,
+            "mae": 0.00581265981485202,
+            "rmse": 0.005821864266239291,
+            "maxRelative": 0.31818049929416575,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.0011317133903503418,
+            "mae": 0.0011317133903503418,
+            "rmse": 0.0011317133903503418,
+            "maxRelative": 0.005002192262725349,
+            "argmaxEqual": true
+          }
+        }
+      },
+      "referenceEngine": {
+        "name": "onnxruntime",
+        "version": "1.31.1",
+        "provider": "CPUExecutionProvider",
+        "graphOptimization": "basic"
+      }
+    }
+  ]
+}

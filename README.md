@@ -28,15 +28,15 @@
 
 各フェーズの目的とゴールは [docs/ROADMAP.md](docs/ROADMAP.md) にあります。
 
-M0・R0・M1・M2は通常PRの取り込みと公開後検証まで完了しました。M1は全1,172変異の分類と、Apple M1 Nativeで初期局面の深さ2・約0.33秒を確認済みです。[現在地と確認元](docs/STATUS.md)・[M1検証記録](docs/M1_VALIDATION.md)。次はM3のブラウザ推論検証です。[具体的な計画](docs/M3_PLAN.md) を策定済みで、モデル実装は未着手です。
+M0・R0・M1・M2と、M3のブラウザモデル推論検証を完了しました。M3は未学習の約502万パラメータモデルをFP32・FP16・INT8重みへ変換し、実配信ファイルと実機M1／Chromeで数値・速度・3D同時動作を確認しています。[現在地](docs/STATUS.md)・[M3の固定記録と制約](docs/M3_VALIDATION.md)。次はM4のPythonバインディングとデータ生成です。
 
 人間同士の対局・マルチプレイは実装しません。変更は必ず作業ブランチと PR を使い、必須 CI の成功後に取り込みます。[開発手順](CONTRIBUTING.md)
 
-公開サイトでは、両AIにEasy（ランダム）／Normal（探索）を設定して観戦できます。初期表示は観戦・一時停止・2Dで、再開・1手送り・待ち時間変更・3D表示を使えます。公開SHA・実機計測・検証結果は [段階別記録](docs/M2_VALIDATION.md) に保存しています。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)はCPU生成済みの固定棋譜を再生する別の試作で、400／800手と全体／注目表示を比較できます。学習モデルは後続のM3・M6です。
+公開サイトでは、両AIにEasy（ランダム）／Normal（探索）を設定して観戦できます。初期表示は観戦・一時停止・2Dで、再開・1手送り・待ち時間変更・3D表示を使えます。公開SHA・実機計測・検証結果は [段階別記録](docs/M2_VALIDATION.md) に保存しています。[9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)はCPU生成済みの固定棋譜を再生する別の試作で、400／800手と全体／注目表示を比較できます。学習済みモデルによる対局はM6の対象です。
 
-M2ではRust core153件＋WASM境界5件、Web単体115件、CI制御Node49件、既知変異はcore／WASM33件とWeb29件、E2E 21件を検証対象にしています。[段階別記録](docs/M2_VALIDATION.md)。PRでは必須7チェックを実行し、main統合後に配信SHAと公開E2Eを確認します。
+PRでは必須8チェックを実行し、main統合後にも配信SHAと公開E2Eを確認します。Rust core153件＋WASM境界5件、Web172件、Python48件、CI制御Node67件、既知変異と既存E2E21件・モデル6件が対象です。[M3検証記録](docs/M3_VALIDATION.md)
 
-M3・M6では、実機のブラウザで動く変換済みモデルをデモに組み込みます。公開する FP16・量子化版なども個別に選択して対局・観戦できるようにし、配信する同じモデルで精度・棋力・速度・サイズを評価します。
+[モデル推論ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1)で、公開した3形式を個別に選んで実行できます。M1／ChromeではFP32・INT8重みはWebGPU／WASM、FP16はWASMが数値基準を満たしました。FP16×WebGPUの基準未達も表示し、別形式へ自動置換しません。未学習モデルのため棋力を示すデモではありません。学習・棋力比較・対局画面への接続はM6で行います。
 
 ## ローカルで動かす
 
@@ -60,7 +60,7 @@ pnpm dev                        # http://localhost:5173
 | 文書 | 内容 |
 |---|---|
 | [docs/STATUS.md](docs/STATUS.md) | 現在の実装・公開・CIと文書の役割 |
-| [docs/M3_PLAN.md](docs/M3_PLAN.md) | 次のブラウザ推論検証の目的・TDD・実機計測・公開条件 |
+| [docs/M3_PLAN.md](docs/M3_PLAN.md) | 完了したブラウザ推論検証の目的・TDD・実機計測・公開条件 |
 | [docs/M2_PLAN.md](docs/M2_PLAN.md) | 完了したWeb探索AI観戦の実装順・TDD・完了条件 |
 | [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | 目的・スコープ・横断的な要件 |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | フェーズごとの目的・ゴール・進捗 |

@@ -2,6 +2,18 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { modelSwitchVariants } from '../measure-browser-models.mjs';
 
+test('WebGPU switches start with a different model and alternate the verified formats', () => {
+  const variants = modelSwitchVariants(20, 'webgpu');
+  assert.equal(variants.length, 20);
+  let previous = 'fp32';
+  for (const variant of variants) {
+    assert.ok(['fp32', 'int8'].includes(variant));
+    assert.notEqual(variant, previous);
+    previous = variant;
+  }
+  assert.deepEqual(variants.slice(0, 4), ['int8', 'fp32', 'int8', 'fp32']);
+});
+
 test('twenty model switches all change the preceding model, excluding the initial load', () => {
   const variants = modelSwitchVariants(20);
   assert.equal(variants.length, 20);

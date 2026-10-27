@@ -1,6 +1,6 @@
 # M3 段階別の検証
 
-2026-10-27。**M3全体は未完了。** ローカルの固定ファイルで3形式の数値比較・実機WebGPU・3D同時動作・全48組の計測と20回の実切替を確認した。ライセンス確定、CIで作る実公開ファイルの照合・公開デモ・公開後の実機計測が残る。最新の固定結果は末尾の「ローカル固定配布物の実機計測」、各節は対象時点の記録として読む。[計画・G1〜G6](M3_PLAN.md) の全項目を満たすまで完了にしない。
+2026-10-28 JST。**M3の技術検証は完了。** 最新の基準公開版は `dd3762cf2bef0e86aa34448cb220618fcbbc9629`。モデル公開の承認、全3形式の実配信、CI成果物との55ファイル照合、公開E2E、実機WebGPU／WASMの48組、WASM／WebGPUで各20回の実切替を確認した。末尾の「M3-5：公開版の最終検証」を現在地とし、それ以前の未完了・未承認の記述は各時点の固定記録として読む。最終記録のPRにも必須CI・通常取り込み・統合後の公開照合を適用する。[計画・G1〜G6](M3_PLAN.md)
 
 ## M3-0：uv環境・入出力・比較契約
 
@@ -131,3 +131,65 @@ LinuxのCIで生成するONNXや参照値は、producer metadata等によりMac�
 PR #27は全必須8チェック成功後にmain `b1bed967eb78186b33abe0b2cfb1c08988886d12` として通常取り込み済み。[統合後CI](https://github.com/ayutaz/voxelshogi/actions/runs/40489714294)・[CodeQL](https://github.com/ayutaz/voxelshogi/actions/runs/40489714313)も成功。CodeQLのmedium指摘1件（Network data written to file）は保存内容が検証結果のJSON metadataのみで、ネットワーク由来のモデル／コードを保存・実行せず、取得値が出力先を選ばないことを確認し、理由付きfalse positiveとして記録して会話を解決した。検査やmain保護は無効化していない。
 
 実モデル公開・実配信ファイル照合・公開後の実機計測はこの承認後に行い、終了までM3全体を完了としない。
+
+## M3-5：公開版の最終検証（2026-10-28 JST）
+
+公開デモは **https://voxelshogi.yousan-apps.workers.dev/?models=1**。FP32・FP16・INT8重み版、WASM／WebGPU、4局面を選んで、配信された変換済みモデルそのものを実行できる。ライセンス／Model Card、hash、同形式の数値比較、FP32からの変化、未学習の表示を確認した。FP16×M1 WebGPUの不合格はエラーとして示し、別形式への自動置換はしない。通常対局のNormalは引き続き探索AIで、未学習モデルによる対局・棋力評価はM6の対象。
+
+### 公開・ファイル・CI
+
+[PR #28](https://github.com/ayutaz/voxelshogi/pull/28)の必須8チェック、未解決レビュー0件を確認して通常mergeした。統合main `dd3762c` の [CI 40521101341](https://github.com/ayutaz/voxelshogi/actions/runs/40521101341)・[Security 40521101405](https://github.com/ayutaz/voxelshogi/actions/runs/40521101405)も成功。公開ジョブ `122252315618` は配信SHA、既存公開E2E21件（39.2秒、flakyなし）、C0の追加3件（58.7秒、retries=0）、実モデル6件（retries=0）、全配信監査を成功した。[デプロイ情報](experiments/m3-public-deployment-info.json)
+
+公開モデルはLinux x86_64・Python3.14.9・uv／lockから生成したclean source。Mac生成版とはONNX・checkpoint・参照値のhashが異なるため、ローカル結果を公開版の証拠へ読み替えず、公開した実ファイルで再測定した。モデルmanifest SHAは `347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54`。[manifest原本](experiments/m3-public-model-manifest.json)・[配信index原本](experiments/m3-public-index.json)
+
+| 形式 | 公開ONNX bytes | 公開ONNX SHA-256 |
+|---|---:|---|
+| FP32 | 20,427,330 | `142ca39efda9d8c2e183c06cf75245960ab93c31f0605784a0cd930521a1a075` |
+| FP16 | 10,398,313 | `6cb2345ad5b658e104b37b0283e5b4332a04579898eb76131ddf0b5761b5678f` |
+| INT8重み | 5,433,774 | `e512cbe716808b1c21f1a15aa679b40b6ab84457430a840631969c86921ff149` |
+
+検証済みの同じ `web-dist` artifactを取得し、実機側でも55ファイルすべてのSHA・長さを照合した。[実機からの全ファイル照合](experiments/m3-public-artifact-match.json)・[CIの全ファイル照合](experiments/m3-ci-public-artifact-match.json)。アプリWorker・JS／WASM／CSS、モデル・checkpoint・入力／全参照値、ORT bundle／bootstrap／全WASM分割と再結合、全ライセンス通知を含む。公開manifest自体もローカルの検証済みartifactと一致させた。MIMEはJSとして配信され、HTML fallbackなし、indexはno-store、hash付きファイルはimmutable。全て同一originであり、クロスオリジンCORS許可を必要としない（実際のCORSヘッダーも記録）。R2・有料GPUは使っていない。
+
+### 全48組と、失敗を残した切替検証
+
+Apple M1・8 GiB・Darwin27.0.0・Chrome156.0.8078.48、計測コードと公開版 `dd3762c`、dirty=false。2026-10-27 14:41 UTCからの[公開版の生JSON](experiments/m3-browser-public.json)は全48組を終了し、40組が全出力照合に成功、FP16×WebGPUの8組は事前基準未達、予期しない行の失敗は0だった。成功組は初回1回、warm-up10＋測定30回、全40回のPolicy1,067,985要素とValue1要素を照合した。native profileは全て要求したproviderだけで、WebGPUのCPU fallbackは無効。FP32は276、INT8重みは308 GPU node／推論。CPU readback完了まで待って計時する。
+
+**この全組試行の後半の切替でHTTP 500が1回発生したため、生JSONの `complete=false` と終了コード1を保持した。** 全48行の性能値は完了しているが、この試行全体を成功扱いにはしない。元の失敗URLは記録されておらず、500の発生元・根因は未特定。応答を変えないHTTP診断を付けた追加試行では再発しなかった。
+
+- [WASMの20回実切替](experiments/m3-browser-public-switches.json)：全3形式、初回を除く20変更、21 Worker作成／21終了・残存0。`switchesComplete=true, complete=false`。追加の切替だけで全48組の成功とは表示しない。
+- [WebGPUの20回実切替](experiments/m3-browser-public-gpu-switches.json)：数値検証済みのFP32とINT8重みを交互に実行。計測コード `34fe472`、公開版とモデルhashは同じ `dd3762c`。全出力が基準内、21 Worker作成／21終了・残存0。FP16×WebGPUはここで成功に読み替えない。
+- [公開画面での障害回復](experiments/m3-public-recovery.json)：合成したHTTP 500でエラー表示し、応答を元へ戻した後の実WebGPU推論が全出力照合に成功。これは別の実サーバー500を観測した記録ではない。元のHTTP 500を隠したり、数値閾値を緩めたり、自動fallback／自動retryで成功にしたりしていない。
+
+集計・生ファイルのhash・CIと診断の範囲は[証拠一覧](experiments/m3-public-evidence.json)。WebGPU切替の準備では、最初から異なる形式になる期待列を先に失敗させ、実装後に先頭をFP32へ戻す変異も検出。Node67件・制御14変異が成功した。Web172・Python48・Web50／Python16変異、モデル6 E2Eは公開CIでも成功している。
+
+### 公開版の速度・メモリ・数値
+
+4局面それぞれのmedianの範囲（ms）。p95は各局面のnearest-rank p95のうち最大値で、全局面を混ぜた百分位ではない。
+
+| backend・形式 | 3Dなし median | 3Dあり median | 3Dあり p95最大 |
+|---|---:|---:|---:|
+| WASM FP32 | 302.40〜303.20 | 301.80〜304.55 | 337.70 |
+| WASM FP16 | 389.05〜391.25 | 388.65〜391.10 | 405.50 |
+| WASM INT8重み | 310.15〜313.00 | 311.20〜323.00 | 379.40 |
+| WebGPU FP32 | 53.50〜53.85 | 55.00〜56.95 | 70.20 |
+| WebGPU INT8重み | 54.80〜55.15 | 55.90〜56.95 | 63.90 |
+| WebGPU FP16 | 数値基準未達 | 数値基準未達 | 採用しない |
+
+成功した3Dあり20組全てで実推論中のtrustedなカメラ入力と実drawを確認。rAF間隔はp95約16.7〜16.8ms、観測最大約16.8ms。入力から描画までの全遅延や全端末のFPS保証ではない。Chrome RSS合計の観測最大1,461,075,968 bytes（約1.36 GiB、共有ページの重複を含みうる）、main page JS heap観測最大14,730,088 bytes、入出力tensor4,397,332 bytes。最大観測間隔1,251msで休止の中断なし。GPU総使用量と内部一時bufferはAPIから取得できずN/A。Worker／session／tensorの終了を確認したが、driverの全メモリが即時返却される保証にはしない。
+
+3Dありの初回load段階（manifest・runtime準備、モデル・入力・参照値の取得／照合）はFP32 1.337〜4.438秒、FP16 1.391〜3.116秒、INT8重み1.246〜2.482秒。session初期化・初回推論・Worker往復、encoded／decoded／header込み転送量は生JSONに分離した。新context／WorkerでもOS・driver cacheは未制御。初回推論の値をwarm推論へ混ぜない。
+
+対応組の同形式基準対browserのPolicy最大絶対差は、WASMのFP32約1.43e-6・FP16約0.001099・INT8約1.28e-6、WebGPUのFP32約1.83e-6・INT8約1.85e-6で全要素が事前の絶対＋相対誤差基準内だった。FP32から圧縮版へのPolicy最大差はFP16約0.0015834・INT8約0.0112894。棋力や勝率の低下を表す値ではない。M1 WebGPUのFP16は初期局面696,324要素超過・最大絶対差0.02197265625、material-bは最大0.04150390625で不合格。基準は変更していない。
+
+### ゴール別の証拠と引き継ぎ
+
+| ゴール | 完了の証拠・適用範囲 |
+|---|---|
+| G1 | 約502万パラメータ・seed314159・入力43ch／Policy／Value・全3変換・opset18・uv.lock・全source hashとcheckpointを公開manifestへ固定。同環境での再生成一致をPythonテストで確認 |
+| G2 | 全3形式のWASM、FP32／INT8重みの実機WebGPUで4入力・全出力照合。FP16×M1 WebGPUは非対応として記録、別モデルへ置換しない |
+| G3 | M1のnative GPU配置、3D入力／描画、中断・失敗回復、WASM／WebGPUで各20実切替と解放を確認 |
+| G4 | 実配信55ファイルと同じCI artifact、root manifest、ORT分割再結合のSHA・長さ・MIME・cacheをCIと実機から照合 |
+| G5 | 承認済みApache-2.0、公開URL、全実行可能形式の選択と実ロード、公開6 E2E・未学習／非対応表示・回復確認 |
+| G6 | 本節の固定測定と失敗、ADR-019、費用見積もり、通常PR／main CI、公開後E2Eと配信照合 |
+
+M4はPython3.14／uvと固定した特徴量・行動契約を引き継ぐ。M6はこの構造のFP32 WebGPUを実機基準にし、圧縮版も同じファイルで比較する。今回のINT8重みでは速度改善を確認できず、FP16 WASMはFP32より遅い。batch1固定・Safari／他GPU未測定・GPU総メモリN/A・HTTP 500の一度の観測を制約として残す。M6の学習速度・棋力・本学習費用は別途測り、有料GPUは見積もり承認後に使う。

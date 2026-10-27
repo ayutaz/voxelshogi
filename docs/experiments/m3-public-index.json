@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "publication": true,
+  "modelNotices": [
+    {
+      "path": "models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/MODEL_CARD-f8c8878651067b1e818028cf8aa4ded50b6c099445984af9eb92b0acf5b3facd.md",
+      "bytes": 1346,
+      "sha256": "f8c8878651067b1e818028cf8aa4ded50b6c099445984af9eb92b0acf5b3facd"
+    }
+  ],
+  "model": {
+    "path": "models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/manifest.json",
+    "bytes": 20846,
+    "sha256": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54"
+  },
+  "runtime": {
+    "version": "1.31.1",
+    "license": "MIT",
+    "bundle": {
+      "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort.webgpu.bundle.min.mjs",
+      "bytes": 122491,
+      "sha256": "c90275ffcd0e74e8929f527840ce9339399bfd45f11a74887e4b81a893907b70"
+    },
+    "bootstrap": {
+      "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.mjs",
+      "bytes": 53457,
+      "sha256": "59cf781530e1a16df2a291d78798e3ec1152467edaec402d6f9599d85047c302"
+    },
+    "wasm": {
+      "path": "ort-wasm-simd-threaded.asyncify.wasm",
+      "bytes": 28747738,
+      "sha256": "ca319e9539cd0f1e291cf56074760121eaf39650f5dbf84b6e52c07f4b2944ec",
+      "parts": [
+        {
+          "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-000.bin",
+          "bytes": 16777216,
+          "sha256": "273f77c856c0eae1945c74e67aa0a655cf96eaa9665f05c3e33d9b4a6930bfd3"
+        },
+        {
+          "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-001.bin",
+          "bytes": 11970522,
+          "sha256": "26d616bf5474508679753aef352929a74a42209b3ff179487d952f0ae58017a2"
+        }
+      ]
+    },
+    "notices": [
+      {
+        "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/LICENSE",
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+      },
+      {
+        "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ThirdPartyNotices.txt",
+        "bytes": 338088,
+        "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3"
+      }
+    ]
+  }
+}

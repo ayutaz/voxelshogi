@@ -9,7 +9,7 @@ import { browserMemory } from './browser-memory.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(new URL('../apps/web/package.json', import.meta.url));
-export const modelSwitchVariants = count => Array.from({ length: count }, (_, i) => ['fp32', 'fp16', 'int8'][(i + 1) % 3]);
+export const modelSwitchVariants = (count, backend = 'wasm') => Array.from({ length: count }, (_, i) => backend === 'webgpu' ? ['int8', 'fp32'][i % 2] : ['fp32', 'fp16', 'int8'][(i + 1) % 3]);
 const summary = values => {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted.length ? { count: sorted.length, median: (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.ceil((sorted.length - 1) / 2)]) / 2, p95: sorted[Math.ceil(sorted.length * .95) - 1], max: sorted.at(-1) } : null;
@@ -39,7 +39,8 @@ async function execute(page, iterations) {
 
 async function main() {
   const args = process.argv.slice(2), smoke = args.includes('--smoke'), switchesOnly = args.includes('--switches-only');
-  assert.ok(!(smoke && switchesOnly) && args.filter(a => !a.startsWith('--')).length <= 1 && args.every(a => ['--smoke', '--switches-only'].includes(a) || !a.startsWith('--')), 'usage: node scripts/measure-browser-models.mjs [--smoke|--switches-only] [OUTPUT.json]');
+  const switchBackend = args.find(a => a.startsWith('--switch-backend='))?.split('=')[1] ?? 'wasm';
+  assert.ok(!(smoke && switchesOnly) && args.filter(a => !a.startsWith('--')).length <= 1 && args.every(a => ['--smoke', '--switches-only'].includes(a) || /^--switch-backend=(?:wasm|webgpu)$/.test(a) || !a.startsWith('--')), 'usage: node scripts/measure-browser-models.mjs [--smoke|--switches-only] [--switch-backend=wasm|webgpu] [OUTPUT.json]');
   const output = resolve(root, args.find(a => !a.startsWith('--')) ?? 'runs/m3/browser-measurement.json');
   const base = process.env.M3_BASE_URL ?? 'http://localhost:4173';
   const { chromium, expect } = await import(pathToFileURL(resolve(dirname(require.resolve('@playwright/test')), 'index.mjs')).href);
@@ -48,7 +49,7 @@ async function main() {
   const report = { schema: 1, smoke, mode: switchesOnly ? 'switches-only' : smoke ? 'smoke' : 'full', complete: false, startedAt: new Date().toISOString(), base,
     measurementSource: { commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), dirty: Boolean(execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim()) },
     machine: { platform: os.platform(), release: os.release(), architecture: os.arch(), cpu: os.cpus()[0].model, memoryBytes: os.totalmem(), chrome: browser.version() },
-    method: { batch: 1, batch8: { status: 'not-applicable', reason: 'this exact ONNX export has fixed batch=1' }, warmup: 10, measured: 30,
+    method: { batch: 1, batch8: { status: 'not-applicable', reason: 'this exact ONNX export has fixed batch=1' }, warmup: 10, measured: 30, switchBackend,
       cold: 'new browser context and Worker; OS and driver shader caches are uncontrolled', reuse: 'same Worker/runtime; each request creates/releases its session and tensors',
       memory: 'sample dedicated browser RSS and main JS heap once per second during repeat; observed maxima, not guaranteed peaks', maximumSamplingGapMs: 5000,
       idleSleep: os.platform() === 'darwin' ? 'caffeinate -i only while this measurement process is alive' : 'not applicable', gpuCompletion: 'await CPU output readback before stopping the inference timer',
@@ -123,16 +124,19 @@ async function main() {
     const live = new Set(), lifecycle = { created: 0, closed: 0 };
     page2.on('worker', worker => { lifecycle.created++; live.add(worker); worker.on('close', () => { lifecycle.closed++; live.delete(worker); }); });
     await observe(page2); await page2.goto(base + '/?models=1'); await expect(page2.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
+    await page2.getByLabel('実行先').selectOption(switchBackend);
     const baseline = await execute(page2, 1);
     assert.equal(baseline.request.variant, 'fp32');
+    assert.equal(baseline.request.backend, switchBackend);
     assert.equal(baseline.request.packageHash, report.deployment.model.sha256);
     report.switchBaseline = { result: baseline, workers: { ...lifecycle, live: live.size } };
-    const variants = modelSwitchVariants(smoke ? 2 : 20);
+    const variants = modelSwitchVariants(smoke ? 2 : 20, switchBackend);
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
       await page2.getByLabel('精度形式').selectOption(variant);
       const result = await execute(page2, 1);
       assert.equal(result.request.variant, variant);
+      assert.equal(result.request.backend, switchBackend);
       assert.notEqual(result.request.variant, report.switches.at(-1)?.variant ?? baseline.request.variant, 'each switch must change the model');
       assert.equal(result.request.packageHash, report.deployment.model.sha256);
       assert.ok(live.size <= 1, 'obsolete model Worker remains alive');

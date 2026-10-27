@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "base": "https://voxelshogi.yousan-apps.workers.dev",
+  "startedAt": "2026-10-27T14:59:09.592Z",
+  "injectedFailure": "HTTP 500 on fp32.onnx (synthetic; not a second observed server error)",
+  "visibleError": "asset download failed: 500",
+  "errorPhase": "error",
+  "retry": {
+    "request": {
+      "revision": 1,
+      "packageHash": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54",
+      "variant": "fp32",
+      "fixture": "initial-b",
+      "backend": "webgpu",
+      "iterations": 1,
+      "schema": 1,
+      "kind": "infer",
+      "requestId": 2
+    },
+    "value": -0.24477380514144897,
+    "comparison": {
+      "policy": {
+        "elements": 1067985,
+        "maxAbs": 0.0000016391277313232422,
+        "maxRelative": 7.670226189293125,
+        "exceeded": 0,
+        "atol": 0.00001,
+        "rtol": 0.0001
+      },
+      "value": {
+        "elements": 1,
+        "maxAbs": 4.470348358154297e-8,
+        "maxRelative": 1.826317787209018e-7,
+        "exceeded": 0,
+        "atol": 0.00001,
+        "rtol": 0.0001
+      }
+    },
+    "information": {
+      "backend": "webgpu",
+      "adapter": {
+        "vendor": "apple",
+        "architecture": "metal-3",
+        "device": "",
+        "description": ""
+      },
+      "features": [
+        "shader-f16",
+        "timestamp-query"
+      ],
+      "runtimeBytes": 29262847
+    },
+    "profile": {
+      "providers": {
+        "WebGpuExecutionProvider": 276
+      },
+      "operators": {
+        "Reshape": 72,
+        "Gemm": 30,
+        "Add": 26,
+        "LayerNormalization": 12,
+        "Slice": 18,
+        "Squeeze": 18,
+        "Transpose": 28,
+        "MatMul": 13,
+        "Div": 7,
+        "Softmax": 6,
+        "Pow": 7,
+        "Mul": 28,
+        "Tanh": 8,
+        "SkipLayerNormalization": 1,
+        "ReduceMean": 1,
+        "Concat": 1
+      }
+    },
+    "buffers": null,
+    "metrics": {
+      "samples": [
+        175.20000004768372
+      ],
+      "warmup": 0,
+      "medianMs": 175.20000004768372,
+      "p95Ms": 175.20000004768372,
+      "loadMs": 2519.399999976158,
+      "initMs": 634.2000000476837,
+      "totalMs": 3447.899999976158,
+      "tensorBytes": 4397332,
+      "resources": [
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/index.json",
+          "startMs": 16.600000023841858,
+          "durationMs": 56.39999997615814,
+          "transferBytes": 1234,
+          "encodedBytes": 934,
+          "decodedBytes": 2681,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/manifest.json",
+          "startMs": 74.10000002384186,
+          "durationMs": 0.5,
+          "transferBytes": 0,
+          "encodedBytes": 4912,
+          "decodedBytes": 20846,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+          "startMs": 75.89999997615814,
+          "durationMs": 0.6000000238418579,
+          "transferBytes": 0,
+          "encodedBytes": 4083,
+          "decodedBytes": 11358,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/MODEL_CARD-f8c8878651067b1e818028cf8aa4ded50b6c099445984af9eb92b0acf5b3facd.md",
+          "startMs": 76,
+          "durationMs": 0.6000000238418579,
+          "transferBytes": 0,
+          "encodedBytes": 921,
+          "decodedBytes": 1346,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort.webgpu.bundle.min.mjs",
+          "startMs": 80,
+          "durationMs": 1.100000023841858,
+          "transferBytes": 0,
+          "encodedBytes": 41992,
+          "decodedBytes": 122491,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.mjs",
+          "startMs": 80.10000002384186,
+          "durationMs": 0.8999999761581421,
+          "transferBytes": 0,
+          "encodedBytes": 20187,
+          "decodedBytes": 53457,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-000.bin",
+          "startMs": 80.19999992847443,
+          "durationMs": 1044.1000000238419,
+          "transferBytes": 16777516,
+          "encodedBytes": 16777216,
+          "decodedBytes": 16777216,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-001.bin",
+          "startMs": 80.29999995231628,
+          "durationMs": 528.3999999761581,
+          "transferBytes": 11970822,
+          "encodedBytes": 11970522,
+          "decodedBytes": 11970522,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/LICENSE",
+          "startMs": 80.39999997615814,
+          "durationMs": 1.5,
+          "transferBytes": 0,
+          "encodedBytes": 1073,
+          "decodedBytes": 1073,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ThirdPartyNotices.txt",
+          "startMs": 80.5,
+          "durationMs": 1.899999976158142,
+          "transferBytes": 0,
+          "encodedBytes": 27692,
+          "decodedBytes": 338088,
+          "protocol": "h3",
+          "delivery": "cache"
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/fp32.onnx",
+          "startMs": 1186,
+          "durationMs": 1329.5,
+          "transferBytes": 20427630,
+          "encodedBytes": 20427330,
+          "decodedBytes": 20427330,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/inputs/initial-b.f32",
+          "startMs": 1186.1000000238419,
+          "durationMs": 88.39999997615814,
+          "transferBytes": 125688,
+          "encodedBytes": 125388,
+          "decodedBytes": 125388,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/initial-b-policy.f32",
+          "startMs": 1186.1999999284744,
+          "durationMs": 242.5,
+          "transferBytes": 4272240,
+          "encodedBytes": 4271940,
+          "decodedBytes": 4271940,
+          "protocol": "h3",
+          "delivery": ""
+        },
+        {
+          "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/initial-b-value.f32",
+          "startMs": 1186.2999999523163,
+          "durationMs": 57.60000002384186,
+          "transferBytes": 304,
+          "encodedBytes": 4,
+          "decodedBytes": 4,
+          "protocol": "h3",
+          "delivery": ""
+        }
+      ]
+    },
+    "roundTripMs": 3467.7000000476837
+  },
+  "publicBuild": {
+    "commit": "dd3762cf2bef0e86aa34448cb220618fcbbc9629"
+  },
+  "finishedAt": "2026-10-27T14:59:19.881Z",
+  "passed": true,
+  "probeSha256": "7bffebd6c7ea6c366a64094853dac94fe58094713638402d15c472c92c0b48d3"
+}
