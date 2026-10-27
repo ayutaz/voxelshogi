@@ -29,3 +29,14 @@ PR #20の初回CIでは、uv0.11.23に埋め込まれたPython配布一覧が3.1
 - Pythonは計37テスト。既知変異は10件へ追加（attentionのsoftmax軸、Policyの成り並び、seed無視、6層の素通り、ファイルhash照合の欠落）。隔離コピーで全件検出した。
 
 再生成は `uv run --locked python -m export.generate runs/m3/fp32-local`。モデルはまだローカルのみ。ライセンス確定後に作る公開配布物と、各低精度版・browserの数値比較は後続段階で実施する。
+
+## M3-2：専用Worker・検証付き配信（開発途中）
+
+- ORT Web 1.31.1のWebGPU bundleと、それが実際に参照するAsyncify bootstrap／WASMを組み合わせる。JSEP版との混用は実機で初期化失敗になったため使用しない。WASMは28,747,738 bytesあり、16 MiB単位の分割を取得して各部分・再結合後のSHA-256を検証する。JSも検証したbytesから読み込み、照合後に別URLのJSを再取得しない。MITライセンスと同版の第三者ライセンス通知を配布物に含める。
+- 公開用の準備処理は未承認ライセンスとdirtyなソースを拒否する。ローカル検証用の配布物は `publication=false` とし、ブラウザ側もlocalhost以外では拒否する。モデル自体はgitへ追加しない。
+- 専用Worker、要求ID・revision・モデルmanifest hash・形式・入力・backendの応答照合、中断時の終了、古い応答の破棄を実装。各要求でsessionとtensorを解放し、runtimeは同じWorkerで再利用する。40回モードはwarm-up10回・測定30回とし、中央値・nearest-rank p95を計算する。全40回の全出力を照合し、最大誤差を保持する。
+- Mac M1の実機Chromeから専用Workerを通し、4局面すべてでFP32のPolicy 1,067,985要素とValueを基準値へ照合した。Policy最大絶対誤差はWASMで約1.49e-6、WebGPUで約1.81e-6。native profilingでは各1推論につきWASMはCPU provider 256 node、WebGPUはGPU provider 276 nodeで、GPU側のCPU fallbackは無効にした。要求したbackend名だけをGPU実行の証拠にはしない。
+- 開発用モデルはM3-1の `sourceDirty=true` の同じローカル配布物。最終固定SHA・公開配布物の計測には数えない。実機probeは `runs/m3/worker-probe.json`（git管理外）へ保存した。公開用の固定測定JSONはM3-4で作成する。
+- 新規単体47件、配信Node6件、型チェック・lintが成功。Webの既知変異は29件から40件へ追加し、全40件を実行済みのassertion失敗として検出した。全出力末尾の照合、session／tensor解放、GPU配置証拠、warm-up、中央値、最悪誤差保持、revisionと古いcallback、Worker終了、hash省略を含む。
+
+画面、低精度版、3D同時動作・反復切替の最終計測、公開モデル・公開E2Eは残っている。専用Workerの局所確認だけでM3-2〜5やM3全体を完了にしない。

@@ -33,6 +33,7 @@ __pycache__/
 *.pt
 *.ckpt
 !apps/web/public/models/.gitkeep
+/apps/web/public/models/m3/
 # Secrets
 .env
 .env.*

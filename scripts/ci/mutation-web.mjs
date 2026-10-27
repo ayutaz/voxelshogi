@@ -44,6 +44,17 @@ const mutations = [
   { name: 'render-ready-before-geometry', file: 'renderer/RenderReady.tsx', before: 'gl.info.render.triangles > 0', after: 'true', test: 'render-ready', extension: 'tsx' },
   { name: 'render-ready-duplicate', file: 'renderer/RenderReady.tsx', before: 'if (!reported.current && gl.info.render.triangles > 0)', after: 'if (gl.info.render.triangles > 0)', test: 'render-ready', extension: 'tsx' },
   { name: 'render-ready-demand-frame', file: 'renderer/RenderReady.tsx', before: 'if (!reported.current && gl.info.render.triangles === 0) invalidate();', after: '', test: 'render-ready', extension: 'tsx' },
+  { name: 'inference-file-hash', file: 'inference/assets.ts', before: 'hash !== file.sha256', after: 'false', test: 'inference-assets' },
+  { name: 'inference-last-output', file: 'inference/engine.ts', before: 'i < count;', after: 'i < count - 1;', test: 'inference-engine' },
+  { name: 'inference-session-release', file: 'inference/engine.ts', before: 'await session.release();', after: '', test: 'inference-engine' },
+  { name: 'inference-tensor-release', file: 'inference/engine.ts', before: 'outputs.dispose();', after: '', test: 'inference-engine' },
+  { name: 'inference-provider-proof', file: 'inference/engine.ts', before: "if (port.info.backend !== request.backend || providers.length === 0 || providers.some(([name, count]) => name !== expected || !Number.isSafeInteger(count) || count <= 0))", after: 'if (false)', test: 'inference-engine' },
+  { name: 'inference-warmup', file: 'inference/engine.ts', before: 'times.slice(warmup)', after: 'times', test: 'inference-engine' },
+  { name: 'inference-median', file: 'inference/engine.ts', before: '(sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.ceil((sorted.length - 1) / 2)]!) / 2', after: 'sorted[Math.floor(sorted.length / 2)]!', test: 'inference-engine' },
+  { name: 'inference-root-revision', file: 'inference/client.ts', before: 'received[key] !== pending.request[key]', after: "key !== 'revision' && received[key] !== pending.request[key]", test: 'inference-client' },
+  { name: 'inference-stale-callback', file: 'inference/client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'inference-client' },
+  { name: 'inference-terminate', file: 'inference/client.ts', before: 'worker.terminate();', after: '', test: 'inference-client' },
+  { name: 'inference-repeat-worst-error', file: 'inference/engine.ts', before: 'Math.max(current[name].maxAbs, comparison[name].maxAbs)', after: 'current[name].maxAbs', test: 'inference-engine' },
 ];
 
 function main() {
@@ -87,7 +98,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 29);
+    assert.equal(results.length, 40);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
