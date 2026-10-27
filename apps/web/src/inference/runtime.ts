@@ -15,6 +15,7 @@ export async function loadPackage(indexUrl: string, signal?: AbortSignal): Promi
   const modelUrl = assetUrl(assetBase, index.model.path);
   const bytes = await fetchVerified(modelUrl, index.model, signal);
   const model = parseModel(JSON.parse(new TextDecoder().decode(bytes)), index.publication);
+  await Promise.all(index.modelNotices.map(file => fetchVerified(assetUrl(assetBase, file.path), file, signal)));
   return { index, model, assetBase, modelBase: new URL('.', modelUrl).href, packageHash: index.model.sha256 };
 }
 

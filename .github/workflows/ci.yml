@@ -81,6 +81,8 @@ jobs:
     # Keep fail/cancel detection; do not serialize workflows behind a queued gate.
     if: always()
     needs: [lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python, models]
+    outputs:
+      models_publication: ${{ needs.web.outputs.models_publication }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -170,6 +172,8 @@ jobs:
     # font/library upgrades; the actual Chromium launch/E2E still validates them.
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      models_publication: ${{ steps.model_policy.outputs.publication }}
     defaults:
       run:
         working-directory: apps/web
@@ -197,8 +201,34 @@ jobs:
       - run: pnpm test
       - name: Compare native and real WASM search
         run: node ../../scripts/ci/search-parity.mjs
+      - name: Read explicit model publication policy
+        id: model_policy
+        run: node scripts/model-publication.mjs export/publication.json
+        working-directory: .
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: steps.model_policy.outputs.publication == 'true'
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        if: steps.model_policy.outputs.publication == 'true'
+        with:
+          version: '0.11.23'
+          enable-cache: true
+      - name: Generate approved model variants
+        if: steps.model_policy.outputs.publication == 'true'
+        working-directory: .
+        run: |
+          uv sync --locked
+          uv run --locked python -m export.generate runs/m3/distribution --license Apache-2.0
+          node scripts/model-publication.mjs export/publication.json runs/m3/distribution
+          node scripts/prepare-inference.mjs runs/m3/distribution apps/web/public/models/m3
       - run: pnpm build
       - run: pnpm exec playwright install chromium
+      - name: Verify approved distribution with real model E2E
+        if: steps.model_policy.outputs.publication == 'true'
+        run: pnpm exec playwright test -c model-playwright.config.ts
+        env:
+          PW_CHANNEL: ''
       - run: pnpm e2e
         env:
           PW_CHANNEL: ''
@@ -326,6 +356,18 @@ jobs:
         env:
           PW_CHANNEL: ''
           E2E_COMMIT: ${{ github.sha }}
+      - name: Audit exact public application, model and runtime files
+        if: steps.candidate.outputs.current == 'true' && needs.gate.outputs.models_publication == 'true'
+        run: node scripts/verify-model-distribution.mjs "$E2E_BASE_URL" model-distribution.json
+        env:
+          E2E_COMMIT: ${{ github.sha }}
+      - name: Public model E2E on the exact approved distribution
+        if: steps.candidate.outputs.current == 'true' && needs.gate.outputs.models_publication == 'true'
+        run: pnpm exec playwright test -c model-playwright.config.ts
+        working-directory: apps/web
+        env:
+          PW_CHANNEL: ''
+          E2E_BASE_URL: https://voxelshogi.${{ vars.WORKERS_SUBDOMAIN }}.workers.dev
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: failure()
         with:
@@ -338,7 +380,9 @@ jobs:
         if: success() && steps.candidate.outputs.current == 'true'
         with:
           name: production-${{ github.sha }}
-          path: deployment-info.json
+          path: |
+            deployment-info.json
+            model-distribution.json
           retention-days: 30
           if-no-files-found: error
       - name: Report deployment phases

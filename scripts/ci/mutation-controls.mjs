@@ -12,6 +12,14 @@ const mutations = [
   { name: 'model-publication-license', file: 'scripts/prepare-inference.mjs', before: "assert.equal(manifest.license, 'Apache-2.0', 'model license must be approved before publication');", after: '', test: 'inference-package' },
   { name: 'model-clean-source', file: 'scripts/prepare-inference.mjs', before: "assert.equal(manifest.sourceDirty, false, 'publication requires clean source');", after: '', test: 'inference-package' },
   { name: 'model-distribution-hash', file: 'scripts/prepare-inference.mjs', before: "assert.equal(sha(bytes), file.sha256, 'model file hash mismatch');", after: '', test: 'inference-package' },
+  { name: 'publication-approval', file: 'scripts/model-publication.mjs', before: "assert.equal(policy.publication, true, 'model publication approval is pending');", after: '', test: 'model-publication' },
+  { name: 'publication-source-commit', file: 'scripts/prepare-inference.mjs', before: "assert.ok(typeof manifest.sourceCommit === 'string' && /^[0-9a-f]{40}$/.test(manifest.sourceCommit), 'publication requires a source commit');", after: '', test: 'inference-package' },
+  { name: 'publication-untrained-scope', file: 'scripts/prepare-inference.mjs', before: "assert.equal(manifest.trained, false, 'M3 approval does not cover trained models');", after: '', test: 'inference-package' },
+  { name: 'twenty-actual-model-switches', file: 'scripts/measure-browser-models.mjs', before: '[(i + 1) % 3]', after: '[i % 3]', test: 'model-switches' },
+  { name: 'application-worker-hash', file: 'scripts/inference-build.mjs', before: "createHash('sha256').update(bytes).digest('hex')", after: "'0'.repeat(64)", test: 'model-distribution' },
+  { name: 'public-served-file-hash', file: 'scripts/verify-model-distribution.mjs', before: "assert.equal(sha256, file.sha256, `hash mismatch: ${url}`);", after: '', test: 'model-distribution' },
+  { name: 'tested-application-artifact', file: 'scripts/verify-model-distribution.mjs', before: "if (expectedArtifact) assert.deepEqual(application, expectedArtifact.application, 'served files differ from tested application artifact');", after: '', test: 'model-distribution' },
+  { name: 'tested-model-artifact', file: 'scripts/verify-model-distribution.mjs', before: "if (expectedArtifact) assert.deepEqual(index, expectedArtifact.deployment, 'served files differ from tested model artifact');", after: '', test: 'model-distribution' },
 ];
 const work = mkdtempSync(join(tmpdir(), 'voxelshogi-control-mutations-'));
 try {
@@ -21,6 +29,11 @@ try {
     const original = readFileSync(join(root, mutation.file), 'utf8');
     assert.equal(original.split(mutation.before).length - 1, 1, `stale mutation ${mutation.name}`);
     cpSync(join(root, test), join(copy, test)); writeFileSync(source, original);
+    cpSync(join(root, 'LICENSE'), join(copy, 'LICENSE'));
+    cpSync(join(root, 'scripts/browser-memory.mjs'), join(copy, 'scripts/browser-memory.mjs'));
+    if (mutation.test === 'model-distribution') for (const file of ['scripts/inference-build.mjs', 'scripts/verify-model-distribution.mjs']) {
+      if (file !== mutation.file) cpSync(join(root, file), join(copy, file));
+    }
     const run = () => spawnSync(process.execPath, ['--test', '--test-reporter=tap', test], { cwd: copy, encoding: 'utf8', timeout: 30_000 });
     const baseline = run(); assert.equal(baseline.status, 0, `control baseline failed: ${mutation.name}`);
     assert.match(baseline.stdout, /# tests [1-9][0-9]*/);

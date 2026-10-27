@@ -7,7 +7,7 @@
   "scripts": {
     "wasm": "bash ../../scripts/build-wasm.sh",
     "dev": "vite",
-    "build": "tsc -b && vite build && node ../../scripts/ci/deployment.mjs stamp dist",
+    "build": "tsc -b && vite build && node ../../scripts/ci/deployment.mjs stamp dist && node ../../scripts/inference-build.mjs dist",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "lint": "eslint .",

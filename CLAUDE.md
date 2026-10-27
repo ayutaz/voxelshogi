@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M3_PLAN.md`（M3-0／1は取り込み済み、M3-2のWorker・画面を検証中。低精度版・最終実機計測・公開デモが残る）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/M3_PLAN.md`（3形式・Worker・画面・ローカル実機計測を確認。ライセンス確定と実公開bytesでの配信・実機検証が残る）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -96,7 +96,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M3: C0は完了。M3-0／1はPR #20・#21で取り込み済み。PR #22のWorker・配信基盤と選択画面から、低精度版・最終実機計測・公開デモへ進む。段階別結果は `docs/M3_VALIDATION.md`、契約と残作業は `docs/MODEL_CONTRACT.md`・`docs/M3_PLAN.md`。M3全体は未完了
+  1. M3: PR #20〜#26を取り込み済み。3形式の変換、Worker・画面、全48組のローカル固定実機計測と20回の実切替を確認。M1 WebGPUのFP16は数値基準未達、同じFP16のWASMは成功。PR #27で公開準備中だがモデルライセンスは未承認で、公開設定はfalse/null。回答後にCI生成した実公開ファイルの配信照合・実機再計測・公開E2Eを行う。段階別結果は `docs/M3_VALIDATION.md`、契約と残作業は `docs/MODEL_CONTRACT.md`・`docs/M3_PLAN.md`。M3全体は未完了
   2. M4: Python バインディングとデータ生成
   3. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   4. M6: Transformer-S の学習

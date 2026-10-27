@@ -6,6 +6,7 @@ import { NO_SELECTION } from '../game/interaction';
 import { InferenceClient, type ClientResult, type Phase } from './client';
 import { loadPackage, type ModelPackage } from './runtime';
 import type { Backend, Precision } from './manifest';
+import { assetUrl } from './assets';
 import './model-demo.css';
 
 const Board3D = lazy(() => import('../renderer/Board3D').then(m => ({ default: m.Board3D })));
@@ -105,6 +106,7 @@ export default function ModelDemo() {
           })}</details> : null}
           {!pkg.index.publication ? <p className="model-local">ローカル検証用・公開前の配布物</p> : null}
           <details><summary>照合情報</summary><p>モデル情報 SHA-256<br /><code data-testid="model-hash">{pkg.packageHash}</code></p><p>選択モデル SHA-256<br /><code data-testid="variant-hash">{selected?.model.sha256}</code></p><p>ORT {pkg.index.runtime.version} / {pkg.model.license ?? '公開ライセンス未確定'}</p></details>
+          {pkg.index.modelNotices.length ? <p>{pkg.index.modelNotices.map((file, index) => <span key={file.path}><a href={assetUrl(pkg.assetBase, file.path)} download>{index === 0 ? 'モデルのライセンス' : 'Model Card'}</a>{index === 0 ? ' / ' : ''}</span>)}</p> : null}
         </aside>
         <section className="model-stage">
           <div className="row"><label className="check"><input aria-label="3D表示" type="checkbox" checked={show3D} onChange={e => setShow3D(e.target.checked)} />3D表示</label><label>断面の層<input aria-label="断面の層" type="range" min="0" max="8" value={layer} onChange={e => setLayer(Number(e.target.value))} /></label></div>

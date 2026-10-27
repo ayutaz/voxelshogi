@@ -7,6 +7,7 @@ export const modelFixture = () => ({ schema: 1, id: 'test-untrained', trained: f
   variants: [{ id: 'fp32', precision: 'fp32', model: ref('fp32.onnx'), references: { 'initial-b': { policy: ref('reference/policy.f32', 4_271_940), value: ref('reference/value.f32', 4) } } }],
 });
 export const deploymentFixture = () => ({ schema: 1, publication: true, model: ref('models/hash/manifest.json'),
+  modelNotices: [ref('models/hash/LICENSE.txt'), ref('models/hash/MODEL_CARD.md')],
   runtime: { version: '1.31.1', bundle: ref('runtime/bundle.mjs'), bootstrap: ref('runtime/bootstrap.mjs'),
     wasm: { path: 'runtime.wasm', bytes: 6, sha256: 'b'.repeat(64), parts: [ref('runtime/part0.bin'), ref('runtime/part1.bin')] },
     notices: [ref('runtime/LICENSE'), ref('runtime/ThirdPartyNotices.txt')] },

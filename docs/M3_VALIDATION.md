@@ -1,6 +1,6 @@
 # M3 段階別の検証
 
-2026-10-27。**M3全体は未完了。** [計画・G1〜G6](M3_PLAN.md) の全項目、実機WebGPU、各変換版の数値比較・公開デモ・最終公開の検証が必要。各節は対象時点の固定記録とし、依存smoke testだけでモデル推論の完了にしない。
+2026-10-27。**M3全体は未完了。** ローカルの固定ファイルで3形式の数値比較・実機WebGPU・3D同時動作・全48組の計測と20回の実切替を確認した。ライセンス確定、CIで作る実公開ファイルの照合・公開デモ・公開後の実機計測が残る。最新の固定結果は末尾の「ローカル固定配布物の実機計測」、各節は対象時点の記録として読む。[計画・G1〜G6](M3_PLAN.md) の全項目を満たすまで完了にしない。
 
 ## M3-0：uv環境・入出力・比較契約
 
@@ -82,3 +82,44 @@ WorkerのResource Timingから、取得URL・時間・HTTPヘッダーを含むt
 最初の全48組＋20回切替では、39組が合格、FP16×WebGPUの8組が事前基準に届かず拒否、FP16×WASMのmaterial-b・3Dなしの反復がタイムアウトした。`pmset -g log` で2026-10-27 05:34:42 UTCのIdle Sleepと05:43:02 UTCのWake、500秒の休止を確認。メモリ観測も05:34:44.337から05:43:03.866まで途切れており、この試行を正式な性能結果に採用しない。失敗ログと未完了扱いのJSONを保持する。20回のWorkerは全てcloseし、残存は0だった。
 
 Macでの計測プロセスに限り `caffeinate -i -w <自プロセスPID>` を起動し、終了時に解除する。画面や恒久設定は変更しない。1秒ごとのメモリ観測が5秒を超えて途切れた場合も、計測中断として合格にしない。休止をまたいだ実モデルE2E・変異検証のタイムアウトも成功へ数えず、休止抑止下での成功を別に保存した。正式な全組計測は固定ビルドで再実行する。
+
+## ローカル固定配布物の実機計測
+
+2026-10-27 06:45:30〜06:55:32 UTC、Apple M1・8 GiB・macOS Darwin27.0.0・実機Chrome156.0.8078.48。計測／Webは `c19fb598e1c5ceb09e6b586131dd36583d55fcbd`、モデル生成は `d44f5aaaf8388933fce391741beca4976cdfa9f0`、双方clean。モデルmanifest SHAは `f28b1192f5654acbcf2f1084c26b85859fdba32ad0ecf56e6f783ee880ed3f32`。各ONNXのbytesとhashはM3-3の表と一致するが、ここではcleanな固定ソースから生成したものを測定した。モデルのlicenseはnull、publication=falseのlocalhost配布であり、公開済みとは扱わない。
+
+- [全48組の生JSON](experiments/m3-browser-local.json)：3Dの有無×WASM／WebGPU×3形式×4局面。40組が全出力照合に成功、FP16×WebGPUの8組は事前基準未達として拒否。予期しない失敗0、観測間隔最大1,256ms。各成功組は初回1回とwarm-up10＋測定30回、全40回の全出力を照合した。GPUはCPU fallback無効・native providerの配置証拠を含み、CPUへのreadback完了を待って計時した。
+- [休止した初回試行の記録](experiments/m3-browser-interrupted.json)：39成功・8数値拒否・1中断。元JSONのSHAと中断時刻を保存し、成功試行へ上書きしない。
+- 全組計測の旧切替ループは初回FP32ロードを含む20回だったため、実際の変更は19回。この点を修正し、`b5a01bd1f238a11c68217fd8897438ba99d1f7a0` のcleanなコード／buildで[追加の20回実切替](experiments/m3-browser-switches-local.json)を実施した。初回を除く全20回が直前と異なる形式で、21 Worker作成／21終了・残存0。`switchesComplete=true`、`complete=false`とし、この追加試行だけで全組の性能測定成功とはしない。
+
+以下は4局面それぞれの中央値の最小〜最大（ms）。p95は各局面でnearest-rankを求めたうちの最大値で、全局面を混ぜた百分位ではない。
+
+| backend・形式 | 3Dなし median | 3Dあり median | 3Dあり p95最大 |
+|---|---:|---:|---:|
+| WASM FP32 | 304.80〜307.10 | 320.25〜334.40 | 387.30 |
+| WASM FP16 | 393.80〜397.30 | 392.40〜395.70 | 401.20 |
+| WASM INT8重み | 315.55〜322.70 | 318.40〜322.25 | 377.50 |
+| WebGPU FP32 | 51.95〜53.95 | 53.00〜54.00 | 58.70 |
+| WebGPU INT8重み | 53.15〜54.50 | 53.75〜55.05 | 60.80 |
+| WebGPU FP16 | 数値基準未達 | 数値基準未達 | 採用しない |
+
+この端末ではINT8重みの圧縮による推論高速化は確認できず、FP16のWASMもFP32より遅い。圧縮の利点は主に配布サイズで、棋力は未評価。3Dありの初回load段階（manifest・runtimeの準備とモデル／入力／参照値の取得・照合）はFP32 577.3〜767.4ms、FP16 348.3〜436.7ms、INT8重み221.5〜269.8ms。session初期化・初回推論・Worker往復・形式別転送量は生JSONに分けて保存した。localhostの値なのでインターネット越しのロード時間には換算しない。新contextでもOS／driver cacheは未制御であり、完全なcold bootではない。
+
+成功した3Dあり20組すべてで実推論中のtrustedなカメラ入力と実drawを確認。推論中rAF間隔は全組のp95が16.7〜16.8ms、観測最大も約16.8ms。ただし入力から描画までの遅延や全負荷でのFPSを保証する値ではない。main pageのJS heap観測最大14,682,418 bytes、Chrome所有process RSS合計の観測最大1,545,256,960 bytes（約1.44 GiB）。RSSは共有ページの重複を含みうる。GPU総使用量とORT内部一時bufferはこのAPIから取得不可でN/A、既知の入出力tensorは4,397,332 bytes。Worker終了は確認したが、driverが保持する全メモリの即時返却までは証明しない。
+
+## 公開準備と残る完了条件
+
+PR #22〜#26は必須8チェック成功後に通常取り込み済み。PR #26のhead `c19fb59` は [CI](https://github.com/ayutaz/voxelshogi/actions/runs/40462994498)・[CodeQL](https://github.com/ayutaz/voxelshogi/actions/runs/40462994451)・[品質](https://github.com/ayutaz/voxelshogi/actions/runs/40462994406) が成功し、mainは `2cfac44`。PR #25統合後の [main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40462552399) も公開確認まで成功した。これはモデル本体公開の証拠ではない。
+
+[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)では公開設定を `export/publication.json` に固定し、未承認のfalse/nullを維持する。承認後の経路用に、ライセンス・Model Card、アプリWorkerを含むbuild manifest、実配信全ファイルのhash／bytes／MIME／cacheの監査と公開6 E2Eを用意した。ローカルではWeb172単体・既知50変異、Node66単体・制御13変異、型・lint・build・actionlint、実機モデル6 E2Eが47.9秒・再試行なしで成功した。公開条件分岐は未実行で、成功扱いにしない。
+
+| ゴール | 現在の根拠・残り |
+|---|---|
+| G1・G2 | 固定モデル・全3変換・同形式の基準比較をローカルで確認。M1 WebGPUのFP16は非対応として記録 |
+| G3 | 実機WebGPU配置・3D入力／描画・中断／再試行・20回実切替を確認 |
+| G4 | ローカルの固定SHAは一致。CIが作成する実公開ファイルの全配信照合は残る |
+| G5 | ライセンス回答待ち。未学習モデルの全実行可能版を公開して各版を実ロードする検証は残る |
+| G6 | [ADR-019](ARCHITECTURE_DECISIONS.md#adr-019-m3の精度形式backend配信方式2026-10-27)と[費用](COST_ESTIMATE.md)へローカルの判断を記録。公開バイト列の実機再計測と最終CI／公開確認は残る |
+
+配信監査は公開サイトのmanifestだけで自己照合せず、ダウンロードした検証済みCI artifactのbuild／アプリ／モデルmanifestと一致させる。同じcommit名を保ったまま実Workerとmanifestを差し替える負例を先に失敗させ、検証を追加した。Worker照合・モデル照合を消す変異も検出。既存の探索観戦等の全21 E2Eも実機Chromeで23.7秒・再試行なしで成功した。
+
+LinuxのCIで生成するONNXや参照値は、producer metadata等によりMacで生成したファイルとhashが異なる可能性がある。公開後は実配信された同じbytesでWebGPUを再測定し、このローカル結果を最終公開結果へ読み替えない。有料GPU・R2は利用していない。

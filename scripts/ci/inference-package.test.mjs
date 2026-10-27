@@ -14,9 +14,9 @@ function fixture() {
   const bytes = Buffer.from('abc');
   writeFileSync(join(model, 'data.bin'), bytes);
   const file = { path: 'data.bin', bytes: 3, sha256: sha(bytes) };
-  const manifest = { schema: 1, license: 'Apache-2.0', trained: false, sourceDirty: false,
+  const manifest = { schema: 1, id: 'voxelshogi-transformer-s-untrained-314159-v1', seed: 314159, parameters: 5021064, license: 'Apache-2.0', trained: false, sourceDirty: false, sourceCommit: 'a'.repeat(40),
     checkpoint: file, fixtures: [{ name: 'test', input: file }],
-    variants: [{ model: file, references: { test: { policy: file, value: file } } }] };
+    variants: [{ id: 'fp32', precision: 'fp32', model: file, references: { test: { policy: file, value: file } } }] };
   writeFileSync(join(model, 'manifest.json'), JSON.stringify(manifest));
   writeFileSync(join(runtime, 'package.json'), JSON.stringify({ version: '1.31.1', license: 'MIT' }));
   writeFileSync(join(runtime, 'README.md'), 'ORT notices in LICENSE/ThirdPartyNotices.txt');
@@ -47,11 +47,19 @@ test('publishes verified originals under immutable hashes and rejoins exact WASM
     assert.equal(readFileSync(join(f.output, index.model.path), 'utf8'), JSON.stringify(f.manifest));
     assert.equal(sha(readFileSync(join(f.output, index.runtime.bundle.path))), index.runtime.bundle.sha256);
     assert.equal(index.runtime.notices.length, 2);
+    assert.equal(index.modelNotices.length, 2);
+    const noticeText = index.modelNotices.map(item => {
+      const bytes = readFileSync(join(f.output, item.path));
+      assert.equal(sha(bytes), item.sha256);
+      return bytes.toString('utf8');
+    });
+    assert.ok(noticeText.some(text => /Apache License/.test(text)));
+    assert.ok(noticeText.some(text => text.includes(f.manifest.id) && /Untrained/.test(text)));
     assert.deepEqual(prepareInference(f.model, join(f.root, 'again'), f.runtime, { partBytes: 4 }), index);
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
 
-for (const failure of ['license', 'dirty', 'hash', 'path']) {
+for (const failure of ['license', 'dirty', 'hash', 'path', 'commit', 'trained']) {
   test(`rejects an invalid release: ${failure}`, () => {
     const f = fixture();
     try {
@@ -59,6 +67,8 @@ for (const failure of ['license', 'dirty', 'hash', 'path']) {
       if (failure === 'dirty') f.manifest.sourceDirty = true;
       if (failure === 'hash') writeFileSync(join(f.model, 'data.bin'), 'abd');
       if (failure === 'path') f.manifest.checkpoint = { ...f.manifest.checkpoint, path: '../secret' };
+      if (failure === 'commit') f.manifest.sourceCommit = null;
+      if (failure === 'trained') f.manifest.trained = true;
       writeFileSync(join(f.model, 'manifest.json'), JSON.stringify(f.manifest));
       assert.throws(() => prepareInference(f.model, f.output, f.runtime));
     } finally { rmSync(f.root, { recursive: true, force: true }); }

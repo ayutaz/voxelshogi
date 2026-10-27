@@ -11,7 +11,7 @@ export interface ModelManifest {
   seed: number; parameters: number; fixtures: ModelFixture[]; variants: Variant[];
 }
 export interface RuntimeManifest { version: string; bundle: FileRef; bootstrap: FileRef; wasm: FileRef & { parts: FileRef[] }; notices: FileRef[] }
-export interface Deployment { schema: 1; publication: boolean; model: FileRef; runtime: RuntimeManifest }
+export interface Deployment { schema: 1; publication: boolean; model: FileRef; modelNotices: FileRef[]; runtime: RuntimeManifest }
 
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid manifest object');
@@ -74,11 +74,14 @@ export function parseDeployment(value: unknown, allowLocal = false): Deployment 
   const index = record(value);
   if (index.schema !== 1 || typeof index.publication !== 'boolean' || (!index.publication && !allowLocal)) throw new Error('unapproved inference publication');
   if (file(index.model).bytes > 1024 * 1024) throw new Error('oversized model manifest');
+  const modelNotices = index.modelNotices ?? [];
+  if (!Array.isArray(modelNotices) || modelNotices.length > 32 || (index.publication && modelNotices.length < 2)) throw new Error('model license and card notices are required');
+  modelNotices.forEach(file);
   const runtime = record(index.runtime);
   if (runtime.version !== '1.31.1') throw new Error('runtime version mismatch');
   file(runtime.bundle); file(runtime.bootstrap);
   const wasm = file(runtime.wasm), parts = array(record(runtime.wasm).parts).map(file);
   if (parts.reduce((n, p) => n + p.bytes, 0) !== wasm.bytes || new Set(parts.map((p) => p.path)).size !== parts.length) throw new Error('incomplete runtime parts');
   array(runtime.notices).forEach(file);
-  return index as unknown as Deployment;
+  return { ...index, modelNotices } as unknown as Deployment;
 }

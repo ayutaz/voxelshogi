@@ -9,6 +9,7 @@ import { browserMemory } from './browser-memory.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(new URL('../apps/web/package.json', import.meta.url));
+export const modelSwitchVariants = count => Array.from({ length: count }, (_, i) => ['fp32', 'fp16', 'int8'][(i + 1) % 3]);
 const summary = values => {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted.length ? { count: sorted.length, median: (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.ceil((sorted.length - 1) / 2)]) / 2, p95: sorted[Math.ceil(sorted.length * .95) - 1], max: sorted.at(-1) } : null;
@@ -37,14 +38,14 @@ async function execute(page, iterations) {
 }
 
 async function main() {
-  const args = process.argv.slice(2), smoke = args.includes('--smoke');
-  assert.ok(args.filter(a => !a.startsWith('--')).length <= 1 && args.every(a => a === '--smoke' || !a.startsWith('--')), 'usage: node scripts/measure-browser-models.mjs [--smoke] [OUTPUT.json]');
+  const args = process.argv.slice(2), smoke = args.includes('--smoke'), switchesOnly = args.includes('--switches-only');
+  assert.ok(!(smoke && switchesOnly) && args.filter(a => !a.startsWith('--')).length <= 1 && args.every(a => ['--smoke', '--switches-only'].includes(a) || !a.startsWith('--')), 'usage: node scripts/measure-browser-models.mjs [--smoke|--switches-only] [OUTPUT.json]');
   const output = resolve(root, args.find(a => !a.startsWith('--')) ?? 'runs/m3/browser-measurement.json');
   const base = process.env.M3_BASE_URL ?? 'http://localhost:4173';
   const { chromium, expect } = await import(pathToFileURL(resolve(dirname(require.resolve('@playwright/test')), 'index.mjs')).href);
   const browser = await chromium.launch({ channel: 'chrome', args: ['--enable-precise-memory-info'] });
   const browserCdp = await browser.newBrowserCDPSession();
-  const report = { schema: 1, smoke, complete: false, startedAt: new Date().toISOString(), base,
+  const report = { schema: 1, smoke, mode: switchesOnly ? 'switches-only' : smoke ? 'smoke' : 'full', complete: false, startedAt: new Date().toISOString(), base,
     measurementSource: { commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), dirty: Boolean(execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim()) },
     machine: { platform: os.platform(), release: os.release(), architecture: os.arch(), cpu: os.cpus()[0].model, memoryBytes: os.totalmem(), chrome: browser.version() },
     method: { batch: 1, batch8: { status: 'not-applicable', reason: 'this exact ONNX export has fixed batch=1' }, warmup: 10, measured: 30,
@@ -66,7 +67,7 @@ async function main() {
     report.browser = await page.evaluate(() => ({ userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency, deviceMemoryGiB: navigator.deviceMemory, webgpu: Boolean(navigator.gpu) }));
     assert.deepEqual(report.model.variants.map(v => v.id), ['fp32', 'fp16', 'int8']);
     await context.close();
-    for (const show3D of smoke ? [true] : [false, true]) for (const backend of smoke ? ['webgpu'] : ['wasm', 'webgpu']) for (const variant of smoke ? ['fp32'] : ['fp32', 'fp16', 'int8']) for (const fixture of smoke ? report.model.fixtures.slice(0, 1) : report.model.fixtures) {
+    for (const show3D of switchesOnly ? [] : smoke ? [true] : [false, true]) for (const backend of smoke ? ['webgpu'] : ['wasm', 'webgpu']) for (const variant of smoke ? ['fp32'] : ['fp32', 'fp16', 'int8']) for (const fixture of smoke ? report.model.fixtures.slice(0, 1) : report.model.fixtures) {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1100 } }), page = await context.newPage();
       await observe(page);
       const row = { show3D, backend, variant, fixture: fixture.name, status: 'running', memory: [], samplingErrors: [] };
@@ -122,19 +123,26 @@ async function main() {
     const live = new Set(), lifecycle = { created: 0, closed: 0 };
     page2.on('worker', worker => { lifecycle.created++; live.add(worker); worker.on('close', () => { lifecycle.closed++; live.delete(worker); }); });
     await observe(page2); await page2.goto(base + '/?models=1'); await expect(page2.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
-    for (let i = 0; i < (smoke ? 2 : 20); i++) {
-      const variant = ['fp32', 'fp16', 'int8'][i % 3];
+    const baseline = await execute(page2, 1);
+    assert.equal(baseline.request.variant, 'fp32');
+    assert.equal(baseline.request.packageHash, report.deployment.model.sha256);
+    report.switchBaseline = { result: baseline, workers: { ...lifecycle, live: live.size } };
+    const variants = modelSwitchVariants(smoke ? 2 : 20);
+    for (let i = 0; i < variants.length; i++) {
+      const variant = variants[i];
       await page2.getByLabel('精度形式').selectOption(variant);
       const result = await execute(page2, 1);
       assert.equal(result.request.variant, variant);
+      assert.notEqual(result.request.variant, report.switches.at(-1)?.variant ?? baseline.request.variant, 'each switch must change the model');
       assert.equal(result.request.packageHash, report.deployment.model.sha256);
       assert.ok(live.size <= 1, 'obsolete model Worker remains alive');
       report.switches.push({ iteration: i + 1, variant, workers: { ...lifecycle, live: live.size }, result, memory: await browserMemory(browserCdp, page2) }); save();
     }
     await context2.close(); assert.equal(live.size, 0); assert.equal(lifecycle.created, lifecycle.closed);
     report.switchLifecycle = { ...lifecycle, live: live.size, afterClose: await browserMemory(browserCdp) };
-    assert.equal(report.rows.length, smoke ? 1 : 48); assert.equal(report.switches.length, smoke ? 2 : 20);
-    report.complete = !smoke && !requiredFailure; report.finishedAt = new Date().toISOString(); save();
+    assert.equal(report.rows.length, switchesOnly ? 0 : smoke ? 1 : 48); assert.equal(report.switches.length, smoke ? 2 : 20);
+    report.switchesComplete = !smoke && report.switches.length === 20 && live.size === 0;
+    report.complete = !smoke && !switchesOnly && !requiredFailure; report.finishedAt = new Date().toISOString(); save();
     if (requiredFailure) process.exitCode = 1;
   } catch (e) { report.errors.push(String(e)); save(); throw e; }
   finally { await browserCdp.detach(); await browser.close(); awake?.kill(); }

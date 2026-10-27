@@ -4,8 +4,20 @@
 /build-info.json
   Cache-Control: no-store
 
+/inference-build.json
+  Cache-Control: no-store
+
 /experiments/*
   Cache-Control: no-cache
+
+/models/m3/index.json
+  Cache-Control: no-store
+
+/models/m3/models/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/models/m3/runtime/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /*
   X-Content-Type-Options: nosniff

@@ -245,6 +245,14 @@ Cloudflare Registrar は卸値（無マークアップ）販売 [公式]。TLD �
 
 ## 出典
 
+### M3のローカル実機結果（2026-10-27）
+
+[固定モデル・全条件・失敗を含む記録](M3_VALIDATION.md#ローカル固定配布物の実機計測)。Apple M1・Chrome156・batch1・3DありでFP32 WebGPUは中央値53〜54ms、WASMは320〜334ms。INT8重みはWebGPU約54〜55msで速度改善は確認できず、FP16はWASM約392〜396ms、WebGPUは数値基準未達だった。推論時間をVast.aiでの学習速度へ換算しない。
+
+配布モデルはFP32 20,420,291、FP16 10,391,274、INT8重み5,426,735 bytes。ORT Asyncify WASM 28,747,738 bytesは16 MiB単位で分割するため、R2を追加せずStatic Assetsで実配信検証へ進める。全形式に加え、元checkpoint・数値照合用の全参照ファイルも配布候補に含む。ロード時間はlocalhost測定で、公開回線の時間・転送費はまだ算出しない。Chrome RSS合計の観測最大は約1.44 GiB（共有ページの重複を含みうる）、GPU総メモリは取得不可。Mac内蔵GPUの検証であり、有料GPU・R2の利用は0。M6でMac MPSの小規模学習速度を測り、有料本学習の直前に相場・時間・上限額を見積もり承認を得る。
+
+### 外部資料
+
 Cloudflareの料金・制限とVast.ai課金条件は2026-10-26に公式資料と再照合。GPU相場・為替・ドメイン参考値は下記の2026-10-25記録であり、現時点の見積もりには再取得が必要。
 
 - Vast.ai課金条件: [公式ドキュメント原文](https://github.com/vast-ai/docs/blob/main/guides/reference/billing.mdx)（停止中ストレージ・残高不足の扱い）
