@@ -143,6 +143,10 @@ M0計画時には通常CIのRust約26秒・Web約84秒（キュー待ちを除�
 
 GitHub Actions の **Public リポジトリの標準 GitHub-hosted runner** は無料で利用できる。M0 は標準 Ubuntu runner を使い、有料の larger runner、外部カバレッジサービス、GPU、R2 を追加しない。artifact は原則7日、重い計測結果は必要なものだけ保存する。[GitHub の料金条件](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 
+## 公開E2Eの安定性に関する追記（2026-10-27）
+
+文書更新後の [main CI 40432366163](https://github.com/ayutaz/voxelshogi/actions/runs/40432366163) は公開・配信SHA・公開E2Eまで最終結果successだったが、カメラ操作テスト1件が初回失敗・再試行成功となった。実行コードとCI設定はM2完了版から変えていない。再試行なしで通った固定記録を上書きせず、この結果も残す。現在のCI設定は変更せず、[STATUSの残課題](STATUS.md#次の着手前に確認する残課題)・[M3計画のC0](M3_PLAN.md#着手前の確認c0) で原因切り分けと安定性の確認を次の作業にする。
+
 ## 段階ごとの検証（実施済みと追加予定）
 
 | 時期 | 追加する検証・運用 |
