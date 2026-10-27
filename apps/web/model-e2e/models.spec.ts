@@ -18,6 +18,7 @@ for (const variant of ['fp32', 'fp16', 'int8']) {
       expect(result.comparison.value.elements).toBe(1);
       expect(result.comparison.policy.exceeded + result.comparison.value.exceeded).toBe(0);
       expect(result.metrics.samples).toHaveLength(1);
+      expect(result.metrics.resources.some(r => r.url.endsWith(`/${variant}.onnx`) && r.decodedBytes > 0)).toBe(true);
       expect(result.profile.providers.CPUExecutionProvider).toBeGreaterThan(0);
       expect(Object.keys(result.profile.providers)).toEqual(['CPUExecutionProvider']);
       expect(Number.isFinite(result.value)).toBe(true);

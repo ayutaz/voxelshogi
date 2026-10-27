@@ -28,6 +28,11 @@ function validateResult(value: unknown, request: InferenceRequest): InferenceRes
   }
   if (!Array.isArray(metrics.samples) || metrics.samples.length !== (request.iterations === 40 ? 30 : 1) || !metrics.samples.every(finite) || metrics.warmup !== (request.iterations === 40 ? 10 : 0)) throw new Error('invalid timing samples');
   for (const field of ['medianMs', 'p95Ms', 'loadMs', 'initMs', 'totalMs']) if (!finite(metrics[field])) throw new Error('invalid timing');
+  if (!Array.isArray(metrics.resources) || metrics.resources.length > 256) throw new Error('invalid asset timings');
+  for (const item of metrics.resources) {
+    const resource = record(item);
+    if (typeof resource.url !== 'string' || resource.url.length > 2048 || typeof resource.protocol !== 'string' || typeof resource.delivery !== 'string' || ['startMs', 'durationMs', 'transferBytes', 'encodedBytes', 'decodedBytes'].some(key => !finite(resource[key]))) throw new Error('invalid asset timing');
+  }
   if (metrics.tensorBytes !== 4397332 || info.backend !== request.backend || !finite(info.runtimeBytes) || info.runtimeBytes === 0 || !Array.isArray(info.features) || !info.features.every((v) => typeof v === 'string')) throw new Error('invalid backend information');
   const profile = record(result.profile), providers = Object.entries(record(profile.providers));
   const expectedProvider = request.backend === 'webgpu' ? 'WebGpuExecutionProvider' : 'CPUExecutionProvider';

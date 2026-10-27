@@ -10,7 +10,7 @@ function message(w: WorkerPort, data: unknown) { w.onmessage?.({ data } as Messa
 function success(r = request(1)) {
   const report = (elements: number) => ({ elements, exceeded: 0, maxAbs: 0, maxRelative: 0, atol: 1e-5, rtol: 1e-4 });
   return { kind: 'result', result: { request: r, value: 0.25, comparison: { policy: report(1_067_985), value: report(1) },
-    metrics: { samples: [3], warmup: 0, medianMs: 3, p95Ms: 3, loadMs: 1, initMs: 2, totalMs: 10, tensorBytes: 4397332 },
+    metrics: { samples: [3], warmup: 0, medianMs: 3, p95Ms: 3, loadMs: 1, initMs: 2, totalMs: 10, tensorBytes: 4397332, resources: [] },
     information: { backend: 'wasm', adapter: null, features: [], runtimeBytes: 100 }, profile: { providers: { CPUExecutionProvider: 1 }, operators: { MatMul: 1 } }, buffers: null } };
 }
 

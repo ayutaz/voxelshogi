@@ -62,6 +62,7 @@ const mutations = [
   { name: 'inference-int8-optimization', file: 'inference/options.ts', before: "precision === 'int8' ? 'basic' : 'all'", after: "'all'", test: 'inference-options' },
   { name: 'inference-fp32-difference', file: 'inference/manifest.ts', before: "v.precision !== 'fp32'", after: 'false', test: 'inference-manifest' },
   { name: 'inference-cached-precision', file: 'inference/engine.ts', before: 'port.createSession(model, variant.precision)', after: "port.createSession(model, 'fp32')", test: 'inference-engine' },
+  { name: 'inference-decoded-transfer', file: 'inference/resources.ts', before: 'decodedBytes: e.decodedBodySize', after: 'decodedBytes: e.encodedBodySize', test: 'inference-resources' },
 ];
 
 function main() {
@@ -107,7 +108,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 47);
+    assert.equal(results.length, 48);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
