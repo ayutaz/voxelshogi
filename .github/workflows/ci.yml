@@ -149,6 +149,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: node ../../scripts/ci/check-versions.mjs
       - run: pnpm wasm
+      - name: Verify fixed model inputs against Rust WASM
+        run: node ../../scripts/model-fixtures.mjs --check
       - run: pnpm typecheck
       - run: pnpm test
       - name: Compare native and real WASM search
