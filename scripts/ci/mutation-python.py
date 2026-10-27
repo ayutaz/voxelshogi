@@ -9,12 +9,52 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-MUTATIONS = [
+CONTRACT_MUTATIONS = [
     ("white-axes", "pieces = pieces[::-1]", "pieces = pieces"),
     ("hand-owner", "counts = counts[::-1]", "counts = counts"),
     ("promotion-label", "+ int(promote)", "+ 0"),
     ("output-tolerance", "if exceeded:", "if False:"),
     ("finite-reference", "not np.isfinite(expected).all() or ", ""),
+]
+MUTATIONS = [
+    (name, "contract.py", before, after, "test_contract.py")
+    for name, before, after in CONTRACT_MUTATIONS
+] + [
+    (
+        "attention-axis",
+        "model.py",
+        "scores.softmax(dim=-1)",
+        "scores.softmax(dim=-2)",
+        "test_model.py",
+    ),
+    (
+        "policy-layout",
+        "model.py",
+        "pair.permute(0, 2, 3, 1)",
+        "pair.permute(0, 2, 1, 3)",
+        "test_model.py",
+    ),
+    (
+        "model-seed",
+        "model.py",
+        "torch.manual_seed(seed)",
+        "torch.manual_seed(SEED)",
+        "test_model.py",
+    ),
+    (
+        "unused-block-weights",
+        "model.py",
+        "self.blocks(self.input(features) + self.position)",
+        "self.input(features) + self.position",
+        "test_model.py",
+    ),
+    (
+        "package-hash",
+        "generate.py",
+        'or digest(path) != file.get("sha256")',
+        "or False",
+        "test_generate.py",
+    ),
 ]
 
 
@@ -37,7 +77,7 @@ def main():
             "PYTHONDONTWRITEBYTECODE": "1",
         }
 
-        def run(name):
+        def run(name, tests=""):
             report = work / "results.xml"
             report.unlink(missing_ok=True)
             result = subprocess.run(
@@ -48,7 +88,7 @@ def main():
                     "--no-sync",
                     "pytest",
                     "-q",
-                    "export/tests/test_contract.py",
+                    f"export/tests/{tests}",
                     f"--junitxml={report}",
                 ],
                 cwd=work,
@@ -77,13 +117,13 @@ def main():
             )
 
         assert run("baseline") == "passed"
-        path = work / "export/contract.py"
-        original = path.read_text()
-        for name, before, after in MUTATIONS:
+        for name, file, before, after, tests in MUTATIONS:
+            path = work / "export" / file
+            original = path.read_text()
             assert original.count(before) == 1, f"stale mutation: {name}"
             try:
                 path.write_text(original.replace(before, after))
-                outcome = run(name)
+                outcome = run(name, tests)
                 results.append({"name": name, "outcome": outcome})
                 print(f"{name}: {outcome}", flush=True)
                 assert outcome == "caught", f"surviving mutation: {name}"
