@@ -66,3 +66,11 @@ Mac M1・実機Chromeの専用Workerで、WASMは3形式×4局面が全出力照
 FP16は検証済みのWASMで実行できる。WebGPUで基準未達なら出力は採用せず、超過数・最大誤差・閾値をエラー表示する。FP32等への自動fallbackで成功にしない。形式ごとに検証を通るbackendと不合格・未測定を区別するというM3計画に従い、最終固定配布物でも同じ全比較を行う。
 
 Pythonは48テストへ拡充し、INT8の手計算、符号・scale・ties-to-even、元グラフの保持、FP16の実際の型、全形式の再生成一致、欠けた／非有限の差分情報も検証する。既知Python変異は16件（丸め・scale・zero point・逆量子化・FP16 I/O・追加の量子化近似を含む）。ブラウザには形式別の最適化設定・差分の検証と表示・runtime再利用時の形式切替の回帰を追加し、既知Web変異47件を検出した。最終計測と公開モデルの配信はまだ完了していない。
+
+## ブラウザ実モデルCIと計測コード
+
+- `model-playwright.config.ts` の6 E2Eを追加。3形式それぞれの4局面・全Policy/Value照合、実Workerの推論中のtrustedなカメラ操作と実draw・中断・再試行、改ざんしたONNXのhash拒否、Worker内GPU機能を無効化した負例を検証する。GPU機能の負例はGPU実行の証拠として扱わない。実機Chromeで6件が成功（45.6秒、再試行なし）。共通化した観測helperで既存21件も28.0秒で全成功し、C0の追加3回も42.3秒・再試行なしで成功した。
+- CIの専用 `models` jobはuvと固定Pythonから3形式を生成し、ローカル専用配布物をproduction buildへ含めて6件を実行する。通常PRにも適用し、失敗・skip・中断・欠落はCI Gateを止める。未承認モデルとそのtraceはartifactへ含めない。モデルE2Eの設定・テストもTypeScriptの検証対象とする。
+- Node制御は58テスト。Gateの実モデルCI依存、RSS単位、公開ライセンス、clean source、配布hashの既知5変異も別プロセスの実行済みassertion失敗として検出し、通常CIへ追加する。
+- `scripts/measure-browser-models.mjs` は全48組の初回／warm-up10＋測定30回、3Dの実入力／描画、main JS heapと専用Chrome process RSS、モデル20回切替とWorkerのcloseを記録する。RSS合計は共有ページの重複を含みうる観測値であり、実メモリの厳密なpeakとは呼ばない。native ORTのGPU総使用量はこのAPIから取得できないためN/Aと理由を保存する。
+- 短い `--smoke` で実GPUの40推論、3Dの実操作・描画とメモリ取得、Workerの終了を確認した。`smoke=true, complete=false` を出力し、この値は正式な性能記録には採用しない。最終固定SHAによる全計測と公開後照合を別途実施する。

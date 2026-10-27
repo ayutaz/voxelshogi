@@ -37,6 +37,7 @@ cargo fmt --all --check
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo test --locked --workspace
 node --test scripts/ci/*.test.mjs
+node scripts/ci/mutation-controls.mjs
 actionlint
 shellcheck scripts/*.sh scripts/ci/*.sh
 
@@ -54,11 +55,26 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）とWeb29変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）・Web47変異・Python16変異・CI制御5変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
 - `Rust core coverage`、`Web unit coverage`、`Known mutation regressions`
+
+M3の `Browser model inference (real WASM)` もCI Gateへ必須の依存として含める。uvから3形式を生成してlocalhostで実際に読み込み、専用Worker・全出力照合・描画と中断・破損／未対応表示の6 E2Eを行う。GPUを持たないCIは実機GPUの証拠にはしない。モデルのライセンス確定までは、生成物をこのジョブ内だけに置き、モデルやtraceをartifactへ公開しない。
+
+実機検証の再現コマンド（事前にWASMビルド・依存導入を行う）：
+
+```bash
+uv run --locked python -m export.generate runs/m3/local
+node scripts/prepare-inference.mjs runs/m3/local apps/web/public/models/m3 --local
+pnpm --dir apps/web build
+pnpm --dir apps/web exec playwright test -c model-playwright.config.ts
+# 別ターミナルでpnpm --dir apps/web preview --port 4173を起動してから実行する
+node scripts/measure-browser-models.mjs runs/m3/browser-measurement.json
+```
+
+計測は3Dあり／なし・各4入力・3形式・WASM／WebGPUを対象に、初回、準備10回＋測定30回、20回のモデル切替を保存する。取得可能なmain JS heapとChrome所有プロセスのRSS、管理tensor量を区別し、GPU総量は取得不可の理由を残す。`--smoke` は短い動作確認であり、M3完了の計測には数えない。公開前のモデル生成に `--license` を勝手に追加しない。
 
 GitHub Actions が発行したチェックだけを受理し、CodeQL の error と high/critical セキュリティ警告も取り込みを止める。カバレッジは測定とレポートの保存を必須とし、一律の割合基準は設けない。全体の cargo-mutants 調査は週次・手動で行う。
 

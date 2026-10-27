@@ -62,6 +62,7 @@ jobs:
       - run: pnpm lint
         working-directory: apps/web
       - run: node --test scripts/ci/*.test.mjs
+      - run: node scripts/ci/mutation-controls.mjs
 
   msrv:
     name: Rust MSRV (1.85)
@@ -79,7 +80,7 @@ jobs:
     name: CI Gate
     # Keep fail/cancel detection; do not serialize workflows behind a queued gate.
     if: always()
-    needs: [lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python]
+    needs: [lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python, models]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -109,6 +110,47 @@ jobs:
       - run: uv run --locked ruff format --check export scripts/ci/mutation-python.py
       - run: uv run --locked pytest -q
       - run: uv run --locked python scripts/ci/mutation-python.py
+
+  models:
+    name: Browser model inference (real WASM)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        with:
+          tool: wasm-bindgen-cli@${{ env.WASM_BINDGEN_VERSION }}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.11.23'
+          enable-cache: true
+      - run: uv sync --locked
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm --dir apps/web install --frozen-lockfile
+      - run: pnpm --dir apps/web wasm
+      - run: uv run --locked python -m export.generate runs/m3/ci
+      - name: Prepare local-only models without publishing binaries
+        run: node scripts/prepare-inference.mjs runs/m3/ci apps/web/public/models/m3 --local
+      - run: pnpm --dir apps/web build
+      - run: pnpm --dir apps/web exec playwright install chromium
+      - name: Verify all formats and real Worker interaction
+        run: pnpm exec playwright test -c model-playwright.config.ts
+        working-directory: apps/web
+        env:
+          PW_CHANNEL: ''
+      # No model/trace artifacts: the model publication license is still pending.
 
   rust:
     name: Rust (fmt, clippy, test)
