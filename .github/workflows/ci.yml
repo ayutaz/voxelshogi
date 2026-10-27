@@ -152,7 +152,7 @@ jobs:
         working-directory: apps/web
         env:
           PW_CHANNEL: ''
-      # No model/trace artifacts: the model publication license is still pending.
+      # This private verification job does not publish model/trace artifacts.
 
   rust:
     name: Rust (fmt, clippy, test)

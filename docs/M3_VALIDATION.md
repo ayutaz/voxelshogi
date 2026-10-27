@@ -123,3 +123,11 @@ PR #22〜#26は必須8チェック成功後に通常取り込み済み。PR #26�
 配信監査は公開サイトのmanifestだけで自己照合せず、ダウンロードした検証済みCI artifactのbuild／アプリ／モデルmanifestと一致させる。同じcommit名を保ったまま実Workerとmanifestを差し替える負例を先に失敗させ、検証を追加した。Worker照合・モデル照合を消す変異も検出。既存の探索観戦等の全21 E2Eも実機Chromeで23.7秒・再試行なしで成功した。
 
 LinuxのCIで生成するONNXや参照値は、producer metadata等によりMacで生成したファイルとhashが異なる可能性がある。公開後は実配信された同じbytesでWebGPUを再測定し、このローカル結果を最終公開結果へ読み替えない。有料GPU・R2は利用していない。
+
+## 未学習モデルの公開承認
+
+2026-10-27、ユーザーが未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版をApache-2.0で公開することを承認した。承認の記録時刻は14:11:37 UTC、設定は `export/publication.json`。学習済みモデル・データセットのライセンスはこの承認へ含めない。上記の「未承認」は各記録時点の状態で、現在は承認済み設定による公開経路を検証する段階。
+
+PR #27は全必須8チェック成功後にmain `b1bed967eb78186b33abe0b2cfb1c08988886d12` として通常取り込み済み。[統合後CI](https://github.com/ayutaz/voxelshogi/actions/runs/40489714294)・[CodeQL](https://github.com/ayutaz/voxelshogi/actions/runs/40489714313)も成功。CodeQLのmedium指摘1件（Network data written to file）は保存内容が検証結果のJSON metadataのみで、ネットワーク由来のモデル／コードを保存・実行せず、取得値が出力先を選ばないことを確認し、理由付きfalse positiveとして記録して会話を解決した。検査やmain保護は無効化していない。
+
+実モデル公開・実配信ファイル照合・公開後の実機計測はこの承認後に行い、終了までM3全体を完了としない。
