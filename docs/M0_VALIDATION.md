@@ -4,7 +4,7 @@
 
 M0-1〜5は完了した。[PR #3](https://github.com/ayutaz/voxelshogi/pull/3) の最終文書コミットも必須7チェックが成功し、保護を迂回せず通常の squash merge を行った。統合後の main の CI・CodeQL・本番公開・配信 SHA・公開 E2E の成功も確認済み。M0完了時のソース・テスト・CI設定は全体変異調査時点の `5a14c0d` と同じ。
 
-本書は**M0時点の履歴**を保持する。R0追加直後はRust116件・Web36件・既知変異14件・E2E9件だった。その後M1も完了し、現在はRust150件・Web36件・CI制御Node46件・既知変異21件・E2E9件。[現在地](STATUS.md)・[M1記録](M1_VALIDATION.md) を参照。[現在のCI状況](CI_CD_PLAN.md#現在の状態) と [R0報告](NINE_KINGS_EXPERIMENT.md) を参照し、以下の旧件数・カバレッジ・全758変異を現在の実測値と混同しない。
+本書は**M0時点の履歴**を保持する。R0追加直後はRust116件・Web36件・既知変異14件・E2E9件だった。その後M1・M2も完了した。現在の件数・公開版は [STATUS](STATUS.md) と [M2記録](M2_VALIDATION.md) を正とし、次の作業は [M3計画](M3_PLAN.md)。[M1記録](M1_VALIDATION.md)・[現在のCI状況](CI_CD_PLAN.md#現在の状態) と [R0報告](NINE_KINGS_EXPERIMENT.md) を参照し、以下の旧件数・カバレッジ・全758変異を現在の実測値と混同しない。
 
 ## M0 完了時の取り込みと公開
 

@@ -120,6 +120,14 @@ PR #15も [CI](https://github.com/ayutaz/voxelshogi/actions/runs/40378365779)・
 
 同じmain runの `web-dist`（artifact12679012024）をZIPとして読み、CIのdigest `24d787399b564e3d5cfb14becda0d6a0ac58fe9f14c5fc91c2da81aaa6a6ddbf` と照合した。コードを実行せず、build-infoのSHA、公開中のJS/WASM/Worker/3Dと2manifest・全6棋譜の計12ファイルが、長さとSHA-256で一致した。[照合記録](experiments/m2-public-artifact-match.json)。
 
+## 最終PRの取り込みと公開（e212ec7）
+
+完了記録とカメラ中断テストの修正を含む [PR #16](https://github.com/ayutaz/voxelshogi/pull/16) は、[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40383894485)・[品質](https://github.com/ayutaz/voxelshogi/actions/runs/40383894486)・[CodeQL](https://github.com/ayutaz/voxelshogi/actions/runs/40383894474) の必須7チェック成功後、通常squash mergeした。PRのE2E21件も再試行なしで成功した。
+
+最終main `e212ec739aeb23b3dedac83f60b861903d96fbc2` の [CI 40385647318](https://github.com/ayutaz/voxelshogi/actions/runs/40385647318) は自動公開・配信SHA・公開E2E21件（37.2秒）が再試行なしで成功。Cloudflare version IDは `f8ad9d72-2aab-4d36-afe6-881d6df4ca04`。Mac実機Chromeでも同じ公開SHAの全21件が22.7秒で成功し、skip・失敗・再試行は0件だった。[最終公開の固定記録](experiments/m2-final-publication.json)。
+
+最終版は性能計測対象の `3a500cd` とRust／Webの実行ソースに差分がなく、公開HTMLが参照する入口JSと、JS/WASM/Worker/3D・2manifest・6棋譜の計12ファイルもバイト数とSHA-256が一致した。したがって前節の計測JSONは元のSHAを維持し、最終公開の確認と混同しない。2026-10-27の文書更新開始時にもmain CI成功と配信SHAを再確認した。後続の文書PRで公開SHAが変わる場合は、そのmain CIと `build-info.json` を確認する。
+
 ## 完了条件の照合
 
 | 条件 | 達成の証拠 | 判定 |
@@ -132,4 +140,4 @@ PR #15も [CI](https://github.com/ayutaz/voxelshogi/actions/runs/40378365779)・
 | G6：予算・初回ロードの実測 | 固定SHA・dirty=falseの7局面、Metal実GPU・Network、初期化／復元／探索／往復、同一CIの12アセット照合 | ✅ |
 | G7：人間対AIとR0 | Normalの人間先後・投了、成り／打ち・棋譜／履歴、比較室・2manifest・6棋譜、公開E2E | ✅ |
 
-M2-1〜5のAPI・Worker・観戦UI・バンドル分割・予算決定・通常統合・公開検証を上記で照合した。APIは [GAME_ENGINE](GAME_ENGINE.md)、開発・公開手順と件数は [CLAUDE](../CLAUDE.md)・[CONTRIBUTING](../CONTRIBUTING.md)・[DEPLOYMENT](DEPLOYMENT.md)、現在地と次のM3は [STATUS](STATUS.md)・[ROADMAP](ROADMAP.md) に反映した。完了記録自身も通常PRの必須CIとmain自動公開を経由する。9王の正式採用・学習モデル・有料GPUはM2の成果に含めない。
+M2-1〜5のAPI・Worker・観戦UI・バンドル分割・予算決定・通常統合・公開検証を上記で照合した。APIは [GAME_ENGINE](GAME_ENGINE.md)、開発・公開手順と件数は [CLAUDE](../CLAUDE.md)・[CONTRIBUTING](../CONTRIBUTING.md)・[DEPLOYMENT](DEPLOYMENT.md)、現在地と次のM3は [STATUS](STATUS.md)・[ROADMAP](ROADMAP.md)・[M3実行計画](M3_PLAN.md) に反映した。完了記録自身の通常PR・必須CIとmain自動公開も上記の最終版で確認した。9王の正式採用・学習モデル・有料GPUはM2の成果に含めない。
