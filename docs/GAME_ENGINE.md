@@ -1,6 +1,6 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
-更新: 2026-10-26。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。現在地は [STATUS](STATUS.md)。PythonバインディングとWebのライブ探索は未実装。
+更新: 2026-10-27。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。現在地は [STATUS](STATUS.md)。M2の `Game.bestMove` と履歴付き専用Workerによるライブ探索も公開済み（[M2検証](M2_VALIDATION.md)）。PythonバインディングとNN推論は未実装で、次は [M3計画](M3_PLAN.md)。
 
 ## モジュール
 
@@ -91,7 +91,7 @@ fn main() -> Result<(), &'static str> {
 
 設定はcamelCaseのJSONで、必須 `maxDepth` は0〜64。任意の `maxNodes` は0〜9,007,199,254,740,991の整数、`maxTimeMs` は同上限以下の有限・非負のミリ秒（小数可）、`maxGamePly` はu32範囲の絶対ply上限。省略・nullは上限なし。初期VSFENが42手目なら絶対plyは41で、表示カーソル0とは区別する。設定JSONは4,096 bytes以下。未知フィールド・不正型・範囲外を終了局面でも拒否する。
 
-`options` は省略可。`iterativeDeepening`、`moveOrdering`、`transpositionTable` はbool、`tableCapacity` は0〜1,000,000。省略した各値はcoreの既定（true・true・true・65,536）。設定例は `{"maxDepth":4,"maxNodes":50000,"maxTimeMs":1000}`。これはAPI例であり、Normalの確定予算は実機計測後に決める。
+`options` は省略可。`iterativeDeepening`、`moveOrdering`、`transpositionTable` はbool、`tableCapacity` は0〜1,000,000。省略した各値はcoreの既定（true・true・true・65,536）。設定例は `{"maxDepth":4,"maxNodes":50000,"maxTimeMs":1000}`。これはAPI例。公開Normalの既定はM2の実機計測に基づく最大深さ6・50,000ノード・約1秒で、画面から0.1／1／3秒を選べる（[計測](M2_VALIDATION.md)）。
 
 返り値はJSON文字列。`schema: 1`、`bestMove: string | null`、`score: number | null`、`completedDepth: number`、`nodes`・`lastIterationNodes`・`ttHits` は**10進文字列**、`stopReason` は `depth | nodes | time | terminal`。u64統計をJSのnumberへ暗黙変換しない。`score` の視点・尺度・未完了時の合法代替手は上記Rust探索と同じ。外部終了のMaxPliesは手なし・評価0、Abandonedは手なし・評価nullを返す。`maxGamePly` は探索の打ち切り条件であり、このAPI自体で対局を終了・保存しない。
 

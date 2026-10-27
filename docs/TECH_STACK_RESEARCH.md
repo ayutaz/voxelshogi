@@ -1,6 +1,6 @@
 # VoxelShogi 技術スタック調査（デューデリジェンス）
 
-- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・公式料金の照合更新: **2026-10-26**
+- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-27**（公式料金の最終照合は2026-10-26）
 - 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内 NN 推論（ONNX Runtime Web: WebGPU、WASM フォールバック、Web Worker 内）、Cloudflare Workers Static Assets + R2、PyTorch DDP 学習（Vast.ai）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。
 - 凡例: **[確認済]** = 各節の取得日に一次情報で確認 / **[記憶ベース]** = 取得日に一次情報で未検証 / **[未確認]** = 確認できなかった・実測が必要
@@ -11,18 +11,18 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。今回のディスク再確認は約32GiBで、初回の約9GBという前提は解消した。現在の計画は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。PyO3 の ABI 対象・学習用依存の組み合わせは M3/M4 着手時に確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次の実装は [M3_PLAN.md](M3_PLAN.md)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-26に実装・公開版 `2405e86` と再照合した（[現在地](STATUS.md)・[配信取得記録](experiments/documentation-baseline-2026-10-26.json)）。下表の公開サイズはこの固定版。M2の作業差分では標準1王の全幅探索を専用module Workerへ接続し、観戦・両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを実装した。固定SHAの計測と公開確認は [M2記録](M2_VALIDATION.md) に保存した。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリは未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
+2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。`onnxruntime-web`・PyO3・maturin・PyTorch・学習用ライブラリはプロジェクトへ未導入で、M3/M4/M6の候補。COOP/COEP・R2も未導入。
 
 | 現在の構成 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
-| Web / WASM | 主要runtimeの直依存は完全固定、開発依存の範囲指定もlockfileで解決を固定。wasm-bindgenとCLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| 検証 | M1でRust150、Web36、Node46、既知変異21、E2E9件 | [M1検証記録](M1_VALIDATION.md)。以下の公開サイズは2405e86の取得値 |
-| 公開WASM | 284,605 bytes（約285 kB） | 2026-10-26、公開版2405e86から取得した非圧縮バイト数 |
-| 公開入口JS / 比較室JS | 1,196,200 / 11,389 bytes（約1.20 MB / 11.4 kB） | 同上。比較室JSは遅延ロード、重い共通JS分割はM2で継続 |
+| Web / WASM | 主要runtimeの直依存は完全固定、開発依存はlockfileで固定。wasm-bindgen/CLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
+| 検証 | Rust core153＋WASM5、Web115、Node49、core/WASM33変異＋Web29変異、E2E21件 | [M2検証](M2_VALIDATION.md)。Native/WASM12fixtureもCIで照合 |
+| 公開WASM | 361,183 bytes | [公開計測](experiments/m2-search-browser-public.json)・[最終版照合](experiments/m2-final-publication.json) |
+| 初回JS / 3D JS / Worker JS | 255,096 / 952,067 / 11,784 bytes（非圧縮） | 初期2Dでは3D・探索Workerを取得しない。選択／探索開始時にロード |
 | R0 | 1,052局を照合、代表6棋譜を公開 | [実測報告](NINE_KINGS_EXPERIMENT.md)。モデル推論ではない |
 
 M2の固定コミット `63a4716` では、実Chromeの2D初回JSは255,096 bytes、3D選択後は累計1,207,163 bytes。WASMは探索追加で361,171 bytes、専用Workerは11,784 bytes。初回2Dの軽量化と3D利用時の全体量を分けて扱う。[固定SHAのNetwork・GPU・探索計測](experiments/m2-search-browser-local.json)・[旧公開版の実取得](experiments/m2-initial-load-before.json)。Normalは1秒予算で初期局面の深さ2を3回とも完了し、3Dを実際に描画したMetal/Apple M1上で計測した。公開版 `3a500cd` はWASM361,183 bytesで、[公開計測](experiments/m2-search-browser-public.json) と [同じCI成果物とのSHA照合](experiments/m2-public-artifact-match.json) を保存した。MacとLinuxのWASMは別のSHAで記録する。静止中の3Dはdemand描画、移動軌跡は連続描画とする。
@@ -190,7 +190,7 @@ WASMサイズはビルド環境でも差が出るため、配信バイト数と�
   - SDPAがopset 18でMatMul＋Softmaxへ分解される構成を試す。全ノードがWebGPUに割り当たるかはM3で検証する。opset 23 にすると ONNX `Attention` が出て CPU フォールバックするので避ける。
   - 必要なら `onnxruntime.transformers` の optimizer で mask なし `MultiHeadAttention` に融合（要検証）。
 - **モデル設計への提言（Conv3d リスク回避）**:
-  1. 9×9×9 を **729 トークンの Transformer**（各マス=トークン、学習可能 3D 位置埋め込み）にする → MatMul/Softmax/LayerNorm 中心で WebGPU 最適化の恩恵が大きい。729² の注意行列は 1 層あたり約 53 万要素で、バッチ 1 なら十分現実的。
+  1. 9×9×9 を **729 トークンの Transformer**（各マス=トークン、学習可能 3D 位置埋め込み）にする → MatMul/Softmax/LayerNorm 中心で WebGPU 最適化の恩恵が大きい。729² は1 headあたり531,441要素で、batch・head数・dtype・中間bufferでメモリ量が変わる。実行可能性はM3の代表構造の実測で判定する。
   2. Conv を使うなら **"2.5D" 化**（深さ軸をチャネルに畳み込み Conv2d を使う、または Conv3d を unfold + MatMul で表現）を検討。
   3. Conv3d を使う場合は depthwise（group≠1）を使わない。
   4. いずれもM3で、学習前に同規模の候補をORT Web（WebGPU/WASM）で計測する。初回案の「1〜2週間」は実測済みの工期ではない。

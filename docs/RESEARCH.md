@@ -1,6 +1,6 @@
-# 調査サマリ（初回2026-10-25、実装状況更新2026-10-26）
+# 調査サマリ（初回2026-10-25、実装状況更新2026-10-27）
 
-現在の確認元は [STATUS](STATUS.md)、次の実装手順は [M2計画](M2_PLAN.md)。詳細は各文書を参照。
+現在の確認元は [STATUS](STATUS.md)、次の実装手順は [M3計画](M3_PLAN.md)。詳細は各文書を参照。
 
 本書の外部技術・価格情報は初回調査時点の記録。採用済みの構成と現在の進捗は [ROADMAP.md](ROADMAP.md)、CI/CD の実装・検証は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。WASM は wasm-bindgen-cli を直接使用し、Python は3.14系を基本、依存が未対応の場合は3.13系とする。
 
@@ -12,7 +12,7 @@
 ## 実装と調査の現在地
 
 - 標準1王の独立実装・Web AlphaとM0のCI/CDは完了。R0では9王3ルールを別IDで実装し、現行1王の対照・上限／幅の感度を含む1,052局を生成・再生照合した。
-- [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)は生成済み6棋譜のA/B観戦再生。通常画面のライブ対局はランダムAI。標準1王のM1全幅探索は実装・検証済み（[記録](M1_VALIDATION.md)）。M2のWorker・学習モデルは未実装。
+- [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)は生成済み6棋譜のA/B観戦再生。通常画面は両AIのEasy/Normalを選ぶWorker探索観戦。標準1王のM1全幅探索とM2のライブ探索・中断・実機公開確認は完了した（[M1](M1_VALIDATION.md)・[M2](M2_VALIDATION.md)）。NN推論・学習モデルは未実装で、M3の環境確認・変換・数値照合・公開条件を計画済み。
 - 正式なルール採用、観戦者による理解度・好みの測定、M3の実機モデル推論、M4のPython／学習データ生成、M5の実棋譜互換性検証は残っている。
 - [先行ルール調査](RULE_VARIANTS_RESEARCH.md)と[R0実測](NINE_KINGS_EXPERIMENT.md)を分け、M1以降の研究候補を実装済みと扱わない。R0の手作り探索評価は、将来の強化学習の報酬設計とは別である。
 
@@ -41,9 +41,9 @@
 
 ## 技術上の主要リスク
 
-1. ONNX Runtime Web の WebGPU 用 wasm が、Cloudflare Static Assets の1ファイル25MiB上限を超える（27MiB）。R2 で配信するか、軽量ビルド（JSPI 16MiB、WASM のみ 13.6MiB）を使う。
-2. WebGPU では、Conv3d が最適化されていない汎用カーネルでしか動かない。ONNX 標準の `Attention` 演算子は CPU で実行される。→ 本格学習の前に、小型モデルで実測する。
+1. 初回調査（2026-10-25、ORT Web 1.30.0）ではWebGPU用WASMが約27MiBで、当時確認したStatic Assetsの1ファイル25MiB上限を超えた。現在の採用版は未決定。M3でJS/WASM・モデル・全外部重みの実サイズと配信条件を再確認し、軽量build・分割・R2等を比較する。
+2. 初回調査対象のORTではConv3dやAttentionにbackendごとの制約があった。M3では採用版の実演算配置と、729トークン・Policy/Valueを持つ代表構造を実機で確認する。古い演算表や小行列の成功だけでモデル全体の対応を保証しない。
 3. GPU・PyTorch・CUDA・ドライバの組み合わせはM6で再確認する。初回調査ではRTX 5090向けにCUDA 13系のビルドを候補とした。
-4. 初回調査のローカルディスク空きは約9GBだったが、2026-10-26の再確認では約32GiB（今回の取得記録）。現時点でキャッシュ削除は不要。M3 の依存導入前に再確認する。
+4. 初回調査のローカルディスク空きは約9GBだったが、2026-10-26は約32GiB、2026-10-27は約27.2GiB（[最新のローカル確認](experiments/documentation-baseline-2026-10-27.json)）。M3の依存導入直前に再確認し、必要な容量だけを確保する。
 
 各リスクに対応する順序とゴールは `docs/ROADMAP.md` を参照。1・2 は M3 で先行検証し、3 は M6 の GPU 選定時に再確認する。M1 の教師用探索は αβ探索で、上記の Gumbel AlphaZero 案は後続の自己対局用である。
