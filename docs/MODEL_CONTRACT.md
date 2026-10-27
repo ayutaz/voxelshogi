@@ -26,7 +26,7 @@ Valueはfloat32、shape `[batch,1]`、手番側の勝ちを+1・負けを−1と
 
 ## 代表構造・比較条件
 
-729 token、幅256、6層、8 head、FFN幅1024のpre-norm Full Attentionを第一の代表構造とする。入力projectionと位置embedding、通常手のfrom/toの2組の射影・内積、駒打ちhead、Value headを含め約5Mパラメータを想定する。正確なパラメータ数・seed・ONNX演算・opset・ファイルhashはM3-1の実装と変換で確定し、5〜10Mの条件をテストする。browserのために無記録で小さくしない。
+729 token、幅256、6層、8 head、FFN幅1024のpre-norm Full Attentionを第一の代表構造とする。入力projectionと位置embedding、通常手のfrom/toの2組の射影・内積、駒打ちhead、Value headを含め5,021,064パラメータになった。seed314159・opset18・固定batch1のFP32変換をM3-1で実装し、5〜10Mの条件と6層の実行をテストする。正確な演算・ファイルhashと各比較値は生成manifestへ記録する。browserのために無記録で小さくしない。
 
 全出力のshape・有限性を必須とし、空出力・NaN/Infを拒否する。各要素で `abs(actual-reference) <= atol+rtol*abs(reference)` を確認する。FP32はatol=1e-5／rtol=1e-4、FP16は1e-3／1e-2を事前の基準とする。量子化版のscale・zero point・丸めと誤差の基準は、対象の量子化方式を決めて実測比較する前に追記する。
 
