@@ -8,11 +8,11 @@
 
 ## 現在の状態
 
-2026-10-28（JST）。M3基準公開版 `dd3762c` のモデル生成・公開・配信55ファイル照合・公開E2Eまで確認。[現在地](STATUS.md)・[M3最終記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)を参照。M2最終版 `e212ec7` とM1時点 `2405e86` の記録は各検証文書へ保持し、後続文書PRの配信SHAと区別する。
+2026-10-28（JST）。M3完了時公開版 `bca5532` のモデル生成・公開・配信55ファイル照合・公開E2Eまで確認。性能計測の`dd3762c`と最終参照値の差は [終了時の証拠](experiments/m3-completion-publication.json) に保持する。[現在地](STATUS.md)・[M3最終記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)を参照。M2最終版 `e212ec7` とM1時点 `2405e86` の記録は各検証文書へ保持し、後続文書PRの配信SHAと区別する。
 
 | 項目 | 現在の確認結果・設定の根拠 |
 |---|---|
-| mainのCI・公開 | [CI 40521101341](https://github.com/ayutaz/voxelshogi/actions/runs/40521101341)：通常CI・実モデル・WASM受け渡し・deploy・公開21件＋モデル6件・C0追加3件・配信55ファイル照合が成功。[Security 40521101405](https://github.com/ayutaz/voxelshogi/actions/runs/40521101405) の4言語解析も成功 |
+| mainのCI・公開 | [CI 40530800389](https://github.com/ayutaz/voxelshogi/actions/runs/40530800389)：通常CI・実モデル・WASM受け渡し・deploy・公開21件＋モデル6件・C0追加3件・配信55ファイル照合が成功。[Security 40530800258](https://github.com/ayutaz/voxelshogi/actions/runs/40530800258) の4言語解析も成功 |
 | 品質の継続検証 | Rust core153＋WASM境界5件、Web172件、Python48件、CI制御Node67件、Native/WASM12fixture、既知core/WASM33・Web50・Python16・CI制御14変異。M1の全1,172変異とM0の全758変異は各段階の固定記録 |
 | main保護 | 定義は [.github/main-ruleset.json](../.github/main-ruleset.json)：PR必須・最新main検証・必須8チェック（M3でPython CodeQL追加）・Actions App15368・CodeQL error/high以上・force push/削除禁止・bypassなし。他者承認0。実設定と拒否／成功の検証は各段階の記録 |
 | 本番認証 | main限定のproduction environmentを使用し、PR／fork／DependabotへCloudflare Secretsを渡さない。配置のAPI確認はM0／M1の固定記録。今回秘密値は取得・変更していない |
@@ -34,7 +34,7 @@
 | main 保護 | ruleset `25816100` を active に設定し、`protected: true` を確認。PR 必須、最新 main 検証、必須7チェック、CodeQL の error / high以上、force push・削除禁止、bypass なし。他者承認0件。定義は `.github/main-ruleset.json` |
 | PR 保護の検証 | [PR #2](https://github.com/ayutaz/voxelshogi/pull/2) は必須7チェック成功後、bypass なしで squash merge 済み（main `e3f7f7a`）。未完了時の通常 merge 拒否と正常時の取り込みを確認 |
 | 復旧訓練 | 成功runの旧 `web-dist` を再ビルドせず loopback 配信し、Chrome E2E 6件が成功。本番は変更していない。[証拠と手順](M0_VALIDATION.md) |
-| 次の作業 | M0-1〜5は取り込み・公開後検証まで完了。当時はM1未着手。その後のM1・M2完了と次のM3は [現在地](STATUS.md)・[実行計画](M3_PLAN.md) を参照。fork実検証は外部からの開発参加時に追加する |
+| 次の作業 | M0-1〜5は取り込み・公開後検証まで完了。当時はM1未着手。その後のM1〜M3完了と次のM4は [現在地](STATUS.md)・[実行計画](ROADMAP.md) を参照。fork実検証は外部からの開発参加時に追加する |
 
 人間同士の対局・マルチプレイは後続フェーズでも実装しない。Python は3.14を基本に、依存が未対応の場合のみ3.13を使う（現在 `.python-version` は3.14.9）。
 

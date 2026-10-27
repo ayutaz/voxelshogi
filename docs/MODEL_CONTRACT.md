@@ -44,7 +44,7 @@ M3-0の小演算テスト `y=2*x+1` は依存・dynamo exporter・CPU ORTの動�
 
 ## 公開版の実機対応（2026-10-28 JST）
 
-公開版 `dd3762c`、Apple M1・Chrome156・ORT1.31.1で、同じ変換版の全Policy／Valueを4局面・初回とwarm-up10＋測定30回で照合した。[全配信hash・固定測定と制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)。このONNXはbatch1固定で、batch8は対象外。M6で必要なら別のexportと検証を行う。
+性能計測用公開版 `dd3762c`、Apple M1・Chrome156・ORT1.31.1で、同じ変換版の全Policy／Valueを4局面・初回とwarm-up10＋測定30回で照合した。M3完了時公開版`bca5532`でもモデルbytesは同じで、再生成参照値の微小差と最終実機照合を [終了時の証拠](experiments/m3-completion-publication.json) に記録した。[全配信hash・固定測定と制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)。このONNXはbatch1固定で、batch8は対象外。M6で必要なら別のexportと検証を行う。
 
 | 形式 | WASM 1 thread | native WebGPU |
 |---|---|---|

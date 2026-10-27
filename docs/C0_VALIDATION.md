@@ -49,4 +49,4 @@ SwiftShader比較ではPlaywrightの `launchOptions.args` に `--use-angle=swift
 
 通常のWeb CIとmainの公開後ジョブに、対象E2Eの3回連続・retries=0を追加した。Webジョブは必須 `CI Gate` の依存で、公開側も1回の失敗でjobが失敗する。通常21件の成功やretryだけで反復の失敗を上書きしない。CI状態の取得は [ci-checks](../.agents/skills/ci-checks/SKILL.md) の最短10分間隔を維持する。
 
-M3のモデル・推論runtime・Python学習用依存は未導入。C0の最終公開確認後、[M3-0](M3_PLAN.md#実装順とtdd) の環境・入出力・比較条件の固定へ進む。
+C0完了時点ではモデル・推論runtime・Python依存は未導入だった。その後 [M3-0〜5](M3_PLAN.md#実装順とtdd) を進め、公開・実機検証まで完了した（[M3記録](M3_VALIDATION.md)）。次は [ROADMAP](ROADMAP.md) のM4。

@@ -96,7 +96,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
-  - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。基準main `dd3762c` のCI・公開E2E・55ファイルの配信照合、実機M1／Chromeの48組、WASM／WebGPUで各20実切替を確認。FP16×M1 WebGPUの数値基準未達、HTTP 500を1回観測した失敗と回復も保持（`docs/M3_VALIDATION.md`、2026-10-28 JST）
+  - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
   1. M4: Python バインディングとデータ生成
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）

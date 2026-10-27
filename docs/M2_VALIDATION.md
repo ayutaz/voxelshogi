@@ -140,4 +140,4 @@ PR #15も [CI](https://github.com/ayutaz/voxelshogi/actions/runs/40378365779)・
 | G6：予算・初回ロードの実測 | 固定SHA・dirty=falseの7局面、Metal実GPU・Network、初期化／復元／探索／往復、同一CIの12アセット照合 | ✅ |
 | G7：人間対AIとR0 | Normalの人間先後・投了、成り／打ち・棋譜／履歴、比較室・2manifest・6棋譜、公開E2E | ✅ |
 
-M2-1〜5のAPI・Worker・観戦UI・バンドル分割・予算決定・通常統合・公開検証を上記で照合した。APIは [GAME_ENGINE](GAME_ENGINE.md)、開発・公開手順と件数は [CLAUDE](../CLAUDE.md)・[CONTRIBUTING](../CONTRIBUTING.md)・[DEPLOYMENT](DEPLOYMENT.md)、現在地と次のM3は [STATUS](STATUS.md)・[ROADMAP](ROADMAP.md)・[M3実行計画](M3_PLAN.md) に反映した。完了記録自身の通常PR・必須CIとmain自動公開も上記の最終版で確認した。9王の正式採用・学習モデル・有料GPUはM2の成果に含めない。
+M2-1〜5のAPI・Worker・観戦UI・バンドル分割・予算決定・通常統合・公開検証を上記で照合した。APIは [GAME_ENGINE](GAME_ENGINE.md)、開発・公開手順と件数は [CLAUDE](../CLAUDE.md)・[CONTRIBUTING](../CONTRIBUTING.md)・[DEPLOYMENT](DEPLOYMENT.md)、当時の次の作業だったM3も完了した。現在地と次のM4は [STATUS](STATUS.md)・[ROADMAP](ROADMAP.md)、M3の完了証拠は [M3検証](M3_VALIDATION.md) を参照。完了記録自身の通常PR・必須CIとmain自動公開も上記の最終版で確認した。9王の正式採用・学習モデル・有料GPUはM2の成果に含めない。
