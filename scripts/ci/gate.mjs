@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url';
 
 export function checkGate(needs, event) {
   if (!needs || Array.isArray(needs) || typeof needs !== 'object') throw new Error('Invalid needs results');
-  return ['lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review'].flatMap((name) => {
+  return ['lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python'].flatMap((name) => {
     const result = needs[name]?.result;
     if (name === 'dependency-review' && event !== 'pull_request' && result === 'skipped') return [];
     return result === 'success' ? [] : [`${name}: ${result ?? 'missing result'}`];

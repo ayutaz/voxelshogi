@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M3_PLAN.md`（ブラウザ推論の環境確認・変換・数値照合・実機計測・公開デモ。計画策定済み、実装未着手）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/M3_PLAN.md`（ブラウザ推論の環境確認・変換・数値照合・実機計測・公開デモ。M3-0のuv環境・入出力契約を実装中）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -32,7 +32,7 @@
 
 ## 開発規約（必読）
 
-- **実装・文書変更の前に必ず作業ブランチを作る。main に直接 commit / push しない。** `AGENTS.md` と `CONTRIBUTING.md` に従い、PR を作成して必須7チェックの成功後に取り込む。main 保護を無効化したり bypass したりしない。
+- **実装・文書変更の前に必ず作業ブランチを作る。main に直接 commit / push しない。** `AGENTS.md` と `CONTRIBUTING.md` に従い、PR を作成して必須8チェック（Python CodeQLを追加）の成功後に取り込む。main 保護を無効化したり bypass したりしない。
 - **TDD を厳守する**（ユーザー指示）。テストを先に書き、失敗（RED）を確認してから最小の実装をする。
   - テストは、空の結果で通ってしまう抜け穴がないように書く。
   - 期待値は「ルール文からの手計算」または「独立した参照実装」で用意する。エンジンの出力をそのまま正解値にしない。
@@ -74,7 +74,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - 対局モードはAI vs AI観戦を主とし、人間 vs AIを補助機能とする。人間同士の対局（ローカル・オンライン）とマルチプレイは実装しない。
 - GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。モデル・データセットのライセンスは、公開前にユーザーに確認する。
-- Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
+- Pythonの実行は `uv run`、ライブラリ管理は `uv add` と `uv.lock` を使う。Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
 - 標準ルールは将棋ったー三次元将棋の10/17改定後版を独立実装し、未記載の終局条件は同サイトの既定を継承する。実棋譜との互換性検証はM5で未実施。R0の9王試作3ルールは別IDで管理し、標準ルールへ正式採用していない。
@@ -95,7 +95,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. C0→M3: `docs/M3_PLAN.md` に従い、C0の修正・実機検証（`docs/C0_VALIDATION.md`）と最終の必須CI・公開後確認を通してからPython3.14の環境・入出力契約へ進む。モデル実装は未着手
+  1. M3: C0はPR #19・main `aa8fe52` の公開／実機検証まで完了。`docs/M3_PLAN.md`・`docs/MODEL_CONTRACT.md` に従い、uv環境・入出力契約から代表モデルの変換へ進む。段階別結果は `docs/M3_VALIDATION.md`。M3全体は未完了
   2. M4: Python バインディングとデータ生成
   3. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   4. M6: Transformer-S の学習

@@ -29,6 +29,7 @@
           { "context": "CodeQL (rust)", "integration_id": 15368 },
           { "context": "CodeQL (javascript-typescript)", "integration_id": 15368 },
           { "context": "CodeQL (actions)", "integration_id": 15368 },
+          { "context": "CodeQL (python)", "integration_id": 15368 },
           { "context": "Rust core coverage", "integration_id": 15368 },
           { "context": "Web unit coverage", "integration_id": 15368 },
           { "context": "Known mutation regressions", "integration_id": 15368 }

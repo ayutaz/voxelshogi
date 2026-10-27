@@ -21,6 +21,7 @@ __pycache__/
 .venv/
 *.egg-info/
 .pytest_cache/
+.ruff_cache/
 *.so
 # Data / models / checkpoints (never commit; publish to Hugging Face instead)
 /data/

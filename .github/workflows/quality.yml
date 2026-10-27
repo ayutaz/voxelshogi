@@ -46,9 +46,13 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.11.23'
+          enable-cache: false
       - name: Summarize core coverage
         run: |
-          python - <<'PY'
+          uv run --no-project --python "$(cat .python-version)" python - <<'PY'
           import json, os
           totals = json.load(open('coverage/rust/summary.json'))['data'][0]['totals']
           assert totals['lines']['count'] > 0, 'No measured Rust lines'
@@ -104,9 +108,13 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.11.23'
+          enable-cache: false
       - name: Summarize Web coverage
         run: |
-          python - <<'PY'
+          uv run --no-project --python "$(cat .python-version)" python - <<'PY'
           import json, os
           totals = json.load(open('apps/web/coverage/coverage-summary.json'))['total']
           assert totals['lines']['total'] > 0, 'No measured Web lines'

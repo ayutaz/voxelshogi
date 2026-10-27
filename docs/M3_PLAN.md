@@ -1,6 +1,6 @@
 # M3 実行計画：変換済みモデルのブラウザ推論
 
-策定: 2026-10-27。**計画のみ。モデル・推論runtime・Python学習用依存は未導入で、M3の実装・実機推論は未着手。** [現在地](STATUS.md)、[全体の目的とゴール](ROADMAP.md)、[実装済みM2](M2_VALIDATION.md) を前提とする。
+策定: 2026-10-27。**M3-0のuv環境・入出力契約を実装中。モデル・推論runtime・実機WebGPUは未実装で、M3全体は未完了。** [段階別検証](M3_VALIDATION.md)・[モデル契約](MODEL_CONTRACT.md) を参照。 [現在地](STATUS.md)、[全体の目的とゴール](ROADMAP.md)、[実装済みM2](M2_VALIDATION.md) を前提とする。
 
 ## 着手前の確認C0
 
@@ -40,7 +40,7 @@ M3は固定seedの**未学習モデルによる技術検証**。数値一致と�
 | M3-4 | 実機計測と方式決定 | 729トークンの代表構造で3D同時表示、初回／再利用・CPU readbackを含む時間、反復切替と解放、非対応時の表示 | `docs/experiments/` の固定JSON、ADR、費用と制約の更新。M4/M6への契約を確定 |
 | M3-5 | 公開デモと最終照合 | モデルのライセンス確定後、全実行可能版の選択・実ロード・推論・hash・未対応表示をE2E。main自動公開後も確認 | 公開URL、実機結果、`M3_VALIDATION.md`。G1〜G6と最終PRの必須CI・通常取り込みを全て確認 |
 
-現時点で `export/`・`training/` に版管理された実装ファイルはなく、専用推論WorkerとM3の検証JSON・`M3_VALIDATION.md` も未作成。表内の成果物を追加しただけでは完了にしない。
+`export/` にはM3-0の契約とテストを追加した。専用推論Worker・代表モデルと各変換版の検証JSONは未作成。表内の成果物を追加しただけでは完了にしない。Pythonは `uv run --locked`、依存追加は `uv add`、CIは `uv sync --locked` で統一する。
 
 ## モデル・入力・比較の契約
 
@@ -77,7 +77,7 @@ WebGPUを要求しただけで全演算がGPUへ配置されたとはしない�
 
 ## CI・実機・公開の役割
 
-通常PRの必須7チェックを維持し、Python／exportの正常・異常系と形式別の基準比較、ブラウザWASM比較、manifest／欠落・破損・版違いの検出、M2の回帰を関連ジョブへ追加する。必要な新ジョブはCI Gateに含め、skip・未実行を成功扱いにしない。Pythonは3.14を基本とし、未対応依存がある場合だけ3.13を明示する。
+通常PRの既存7チェックを維持し、Python CodeQLを追加して必須8チェックとする。Python／exportの正常・異常系と形式別の基準比較、ブラウザWASM比較、manifest／欠落・破損・版違いの検出、M2の回帰を関連ジョブへ追加する。必要な新ジョブはCI Gateに含め、skip・未実行を成功扱いにしない。Pythonは3.14を基本とし、未対応依存がある場合だけ3.13を明示する。
 
 GPUなしCIのWebGPU mock・software adapterは、実機GPUの証明に使わない。実機WebGPUは固定SHAの手順と結果JSONで別途確認する。公開E2Eは実配信ファイルをロードして推論・版選択・破損／未対応表示を確認し、配信SHAとhashを照合する。取得間隔は [ci-checks](../.agents/skills/ci-checks/SKILL.md) に従う。
 

@@ -25,6 +25,7 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - 新しいテストが対象のバグを検出することを、変異の注入で確認する。一時的な変異は成果物に残さない。
 - ルール変更は `docs/RULESET.md` を先に更新し、互換性に応じて `ruleset_id` を変更する。進捗・完了条件は `docs/ROADMAP.md` に反映する。
 - Python は `.python-version`（3.14系）を使い、依存が未対応の場合のみ3.13へ切り替える。さらに古い版が必要なら理由・対象・解消条件を記録する。
+- Pythonの実行は `uv run --locked`、依存追加は `uv add`（開発用は `uv add --dev`）。`uv.lock` をcommitし、CIで `uv sync --locked`・`uv audit --locked`・Pythonテストと既知変異を実行する。LinuxのtorchはCPU専用indexを使う。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
 文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次の具体的な実装手順は [M3_PLAN.md](docs/M3_PLAN.md) を参照する。
@@ -53,10 +54,10 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）とWeb29変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の7件。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の33変異（coreとWASM境界）とWeb29変異の回帰検証を実行する。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
-- `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`
+- `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
 - `Rust core coverage`、`Web unit coverage`、`Known mutation regressions`
 
 GitHub Actions が発行したチェックだけを受理し、CodeQL の error と high/critical セキュリティ警告も取り込みを止める。カバレッジは測定とレポートの保存を必須とし、一律の割合基準は設けない。全体の cargo-mutants 調査は週次・手動で行う。

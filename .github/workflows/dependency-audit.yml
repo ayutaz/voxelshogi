@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   audit:
-    name: Rust and Web dependencies
+    name: Rust, Web and Python dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -26,3 +26,11 @@ jobs:
           node-version-file: .node-version
       - run: pnpm audit --audit-level=high
         working-directory: apps/web
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.11.23'
+          enable-cache: false
+      - run: uv audit --locked
