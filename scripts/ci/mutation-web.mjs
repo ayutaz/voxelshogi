@@ -59,6 +59,9 @@ const mutations = [
   { name: 'model-ui-stale-progress', file: 'inference/ModelDemo.tsx', before: 'if (current === generation.current) setState(phase);', after: 'setState(phase);', test: 'model-demo', extension: 'tsx' },
   { name: 'model-ui-cancel-change', file: 'inference/ModelDemo.tsx', before: 'generation.current++; revision.current++; client.current?.cancel();', after: 'generation.current++; revision.current++;', test: 'model-demo', extension: 'tsx' },
   { name: 'model-ui-dispose', file: 'inference/ModelDemo.tsx', before: 'instance.dispose();', after: '', test: 'model-demo', extension: 'tsx' },
+  { name: 'inference-int8-optimization', file: 'inference/options.ts', before: "precision === 'int8' ? 'basic' : 'all'", after: "'all'", test: 'inference-options' },
+  { name: 'inference-fp32-difference', file: 'inference/manifest.ts', before: "v.precision !== 'fp32'", after: 'false', test: 'inference-manifest' },
+  { name: 'inference-cached-precision', file: 'inference/engine.ts', before: 'port.createSession(model, variant.precision)', after: "port.createSession(model, 'fp32')", test: 'inference-engine' },
 ];
 
 function main() {
@@ -104,7 +107,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 44);
+    assert.equal(results.length, 47);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

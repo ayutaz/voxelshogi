@@ -1,8 +1,9 @@
-"""Generate immutable-by-hash model inputs, checkpoint and FP32 reference data."""
+"""Generate checkpoint, FP32/FP16/INT8 models and per-format references."""
 
 import argparse
 import hashlib
 import json
+import math
 import platform
 import re
 import subprocess
@@ -23,6 +24,7 @@ from export.contract import (
     encode_position,
 )
 from export.model import CONFIG, SEED, make_model
+from export.variants import make_fp16, make_int8
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,6 +46,86 @@ def write_floats(root, name, values):
     path.parent.mkdir(parents=True, exist_ok=True)
     np.asarray(values, dtype="<f4").tofile(path)
     return descriptor(root, path)
+
+
+def output_difference(reference, actual):
+    if (
+        reference.shape != actual.shape
+        or reference.size == 0
+        or not np.isfinite(reference).all()
+        or not np.isfinite(actual).all()
+    ):
+        raise ValueError("invalid low-precision comparison")
+    delta = actual.astype(np.float64) - reference.astype(np.float64)
+    return {
+        "elements": int(delta.size),
+        "maxAbs": float(np.abs(delta).max()),
+        "mae": float(np.abs(delta).mean()),
+        "rmse": float(np.sqrt(np.square(delta).mean())),
+        "maxRelative": float(
+            (
+                np.abs(delta) / np.maximum(np.abs(reference), np.finfo(np.float32).tiny)
+            ).max()
+        ),
+        "argmaxEqual": bool(reference.argmax() == actual.argmax()),
+    }
+
+
+def low_precision_variant(
+    root, source, fixtures, fp32_references, precision, converter
+):
+    graph, settings = converter(source)
+    path = root / f"{precision}.onnx"
+    onnx.save(graph, path)
+    options = ort.SessionOptions()
+    options.intra_op_num_threads = options.inter_op_num_threads = 1
+    options.graph_optimization_level = (
+        ort.GraphOptimizationLevel.ORT_ENABLE_BASIC
+        if precision == "int8"
+        else ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+    )
+    session = ort.InferenceSession(path, options, providers=["CPUExecutionProvider"])
+    references, differences = {}, {}
+    for fixture in fixtures:
+        name = fixture["name"]
+        values = np.fromfile(root / fixture["input"]["path"], dtype="<f4").reshape(
+            1, 729, FEATURES
+        )
+        actual = session.run(["policy", "value"], {"features": values})
+        references[name], differences[name] = {}, {}
+        for output_name, output in zip(["policy", "value"], actual, strict=True):
+            expected_shape = (1, ACTIONS) if output_name == "policy" else (1, 1)
+            if (
+                output.shape != expected_shape
+                or output.dtype != np.float32
+                or not np.isfinite(output).all()
+            ):
+                raise ValueError("invalid converted output shape/dtype/finite")
+            base = np.fromfile(
+                root / fp32_references[name][output_name]["path"], dtype="<f4"
+            ).reshape(expected_shape)
+            references[name][output_name] = write_floats(
+                root, f"reference/{precision}/{name}-{output_name}.f32", output
+            )
+            differences[name][output_name] = output_difference(base, output)
+    return {
+        "id": precision,
+        "precision": precision,
+        "model": descriptor(root, path),
+        "opset": 18,
+        "operators": sorted(
+            {(n.domain + ":" if n.domain else "") + n.op_type for n in graph.graph.node}
+        ),
+        "conversion": settings,
+        "references": references,
+        "fp32Difference": differences,
+        "referenceEngine": {
+            "name": "onnxruntime",
+            "version": ort.__version__,
+            "provider": "CPUExecutionProvider",
+            "graphOptimization": "basic" if precision == "int8" else "all",
+        },
+    }
 
 
 def source_context():
@@ -127,6 +209,7 @@ def generate(output, *, seed=SEED, license=None):
         "export/contract.py",
         "export/model.py",
         "export/generate.py",
+        "export/variants.py",
         "export/fixtures/positions.json",
         "uv.lock",
     ]
@@ -160,6 +243,7 @@ def generate(output, *, seed=SEED, license=None):
                     "numpy",
                     "onnxscript",
                     "safetensors",
+                    "onnxconverter-common",
                 ]
             },
         },
@@ -182,6 +266,16 @@ def generate(output, *, seed=SEED, license=None):
             }
         ],
     }
+    manifest["variants"].extend(
+        [
+            low_precision_variant(
+                output, graph, fixtures, references, "fp16", make_fp16
+            ),
+            low_precision_variant(
+                output, graph, fixtures, references, "int8", make_int8
+            ),
+        ]
+    )
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     validate_package(output)
     return manifest
@@ -215,6 +309,35 @@ def validate_package(root):
         raise ValueError("input byte length mismatch")
     files = [manifest["checkpoint"]] + [f["input"] for f in manifest["fixtures"]]
     for variant in manifest["variants"]:
+        if (
+            variant.get("id") not in {"fp32", "fp16", "int8"}
+            or variant.get("precision") != variant["id"]
+            or variant.get("opset") != 18
+        ):
+            raise ValueError("unsupported or inconsistent variant precision")
+        if variant["id"] != "fp32":
+            differences = variant.get("fp32Difference")
+            if not isinstance(differences, dict) or set(differences) != set(names):
+                raise ValueError("missing FP32 differences")
+            for outputs in differences.values():
+                if not isinstance(outputs, dict) or set(outputs) != {"policy", "value"}:
+                    raise ValueError("missing FP32 difference outputs")
+                for name, stats in outputs.items():
+                    expected = ACTIONS if name == "policy" else 1
+                    if (
+                        not isinstance(stats, dict)
+                        or type(stats.get("elements")) is not int
+                        or stats["elements"] != expected
+                        or type(stats.get("argmaxEqual")) is not bool
+                    ):
+                        raise ValueError("invalid FP32 difference count")
+                    if any(
+                        type(stats.get(key)) not in (int, float)
+                        or not math.isfinite(stats[key])
+                        or stats[key] < 0
+                        for key in ["maxAbs", "mae", "rmse", "maxRelative"]
+                    ):
+                        raise ValueError("invalid FP32 difference statistic")
         files.append(variant["model"])
         if set(variant["references"]) != {f["name"] for f in manifest["fixtures"]}:
             raise ValueError("missing fixture references")

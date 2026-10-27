@@ -103,3 +103,13 @@ it('never labels a CPU placement as WebGPU or silently switches a requested back
   await expect(f.engine.infer({ ...request(), backend: 'webgpu' })).rejects.toThrow(/placement|backend/);
   expect(f.released).toHaveBeenCalledTimes(1);
 });
+
+it('selects session precision per request when the same runtime is reused', async () => {
+  const f = setup(), pkg = await f.deps.load();
+  pkg.model.variants.push({ ...pkg.model.variants[0]!, id: 'int8', precision: 'int8' });
+  await f.engine.infer(request());
+  await f.engine.infer({ ...request(), requestId: 2, variant: 'int8' });
+  expect(f.deps.open).toHaveBeenCalledTimes(1);
+  expect(f.runtime.createSession).toHaveBeenNthCalledWith(1, expect.any(Uint8Array), 'fp32');
+  expect(f.runtime.createSession).toHaveBeenNthCalledWith(2, expect.any(Uint8Array), 'int8');
+});
