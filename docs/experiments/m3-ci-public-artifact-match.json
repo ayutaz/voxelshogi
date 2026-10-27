@@ -1,0 +1,505 @@
+{
+  "schema": 1,
+  "verifiedAt": "2026-10-27T14:37:04.436Z",
+  "expectedCommit": "dd3762cf2bef0e86aa34448cb220618fcbbc9629",
+  "modelId": "voxelshogi-transformer-s-untrained-314159-v1",
+  "modelManifestSha256": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54",
+  "sameOrigin": true,
+  "records": [
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/build-info.json",
+      "bytes": 54,
+      "sha256": "57725b29fb630fe7878555eed89c52d5a2f98a1a22641fe5d86c68674f9aa05f",
+      "mime": "application/json",
+      "cache": "no-store",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/inference-build.json",
+      "bytes": 1926,
+      "sha256": "d88ea36a2a8e3913a4db7e475ddbe920cb911b08e4ebe6d6cde54aee3ce1c805",
+      "mime": "application/json",
+      "cache": "no-store",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/Board3D-CsHOhVfi.js",
+      "bytes": 952111,
+      "sha256": "0b6bba33b68162612744b3c4885da6b1f0da3ccc433fac732a8179ffe3ee3a76",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/ExperimentViewer-bUaQPwce.css",
+      "bytes": 4565,
+      "sha256": "62d67149cc4cb22cfabf6006e60e09833d35a9bcf82223efd44f2f1679902f16",
+      "mime": "text/css",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/ExperimentViewer-Utgu9wj2.js",
+      "bytes": 11469,
+      "sha256": "beccd18d5a2c6eb4c574793be62466df096611c9c64652f79945ea4a2d3f84b8",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/index-CRM8jvGt.js",
+      "bytes": 244405,
+      "sha256": "22df0d407435f027068d9aa86dbc60bb781b9db0d2b70f8462fc1daddd894139",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/index-Dl_AXcXe.css",
+      "bytes": 4341,
+      "sha256": "ed9a0363f0a7cbe74783872b5e0a0dd841feaf99792b17147c1154e553ba4d12",
+      "mime": "text/css",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/inference.worker-C0ECn1eC.js",
+      "bytes": 14228,
+      "sha256": "0c39d677c5933947806378e81b801f37330627e8c818774153df72740434a2d5",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/jsx-runtime-BNIe-8LO.js",
+      "bytes": 11196,
+      "sha256": "6876572c92355acc8889efc949a3f31d24dad681a70fed53b8268dff2ce9de67",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/ModelDemo-CdKtCj5q.js",
+      "bytes": 19215,
+      "sha256": "41d3c39619665d5ac9551834fd5efe4463f98863915fea6f745ba69483911c4a",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/ModelDemo-Dc4dD9K3.css",
+      "bytes": 1413,
+      "sha256": "8400ac66b0cbd2dbbfa56927e71951c3f31c5ea2f6d59b929809e5928e7f64f8",
+      "mime": "text/css",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/search.worker-B1wHbOjO.js",
+      "bytes": 11784,
+      "sha256": "cd6937275f4e9432bf0bdc82378c86257067bab40b55b485a56b99b4c00a0eb9",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+      "bytes": 361183,
+      "sha256": "f0ff6f99d6482f4d40da757503a43c46a3e1e4953c440f35fe6d1b2b86e5881d",
+      "mime": "application/wasm",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/index.json",
+      "bytes": 2681,
+      "sha256": "ff5488f5728d2567bd29090d9e74152c535ec3a6dfcbff199064842dd5d5f599",
+      "mime": "application/json",
+      "cache": "no-store",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/manifest.json",
+      "bytes": 20846,
+      "sha256": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54",
+      "mime": "application/json",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-000.bin",
+      "bytes": 16777216,
+      "sha256": "273f77c856c0eae1945c74e67aa0a655cf96eaa9665f05c3e33d9b4a6930bfd3",
+      "mime": "application/octet-stream",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-001.bin",
+      "bytes": 11970522,
+      "sha256": "26d616bf5474508679753aef352929a74a42209b3ff179487d952f0ae58017a2",
+      "mime": "application/octet-stream",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort.webgpu.bundle.min.mjs",
+      "bytes": 122491,
+      "sha256": "c90275ffcd0e74e8929f527840ce9339399bfd45f11a74887e4b81a893907b70",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.mjs",
+      "bytes": 53457,
+      "sha256": "59cf781530e1a16df2a291d78798e3ec1152467edaec402d6f9599d85047c302",
+      "mime": "text/javascript",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/LICENSE",
+      "bytes": 1073,
+      "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ThirdPartyNotices.txt",
+      "bytes": 338088,
+      "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
+      "mime": "text/plain",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/LICENSE-cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "mime": "text/plain",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/MODEL_CARD-f8c8878651067b1e818028cf8aa4ded50b6c099445984af9eb92b0acf5b3facd.md",
+      "bytes": 1346,
+      "sha256": "f8c8878651067b1e818028cf8aa4ded50b6c099445984af9eb92b0acf5b3facd",
+      "mime": "text/markdown",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": "br",
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/model.safetensors",
+      "bytes": 20092056,
+      "sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/inputs/initial-b.f32",
+      "bytes": 125388,
+      "sha256": "e45e6524437c01d7ad4d61db1faded24a2b1d0aaaf814fbbbcb42aa198f0642a",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/inputs/after-one-w.f32",
+      "bytes": 125388,
+      "sha256": "fea43477b26cf5b66d8da7c9123309a2bb4a20821952e0ab47c845347135d1b6",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/inputs/mate-in-one-b.f32",
+      "bytes": 125388,
+      "sha256": "c817286c328d398fe4026bc5ac9c888c6aab963fd19314d527e473e82d80c3b6",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/inputs/material-b.f32",
+      "bytes": 125388,
+      "sha256": "9f98fdc7ba475e87e9128faeded6254a3b809ab0c96d1d7e50d80be5b8dfc5ca",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/fp32.onnx",
+      "bytes": 20427330,
+      "sha256": "142ca39efda9d8c2e183c06cf75245960ab93c31f0605784a0cd930521a1a075",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/initial-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "7c2430cb5e6a26a3dd6ea5135224809fba3d64185509abc22a2cb8c71300a044",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/initial-b-value.f32",
+      "bytes": 4,
+      "sha256": "f32e752db70f8c6a874601e1cfbd0b53231e81920389571f517b143982a4c971",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/after-one-w-policy.f32",
+      "bytes": 4271940,
+      "sha256": "e421682bf5f46e51a61362200b0319ae01a046b2408b48bcce86f8c3986bcbd2",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/after-one-w-value.f32",
+      "bytes": 4,
+      "sha256": "20a35b516c043f5b28475d361905a160a8508905c4ce66c67a0638e2fa053239",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/mate-in-one-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "c7d98132dad4d3d91dd09b619dee4d4dbd434694bf53684568ce7fd0fffe3f82",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/mate-in-one-b-value.f32",
+      "bytes": 4,
+      "sha256": "35d3e85240d1cddc88f9788ed48cb0c9ca999447e653afe7185700ace4a0f26c",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/material-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "01d270a45a85e420f763725f0e41d2dfcce855b95cd2b2ce39e805f49070416b",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp32/material-b-value.f32",
+      "bytes": 4,
+      "sha256": "1eb3ef94d694c56a5ca2a9df82dd9225e133ba4de45be9a0d856e16d5526ba33",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/fp16.onnx",
+      "bytes": 10398313,
+      "sha256": "6cb2345ad5b658e104b37b0283e5b4332a04579898eb76131ddf0b5761b5678f",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/initial-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "8c3267d4ce458afe837631bae29e873426481a3d5fb3527cb982981e348328be",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/initial-b-value.f32",
+      "bytes": 4,
+      "sha256": "5e18175cb79478ed49c173857a10ac7fc0470a49945fd5d64cae94053fa58900",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/after-one-w-policy.f32",
+      "bytes": 4271940,
+      "sha256": "a5b61183212556f56e6ed691ac114e4a5f589683c0bd938ba74513ed18af942f",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/after-one-w-value.f32",
+      "bytes": 4,
+      "sha256": "5771eb60d275390bba8f9e355f9d9e4cc601fb78a09f2588e07d814f785bae0d",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/mate-in-one-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "3979495db5bd5efd272c0677143a41ef2a5d8f9776b6c05549211640723075e7",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/mate-in-one-b-value.f32",
+      "bytes": 4,
+      "sha256": "0d8a588fb0697a2e6e6f0a6a925e0f3465c19f2909d1eca3464f9e46b377f8e6",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/material-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "62242e008f524692e4d1f888f4b43f3c5312b1f36a8ad01395f80dfe61b3fd7d",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/fp16/material-b-value.f32",
+      "bytes": 4,
+      "sha256": "be474e55c190afd2117c946c50fba2dde0bac67b0205ff04cb0e4a38cf9535ee",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/int8.onnx",
+      "bytes": 5433774,
+      "sha256": "e512cbe716808b1c21f1a15aa679b40b6ab84457430a840631969c86921ff149",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/initial-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "b7218f39fd8803b609aa5ef30f6aabf355bcc0fa6375cf274196269841751f26",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/initial-b-value.f32",
+      "bytes": 4,
+      "sha256": "6a45b1eed8a4886dbff8afa31b9c287c1cf2f7cf98a1a3f474517e3d427ca6d9",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/after-one-w-policy.f32",
+      "bytes": 4271940,
+      "sha256": "8b8fc5261a5c0b1bc037c5fe383fe6de838a6ac436d155c64db934a60ce251ff",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/after-one-w-value.f32",
+      "bytes": 4,
+      "sha256": "d2fa951d7ceb62f2425d382ad113410a2f7b8204111b2b08b1c1607ed2de285c",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/mate-in-one-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "41298019a30707ae9eb310cbe9f2e7596a068ee96961afc9fb1d4eef70c53123",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/mate-in-one-b-value.f32",
+      "bytes": 4,
+      "sha256": "4b6a654543a49ff5056006d0078ace6f0467144d8521453f575f3ffc8a60bf2c",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/material-b-policy.f32",
+      "bytes": 4271940,
+      "sha256": "9199201e6eb1e5c87cc2d911619a043918585e3d0c12574d5497bd2d485381d2",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    },
+    {
+      "url": "https://voxelshogi.yousan-apps.workers.dev/models/m3/models/347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54/reference/int8/material-b-value.f32",
+      "bytes": 4,
+      "sha256": "8ae68de2eeecc5138c918cfb97fc6641b2171337a89b9e52e510f6a010d177e6",
+      "mime": "",
+      "cache": "public, max-age=31536000, immutable",
+      "contentEncoding": null,
+      "cors": null
+    }
+  ]
+}

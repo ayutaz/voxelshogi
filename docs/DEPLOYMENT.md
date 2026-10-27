@@ -2,12 +2,12 @@
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
-更新: 2026-10-27。M2最終版の確認元 `e212ec7` の [main CI 40385647318](https://github.com/ayutaz/voxelshogi/actions/runs/40385647318) は通常検証・WASM受け渡し・deploy・配信SHA・公開E2E21件が再試行なしで成功した。実機Chromeでも最終公開版の全21件を確認。途中版の再試行と観測競合の修正は [M2記録](M2_VALIDATION.md) に記載する。最新配信を固定する値ではなく、本更新の確認元である。[現在地](STATUS.md)。
+更新: 2026-10-28 JST。M3基準版 `dd3762c` の [main CI 40521101341](https://github.com/ayutaz/voxelshogi/actions/runs/40521101341) はモデル生成・通常検証・WASM受け渡し・公開・配信SHA・公開21件＋モデル6件・配信55ファイル照合が成功。実機の公開ファイル照合・全48組・切替も [M3最終記録](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) に保存した。M2の旧確認元 `e212ec7` と観測競合の修正は [M2記録](M2_VALIDATION.md) に保持。現在配信されるSHAはbuild-info.jsonで確認する。[現在地](STATUS.md)。
 
 ## 構成
 
 - `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
-- `apps/web/public/_headers`: `/assets/*` はimmutable、`/build-info.json` はno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
+- `apps/web/public/_headers`: `/assets/*` とモデル／runtimeのhash付きファイルはimmutable、`/build-info.json`・`/inference-build.json`・モデルindexはno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
 - R0の比較室: [9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)。実際のCPU探索棋譜を再生する。ライブ推論・学習モデルではない。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。
 - デプロイ先は、ユーザーの個人 Cloudflare アカウント（ka1357amnbpdr@gmail.com）。
@@ -16,13 +16,13 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 `.github/workflows/ci.yml` の流れは次のとおり。トリガーは main への push、PR、手動実行（workflow_dispatch）。
 
-1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査。PR では dependency-review も行う
-2. `web`: WASM ビルド、型チェック、Vitest、SHA 付き build、Playwright（Chromium、21件、Native/WASM照合も実行）。配信用 `web-dist` と、E2EがNodeで棋譜を再検証する生成WASM `web-e2e-wasm` を別artifactに保存
+1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査、uv／Pythonの契約・モデルテスト、実モデル専用job。PR では dependency-review も行う
+2. `web`: WASM ビルド、型チェック、Vitest、Native/WASM照合。承認済みの公開設定からuvで3モデルを生成し、ライセンス・clean source・全形式を検証。SHA付きbuild、モデル6件・既存21件の実E2Eを実行する。配信用 `web-dist` と、E2EがNodeで棋譜を再検証する生成WASM `web-e2e-wasm` を別artifactに保存
 3. `CI Gate`: 必須ジョブの成功を集約する。main/手動での PR 専用ジョブの省略だけを許容する
 4. `deploy`: main の push と Gate 成功時のみ。production のロック取得後に候補 SHA と最新 main を照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じ run の `web-dist` を Wrangler で公開する。`web-e2e-wasm` も同じrunからdigest照合付きで復元し、公開前に `pnpm e2e --list` で全テストのimportを確認する
-5. 配信された `build-info.json` の SHA と対象コミットを有限回の取得で照合し、公開 URL に対して Playwright 21件を実行する
+5. 配信された `build-info.json` のSHAと対象コミットを有限回の取得で照合し、公開URLに対して既存21件・C0追加3件・モデル6件を実行する。モデル配布物とアプリWorker等の実ファイルを同じCI artifactのmanifestへ照合し、hash・長さ・MIME・cacheを保存する
 
-CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR では CodeQL 3種類、Rust/Web カバレッジと既知変異の3種類も必須とする。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
+CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR ではCodeQL 4種類、Rust/Webカバレッジと既知変異の3種類も必須とする（CI Gateと計8件）。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
 
 変更は必ず作業ブランチから PR を作成する。main は PR・最新 main に対する必須チェックを要求し、force push・削除・bypass を禁止する。[開発手順](../CONTRIBUTING.md)
 
@@ -129,9 +129,9 @@ artifactの取得元は同じworkflow runに限定し、digest不一致はエラ
 
 ## M3以降の推論配信の拡張
 
-M3は [実行計画](M3_PLAN.md) を策定済みで実装未着手。M3-3で全配布物のサイズ・hash・配信候補、M3-4で実機計測とADR、M3-5で公開デモと最終照合を行う。
+M3は公開・実機検証まで完了。[全配布ファイル・固定実測・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)・[ADR-019](ARCHITECTURE_DECISIONS.md#adr-019-m3の精度形式backend配信方式2026-10-27)。承認済みの未学習モデル3形式は同一originのStatic Assetsで配信し、28,747,738 bytesのAsyncify WASMは16 MiB単位に分割する。個別ファイルは全て25 MiB以内。R2は追加していない。
 
-- M3 で実際の変換済みモデルと runtime のサイズ・対象実機の演算対応を確認し、軽量ビルド・R2公開バケットとカスタムドメイン・Worker経由配信などを比較して決める。初回調査時の25MiB制限を含め、採用時に制限を再確認する。R2 の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
-- 公開する実行可能な FP32・FP16・量子化版を選んで動かせるようにし、評価記録と配布ファイルの SHA-256 を一致させる。M3 は未学習モデルの技術デモ、M6 は学習済みモデルとの対局・観戦として検証する。
+- M6でモデルが大きくなり、分割Static Assetsで不適切になる場合に、軽量build・R2・Worker経由配信等を再評価する。R2の有効化に支払い方法が必要なら、その段階でユーザーに依頼する。
+- 実行可能なFP32・FP16・INT8重み版は [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で選択して実行できる。M3は未学習モデルの技術デモ、M6は学習済みモデルの対局・観戦として、同じ実配信hashを評価対象にする。
 - マルチスレッド WASM を使う場合は、`_headers` に COOP/COEP を追加する。
 - 詳細は `docs/TECH_STACK_RESEARCH.md` §3.4 と §4、`docs/COST_ESTIMATE.md` §5。

@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "validatedAt": "2026-10-27T15:05:51.031Z",
+  "base": "https://voxelshogi.yousan-apps.workers.dev",
+  "publicCommit": "dd3762cf2bef0e86aa34448cb220618fcbbc9629",
+  "modelManifestSha256": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54",
+  "matrix": {
+    "combinations": 48,
+    "passed": 40,
+    "numericRejected": 8,
+    "unexpectedRowFailures": 0,
+    "acceptedForPerformance": true,
+    "wholeAttemptComplete": false,
+    "terminalExit": 1,
+    "reason": "All 48 row measurements finished; subsequent second model switch received HTTP 500. Original complete=false and error are retained unchanged."
+  },
+  "switches": {
+    "wasm": {
+      "actualChanges": 20,
+      "createdWorkers": 21,
+      "closedWorkers": 21,
+      "liveWorkers": 0
+    },
+    "webgpu": {
+      "actualChanges": 20,
+      "formats": [
+        "fp32",
+        "int8"
+      ],
+      "createdWorkers": 21,
+      "closedWorkers": 21,
+      "liveWorkers": 0
+    }
+  },
+  "recovery": {
+    "observedHttp500Count": 1,
+    "reproducedInFollowup": false,
+    "originOf500": "unknown; URL was not recorded in the original attempt",
+    "syntheticHttp500Visible": true,
+    "actualWebgpuRetryPassed": true
+  },
+  "diagnostics": {
+    "sourceSha256": "d773caed43112a6a68ff9cef70825d383a394cc699ef1c111b9a86dd1c68088b",
+    "behavior": "Read-only response/request failure listeners in follow-up switch runs; no routing, response replacement, retries or numerical-threshold changes.",
+    "httpFailuresInFollowup": 0
+  },
+  "ci": {
+    "pr": 28,
+    "head": "0bed990e964b73f44c1854e12508514ea157d2a0",
+    "requiredContexts": 8,
+    "mainRun": 40521101341,
+    "securityRun": 40521101405,
+    "deployJob": 122252315618,
+    "publicE2E": {
+      "passed": 21,
+      "seconds": 39.2,
+      "flaky": 0
+    },
+    "publicCameraRegression": {
+      "passed": 3,
+      "seconds": 58.7,
+      "retries": 0
+    },
+    "publicModels": {
+      "passed": 6,
+      "retries": 0
+    }
+  },
+  "artifacts": [
+    {
+      "path": "m3-browser-public.json",
+      "bytes": 1530691,
+      "sha256": "297c26d43ab732edccc9b10df2ae9975e882718e859e0ce89db48d7d041983cb"
+    },
+    {
+      "path": "m3-browser-public-switches.json",
+      "bytes": 245383,
+      "sha256": "b37a2df2f55ca21bd84d5882eeefcbccd0233830b235b166b532877505efc58c"
+    },
+    {
+      "path": "m3-browser-public-gpu-switches.json",
+      "bytes": 247502,
+      "sha256": "8260b6bbd32cb23b927a63c7553d914270fbd015a70de8d7f42aa93b8f845c46"
+    },
+    {
+      "path": "m3-public-artifact-match.json",
+      "bytes": 22223,
+      "sha256": "d6a222d2bd4d6f0fe473a0225dfd546e7303db20499ddc854ffb20edde7deee0"
+    },
+    {
+      "path": "m3-ci-public-artifact-match.json",
+      "bytes": 22223,
+      "sha256": "a0b84dad6fa3a828c2244833d74d7ea33324ca5d64130983bb01285e3014c0e7"
+    },
+    {
+      "path": "m3-public-deployment-info.json",
+      "bytes": 123,
+      "sha256": "eda6db496699b5dfbe6222941bcaa716766189d8bcab8fdc2883c7a0acee6486"
+    },
+    {
+      "path": "m3-public-recovery.json",
+      "bytes": 8455,
+      "sha256": "1886103d5b3547f9792145d0ac073b04b65d41f721e67f8634e7776e5ada9a34"
+    },
+    {
+      "path": "m3-public-index.json",
+      "bytes": 2681,
+      "sha256": "ff5488f5728d2567bd29090d9e74152c535ec3a6dfcbff199064842dd5d5f599"
+    },
+    {
+      "path": "m3-public-model-manifest.json",
+      "bytes": 20846,
+      "sha256": "347d9cdcecd2b8c160b2b9310e492acc1b48f50ac0bc8699d880bf837404db54"
+    }
+  ],
+  "exactArtifactBytesVerified": 55
+}
