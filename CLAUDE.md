@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M3_PLAN.md`（3形式・Worker・画面・ローカル実機計測を確認。ライセンス確定と実公開bytesでの配信・実機検証が残る）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/M3_PLAN.md`（3形式・Worker・画面・ローカル実機計測を確認。未学習モデルのApache-2.0公開は承認済み、実公開bytesでの配信・実機検証が残る）。全体の順序は `docs/ROADMAP.md`。完了したM2の契約・検証・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -75,6 +75,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - 対局モードはAI vs AI観戦を主とし、人間 vs AIを補助機能とする。人間同士の対局（ローカル・オンライン）とマルチプレイは実装しない。
 - GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。モデル・データセットのライセンスは、公開前にユーザーに確認する。
+- M3の未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版は、2026-10-27にApache-2.0での初回公開をユーザーが承認した。設定は `export/publication.json`。承認はこの検証用モデルだけを対象とし、M6の学習済みモデルとデータセットは別途確認する。
 - Pythonの実行は `uv run`、ライブラリ管理は `uv add` と `uv.lock` を使う。Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
 - Hugging Face の名前空間は `ayousanz/`（`ayutaz` という HF ユーザーは存在しない）。
@@ -96,7 +97,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M3: PR #20〜#26を取り込み済み。3形式の変換、Worker・画面、全48組のローカル固定実機計測と20回の実切替を確認。M1 WebGPUのFP16は数値基準未達、同じFP16のWASMは成功。PR #27で公開準備中だがモデルライセンスは未承認で、公開設定はfalse/null。回答後にCI生成した実公開ファイルの配信照合・実機再計測・公開E2Eを行う。段階別結果は `docs/M3_VALIDATION.md`、契約と残作業は `docs/MODEL_CONTRACT.md`・`docs/M3_PLAN.md`。M3全体は未完了
+  1. M3: PR #20〜#27を取り込み済み。3形式の変換、Worker・画面、全48組のローカル固定実機計測と20回の実切替を確認。M1 WebGPUのFP16は数値基準未達、同じFP16のWASMは成功。未学習モデルのApache-2.0公開は承認済み。CI生成した実公開ファイルの配信照合・実機再計測・公開E2Eを行う。段階別結果は `docs/M3_VALIDATION.md`、契約と残作業は `docs/MODEL_CONTRACT.md`・`docs/M3_PLAN.md`。M3全体は未完了
   2. M4: Python バインディングとデータ生成
   3. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   4. M6: Transformer-S の学習

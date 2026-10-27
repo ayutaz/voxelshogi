@@ -12,8 +12,8 @@
 | 現在の公開画面 | 通常画面は履歴付きWorkerによる探索AI同士の観戦。両AIのEasy/Normal、一時停止・1手送り・速度変更・中断／再試行、人間対AIを利用できる。比較室は固定棋譜の再生で、学習モデルは未導入 |
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
-| 次の実装 | C0は [PR #19](https://github.com/ayutaz/voxelshogi/pull/19)で完了。M3のPR #20〜#26を取り込み済み。全3形式の変換・Worker・画面・通常PR実モデルCI、ローカル固定48組と初回を除く20回の切替を確認。[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)で公開準備と記録を検証中。[段階別検証](M3_VALIDATION.md) |
-| M3〜M6 | M3全体は未完了。モデルライセンス回答、CI生成した実公開ファイルの全配信照合・実機再計測・公開E2Eが残る。公開設定はfalse/null。M4〜M6は実装未着手。モデル推論の先行検証→Python／データ生成→小型モデルの学習・配信。M5の実棋譜互換性は独立して挿入できる。[フェーズごとの目的・ゴール](ROADMAP.md) |
+| 次の実装 | C0は [PR #19](https://github.com/ayutaz/voxelshogi/pull/19)で完了。M3のPR #20〜#27を取り込み済み。全3形式の変換・Worker・画面・通常PR実モデルCI、ローカル固定48組と初回を除く20回の切替を確認。[PR #27](https://github.com/ayutaz/voxelshogi/pull/27)の公開準備・記録と統合後CIも成功。[段階別検証](M3_VALIDATION.md) |
+| M3〜M6 | M3全体は未完了。未学習モデル3形式のApache-2.0公開は2026-10-27にユーザー承認済み。CI生成した実公開ファイルの全配信照合・実機再計測・公開E2Eが残る。M4〜M6は実装未着手。モデル推論の先行検証→Python／データ生成→小型モデルの学習・配信。M5の実棋譜互換性は独立して挿入できる。[フェーズごとの目的・ゴール](ROADMAP.md) |
 
 M3の実機はApple M1・8 GiB・Chrome156。WebGPUのFP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否した。3DありのFP32 WebGPU中央値は53〜54ms。M3のモデルは未学習で、現在の通常対局AIへは接続していない。有料GPU・R2は未使用。[固定JSON・限界](M3_VALIDATION.md#ローカル固定配布物の実機計測)
 
@@ -28,7 +28,7 @@ M3の実機はApple M1・8 GiB・Chrome156。WebGPUのFP32・INT8重みと、WAS
 | M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。M3の現況はWeb172・Node66・Python48、Web50／Python16／制御13変異、モデルE2E6件も追加（PR #27のローカル検証） |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
-| 未導入・保留 | M3のNN runtimeは実装・ローカル実機確認済み、モデル本体公開は未承認。R2・COOP/COEP・有料GPUは未導入。9王の正式採用は保留 |
+| 未導入・保留 | M3のNN runtimeは実装・ローカル実機確認済み、未学習モデルの公開は承認済みだが、公開経路は検証中。R2・COOP/COEP・有料GPUは未導入。9王の正式採用は保留 |
 | ローカル準備 | 空き容量は2026-10-27確認で約27.2 GiB。[取得記録](experiments/documentation-baseline-2026-10-27.json)。Pythonは3.14.9、依存導入直前に容量と互換性を再確認 |
 
 ## 次の着手前に確認する残課題
