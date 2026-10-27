@@ -16,6 +16,7 @@ const mutations = [
   { name: 'publication-source-commit', file: 'scripts/prepare-inference.mjs', before: "assert.ok(typeof manifest.sourceCommit === 'string' && /^[0-9a-f]{40}$/.test(manifest.sourceCommit), 'publication requires a source commit');", after: '', test: 'inference-package' },
   { name: 'publication-untrained-scope', file: 'scripts/prepare-inference.mjs', before: "assert.equal(manifest.trained, false, 'M3 approval does not cover trained models');", after: '', test: 'inference-package' },
   { name: 'twenty-actual-model-switches', file: 'scripts/measure-browser-models.mjs', before: '[(i + 1) % 3]', after: '[i % 3]', test: 'model-switches' },
+  { name: 'actual-gpu-model-switches', file: 'scripts/measure-browser-models.mjs', before: "['int8', 'fp32'][i % 2]", after: "['fp32', 'int8'][i % 2]", test: 'model-switches' },
   { name: 'application-worker-hash', file: 'scripts/inference-build.mjs', before: "createHash('sha256').update(bytes).digest('hex')", after: "'0'.repeat(64)", test: 'model-distribution' },
   { name: 'public-served-file-hash', file: 'scripts/verify-model-distribution.mjs', before: "assert.equal(sha256, file.sha256, `hash mismatch: ${url}`);", after: '', test: 'model-distribution' },
   { name: 'tested-application-artifact', file: 'scripts/verify-model-distribution.mjs', before: "if (expectedArtifact) assert.deepEqual(application, expectedArtifact.application, 'served files differ from tested application artifact');", after: '', test: 'model-distribution' },
