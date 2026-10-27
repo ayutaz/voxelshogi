@@ -34,6 +34,7 @@ __pycache__/
 *.ckpt
 !apps/web/public/models/.gitkeep
 /apps/web/public/models/m3/
+/apps/web/model-test-results/
 # Secrets
 .env
 .env.*

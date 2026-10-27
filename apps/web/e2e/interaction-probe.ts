@@ -20,13 +20,13 @@ interface Probe {
 declare global { interface Window { interactionProbe: Probe } }
 
 /** Observes real browser events and real Worker traffic without delaying replies. */
-export async function installInteractionProbe(page: Page) {
-  await page.addInitScript(() => {
+export async function installInteractionProbe(page: Page, settings = { phaseTestId: 'ai-phase', cancelTestId: 'cancel-search', runningText: '思考中' }) {
+  await page.addInitScript((settings) => {
     const probe: Probe = window.interactionProbe = { events: [] as InteractionEvent[], frames: 0, armCamera };
     const active = new Set<number>();
     const mark = (kind: string, detail: Partial<InteractionEvent> = {}) => {
       const event = { kind, at: performance.now(), pending: active.size > 0,
-        phase: document.querySelector('[data-testid="ai-phase"]')?.textContent ?? '', ...detail };
+        phase: document.querySelector<HTMLElement>(`[data-testid="${settings.phaseTestId}"]`)?.dataset.phase ?? document.querySelector(`[data-testid="${settings.phaseTestId}"]`)?.textContent ?? '', ...detail };
       probe.events.push(event);
       return event;
     };
@@ -37,8 +37,8 @@ export async function installInteractionProbe(page: Page) {
         probe.camera = mark('camera-end', { trusted: event.isTrusted, buttons: event.buttons });
         // Sample at the actual input event, before the driver's next RPC.
         // Never hold, replace, or delay the real search result.
-        if (probe.camera.pending && probe.camera.phase.includes('思考中')) {
-          document.querySelector<HTMLButtonElement>('[data-testid="cancel-search"]')?.click();
+        if (probe.camera.pending && probe.camera.phase.includes(settings.runningText)) {
+          document.querySelector<HTMLButtonElement>(`[data-testid="${settings.cancelTestId}"]`)?.click();
         }
       };
       window.addEventListener('pointerup', finish);
@@ -50,6 +50,7 @@ export async function installInteractionProbe(page: Page) {
       constructor(url: string | URL, options?: WorkerOptions) {
         super(url, options);
         this.addEventListener('message', ({ data }) => {
+          if (data.kind === 'progress') { mark('progress', { worker: this.id, requestId: data.request?.requestId, metrics: data.phase }); return; }
           active.delete(this.id);
           mark('reply', { worker: this.id, requestId: data.requestId, metrics: data.metrics });
         });
@@ -72,7 +73,7 @@ export async function installInteractionProbe(page: Page) {
       }, true);
     }
     document.addEventListener('click', (event) => {
-      if ((event.target as HTMLElement)?.dataset.testid === 'cancel-search') mark('cancel');
+      if ((event.target as HTMLElement)?.dataset.testid === settings.cancelTestId) mark('cancel');
     }, true);
     const clear = WebGL2RenderingContext.prototype.clear;
     WebGL2RenderingContext.prototype.clear = function (mask) {
@@ -88,7 +89,7 @@ export async function installInteractionProbe(page: Page) {
         mark('draw');
       }
     };
-  });
+  }, settings);
 }
 
 export async function readInteractionProbe(page: Page) {

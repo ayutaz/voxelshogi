@@ -92,7 +92,7 @@ export default function ModelDemo() {
             {pkg.model.fixtures.map(f => <option key={f.name} value={f.name}>{f.name}</option>)}
           </select></label>
           <p data-testid="fixture-side">{position?.snapshot?.side === 'w' ? '後手' : '先手'}の視点・標準1王ルール</p>
-          <div className="row"><button className="primary" onClick={() => run(1)} disabled={busy || !position?.snapshot}>推論を実行</button><button onClick={() => run(40)} disabled={busy || !position?.snapshot}>30回を計測</button><button onClick={() => stop('cancelled')} disabled={!busy}>中断</button></div>
+          <div className="row"><button className="primary" onClick={() => run(1)} disabled={busy || !position?.snapshot}>推論を実行</button><button onClick={() => run(40)} disabled={busy || !position?.snapshot}>30回を計測</button><button data-testid="cancel-inference" onClick={() => stop('cancelled')} disabled={!busy}>中断</button></div>
           <p data-testid="inference-phase" data-phase={state} role="status">{phaseLabels[state]}</p>
           {error || position?.error ? <p role="alert">{error || position?.error}</p> : null}
           <small>反復計測は準備10回＋測定30回。推論と全出力の数値照合をWorkerで行います。条件変更は現在の要求を中断します。</small>
