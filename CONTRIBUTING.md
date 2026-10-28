@@ -57,7 +57,7 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の38変異（coreとWASM／Python境界）・Web50変異・Pythonモデル16変異・Python境界／データ／資源監視／pilot21変異・CI制御14変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の38変異（coreとWASM／Python境界）・Web50変異・Pythonモデル16変異・Python境界／データ／資源監視／pilot／HF公開26変異・CI制御14変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
@@ -89,3 +89,7 @@ GitHub Actions が発行したチェックだけを受理し、CodeQL の error 
 PR・fork・Dependabot には production の Cloudflare Secrets を渡さず、本番 deploy は実行しない。main の push では統合後の通常 CI が成功した後、同じ run のビルド成果物を公開し、配信 SHA と公開 E2E を検証する。[デプロイと復旧手順](docs/DEPLOYMENT.md)
 
 C0のカメラ／探索回帰は通常Web CIと公開後に各3回・1 worker・retries=0で追加検証する。通常E2Eの再試行成功だけでこの反復検証の失敗を取り込まない。診断JSONは対象テストのattachmentとCIログに記録する（[原因・再現手順](docs/C0_VALIDATION.md)）。
+
+## Hugging Face公開と保存場所
+
+repo作成・公開は[hf-publication](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。生成物をMacへ中継せず、外部Linuxから`voxelshogi/`配下へ送信する。公開設定・ライセンス・ファイル一覧とhashを検査し、固定Hub revisionでの全件照合後に転送完了とする。純粋テストと既知変異はCIへ含めるが、CIで実repoを作成したりデータを公開したりしない。

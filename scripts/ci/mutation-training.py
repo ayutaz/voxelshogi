@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "hub-namespace",
+        "training/hub_release.py",
+        'r"voxelshogi/[A-Za-z0-9][A-Za-z0-9._-]*"',
+        'r"[A-Za-z0-9]+/[A-Za-z0-9][A-Za-z0-9._-]*"',
+        "test_hub_release.py",
+    ),
+    (
+        "hub-public-creation",
+        "training/hub_release.py",
+        "api.create_repo(**destination, private=False)",
+        "api.create_repo(**destination, private=True)",
+        "test_hub_release.py",
+    ),
+    (
+        "hub-manual-gate",
+        "training/hub_release.py",
+        'if info.private or info.gated != "manual":',
+        "if info.private:",
+        "test_hub_release.py",
+    ),
+    (
+        "hub-reviewed-inventory",
+        "training/hub_release.py",
+        "if current != plan:",
+        "if False:",
+        "test_hub_release.py",
+    ),
+    (
+        "hub-transfer-hash",
+        "training/hub_release.py",
+        'digest.hexdigest() != file["sha256"]',
+        "False",
+        "test_hub_release.py",
+    ),
+    (
         "pilot-selected-gpu",
         "training/pilot.py",
         'gpu["name"] not in names',

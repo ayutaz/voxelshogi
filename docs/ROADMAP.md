@@ -166,7 +166,7 @@
 | 10万局面程度を生成できる | 生成スクリプトの実行ログと件数 |
 | データの検証が通る | 検証スクリプト: 全局面の再生、合法手との整合、推奨手が合法手に含まれること、重複検出、不正局面の検出 |
 | 同じシードで再現できる | 同じシード・実装・固定深さ／ノード・生成設定で2回生成し、ファイルのハッシュが一致する。少量はCI、本規模は固定した外部CPU環境で全再生成して確認する。時間上限だけによる再現は保証しない |
-| Hugging Face に公開できる構成がある | 公開スクリプトと Dataset Card の雛形（`ayousanz/voxelshogi-synthetic-v1`、`ayousanz/voxelshogi-search-v1`） |
+| Hugging Face に公開できる構成がある | 公開スクリプトと Dataset Card の雛形（`voxelshogi/voxelshogi-synthetic-v1`、`voxelshogi/voxelshogi-search-v1`） |
 | （追加）対局単位で train/val/test が分かれている | 同じ対局の局面が分割をまたがないことのテスト |
 | （追加）性能を実測し、費用見積もりを更新している | 探索教師の局面/秒、1試合の CPU 時間を `docs/COST_ESTIMATE.md` に反映 |
 | （追加）Macでの負荷を抑えて本生成できる | ローカル試行の時間・メモリ制限、外部CPUの承認済み予算、全件検証・再生成・退避の記録。[M4実行計画](M4_PLAN.md) |
@@ -204,7 +204,7 @@
 - Policy Head（from-to アテンション＋成り・打ち）、Value Head（勝ち・引分・負けの3値）
 - 教師あり学習、評価スクリプト、ONNX 変換、Web Worker での推論
 - 基準モデルと各変換版を同じ評価データ・対局条件で比較し、デモのモデル選択に公開した各版を追加する。精度形式・backend・対応端末を表示する
-- HF 公開の準備（`ayousanz/voxelshogi-transformer-s`、Model Card の雛形）
+- HF 公開の準備（`voxelshogi/voxelshogi-transformer-s`、Model Card の雛形）
 
 ---
 
@@ -227,7 +227,7 @@
 - MCTS、Gumbel AlphaZero 系の探索の検討、KataGo の playout cap randomization
 - 自己対局 Actor（Rust の CPU 並列）、Replay Buffer
 - DDP、Vast.ai 用の Docker イメージ、チェックポイントの外部バックアップ
-- 4GPU での学習検証、棋力評価、`ayousanz/voxelshogi-selfplay-v1` の準備
+- 4GPU での学習検証、棋力評価、`voxelshogi/voxelshogi-selfplay-v1` の準備
 
 ---
 
@@ -240,7 +240,7 @@
 | 条件 | 検証方法 |
 |---|---|
 | アーキテクチャ間の比較結果がある | 同じ FLOPs での Elo、学習効率、推論速度の表を、再現手順とともに `docs/BENCHMARKS.md` にまとめる |
-| Hugging Face にモデルを公開できる | `ayousanz/voxelshogi-transformer-m` と Model Card（ライセンスは公開前にユーザーに確認） |
+| Hugging Face にモデルを公開できる | `voxelshogi/voxelshogi-transformer-m` と Model Card（ライセンスは公開前にユーザーに確認） |
 | Web ブラウザで適切なモデルを選択できる | 端末の性能に応じたモデルの選択、量子化モデル、切り替え時のメモリ解放を E2E で確認 |
 
 **作業**
@@ -451,9 +451,9 @@ M1 の探索ノード/秒は CPU の指標で、GPU の学習速度を表すも�
 | M3 の技術デモでモデルを配信する前 | 未学習のM3モデル3形式をApache-2.0で公開する。M6の学習済みモデルは別途確認 | ✅ 2026-10-27にユーザー承認、`export/publication.json`へ記録 |
 | M4の外部GPUサービス利用前 | [米国RTX5090×1・最大60分／基本$1・消費上限$2の初回案](M4_REMOTE_PLAN.md)。5090対応・CI統合と起動前確認を済ませ、具体的な見積もり承認後に起動 | ⬜ キー設定とCloudRift認証は確認済み。2026-10-28 03:50 UTC時点で同SKUは推定空き1ノード、4090×1は空き0。未契約。Macでは生成・計測を行わない |
 | M4 で公開する前 | データセットのライセンスを決める（提案: CC-BY-4.0） | ⬜ |
-| M4 で公開する前 | Hugging Face への公開方法を決める（提案: 最初はローカルの `ayousanz` ログインから手動で公開する。CI から公開する場合は `HF_TOKEN` を登録する） | ⬜ |
+| M4 で公開する前 | [voxelshogi組織へ外部Linuxから直接公開](HF_PUBLICATION.md)。repo作成・public/manual設定・転送・hash照合はスキルとハーネスで行う。Macにはデータを中継しない | ⬜ 宛先・保存方針は指定済み。取得申請のmanual gateという意図を確認中。ライセンス・実公開は未確定 |
 | M6以降で必要になった場合だけ | R2を採用する場合の支払い方法登録 | M3では分割Static Assetsを採用し不要。大型モデルの配信方式を再評価した時点で案内する |
-| M6 まで | M4と同じGPUサービスで、小規模学習の実測から本学習の時間・総額を提示し承認後に使う。追加の入金が必要なら金額を別途確認。APIキーをGPUホストへコピーしない | ⬜ CloudRift認証は確認済み。CUDA実学習・本学習は未実施 |
+| M6 まで | M4と同じGPUサービスで、小規模学習の実測から本学習の時間・総額を提示し承認後に使う。追加の入金が必要なら金額を別途確認。provider APIキーをGPUホストへコピーしない | ⬜ CloudRift認証は確認済み。CUDA実学習・本学習は未実施 |
 | 任意 | M5 用に、検証に向く将棋ったーの棋譜の URL を教える（取得・検証はエージェント側で対応可能） | ⬜ |
 | 任意 | リポジトリのトピックを設定する | ⬜ |
 
