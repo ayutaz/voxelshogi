@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "purpose": "HF pilot publication preflight",
+  "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+  "provider": "cloudrift",
+  "sku": "rtx59-7-48-750-xam.1",
+  "rate_usd_per_hour": 1,
+  "maximum_seconds": 1800,
+  "maximum_usd": 1,
+  "python_boundary_tests_passed": 11,
+  "gpu_verified": {
+    "name": "NVIDIA GeForce RTX 5090",
+    "memory_mib": 32607,
+    "driver": "580.159.03"
+  },
+  "generation_started": false,
+  "dataset_uploaded": false,
+  "failure": {
+    "stage": "HF repository preflight",
+    "error_type": "HfHubHTTPError",
+    "account_authentication_succeeded": true,
+    "candidate_repository_found": false,
+    "alternate_stored_credential_probe": "automatic approval review rejected; awaiting explicit user consent"
+  },
+  "final_status": "Inactive",
+  "resources_released": true,
+  "persistent_volume_count": 0,
+  "ended_early": true,
+  "final_invoice_retrieved": false
+}

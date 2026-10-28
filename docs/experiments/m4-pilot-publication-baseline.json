@@ -1,0 +1,30 @@
+{
+  "source_commit": "37b5bac2db5a1fbdd8b1517ed035460d76d0d504",
+  "pr": 37,
+  "required_checks": 8,
+  "required_checks_success": true,
+  "merged": true,
+  "main_ci_run": 40647681139,
+  "main_security_run": 40647681204,
+  "main_ci_success": true,
+  "main_security_success": true,
+  "public_commit": "37b5bac2db5a1fbdd8b1517ed035460d76d0d504",
+  "public_observations": [
+    {
+      "client": "python-urllib",
+      "http_status": 403,
+      "verified": false
+    },
+    {
+      "client": "curl",
+      "http_status": 200,
+      "verified": true,
+      "observed_at": "2026-10-28 07:15:53 UTC"
+    }
+  ],
+  "public_e2e_passed": 21,
+  "c0_additional_passed": 3,
+  "model_e2e_passed": 6,
+  "distribution_files_verified": 55,
+  "deploy_job_id": 122682499806
+}

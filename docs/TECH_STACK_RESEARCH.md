@@ -1,7 +1,7 @@
 # VoxelShogi 技術スタック調査（デューデリジェンス）
 
 - 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-28**（公式料金の最終照合は2026-10-26）
-- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch DDP 学習（Vast.ai）、Hugging Face（モデル・データセット）
+- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch DDP学習（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。
 - 凡例: **[確認済]** = 各節の取得日に一次情報で確認 / **[記憶ベース]** = 取得日に一次情報で未検証 / **[未確認]** = 確認できなかった・実測が必要
 
@@ -11,16 +11,16 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO3のABI対象とデータ生成依存はM4、CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次は [ROADMAPのM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO30.30.1／maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2、HF SDK2.3.0はM4で導入・Linux CIと実機で検証済み。CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次は [ROADMAPのM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・学習／データ生成の追加依存、COOP/COEP・R2は未導入。
+2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・データ生成依存とHF公開ハーネスはM4で導入済み。LinuxのtorchはCPU版で、CUDA学習・COOP/COEP・R2は未導入。
 
 | 採用構成／固定記録 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
 | Web / WASM | 主要runtimeの直依存は完全固定、開発依存はlockfileで固定。wasm-bindgen/CLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| 現在の検証 | Rust core153＋WASM5、Web172、Python48、Node67。既知core/WASM33・Web50・Python16・制御14変異、既存21＋モデル6 E2E | [M3検証](M3_VALIDATION.md)。Native/WASM12fixtureとC0追加3件もCIで照合 |
+| M4までの検証（PR #37基準） | Rust core153＋WASM5＋Python境界2、Web172、Python121、Node67。既知Rust境界38・Web50・Pythonモデル16・training32・CI制御14変異、公開21＋モデル6 E2E | [M4検証](M4_VALIDATION.md)。Native/WASM12fixtureとC0追加3件もCIで照合 |
 | NN runtime | ORT Web／Python ORTとも1.31.1、opset18、WASM 1 thread | `apps/web/package.json`・`uv.lock`、[モデル契約](MODEL_CONTRACT.md) |
 | Pythonの導入済み依存 | torch2.14.1（Linuxは+cpu）、numpy2.5.4、onnx1.23.2、onnxscript0.7.2、onnxconverter-common1.16.0、safetensors0.8.0 | `pyproject.toml`・`uv.lock`。実行は`uv run --locked`、追加は`uv add` |
 | M2公開WASM（固定記録） | 361,183 bytes | [公開計測](experiments/m2-search-browser-public.json)・[最終版照合](experiments/m2-final-publication.json) |
@@ -117,9 +117,9 @@ M3は未学習モデル3形式を [公開ラボ](https://voxelshogi.yousan-apps.
 ## 2. Rust → Python（PyO3 + maturin）[確認済]
 
 - `pyo3` 0.30.1（2026-10-14、MSRV 1.85、最小 Python 3.9）、`maturin` 1.15.0（MSRV 1.89、PyPI でも配布）。
-- **採用予定の理由（未実装）**: 学習側（自己対局・データ生成・特徴量化）で Rust のルールエンジンを Python から直接呼べる。maturin は `uv` と相性が良く（`uv tool install maturin` / `maturin develop --uv`）、abi3 ホイールを作れば Python マイナーバージョン毎のビルドが不要。
+- **M4で採用済み**: Rustのルール・履歴・探索を薄いPyO3境界から共有する。maturinはuv workspaceでビルドし、実行は`uv run --locked`。現在はPython3.14専用で、abi3・free-threaded版は採用していない。
 - **注意点**:
-  - ABIの下限はM4で決める。Python 3.14を基本とし、安易に3.11へ広げない。PyO3の [abi3-pyXY](https://pyo3.rs/main/features#the-abi3-pyxy-features) はwheelの最小Pythonを指定する機能なので、選んだ版で3.14を検証し、依存が未対応の場合だけ3.13を対象にする。学習機（Vast.ai, Linux x86_64）とローカル（macOS arm64）で別ホイールが必要なので、Vast.ai 上では **ソースから `maturin build --release`** するのが簡単（Rust ツールチェーンを Docker イメージに入れる）。
+  - 現行のPython対象は`>=3.14,<3.15`。Python3.14.9でMac arm64と外部Linux x86_64の拡張を確認済み。以下のabi3一般論は初回調査の候補で、現行設定の説明ではない。PyO3の [abi3-pyXY](https://pyo3.rs/main/features#the-abi3-pyxy-features) はwheelの最小Pythonを指定する機能なので、選んだ版で3.14を検証し、依存が未対応の場合だけ3.13を対象にする。学習機（Vast.ai, Linux x86_64）とローカル（macOS arm64）で別ホイールが必要なので、Vast.ai 上では **ソースから `maturin build --release`** するのが簡単（Rust ツールチェーンを Docker イメージに入れる）。
   - 自己対局のホットループは **GIL を解放**（`py.allow_threads` / 0.30 系の名称は `Python::detach` 系へ移行中 [未確認]）して Rust 側でスレッド並列化し、Python には NumPy 配列（`numpy` クレート）でまとめて返す。1 局面ずつ Python 呼び出しするとオーバーヘッドが支配的になる。
   - PyO3 はリリース毎に API 破壊（Bound API 移行など）があるため、`0.30` でマイナー固定。
   - free-threaded Python（3.13t/3.14t）は当面不要。
@@ -321,7 +321,7 @@ A〜Dと以下のメモは初回候補。現在はEを採用し、JS／bootstrap
   - 729 トークン（9³）程度なら標準 SDPA で十分。
 - **BF16**: 4090 / 5090 / H100 / H200 すべてハードウェア BF16 対応。`torch.autocast("cuda", dtype=torch.bfloat16)` を基本にし、GradScaler 不要。TF32 は `torch.set_float32_matmul_precision("high")`。
 - **DDP**: `torchrun --nproc_per_node=N`。コンシューマ GPU（4090/5090）は NVLink なし・P2P 制限があり、マルチ GPU 間通信は PCIe 経由で遅い → 小〜中規模モデルなら DDP 効率は高いが、**GPU 数を増やす前に 1→2→4 GPU のスケーリング効率を実測**。Vast.ai の 4090 機では P2P 無効化（`NCCL_P2P_DISABLE=1`）が必要な場合がある [記憶ベース]。
-- **ローカル（M1 / 8 GB）**: macOS arm64 ホイールは 127 MB（展開後数百 MB）で、ディスク的にはインストール可能。CUDA は使えないので **CPU または MPS でスモークテストのみ**（1〜2 イテレーション、極小モデル、バッチ数件）。MPS は BF16 対応が限定的・`torch.compile` の MPS サポートも限定的 [未確認] → ローカルでは fp32・compile なしでテストし、BF16/compile/DDP の検証は Vast.ai の最小構成（1×4090）で行う。
+- **ローカル（M1 / 8 GB）**: macOS arm64 ホイールは 127 MB（展開後数百 MB）で、ディスク的にはインストール可能。CUDA は使えないので 当時はCPU／MPSの小規模スモークを候補にしたが、2026-10-28のユーザー指定により、以後の探索・生成・性能計測・学習・重い回帰検証はMacで行わない。MPS は BF16 対応が限定的・`torch.compile` の MPS サポートも限定的 [未確認] この初回候補は現在のMac運用へ適用せず、CUDA・BF16・compile・DDPはM6の承認済みVast.ai／CloudRiftで検証する。
 
 ### 5.2 safetensors 0.8.0 [確認済]
 - **採用理由**: pickle を使わない安全・高速（mmap）な重み形式。HF Hub の標準。

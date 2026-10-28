@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "provider": "cloudrift",
+  "sku": "rtx59-7-48-750-xam.1",
+  "initial_approval": {
+    "maximum_seconds": 3600,
+    "maximum_usd": 2
+  },
+  "rate_usd_per_hour": 1,
+  "termination_requested_at_utc": "2026-10-28T07:25:08.469030+00:00",
+  "confirmation_method": "CloudRift instances/list with ById",
+  "confirmed_status": "Inactive",
+  "resources_released": true,
+  "persistent_volume_count": 0,
+  "trial_parquet_uploaded_before_termination": false,
+  "retained_locally": "small context, validation aggregates, configuration and SHA-256 only",
+  "raw_trial_parquet_recovery": "regenerate on approved external Linux; compare historical hashes",
+  "final_invoice_retrieved": false
+}

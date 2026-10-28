@@ -15,7 +15,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
-| 次はM4〜M6 | M4のPythonバインディング・データ生成へ進む。M6で学習・棋力評価・全変換版の対局／観戦へ接続する。M5の実棋譜互換性は独立して挿入できる。[各フェーズの目的・ゴール](ROADMAP.md) |
+| 次はM4〜M6 | M4の試料HF公開と有効10万局面の本生成へ進む。M6で学習・棋力評価・全変換版の対局／観戦へ接続する。M5の実棋譜互換性は独立して挿入できる。[各フェーズの目的・ゴール](ROADMAP.md) |
 
 M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、有料GPU・R2は未使用。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
@@ -31,15 +31,25 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | 同一性 | 55応答と最終CI artifactの実バイト列を照合。ONNX3形式・checkpoint・入力・ORT・アプリ実行ファイルは性能計測版と同じhash。参照値の一部は再生成で微小に変わったため、最終参照値と再照合した |
 | 固定環境・検証 | Rust1.97.1／MSRV1.85、Node24.22.1、pnpm10.32.1、Python3.14.9／uv。Rust core153＋WASM5、Web172、Python48、Node67。既知変異はcore／WASM33・Web50・Python16・CI制御14件 |
 
-## 次のM4と残る判断
+## M4の現在地と次の作業
 
-M4-0〜2のPyO3／maturin境界、行動マスク付き環境、少量Parquet生成と独立検証、資源監視・停止再開を実装した。[契約・実行方法](M4_DATA_CONTRACT.md)・[ローカル検証と取り込みの確認元](M4_VALIDATION.md)。M3の入力43ch／Policy1,067,985／scalar Valueの契約を引き継ぎ、Pythonへルールを再実装していない。M4全体は未完了で、次はM4-3の小規模計測と外部CPU見積もり。その後、固定seed・エンジン・深さ／ノードで約10万局面の生成・全件検証・全再生成を行う。
+| 対象 | 現在の状態・証拠 | 次へ進む条件 |
+|---|---|---|
+| Python連携・生成実装 | 実装済み。PyO3境界、行動マスク、履歴・教師の全件検証、停止再開、本生成CLI。[契約](M4_DATA_CONTRACT.md)・[検証](M4_VALIDATION.md) | 同じRust coreを共有し、Pythonへルールを再実装しない |
+| 初回・代表試行 | 完了。30固定探索、初回102行、64手の1／2／4ワーカー比較と12対局が成功。最大試料は有効769局面・深さ2の探索教師252件。[集計](experiments/m4-cloudrift-representative-2026-10-28.json) | 小標本を10万局面の完了としない。CPU速度をCUDA学習速度へ読み替えない |
+| 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回ParquetはHF退避できず、再生成が必要。Macには小さい設定・集計・hashだけ |
+| 試料のHF公開 | 生成前のHF APIエラーで停止、今回実機も早期終了。認証の追加確認待ち。[公開計画・試行記録](M4_HF_PILOT_RELEASE.md) | 外部Linuxで歴史的hashに一致させ、public/manual・固定Hub commitの全ファイルを照合して完了 |
+| 有効10万局面 | 本生成CLIは実装済み、実データは未生成。[最大12時間・US$12の見積もり](M4_PRODUCTION_QUOTE.md) | 総行数・重複除外後の件数・教師内訳・対局分割を確認し、全検証・全再生成・HF照合を行う |
+| 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
+| M5・M6 | 実棋譜互換性、CUDA学習・棋力評価・学習済みモデル対局は未実行 | M5は棋譜がそろい次第独立して実施。M6は同じGPUサービスで学習速度と配布条件を確認 |
 
-ユーザー指定で、以後はMacで探索・生成・性能計測・学習・重い回帰検証を行わない。Macは編集・読み取り・軽量な確認のみ。Vast.ai／CloudRift上でCPU生成からGPU学習へつなぐ。Linux専用pilotを準備し、初回試行は1ワーカー・既定240秒（最大5分）、試行合計10分、子プロセス群RSS合計1 GiBの監視を使う。CIのno-GPU smokeは正しさだけを確認し、外部実機の性能として扱わない。
+Macは編集・読み取り・軽量確認のみ。探索・生成・計測・学習はVast.ai／CloudRift、重い回帰はLinux CIで行う。データと学習checkpointは外部LinuxからHFの`voxelshogi/`配下へ直接送り、Macへ中継しない。public/manualはダウンロード申請を人が承認する設定で、公開自体の再承認待ちではない。M3の既承認配布は維持し、学習済みモデルのライセンスと取得ゲートに沿うWeb配信はM6で別に確定する。
 
-[初回の構成・料金・実測と後続手順](M4_REMOTE_PLAN.md)。CloudRift米国RTX 5090×1、最大60分・単価$1/時・消費上限$2をユーザーが明示承認し、06:30 UTCに起動した。準備はPR #34〜#36で通常統合済み。`a6e31ae`のmain CI・Security・自動公開・配信SHA・公開E2Eも確認済み。実機の境界11テスト、固定30探索、102行の生成・全件検証・全再生成一致が成功し、重複除外後81局面・探索教師15局面を確認した。[小さい集計とhash](experiments/m4-cloudrift-pilot-2026-10-28.json)。ゲストの論理CPUは7で、APIの14表示とは異なる。代表試行も1・2・4ワーカーと12対局で検証・全再生成一致を確認（有効769局面、探索教師252）。[追加最大12時間・US$12の本生成案](M4_PRODUCTION_QUOTE.md)を作成。次は追加予算・ライセンス・HF設定の確定後に本生成。GPUの認識は確認したがCUDA学習は未検証。
+## M4準備の統合・公開基準
 
-M4の公開先は`voxelshogi/`配下、public/manualはダウンロード申請の手動承認という意味でユーザー確認済み。外部Linuxから直接転送・hash照合する。[HF公開スキルとハーネス](HF_PUBLICATION.md)はPR #35で統合済み。Macには検証用モデルと小さい記録だけを残す。[データセットの公開カード案](M4_DATASET_CARD_DRAFT.md)を用意し、対象ライセンスは別途確認する。実repo作成・転送は未実施。M3のApache-2.0承認をデータやM6学習済みモデルへ拡大しない。M5は棋譜がそろい次第独立して実施できる。M6のCUDA実学習と本学習は、別の見積もり承認後に行う。
+[PR #37](https://github.com/ayutaz/voxelshogi/pull/37)は必須8チェック成功後に通常merge済み。統合`37b5bac2db5a1fbdd8b1517ed035460d76d0d504`の[main CI](https://github.com/ayutaz/voxelshogi/actions/runs/40647681139)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40647681204)、自動公開・配信SHA一致・公開21 E2E・C0追加3件・モデル6件・配信55ファイル照合を確認した。[固定記録](experiments/m4-pilot-publication-baseline.json)。初回のPython urllib取得403とcurlでの200・SHA一致も保存し、失敗を上書きしない。
+
+同ソースのPython CIは121テスト成功、Pythonモデル16変異・training32変異を検出。Rust core153＋WASM5＋Python境界2、Web172、Node67、既知Rust境界38・Web50・CI制御14変異も通常CIへ含む。M3終了時の旧テスト数や性能値は上の固定記録に保持し、現在のM4実装と区別する。
 
 ## M2の実装・公開・品質の確認元
 
@@ -90,7 +100,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5互換性は未実施 |
 | [CI_CD_PLAN](CI_CD_PLAN.md)、[DEPLOYMENT](DEPLOYMENT.md) | 現行のCI・main保護・認証の配置・配信・復旧手順。過去のrunは固定記録として保持 |
-| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3の実機結果と公開確認による形式・backend・配信の採用はADR-019。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
+| [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3の形式・backend・配信はADR-019、M4のPython境界・外部生成・HF公開はADR-020。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
 | [RULE_VARIANTS_RESEARCH](RULE_VARIANTS_RESEARCH.md) | ルールの先行調査と未実施の継続評価。標準のM1完了と9王への未適用を区別 |
 | [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。M3の未学習Transformerと、未実施のGumbel・構造比較・DDP学習を区別する |
@@ -101,4 +111,4 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 
-M4の外部本生成は[本生成契約](M4_PRODUCTION.md)に従う。固定seedの序盤分岐、1〜4ワーカーの順序を固定した確定、全件検証と全再生成、承認済み時間・費用枠と有効10万件の判定はPR #36で実装・統合済み（Python121件、既知32変異、必須8チェック成功）。初回の有料起動は当初レビューで拒否されたが、その後ユーザーが時間・上限額を明示承認し、実機計測へ進んだ。100,000有効局面の本生成とHF実公開はまだ完了していない。
+M4全体を完了とするには、試料公開だけでなく重複除外後100,000局面の実データ・全件検証・全再生成一致・HF照合が必要。[本生成契約](M4_PRODUCTION.md)・[実行順とゴール](M4_PLAN.md)を確認する。
