@@ -5,7 +5,7 @@
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/ROADMAP.md` のM4（Pythonバインディングとデータ生成）。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/ROADMAP.md` のM4と `docs/M4_PLAN.md`（Pythonバインディングとデータ生成）。Macは開発と短い試行、本生成・全件検証・再生成は外部CPUを第一候補とし、具体的な見積もり承認後に実行する。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
