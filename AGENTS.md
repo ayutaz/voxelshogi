@@ -7,3 +7,4 @@
 - CI確認時は [.agents/skills/ci-checks/SKILL.md](.agents/skills/ci-checks/SKILL.md) を使う。取得は最短10分間隔とし、CI待ちだけの短いwait/sleepの反復も行わない。
 - 人間同士の対局・マルチプレイは実装しない。Python は3.14を基本とし、依存が未対応の場合は3.13を使う。
 - Pythonは `uv run` から実行し、ライブラリは `uv add` で管理する。`pyproject.toml` と `uv.lock` を更新し、CIでは `--locked` で検証する。
+- Macは編集・読み取り・軽量な静的／単体確認に限る。探索・データ生成・性能計測・学習・重い回帰検証は、GitHub Actionsまたは承認済みのVast.ai／CloudRift環境で行う。ローカル計測を省いた分をCIの性能値で代用しない。

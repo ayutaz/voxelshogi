@@ -27,6 +27,7 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - Python は `.python-version`（3.14系）を使い、依存が未対応の場合のみ3.13へ切り替える。さらに古い版が必要なら理由・対象・解消条件を記録する。
 - Pythonの実行は `uv run --locked`、依存追加は `uv add`（開発用は `uv add --dev`）。`uv.lock` をcommitし、CIで `uv sync --locked`・`uv audit --locked`・Pythonテストと既知変異を実行する。LinuxのtorchはCPU専用indexを使う。
 - Python境界はuv workspaceの`crates/voxelshogi-python`をmaturinでビルドする。ビルドは1ジョブ、ソース・Cargo.lockをuvのcache keyへ含める。少量データ生成・単独検証は [M4の負荷上限付きCLI](docs/M4_DATA_CONTRACT.md#実行と制限) を使い、本生成をMacで行わない。
+- この作業環境のエージェントはMacで探索・生成・計測・学習・重い回帰検証を行わない。Macは編集・読み取り・軽量な確認のみとし、フル検証はCI、実機計測と学習は承認済みVast.ai／CloudRiftで実行する。[現在の運用](docs/M4_REMOTE_PLAN.md)。CIの性能を外部GPU実機の性能と読み替えない。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
 文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次のM4の目的・作業・完了条件は [ROADMAP.md](docs/ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
@@ -56,7 +57,7 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の38変異（coreとWASM／Python境界）・Web50変異・Pythonモデル16変異・Python境界／データ／資源監視15変異・CI制御14変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の38変異（coreとWASM／Python境界）・Web50変異・Pythonモデル16変異・Python境界／データ／資源監視／pilot19変異・CI制御14変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
