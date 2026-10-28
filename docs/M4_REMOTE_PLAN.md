@@ -103,7 +103,7 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 新規の集計・GPU一覧検査・Linux／CI実行制限は、手計算の期待値を持つ9件の軽量テストでRED/GREENを確認した。速度の分母、教師の深さ、GPU複数枚の拒否、Mac実行の拒否、選定GPUとVRAM下限を変異6件で検出した。Macで行ったのはこれらの小さい純粋関数と構文・文書の確認だけで、探索・生成・性能計測は実行していない。
 
-全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知32変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
+全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知35変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
 
 ## 生成物の保存とHF公開
 
@@ -143,8 +143,8 @@ pilotと代表試行を共通ledgerで実行し、累積508.750秒で終了し�
 
 [本生成見積もり](M4_PRODUCTION_QUOTE.md)は1,800対局・4ワーカー・最大117,000行から有効100,000以上を目標とする。実測から全3工程約5.76〜7.91時間、遅い側を採用して準備・HF照合・終了・余裕を加え、追加最大12時間・US$12を提案。予算総枠US$100とM4データv1のCC-BY-4.0は承認済み。本生成はHF作成権限・public/manualと累積予算残額の確認後に進む。
 
-## 初回の終了・保存状態と次の公開
+## 初回の終了・保存状態と公開による回復
 
 初回実機は07:25 UTCに終了処理され、後続のID指定APIでInactive・resources_released=true、永続volume0を確認した。[終了記録](experiments/m4-initial-teardown-2026-10-28.json)。最終請求額はまだ回収していないため、利用上限額を実請求と扱わない。
 
-試料Parquetはライセンス未確定の間にHFへ退避できず、解放済み実機に残す形になった。Macへはデータ本体を保存していない。現在はユーザーからCC-BY-4.0・少量再生成と公開の承認、費用総枠US$100を受領し、[外部Linuxで再生成して歴史的hashへ照合する公開計画](M4_HF_PILOT_RELEASE.md)を進める。以後はライセンス・HF権限・public/manualを生成前に確認する。
+試料Parquetはライセンス未確定の間にHFへ退避できず、解放済み実機に残す形になった。Macへはデータ本体を保存していない。その後、ユーザーからCC-BY-4.0・少量再生成と公開の承認、費用総枠US$100を受領し、[外部Linuxでの再生成・歴史的hash照合・HF公開](M4_HF_PILOT_RELEASE.md)を完了した。試料2 config・カードを固定Hub commitで28ファイル全件照合済み。以後もライセンス・HF権限・public/manual・Community OFFを生成前に確認する。次は[M4-5aの起動前準備と本生成](M4_PLAN.md#次に実行する単位)であり、過去のライセンス・認証待ちには戻さない。

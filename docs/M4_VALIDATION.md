@@ -36,7 +36,7 @@ macOS27でrelease拡張のimport時に`mis-aligned LINKEDIT string pool`を観�
 
 依存監査で新しいpath依存のversion未指定と、PyO3のビルド依存target-lexicon0.13.5の`Apache-2.0 WITH LLVM-exception`が検出された。pathにversionを明記し、同クレートの固定版だけを`deny.toml`で明示的に許可した。ライセンス検査自体や一般の許可一覧を無効化していない。参考: [crateごとの許可設定](https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html#exceptions)。
 
-小規模テストの経過時間を、10万局面の生成速度や外部CPU費用へ換算しない。CLIのRSSは所有する子プロセス群の観測値で、監視する親やChromeの常駐分を含めない。利用可能メモリは負荷の代理指標、RSSは監視による停止基準であり、瞬間的なハード上限やGPUメモリではない。電源断耐性、異なるOS間のParquetバイト再現、外部並列生成の効率は未検証。
+小規模テストの経過時間を、10万局面の生成速度や外部CPU費用へ換算しない。CLIのRSSは所有する子プロセス群の観測値で、監視する親やChromeの常駐分を含めない。利用可能メモリは負荷の代理指標、RSSは監視による停止基準であり、瞬間的なハード上限やGPUメモリではない。電源断耐性と異なるOS間のParquetバイト再現は未検証。外部並列生成は後述の代表試行で1／2／4ワーカーを比較済みだが、10万局面規模の効率は未実測。
 
 ## 再実行する検証
 
@@ -67,6 +67,6 @@ PR #34〜#36を必須8チェック成功後に通常統合。PR #36は全Python1
 
 初回のCloudRift利用はユーザーが最大60分・消費上限US$2で承認し、単価$1/時の米国RTX5090を1台起動した。実機のPython境界11テスト、固定30探索、102行の生成・全件検証・全再生成バイト一致が成功。[固定集計](experiments/m4-cloudrift-pilot-2026-10-28.json)・[構成と測定値の解釈](M4_REMOTE_PLAN.md#初回実機の結果2026-10-28)。探索深さ2は初期局面約0.194秒。短い試料の有効81局面を、10万件完了へ読み替えない。データ本体はMacへ保存していない。
 
-64手・1／2／4ワーカーと12対局の代表試行も全件検証・全再生成が成功した。[固定JSON](experiments/m4-cloudrift-representative-2026-10-28.json)。6対局ではワーカー数間も全ファイル一致。12対局は有効769局面・探索教師252件、教師は全て深さ2。共通ledgerの累積508.750秒、外側監視のRSS最大約531.4 MiBで初回試行の上限内だった。[本生成の見積もり](M4_PRODUCTION_QUOTE.md)は承認済み総枠US$100内で管理する。実データは未生成であり、これを10万局面の完了としない。
+64手・1／2／4ワーカーと12対局の代表試行も全件検証・全再生成が成功した。[固定JSON](experiments/m4-cloudrift-representative-2026-10-28.json)。6対局ではワーカー数間も全ファイル一致。12対局は有効769局面・探索教師252件、教師は全て深さ2。共通ledgerの累積508.750秒、外側監視のRSS最大約531.4 MiBで初回試行の上限内だった。[本生成の見積もり](M4_PRODUCTION_QUOTE.md)は承認済み総枠US$100内で管理する。10万局面規模の実データは未生成であり、これを本生成の完了としない。
 
 初回実機の[終了・資源解放](experiments/m4-initial-teardown-2026-10-28.json)と、PR #37の通常統合・main CI/Security・公開後の[固定記録](experiments/m4-pilot-publication-baseline.json)も確認済み。試料Parquetは退避できなかったため、[試料公開](M4_HF_PILOT_RELEASE.md)では承認済みCC-BY-4.0で再生成し、歴史的hashとの一致を条件にする。

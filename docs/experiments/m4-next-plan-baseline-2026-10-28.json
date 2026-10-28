@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "checked_at": "2026-10-28T10:40:56.293232+00:00",
+  "baseline_main_commit": "5065d98685c77e8d50215870555d98e68ddec98c",
+  "ci": {
+    "run": 40669143635,
+    "conclusion": "success",
+    "security_run": 40669143626,
+    "security_conclusion": "success",
+    "deploy_job": 122754583575,
+    "python_tests": 129,
+    "python_model_mutations": 16,
+    "training_mutations": 35,
+    "python_job": 122751188770,
+    "public_e2e": {
+      "passed": 21,
+      "reported_seconds": 39.6
+    },
+    "public_c0": {
+      "passed": 3,
+      "reported_seconds": 58.3
+    },
+    "public_model_e2e": {
+      "passed": 6,
+      "reported_duration": "1.1m"
+    },
+    "verified_public_files": 55
+  },
+  "public_commit": "5065d98685c77e8d50215870555d98e68ddec98c",
+  "hf": {
+    "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+    "revision": "83dd4523817908770dcaf11319243a5405addf26",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true,
+    "community_evidence": {
+      "status": 403,
+      "error": "Discussions are disabled for this repo"
+    },
+    "verified_release_evidence": "m4-hf-pilot-release-2026-10-28.json"
+  },
+  "resources": {
+    "owned_instances": [
+      {
+        "id": "05144cf4-d299-11f1-90d9-1fbe1319f042",
+        "status": "Inactive",
+        "resources_released": true
+      },
+      {
+        "id": "af60e56c-d2a5-11f1-961d-9b042e455883",
+        "status": "Inactive",
+        "resources_released": true
+      },
+      {
+        "id": "f5b7463c-d2aa-11f1-aeba-f35b00fe6bee",
+        "status": "Inactive",
+        "resources_released": true
+      },
+      {
+        "id": "e837653a-d2b1-11f1-8d2e-fb230893d611",
+        "status": "Inactive",
+        "resources_released": true
+      }
+    ],
+    "persistent_volumes": 0
+  },
+  "budget": {
+    "approved_total_usd": 100,
+    "reserved_caps_usd": 5,
+    "remaining_unreserved_usd": 95,
+    "invoice_retrieved": false
+  },
+  "scope": "Read-only documentation baseline; no rental, generation or training started."
+}

@@ -20,7 +20,7 @@ Python は3.14系を基本、依存が未対応の場合のみ3.13系とする�
 | Rust / MSRV | 1.97.1 / 1.85 | `rust-toolchain.toml`、`Cargo.toml`、MSRV CI |
 | Node / pnpm / Python | 24.22.1 / 10.32.1 / 3.14.9 | `.node-version`、`packageManager`、`.python-version` |
 | Web / WASM | 主要runtimeの直依存は完全固定、開発依存はlockfileで固定。wasm-bindgen/CLIは0.2.129 | `apps/web/package.json`・lockfile、WASMのCargo設定 |
-| M4までの検証（PR #37基準） | Rust core153＋WASM5＋Python境界2、Web172、Python121、Node67。既知Rust境界38・Web50・Pythonモデル16・training32・CI制御14変異、公開21＋モデル6 E2E | [M4検証](M4_VALIDATION.md)。Native/WASM12fixtureとC0追加3件もCIで照合 |
+| M4までの検証（PR #40基準） | Rust core153＋WASM5＋Python境界2、Web172、Python129、Node67。既知Rust境界38・Web50・Pythonモデル16・training35・CI制御14変異、公開21＋C0追加3＋モデル6 E2E | [最新の固定記録](experiments/m4-next-plan-baseline-2026-10-28.json)。Native/WASM12fixtureもCIで照合 |
 | NN runtime | ORT Web／Python ORTとも1.31.1、opset18、WASM 1 thread | `apps/web/package.json`・`uv.lock`、[モデル契約](MODEL_CONTRACT.md) |
 | Pythonの導入済み依存 | torch2.14.1（Linuxは+cpu）、numpy2.5.4、onnx1.23.2、onnxscript0.7.2、onnxconverter-common1.16.0、safetensors0.8.0 | `pyproject.toml`・`uv.lock`。実行は`uv run --locked`、追加は`uv add` |
 | M2公開WASM（固定記録） | 361,183 bytes | [公開計測](experiments/m2-search-browser-public.json)・[最終版照合](experiments/m2-final-publication.json) |
