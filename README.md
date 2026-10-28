@@ -28,7 +28,7 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 ### 開発状況
 
-ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。Python連携と少量の学習用データ生成・検証も実装しました。次はデータ生成の規模を広げ、その後に学習済みモデルの対局・観戦へつなげます。
+ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。Python連携とデータ生成・全件検証・再生成も実装し、CloudRiftの外部CPUで少量・並列試行を確認しました。現在は[試料データのHF公開](docs/M4_HF_PILOT_RELEASE.md)を進めています。次は重複除外後10万局面へ規模を広げ、学習済みモデルの対局・観戦へつなげます。
 
 詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。
 
@@ -85,6 +85,7 @@ node scripts/prepare-inference.mjs runs/m3/local apps/web/public/models/m3 --loc
 | 目的・開発範囲 | [プロジェクト仕様](docs/PROJECT_SPEC.md) |
 | 今できること・今後の予定 | [現在の状態](docs/STATUS.md) / [ロードマップ](docs/ROADMAP.md) |
 | エンジンのAPI・設計 | [ゲームエンジン](docs/GAME_ENGINE.md) / [設計判断](docs/ARCHITECTURE_DECISIONS.md) |
+| データ生成・公開 | [M4実行計画](docs/M4_PLAN.md) / [HF公開・保存ルール](docs/HF_PUBLICATION.md) |
 | モデルの入出力・検証結果 | [モデル契約](docs/MODEL_CONTRACT.md) / [検証記録](docs/M3_VALIDATION.md) |
 | 研究の背景・先行事例 | [調査サマリ](docs/RESEARCH.md) / [関連研究](docs/RELATED_WORK.md) |
 
@@ -92,4 +93,4 @@ node scripts/prepare-inference.mjs runs/m3/local apps/web/public/models/m3 --loc
 
 コードは **Apache License 2.0** です。詳細は [LICENSE](LICENSE) と [NOTICE](NOTICE) を参照してください。
 
-公開済みの検証用未学習モデルもApache-2.0です。今後公開する学習済みモデル・データセットのライセンスは、各配布物に明記します。
+公開済みの検証用未学習モデルもApache-2.0です。M4の自作合成データv1はCC-BY-4.0での公開をユーザー承認済みです。学習済みモデルのライセンスは公開前に別途確定し、各配布物に明記します。

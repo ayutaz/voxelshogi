@@ -14,7 +14,7 @@
 - 標準1王の独立実装・Web AlphaとM0のCI/CDは完了。R0では9王3ルールを別IDで実装し、現行1王の対照・上限／幅の感度を含む1,052局を生成・再生照合した。
 - [公開比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)は生成済み6棋譜のA/B観戦再生。通常画面は両AIのEasy/Normalを選ぶWorker探索観戦。標準1王のM1全幅探索とM2のライブ探索・中断・実機公開確認は完了した（[M1](M1_VALIDATION.md)・[M2](M2_VALIDATION.md)）。
 - M3も完了。[公開推論ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1)で未学習の約502万パラメータTransformerを3形式から選んで実行できる。M1／ChromeではFP32とINT8重みのWebGPU、全3形式のWASMを数値検証済み。FP16×WebGPUの基準未達は明示し、自動fallbackしない。公開55ファイル照合、48組の実機計測と各backendでの20回実切替を [固定記録](M3_VALIDATION.md) に保存した。
-- 9王の正式採用、観戦者による理解度・好みの測定、M4のPythonバインディング／学習データ生成、M5の実棋譜互換性、M6の学習・棋力評価とモデル対局は残っている。
+- 9王の正式採用、観戦者による理解度・好みの測定、M4の有効10万局面の本生成・HF公開、M5の実棋譜互換性、M6の学習・棋力評価とモデル対局は残っている。Python境界と生成・検証の実装、外部CPUでの少量・並列試行は完了した（[M4検証](M4_VALIDATION.md)）。
 - [先行ルール調査](RULE_VARIANTS_RESEARCH.md)と[R0実測](NINE_KINGS_EXPERIMENT.md)を分け、M1以降の研究候補を実装済みと扱わない。R0の手作り探索評価は、将来の強化学習の報酬設計とは別である。
 
 ## ルール（一次資料）
