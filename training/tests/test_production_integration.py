@@ -61,7 +61,7 @@ def test_production_cli_uses_supervisor_and_verifies_every_file():
             "minimum_eligible_rows": 1,
             "gpu_model": "rtx5090",
             "config": replace(
-                config(), engine_commit=commit, search_opening_plies=1
+                config(), engine_commit=commit, seed=18, search_opening_plies=1
             ).value(),
         }
         request = work / "request.json"
@@ -89,7 +89,10 @@ def test_production_cli_uses_supervisor_and_verifies_every_file():
         report = json.loads((work / "output/report.json").read_text())
         assert report["complete"] and report["regenerated_bytes_match"]
         assert report["validation"]["rows"] == 9
-        assert report["validation"]["eligible_teachers"] > 0
+        # Seed18 first-move indices are 1, 3, 6 among the seven corner king moves.
+        # Only the initial row is repeated; search has one unique labelled row.
+        assert report["validation"]["eligible_rows"] == 7
+        assert report["validation"]["eligible_teachers"] == 1
         assert report["supervisor"]["reason"] == "completed"
         assert report["context"]["measurement_kind"] == "ci-correctness-only"
 
