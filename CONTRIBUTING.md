@@ -92,4 +92,4 @@ C0のカメラ／探索回帰は通常Web CIと公開後に各3回・1 worker・
 
 ## Hugging Face公開と保存場所
 
-repo作成・公開は[hf-publication](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。生成物をMacへ中継せず、外部Linuxから`voxelshogi/`配下へ送信する。公開設定・ライセンス・ファイル一覧とhashを検査し、固定Hub revisionでの全件照合後に転送完了とする。純粋テストと既知変異はCIへ含めるが、CIで実repoを作成したりデータを公開したりしない。
+repo作成・公開は[hf-publication](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。生成物をMacへ中継せず、外部Linuxから`voxelshogi/`配下へ送信する。public/manual・Community OFF・Dataset Card・ライセンス・ファイル一覧とhashを検査し、固定Hub revisionでの全件照合後に転送完了とする。純粋テストと既知変異はCIへ含めるが、CIで実repoを作成したりデータを公開したりしない。

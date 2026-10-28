@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "hub-community-after-upload",
+        "training/hub_release.py",
+        'if (\n        api.community_disabled(repo_id=plan["repo_id"], repo_type=plan["repo_type"])\n        is not True\n    ):',
+        "if False:",
+        "test_hub_release.py",
+    ),
+    (
+        "hub-community-disabled",
+        "training/hub_release.py",
+        "if api.community_disabled(**destination) is not True:",
+        "if False:",
+        "test_hub_release.py",
+    ),
+    (
+        "hub-dataset-card",
+        "training/hub_release.py",
+        "if section is None or not section.group(1).strip():",
+        "if False:",
+        "test_hub_release.py",
+    ),
+    (
         "mutation-runtime-exclude",
         "scripts/ci/mutation-training.py",
         'stream.write("\\n/results.xml\\n")',

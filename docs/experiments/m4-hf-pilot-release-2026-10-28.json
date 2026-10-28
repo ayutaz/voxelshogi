@@ -1,0 +1,246 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "repo_url": "https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1",
+  "private": false,
+  "gated": "manual",
+  "community_disabled": true,
+  "community_readback": {
+    "status": 403,
+    "error": "Discussions are disabled for this repo"
+  },
+  "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+  "receipt": {
+    "community_settings": {
+      "discussionsDisabled": true
+    },
+    "dry_run": false,
+    "hub_commit": "83dd4523817908770dcaf11319243a5405addf26",
+    "release_sha256": "558c4102a1c0f893963e57868ebcf1a6fc3be7c34a8b674bb212ed56a27f4db0",
+    "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "plan": {
+    "files": [
+      {
+        "bytes": 18657,
+        "path": "LICENSE",
+        "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+      },
+      {
+        "bytes": 5346,
+        "path": "README.md",
+        "sha256": "15d15d3ae95c0e44c71626454fc6643b22e90506bc6ebf7098890b33b5227124"
+      },
+      {
+        "bytes": 580,
+        "path": "manifest.json",
+        "sha256": "1b36b145cf8e39767909fc10c9141e88d291155ed5ac871c6aa59d52c4f3bfa7"
+      },
+      {
+        "bytes": 11292,
+        "path": "pilot-16/game-000000.parquet",
+        "sha256": "042491048586b975bc7f14c5345e58a87bcf05b1e3a5783bb16f389a08f39437"
+      },
+      {
+        "bytes": 11738,
+        "path": "pilot-16/game-000001.parquet",
+        "sha256": "a14da5223ce794445516342a7139a608eb991d8b6df59e9948b869fb24aac5b4"
+      },
+      {
+        "bytes": 9738,
+        "path": "pilot-16/game-000002.parquet",
+        "sha256": "914a86908d1ce0fa773cb9c39740873f35096b49b0ffff3a64d803e8e908275b"
+      },
+      {
+        "bytes": 11246,
+        "path": "pilot-16/game-000003.parquet",
+        "sha256": "3344796ff18c70c8fbb64cf241b604b0b4494ddf82bbddfd2a160fc0e423fe99"
+      },
+      {
+        "bytes": 11080,
+        "path": "pilot-16/game-000004.parquet",
+        "sha256": "9f6918b9c5715a6fc9b6045f4b3b7c12b17f17be0f1535f4f459bcded532a080"
+      },
+      {
+        "bytes": 9794,
+        "path": "pilot-16/game-000005.parquet",
+        "sha256": "3fda355e8ca6d544e21bdffa8ed8f3685aaaf895b9fe94a0c77b10791e70bfe5"
+      },
+      {
+        "bytes": 412,
+        "path": "pilot-16/generation.json",
+        "sha256": "530da5662b5046053acc6084f4f513988d3b5bb6b405ffa7986c7ced328c9d93"
+      },
+      {
+        "bytes": 1220,
+        "path": "pilot-16/manifest.json",
+        "sha256": "7bd865f09fbd8852147b3fa18724ac3bba752e0816f2ac54c85d9240079347ca"
+      },
+      {
+        "bytes": 2382,
+        "path": "pilot-16/validation.json",
+        "sha256": "b1b379eae4baef9589e01406e6e5783921f4629ac3b6692918f00872064579f2"
+      },
+      {
+        "bytes": 21439,
+        "path": "representative-64/game-000000.parquet",
+        "sha256": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e"
+      },
+      {
+        "bytes": 21927,
+        "path": "representative-64/game-000001.parquet",
+        "sha256": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb"
+      },
+      {
+        "bytes": 27713,
+        "path": "representative-64/game-000002.parquet",
+        "sha256": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb"
+      },
+      {
+        "bytes": 21857,
+        "path": "representative-64/game-000003.parquet",
+        "sha256": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7"
+      },
+      {
+        "bytes": 19991,
+        "path": "representative-64/game-000004.parquet",
+        "sha256": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50"
+      },
+      {
+        "bytes": 20683,
+        "path": "representative-64/game-000005.parquet",
+        "sha256": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8"
+      },
+      {
+        "bytes": 20731,
+        "path": "representative-64/game-000006.parquet",
+        "sha256": "ed98ebabb304ffd98e1d37ed46e764589ef51a11ef9f74d4cecf7485be299ec4"
+      },
+      {
+        "bytes": 22061,
+        "path": "representative-64/game-000007.parquet",
+        "sha256": "5ecb9ea91333f686ef6f70250280b36d0c88e41e200b37a43276f41540f8ec9f"
+      },
+      {
+        "bytes": 17071,
+        "path": "representative-64/game-000008.parquet",
+        "sha256": "77a2f61e7c49bb6fd0719135f5f52e6951435fe3f35234fafb42d41b71c25ccf"
+      },
+      {
+        "bytes": 21737,
+        "path": "representative-64/game-000009.parquet",
+        "sha256": "2b31ec0c7573c9381ed83f575b230b97a33a8c27c20561f597edff88a07aca9e"
+      },
+      {
+        "bytes": 22653,
+        "path": "representative-64/game-000010.parquet",
+        "sha256": "9e926bbfac8167433aece2b58306ab8026aaea307d6a94238ecf0bc99292dc22"
+      },
+      {
+        "bytes": 17539,
+        "path": "representative-64/game-000011.parquet",
+        "sha256": "edff1f59230ab60231ee23eee0baffa8a3a5c80a0880e1e2ba98f7c8eff3824f"
+      },
+      {
+        "bytes": 414,
+        "path": "representative-64/generation.json",
+        "sha256": "3857643aa1994051745075de68be42c4bc557f20568afae038abe1d51acd7ef6"
+      },
+      {
+        "bytes": 1924,
+        "path": "representative-64/manifest.json",
+        "sha256": "c466fd0d9c37c7a75a17616f4b63ef9dd0d7e426b841b1be3906eb31999f8d82"
+      },
+      {
+        "bytes": 2967,
+        "path": "representative-64/validation.json",
+        "sha256": "44a115f29d98319c028444005c41fc0d81f86bca551c5ca14e9087d088f018e2"
+      },
+      {
+        "bytes": 6122,
+        "path": "validation.json",
+        "sha256": "412ed4cb12b064f17a6b5b81b8bb471de87d3a89798e2cce82be4308dca91679"
+      }
+    ],
+    "gated": "manual",
+    "license": "cc-by-4.0",
+    "license_approved": true,
+    "private": false,
+    "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+    "repo_type": "dataset",
+    "schema": 1,
+    "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461"
+  },
+  "historical_bytes_match": true,
+  "configs": {
+    "pilot-16": {
+      "duplicates": 21,
+      "eligible_rows": 81,
+      "eligible_sources": {
+        "random": 33,
+        "rules": 32,
+        "search": 16
+      },
+      "eligible_splits": {
+        "train": 64,
+        "val": 17
+      },
+      "eligible_teachers": 15,
+      "games": 6,
+      "rows": 102,
+      "sources": {
+        "random": 34,
+        "rules": 34,
+        "search": 34
+      },
+      "valid_teachers": 32
+    },
+    "representative-64": {
+      "duplicates": 11,
+      "eligible_rows": 769,
+      "eligible_sources": {
+        "random": 257,
+        "rules": 256,
+        "search": 256
+      },
+      "eligible_splits": {
+        "train": 704,
+        "val": 65
+      },
+      "eligible_teachers": 252,
+      "games": 12,
+      "rows": 780,
+      "sources": {
+        "random": 260,
+        "rules": 260,
+        "search": 260
+      },
+      "valid_teachers": 256
+    }
+  },
+  "teardown": {
+    "checked_at": 1793180936.316959,
+    "instances": [
+      {
+        "id": "e837653a-d2b1-11f1-8d2e-fb230893d611",
+        "status": "Inactive",
+        "resources_released": true
+      }
+    ],
+    "persistent_volumes": 0
+  },
+  "budget": {
+    "approved_total_usd": 100,
+    "conservatively_reserved_caps_usd": 5,
+    "remaining_unreserved_usd": 95,
+    "invoice_retrieved": false
+  },
+  "limitations": [
+    "Pilot configurations overlap; eligible counts are not additive.",
+    "No test games; this is not the 100000-position production release or a trained model.",
+    "Generation, validation, regeneration, upload and full fixed-revision download verification ran on external Linux; Mac recovered only metadata and the Dataset Card."
+  ],
+  "post_upload_settings_checked_at": 1793181097.57906
+}

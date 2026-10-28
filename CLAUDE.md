@@ -7,7 +7,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/ROADMAP.md` のM4、`docs/M4_PLAN.md` と `docs/M4_REMOTE_PLAN.md`。外部CPUの初回・代表計測と終了は確認済み。試料のHF公開を先に行い、次に実測見積もりで有効10万局面の本生成へ進む。Macでは編集・軽量確認のみ。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/ROADMAP.md` のM4、`docs/M4_PLAN.md` と `docs/M4_REMOTE_PLAN.md`。外部CPUの初回・代表計測と終了は確認済み。試料のHF公開・カード・全hash照合も完了し、次に実測見積もりで有効10万局面の本生成へ進む。Macでは編集・軽量確認のみ。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -83,7 +83,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - M3の未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版は、2026-10-27にApache-2.0での初回公開をユーザーが承認した。設定は `export/publication.json`。承認はこの検証用モデルだけを対象とし、M6の学習済みモデルとデータセットは別途確認する。
 - Pythonの実行は `uv run`、ライブラリ管理は `uv add` と `uv.lock` を使う。Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
-- データセット・モデルの公開先はHugging Faceの`voxelshogi/`配下（2026-10-28ユーザー指定）。認証アカウントは`ayousanz`。[hf-publicationスキル](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。public/manualの取得ゲートとライセンスを確認し、外部Linuxから直接転送・hash照合する。Macには検証用モデルと小さい実行記録だけを保存し、データセット・学習checkpointを置かない。
+- データセット・モデルの公開先はHugging Faceの`voxelshogi/`配下（2026-10-28ユーザー指定）。認証アカウントは`ayousanz`。[hf-publicationスキル](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。public/manualの取得ゲート・Community OFF・Dataset Cardとライセンスを確認し、外部Linuxから直接転送・hash照合する。Macには検証用モデルと小さい実行記録だけを保存し、データセット・学習checkpointを置かない。
 - 標準ルールは将棋ったー三次元将棋の10/17改定後版を独立実装し、未記載の終局条件は同サイトの既定を継承する。実棋譜との互換性検証はM5で未実施。R0の9王試作3ルールは別IDで管理し、標準ルールへ正式採用していない。
 - 公開 URL はまず workers.dev を使う。デプロイは GitHub Actions から行う（Cloudflare 側の Git 連携は使わない）。理由は `docs/DEPLOYMENT.md` を参照。
 - Cloudflare は、ユーザーの個人アカウント（ka1357amnbpdr@gmail.com）を使う。このマシンの wrangler はグローバルには別アカウントでログインしているため、**必ず `scripts/cf.sh`（プロジェクト専用ログイン）経由で wrangler を使う**。素の `wrangler` は使わない（`apps/web` の `pnpm run deploy` も `scripts/cf.sh` を経由する。`pnpm deploy` は pnpm の組み込みコマンドなので使わない）。
@@ -103,7 +103,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M4: Python境界・生成・検証・再生成の実装、CloudRiftでの初回／代表試行と資源終了は確認済み。最大試料は有効769局面・探索教師252件。現在はログイン済みHF CLIの`voxelshogi`配下作成が403で、組織アクセスの再認可待ち。全実機は終了・資源解放済み。認証が変わるまで再レンタルせず、権限確認後に試料の再生成・歴史的hash照合とHF公開を行う（`docs/M4_HF_PILOT_RELEASE.md`）。その後は最大12時間・US$12の本生成案（`docs/M4_PRODUCTION_QUOTE.md`）で有効10万局面へ進む。費用合計US$100、M4データv1のCC-BY-4.0、HF public/manualはユーザー承認済み。10万有効局面とM6学習は未実行。
+  1. M4: Python境界・生成・検証・再生成の実装、CloudRiftでの初回／代表試行と資源終了は確認済み。最大試料は有効769局面・探索教師252件。再認証後に試料2 configをDataset Card付きでHFへ公開し、歴史的hash・public/manual・Community OFF・固定Hub commitの全28ファイルを照合済み。全実機は終了・資源解放済み（`docs/M4_HF_PILOT_RELEASE.md`）。その後は最大12時間・US$12の本生成案（`docs/M4_PRODUCTION_QUOTE.md`）で有効10万局面へ進む。費用合計US$100、M4データv1のCC-BY-4.0、HF public/manualはユーザー承認済み。10万有効局面とM6学習は未実行。
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   3. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

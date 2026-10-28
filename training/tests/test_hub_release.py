@@ -37,6 +37,12 @@ class Hub:
     def update_repo_settings(self, **kwargs):
         self.calls.append(("settings", kwargs))
 
+    def disable_community(self, **kwargs):
+        self.calls.append(("community", kwargs))
+
+    def community_disabled(self, **kwargs):
+        return True
+
     def upload_folder(self, **kwargs):
         self.calls.append(("upload", kwargs))
         return SimpleNamespace(oid="c" * 40)
@@ -93,6 +99,10 @@ def test_hash_verification_does_not_accept_an_upload_receipt_as_proof(tmp_path):
         verify_release(plan, receipt, UploadedHub(), fetch, system="linux")["verified"]
         is True
     )
+    api = UploadedHub()
+    api.community_disabled = lambda **kw: False
+    with pytest.raises(ValueError, match="Community"):
+        verify_release(plan, receipt, api, fetch, system="linux")
     (tmp_path / "model.onnx").write_bytes(b"abd")
     with pytest.raises(ValueError, match="hash"):
         verify_release(plan, receipt, UploadedHub(), fetch, system="linux")
@@ -186,7 +196,7 @@ def test_manual_gate_precedes_upload_and_receipt_pins_hub_commit(tmp_path):
     plan, api = release(tmp_path), Hub()
     result = publish_release(tmp_path, plan, api, execute=True, system="linux")
     names = [name for name, _ in api.calls]
-    assert names.index("settings") < names.index("upload")
+    assert names.index("settings") < names.index("community") < names.index("upload")
     settings = next(v for name, v in api.calls if name == "settings")
     assert settings["gated"] == "manual"
     upload = next(v for name, v in api.calls if name == "upload")
@@ -202,3 +212,125 @@ def test_manual_gate_precedes_upload_and_receipt_pins_hub_commit(tmp_path):
             .encode()
         ).hexdigest()
     )
+
+
+@pytest.mark.parametrize("disabled", [False, None])
+def test_community_off_is_required_before_upload(tmp_path, disabled):
+    from training.hub_release import publish_release
+
+    api = Hub()
+    api.community_disabled = lambda **kw: disabled
+    with pytest.raises(ValueError, match="Community"):
+        publish_release(tmp_path, release(tmp_path), api, execute=True, system="linux")
+    assert not any(name == "upload" for name, _ in api.calls)
+
+
+def test_dataset_card_requires_documented_sections(tmp_path):
+    from training.hub_release import plan_release
+
+    (tmp_path / "README.md").write_text("---\nlicense: cc-by-4.0\n---\nData\n")
+    (tmp_path / "LICENSE").write_text("fixture")
+    (tmp_path / "data.parquet").write_bytes(b"fixture")
+    for name in ("manifest.json", "validation.json"):
+        (tmp_path / name).write_text("{}")
+    arguments = dict(
+        repo_id="voxelshogi/test-data",
+        repo_type="dataset",
+        license_id="cc-by-4.0",
+        license_approved=True,
+        source_commit="a" * 40,
+    )
+    with pytest.raises(ValueError, match="Dataset Card"):
+        plan_release(tmp_path, **arguments)
+    with (tmp_path / "README.md").open("a") as stream:
+        stream.write(
+            "\n".join(
+                "## " + title + "\nDocumented fixture.\n"
+                for title in (
+                    "Generation and provenance",
+                    "Usage and schema",
+                    "Verification",
+                    "Access and license",
+                )
+            )
+        )
+    assert len(plan_release(tmp_path, **arguments)["files"]) == 5
+
+
+def test_community_adapter_confirms_disabled_instead_of_any_403():
+    from training.hub_release import PublicationApi
+
+    calls = []
+
+    class Response:
+        status_code = 403
+        error = "Discussions are disabled for this repo"
+
+        def json(self):
+            return {"error": self.error}
+
+        def raise_for_status(self):
+            if self.status_code >= 400:
+                raise RuntimeError("HTTP rejected")
+
+    class Session:
+        def put(self, url, **kwargs):
+            calls.append((url, kwargs))
+            return SimpleNamespace(raise_for_status=lambda: None)
+
+        def get(self, url, **kwargs):
+            calls.append((url, kwargs))
+            return Response()
+
+    api = PublicationApi(Hub(), Session(), {"Authorization": "fixture"})
+    destination = dict(repo_id="voxelshogi/test-model", repo_type="model")
+    api.disable_community(**destination)
+    assert (
+        calls[0][0]
+        == "https://huggingface.co/api/models/voxelshogi/test-model/settings"
+    )
+    assert calls[0][1]["json"] == {"discussionsDisabled": True}
+    assert api.community_disabled(**destination) is True
+    Response.error = "Invalid credentials"
+    with pytest.raises(RuntimeError, match="HTTP rejected"):
+        api.community_disabled(**destination)
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "Generation and provenance",
+        "Usage and schema",
+        "Verification",
+        "Access and license",
+    ],
+)
+def test_empty_dataset_card_section_is_rejected(tmp_path, missing):
+    from training.hub_release import plan_release
+
+    headings = [
+        "Generation and provenance",
+        "Usage and schema",
+        "Verification",
+        "Access and license",
+    ]
+    (tmp_path / "README.md").write_text(
+        "---\nlicense: cc-by-4.0\n---\n"
+        + "".join(
+            "## " + title + "\n" + ("" if title == missing else "Fixture text.") + "\n"
+            for title in headings
+        )
+    )
+    (tmp_path / "LICENSE").write_text("fixture")
+    (tmp_path / "data.parquet").write_bytes(b"fixture")
+    for name in ("manifest.json", "validation.json"):
+        (tmp_path / name).write_text("{}")
+    with pytest.raises(ValueError, match="Dataset Card"):
+        plan_release(
+            tmp_path,
+            repo_id="voxelshogi/test-data",
+            repo_type="dataset",
+            license_id="cc-by-4.0",
+            license_approved=True,
+            source_commit="a" * 40,
+        )

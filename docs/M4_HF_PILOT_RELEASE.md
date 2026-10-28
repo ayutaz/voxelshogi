@@ -1,8 +1,16 @@
 # M4試料のHF公開計画
 
-2026-10-28。ユーザーからデータセットのHFアップロードを指示済み。**M4合成データv1のCC-BY-4.0と再生成用の追加30分・US$1はユーザー承認済み。費用合計はUS$100が承認上限。** 本生成の12時間・US$12枠とは別の少量公開作業とする。**現在はHF CLIのログイン済み認証でも組織配下の作成が403で拒否され、組織アクセスの再認可待ち。実機は早期終了・資源解放済みで、生成・公開は未実施。**
+2026-10-28。ユーザーからデータセットのHFアップロードを指示済み。**M4合成データv1のCC-BY-4.0と再生成用の追加30分・US$1はユーザー承認済み。費用合計はUS$100が承認上限。** 本生成の12時間・US$12枠とは別の少量公開作業とする。**再認証後、試料2 configをHFへ公開済み。public/manual・Community OFF、Dataset Cardと固定Hub commitの全28ファイルhash照合、実機終了・資源解放を確認した。** [公開データとカード](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)、[固定した実行記録](experiments/m4-hf-pilot-release-2026-10-28.json)。有効10万局面の本生成と学習は未実行。
 
-## 現在の保存状態
+## 公開完了の記録
+
+ユーザーの`hf auth login --force`指示と再ログイン後、認証アカウントと組織権限を確認し、承認済みのCloudRift実機1台で実行した。2026-10-28 09:28 UTCに起動し、09:47 UTCに終了要求、09:48 UTCにID指定で`Inactive`・`resources_released=true`・永続volume 0件を確認した。単価US$1/時、最大30分／US$1、独立した25分終了制御の範囲内。累積の上限枠はUS$5、未予約額US$95であり、実請求額は未回収。
+
+両configとも全件検証・全再生成に成功し、過去のmanifest・全Parquet hashと一致。外部LinuxからDataset Card・LICENSE等を含む28ファイルを直接送り、Hub commit `83dd4523817908770dcaf11319243a5405addf26`へ固定して全ファイルのbytes・SHA-256を照合した。public/manualに加え、CommunityのDiscussions／Pull RequestsをOFFにした。設定更新の応答と、discussions APIの403・`Discussions are disabled for this repo`を確認。認証失敗の403とは区別した。
+
+実際のカードはHFのroot READMEと[保存した公開版](M4_DATASET_CARD_DRAFT.md)。生成条件・件数・重複・教師・split、schemaと利用例、検証・再生成、制約・用途、取得ゲート・ライセンス・帰属を記載した。Macへ回収したのは小さいreceipt・hash・カードだけで、データ本体は中継していない。
+
+## 初回終了時の保存状態（公開前の経緯）
 
 初回CloudRift実機は2026-10-28 07:25 UTCに終了処理され、07:49 UTC以降のID指定APIで`Inactive`・`resources_released=true`を確認した。追加の永続volumeは0件。[終了の固定記録](experiments/m4-initial-teardown-2026-10-28.json)。初回・代表試行のParquetはHFへ退避できておらず、解放済みのローカルディスクから回収できない。設定・検証結果・全ファイルhashはGitに保存済みで、同じ条件での再生成と照合が必要。
 
@@ -44,7 +52,7 @@ Macに残る旧9行試料を代わりのデータとして公開したり、Mac�
 
 ゴールは**Hub上の実データ・public/manual・固定revisionの全件hash一致と、外部実機の終了が確認済み**になること。カードやplanのみ、repoのみの作成、アップロード応答のみでは完了にしない。
 
-## 今回の公開事前確認と停止
+## 08:00 UTCの公開事前確認と停止（解決済みの経緯）
 
 [試行記録](experiments/m4-hf-preflight-attempt-2026-10-28.json)。08:00 UTCに承認済みの同構成1台を起動し、固定依存・Python3.14.9・境界11テスト・実GPUを確認した。既定のHF OAuth認証では本人認証は成功したが、repo作成の事前確認がHfHubHTTPErrorで停止し、後続の読み取りでも候補repoは未作成だった。データ生成・転送は開始していない。停止後は有料実機を早期終了し、Inactive・resources_released=trueと追加volume0を確認した。
 
@@ -52,10 +60,10 @@ OAuthでは組織アクセスの許可は別管理で、一般認証や所属だ
 
 別の公式保存済みHFトークンを調べて使用する試行は、自動承認レビューが「追加資格情報の利用が明示承認されていない」として拒否した。別経路で回避せず、ユーザーに既存HFトークンの権限確認・使用を問い合わせ済み。専用トークンを使う場合はgitignore対象の.envのHF_TOKENへ設定できる。秘密値を会話・ログへ貼らない。承認後は同じ公開ハーネスで権限・public/manualを先に確認し、歴史的hash照合から再開する。
 
-## HF CLIの確認結果と再開条件
+## HF CLIの確認結果と再開条件（再認証前の記録）
 
 ユーザーがログイン済みHF CLI認証の使用を明示承認した後、CLIでも`ayousanz`のログインと`voxelshogi`所属を確認した。保存済み資格情報はOAuthの1件のみだった。同じ認証で外部Linuxの公開ハーネスを実行すると、`create_repo`がHTTP403・「You don't have the rights to create a dataset under the namespace "voxelshogi"」で拒否された。[確定した診断・終了記録](experiments/m4-hf-cli-authorization-2026-10-28.json)。本人認証の失敗ではなく、この認証による対象組織配下の作成が許可されていないことを確認した。
 
 CLIの強制再認証開始も、権限拡大の対象組織・scope・保存期間の明示承認不足として自動承認レビューに拒否された。ユーザーへ、手元で`hf auth login --force`を実行してHFの認可画面で`voxelshogi`組織への作成・書込アクセスを許可するか、専用トークンをgitignore対象の`.env`の`HF_TOKEN`へ設定する手順を案内した。トークンを会話へ貼らない。
 
-データはまだ生成していない。認証が変わるか組織アクセスが許可されるまで、同じ403のまま実機を繰り返し借りない。現在は全実機のInactive・resources_released=trueと追加volume0を確認済み。初回US$2・最初の公開試行US$1・CLI承認後試行US$1の上限枠合計US$4を保守的に控除し、US$100総枠の未予約額はUS$96。これは実請求額ではなく、請求額は未回収。認証再設定後の再開も同じ総枠・元のデータ／公開条件内で管理する。
+この試行ではデータを生成しなかった。認証が変わるまで再レンタルせず停止した。当時は全実機のInactive・resources_released=trueと追加volume0を確認済み。初回US$2・最初の公開試行US$1・CLI承認後試行US$1の上限枠合計US$4を保守的に控除し、US$100総枠の未予約額はUS$96。これは実請求額ではなく、請求額は未回収。認証再設定後の再開も同じ総枠・元のデータ／公開条件内で管理する。
