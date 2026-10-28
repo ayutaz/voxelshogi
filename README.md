@@ -28,9 +28,11 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 ### 開発状況
 
-ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。Python連携とデータ生成・全件検証・再生成も実装し、CloudRiftの外部CPUで少量・並列試行を確認しました。[試料データとDataset CardをHFへ公開済み](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)です（public・手動取得承認・Community OFF）。[全ファイルの照合記録](docs/M4_HF_PILOT_RELEASE.md)も残しています。現在は[重複除外後10万局面を目指す本生成を実行中](docs/M4_PRODUCTION_RUN.md)です。完了後、学習済みモデルの対局・観戦へつなげます。
+ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。
 
-詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。直近は[M4の本生成準備・実行・公開](docs/M4_PLAN.md#次に実行する単位)、その後は[M6の学習・評価・モデル観戦](docs/M6_PLAN.md)へ進みます。
+CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。学習済みモデルの対局・観戦は次のM6で開発します。
+
+詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。M4と、固定3局145手を照合したM5は完了し、次は[M6の教師・学習・評価・モデル観戦](docs/M6_PLAN.md)へ進みます。
 
 ### ルールについて
 

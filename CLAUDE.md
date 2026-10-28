@@ -7,7 +7,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/ROADMAP.md` のM4、`docs/M4_PLAN.md` と `docs/M4_REMOTE_PLAN.md`。外部CPUの初回・代表計測と終了は確認済み。試料のHF公開・カード・全hash照合も完了し、次に実測見積もりで有効10万局面の本生成へ進む。Macでは編集・軽量確認のみ。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/M6_PLAN.md` のM6-0〜1（教師・評価条件と学習／再開の実装）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -32,8 +32,8 @@
 | `scripts/cf.sh` | プロジェクト専用ログイン（`.cloudflare-cli/`、git管理外）で wrangler を起動する（ADR-010） |
 | `export/` | uv管理の特徴量・行動契約、未学習代表モデルとONNX変換・数値比較 |
 | `crates/voxelshogi-python` | PyO3／maturinのPython境界と行動マスク付きGymnasium環境。ルールはRust coreを呼ぶ |
-| `training/` | 少量Parquet生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
-| 予定 | 外部CPUの本生成実行、学習ループ、`infrastructure/` |
+| `training/` | Parquet本生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
+| 予定 | 学習ループ、CUDA学習環境、`infrastructure/` |
 
 ## 開発規約（必読）
 
@@ -103,8 +103,8 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
+  - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
+  - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M4: Python境界・生成・検証・再生成の実装、CloudRiftでの初回／代表試行と資源終了は確認済み。最大試料は有効769局面・探索教師252件。再認証後に試料2 configをDataset Card付きでHFへ公開し、歴史的hash・public/manual・Community OFF・固定Hub commitの全28ファイルを照合済み。試料公開までの実機は終了・資源解放済み（`docs/M4_HF_PILOT_RELEASE.md`）。その後は最大12時間・US$12の本生成案（`docs/M4_PRODUCTION_QUOTE.md`）で有効10万局面へ進む。費用合計US$100、M4データv1のCC-BY-4.0、HF public/manualはユーザー承認済み。[1,800局の本生成を実行中](docs/M4_PRODUCTION_RUN.md)。10万有効件数・全検証・再生成・公開の完了は未判定、M6学習は未実行。
-  2. M5: 固定した改定後3局145手を全件照合済み。PR #42を通常merge。対象と制約は[記録](docs/M5_PLAN.md)。
-  3. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜5。教師・学習／再開の実装 → 外部CUDA小規模試行の見積もり・承認・実測 → 本学習・評価 → 全変換版のHF公開とブラウザ観戦。現状のLinux torchはCPU版で、CUDA学習は未実装・未実行。
+  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、小規模CUDA試行を見積もり・承認後に実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。現状のLinux torchはCPU版で、CUDA学習は未実装・未実行。M4の費用承認を学習へ転用しない。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
