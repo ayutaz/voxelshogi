@@ -1,6 +1,6 @@
 # M6実行計画：学習済みTransformer-Sで観戦する
 
-2026-10-28。**未着手。** M3の未学習モデル・変換・ブラウザ推論は完了。M4の試料は公開済みだが、重複除外後10万局面の本生成は未実行。M6では、[M4完了](M4_PLAN.md)を確認してから学習へ進む。概要・共通の完了条件は[ROADMAP](ROADMAP.md#m6-transformer-s-の学習phase-4)、入出力は[MODEL_CONTRACT](MODEL_CONTRACT.md)に従う。
+2026-10-29 JST。**未着手。** M3の未学習モデル・変換・ブラウザ推論と[M4本生成・公開・資源終了](M4_COMPLETION.md)は完了。M4の固定Hub revision `6e7fb29d2469b56a895042fbb089d86e7b4d074f`の`production-64`（有効113,321局面・探索教師36,894件）を入力として、教師と評価条件の固定から進める。概要・共通の完了条件は[ROADMAP](ROADMAP.md#m6-transformer-s-の学習phase-4)、入出力は[MODEL_CONTRACT](MODEL_CONTRACT.md)に従う。
 
 ## 目的と完了条件
 

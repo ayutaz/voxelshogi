@@ -1,6 +1,6 @@
 # M4：Python連携・生成と実機検証
 
-確認: 2026-10-28 JST。[M4実行計画](M4_PLAN.md)のうち、Python連携・少量生成・検証・停止再開が対象。[API・データ・実行上限の契約](M4_DATA_CONTRACT.md)・[固定した小規模確認のJSON](experiments/m4-small-validation.json)。以下のM4-0〜2は当時の固定記録。末尾に外部実機の結果を追記する。M4全体・約10万有効局面・データ公開は未完了。
+確認: 2026-10-28 JST。[M4実行計画](M4_PLAN.md)のうち、Python連携・少量生成・検証・停止再開が対象。[API・データ・実行上限の契約](M4_DATA_CONTRACT.md)・[固定した小規模確認のJSON](experiments/m4-small-validation.json)。以下のM4-0〜2は当時の固定記録。末尾に外部実機の結果を追記する。以下は当時の履歴。M4全体は[2026-10-29 JSTに本生成・公開・資源終了まで完了](M4_COMPLETION.md)。
 
 ## 実装とローカル検証
 
@@ -70,3 +70,7 @@ PR #34〜#36を必須8チェック成功後に通常統合。PR #36は全Python1
 64手・1／2／4ワーカーと12対局の代表試行も全件検証・全再生成が成功した。[固定JSON](experiments/m4-cloudrift-representative-2026-10-28.json)。6対局ではワーカー数間も全ファイル一致。12対局は有効769局面・探索教師252件、教師は全て深さ2。共通ledgerの累積508.750秒、外側監視のRSS最大約531.4 MiBで初回試行の上限内だった。[本生成の見積もり](M4_PRODUCTION_QUOTE.md)は承認済み総枠US$100内で管理する。10万局面規模の実データは未生成であり、これを本生成の完了としない。
 
 初回実機の[終了・資源解放](experiments/m4-initial-teardown-2026-10-28.json)と、PR #37の通常統合・main CI/Security・公開後の[固定記録](experiments/m4-pilot-publication-baseline.json)も確認済み。試料Parquetは退避できなかったため、[試料公開](M4_HF_PILOT_RELEASE.md)では承認済みCC-BY-4.0で再生成し、歴史的hashとの一致を条件にする。
+
+## 本規模の完了確認（2026-10-29 JST）
+
+[完了記録](M4_COMPLETION.md)・[job、全件report、HF plan／receiptと終了記録](experiments/m4-production-release-2026-10-29.json)。1,800局・有効113,321局面・探索教師36,894件を全検証し、固定環境で全再生成がバイト一致した。Card付きHF公開・public/manual・Community OFF・固定Hub commitの全1,831対象ファイル照合、実機終了・資源解放・volume 0まで確認。実装の通常CIと、小規模の停止再開／変異の履歴は上記の固定記録を保持する。

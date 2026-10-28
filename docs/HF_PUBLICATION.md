@@ -24,7 +24,7 @@
 | `Verification` | 全件検証・再生成、hash、検証結果への参照、未検証事項 |
 | `Access and license` | public/manualとCommunity OFF、取得申請、承認済みライセンス・帰属 |
 
-[今回の公開カード](M4_DATASET_CARD_DRAFT.md)は[HFの固定版](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1/blob/83dd4523817908770dcaf11319243a5405addf26/README.md)と同じ内容。試料を10万局面の本生成や学習済みモデルと呼ばず、config間の重複も明示する。
+[試料公開時のカード](M4_DATASET_CARD_DRAFT.md)は[HFの固定版](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1/blob/83dd4523817908770dcaf11319243a5405addf26/README.md)と同じ内容。試料を10万局面の本生成や学習済みモデルと呼ばず、config間の重複も明示する。
 
 ## スキルとハーネス
 
@@ -68,3 +68,7 @@ uv run --locked python -m training.hub_release runs/release/model runs/release-p
 一次資料：[Hubへのアップロード](https://huggingface.co/docs/huggingface_hub/guides/upload)、[APIのrepo設定](https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.update_repo_settings)、[モデルのmanual gate](https://huggingface.co/docs/hub/models-gated)、[データのmanual gate](https://huggingface.co/docs/hub/datasets-gated)。
 
 Community設定はSDK未対応のため`PublicationApi`から公式HubのsettingsへPUTし、discussions APIの無効応答を確認する。参考：[HF公式SDKの設定例](https://github.com/huggingface/swift-huggingface/blob/main/README.md#repository-management)、[Community設定の仕様](https://huggingface.co/docs/hub/repositories-settings)。
+
+## 本生成公開の完了（2026-10-29 JST）
+
+[本生成のDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1/blob/6e7fb29d2469b56a895042fbb089d86e7b4d074f/README.md)は実数・来歴・制約を記載済み。`production-64`を追加し、旧試料を保持した。固定Hub commitの全1,831対象ファイルとCardのhash、public/manual・Community OFF、実機終了・資源解放を[完了記録](M4_COMPLETION.md)へ残した。

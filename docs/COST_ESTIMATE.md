@@ -289,3 +289,11 @@ Cloudflareの料金・制限とVast.ai課金条件は2026-10-26に公式資料�
 - 為替: `https://api.frankfurter.app/latest?from=USD&to=JPY`（ECB, 2026-10-23）、`https://open.er-api.com/v6/latest/USD`（2026-10-25 00:02 UTC）
 - Cloudflare: `https://developers.cloudflare.com/workers/platform/limits/`（2026-10-12 更新）、`/workers/platform/pricing/`、`/workers/static-assets/billing-and-limitations/`（2026-04-23 更新）、`/r2/pricing/`（2026-10-01 更新）、`/r2/buckets/public-buckets/`、`/registrar/`
 - ドメイン価格（参考・第三者）: `https://cfdomainpricing.com/`（2026-10-25 取得）
+
+### M4本生成の実績（2026-10-29 JST）
+
+[固定したjob・report・公開／終了receipt](experiments/m4-production-release-2026-10-29.json)・[解釈と制約](M4_COMPLETION.md)。CloudRift RTX5090×1・ゲスト7論理CPU、4ワーカー、seed17、1,800局・最大64手・深さ2／10,000ノード・TT4,096・序盤分岐16手。116,921行・有効113,321局面・有効探索教師36,894件を全検証した。
+
+生成4,255.160秒、全検証8,069.726秒、全再生成4,222.838秒、合計約4.5966時間。生成27.48行/秒・有効局面26.63/秒・有効教師8.67/秒（重複除外前9.01/秒）。1対局当たりの償却経過時間は生成2.364秒・検証4.483秒・再生成2.346秒。混合3生成元・4ワーカーの通算値で、単独探索の応答時間・process CPU秒・CUDA学習速度ではない。1組のParquetは38,552,239 bytes、全再生成のバイト一致とHFの固定revision全1,831対象ファイル照合を確認した。
+
+準備から資源解放確認まで約5.04時間、US$1/時との積は参考約US$5.04で、実請求は未回収。上限12時間／US$12内に終了し、稼働中VoxelShogi実機0・永続volume 0。生成しなかった準備実機の上限US$24も保守的に残し、過去US$5・本生成US$12と合わせた予約上限はUS$41、承認済みUS$100の未予約額はUS$59。サービス残高・請求額とは区別する。M6学習のCUDA版依存・速度・VRAM・金額は未測定のため、M4のCPU速度や残額から本学習費用を確定しない。
