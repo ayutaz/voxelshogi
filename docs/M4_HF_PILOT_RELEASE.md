@@ -54,7 +54,7 @@ OAuthでは組織アクセスの許可は別管理で、一般認証や所属だ
 
 ## HF CLIの確認結果と再開条件
 
-ユーザーがログイン済みHF CLI認証の使用を明示承認した後、CLIでも`ayousanz`のログインと`voxelshogi`所属を確認した。保存済み資格情報はOAuthの1件のみだった。同じ認証で外部Linuxの公開ハーネスを実行すると、`create_repo`がHTTP403・「You don't have the rights to create a dataset under the namespace \"voxelshogi\"」で拒否された。[確定した診断・終了記録](experiments/m4-hf-cli-authorization-2026-10-28.json)。本人認証の失敗ではなく、この認証による対象組織配下の作成が許可されていないことを確認した。
+ユーザーがログイン済みHF CLI認証の使用を明示承認した後、CLIでも`ayousanz`のログインと`voxelshogi`所属を確認した。保存済み資格情報はOAuthの1件のみだった。同じ認証で外部Linuxの公開ハーネスを実行すると、`create_repo`がHTTP403・「You don't have the rights to create a dataset under the namespace "voxelshogi"」で拒否された。[確定した診断・終了記録](experiments/m4-hf-cli-authorization-2026-10-28.json)。本人認証の失敗ではなく、この認証による対象組織配下の作成が許可されていないことを確認した。
 
 CLIの強制再認証開始も、権限拡大の対象組織・scope・保存期間の明示承認不足として自動承認レビューに拒否された。ユーザーへ、手元で`hf auth login --force`を実行してHFの認可画面で`voxelshogi`組織への作成・書込アクセスを許可するか、専用トークンをgitignore対象の`.env`の`HF_TOKEN`へ設定する手順を案内した。トークンを会話へ貼らない。
 
