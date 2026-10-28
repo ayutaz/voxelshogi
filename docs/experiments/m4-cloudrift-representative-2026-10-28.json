@@ -1,0 +1,410 @@
+{
+  "schema": 1,
+  "observed_date": "2026-10-28",
+  "measurement_kind": "external-cpu-representative",
+  "cases": {
+    "w1": {
+      "job": {
+        "approved": true,
+        "approved_seconds": 175,
+        "config": {
+          "engine_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "games": 6,
+          "initial": null,
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "max_plies": 64,
+          "search_opening_plies": 16,
+          "seed": 17,
+          "sources": [
+            "random",
+            "rules",
+            "search"
+          ],
+          "table_capacity": 4096
+        },
+        "gpu_model": "rtx5090",
+        "hourly_usd": 1,
+        "max_cost_usd": 2,
+        "minimum_eligible_rows": 1,
+        "provider": "cloudrift",
+        "purpose": "representative",
+        "schema": 1,
+        "workers": 1
+      },
+      "report": {
+        "complete": true,
+        "context": {
+          "gpu": {
+            "driver": "580.159.03",
+            "memory_mib": 32607,
+            "name": "NVIDIA GeForce RTX 5090"
+          },
+          "job_sha256": "da3ff9e085e5baf2d876f7ec5f656af24e3e1dadbbf5b0661f05af058e57222d",
+          "logical_cpus": 7,
+          "measurement_kind": "external-cpu-production",
+          "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+          "python": "3.14.9",
+          "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+        },
+        "dataset_manifest_sha256": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5",
+        "files": {
+          ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "game-000000.parquet": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e",
+          "game-000001.parquet": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb",
+          "game-000002.parquet": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb",
+          "game-000003.parquet": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7",
+          "game-000004.parquet": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50",
+          "game-000005.parquet": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8",
+          "manifest.json": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5"
+        },
+        "generate_seconds": 41.27349632100004,
+        "parquet_bytes": 133610,
+        "regenerate_seconds": 41.36313560899998,
+        "regenerated_bytes_match": true,
+        "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+        "supervisor": {
+          "elapsed": 123.90989547899994,
+          "peak_rss": 147349504,
+          "reason": "completed",
+          "returncode": 0
+        },
+        "validate_seconds": 41.16874631799999,
+        "validation": {
+          "duplicates": 5,
+          "eligible_rows": 385,
+          "eligible_sources": {
+            "random": 129,
+            "rules": 128,
+            "search": 128
+          },
+          "eligible_splits": {
+            "train": 320,
+            "val": 65
+          },
+          "eligible_teachers": 126,
+          "games": 6,
+          "rows": 390,
+          "sources": {
+            "random": 130,
+            "rules": 130,
+            "search": 130
+          },
+          "valid_teachers": 128
+        }
+      },
+      "eligible_teacher_depths": {
+        "2": 126
+      },
+      "eligible_teacher_stop_reasons": {
+        "depth": 126
+      }
+    },
+    "w2": {
+      "job": {
+        "approved": true,
+        "approved_seconds": 175,
+        "config": {
+          "engine_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "games": 6,
+          "initial": null,
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "max_plies": 64,
+          "search_opening_plies": 16,
+          "seed": 17,
+          "sources": [
+            "random",
+            "rules",
+            "search"
+          ],
+          "table_capacity": 4096
+        },
+        "gpu_model": "rtx5090",
+        "hourly_usd": 1,
+        "max_cost_usd": 2,
+        "minimum_eligible_rows": 1,
+        "provider": "cloudrift",
+        "purpose": "representative",
+        "schema": 1,
+        "workers": 2
+      },
+      "report": {
+        "complete": true,
+        "context": {
+          "gpu": {
+            "driver": "580.159.03",
+            "memory_mib": 32607,
+            "name": "NVIDIA GeForce RTX 5090"
+          },
+          "job_sha256": "9837969fa2af9f6aa1c9a0bc68e04843eac62a941eacd9ba62e1c154ba7e5876",
+          "logical_cpus": 7,
+          "measurement_kind": "external-cpu-production",
+          "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+          "python": "3.14.9",
+          "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+        },
+        "dataset_manifest_sha256": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5",
+        "files": {
+          ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "game-000000.parquet": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e",
+          "game-000001.parquet": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb",
+          "game-000002.parquet": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb",
+          "game-000003.parquet": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7",
+          "game-000004.parquet": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50",
+          "game-000005.parquet": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8",
+          "manifest.json": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5"
+        },
+        "generate_seconds": 41.0647373380001,
+        "parquet_bytes": 133610,
+        "regenerate_seconds": 41.049458505000075,
+        "regenerated_bytes_match": true,
+        "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+        "supervisor": {
+          "elapsed": 123.46405433300004,
+          "peak_rss": 321609728,
+          "reason": "completed",
+          "returncode": 0
+        },
+        "validate_seconds": 41.18544087100008,
+        "validation": {
+          "duplicates": 5,
+          "eligible_rows": 385,
+          "eligible_sources": {
+            "random": 129,
+            "rules": 128,
+            "search": 128
+          },
+          "eligible_splits": {
+            "train": 320,
+            "val": 65
+          },
+          "eligible_teachers": 126,
+          "games": 6,
+          "rows": 390,
+          "sources": {
+            "random": 130,
+            "rules": 130,
+            "search": 130
+          },
+          "valid_teachers": 128
+        }
+      },
+      "eligible_teacher_depths": {
+        "2": 126
+      },
+      "eligible_teacher_stop_reasons": {
+        "depth": 126
+      }
+    },
+    "w4": {
+      "job": {
+        "approved": true,
+        "approved_seconds": 175,
+        "config": {
+          "engine_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "games": 6,
+          "initial": null,
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "max_plies": 64,
+          "search_opening_plies": 16,
+          "seed": 17,
+          "sources": [
+            "random",
+            "rules",
+            "search"
+          ],
+          "table_capacity": 4096
+        },
+        "gpu_model": "rtx5090",
+        "hourly_usd": 1,
+        "max_cost_usd": 2,
+        "minimum_eligible_rows": 1,
+        "provider": "cloudrift",
+        "purpose": "representative",
+        "schema": 1,
+        "workers": 4
+      },
+      "report": {
+        "complete": true,
+        "context": {
+          "gpu": {
+            "driver": "580.159.03",
+            "memory_mib": 32607,
+            "name": "NVIDIA GeForce RTX 5090"
+          },
+          "job_sha256": "5f3092a700c676398b5bd9f608874ec2a3c2918f0a1799fdb75b7d81f8cc5983",
+          "logical_cpus": 7,
+          "measurement_kind": "external-cpu-production",
+          "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+          "python": "3.14.9",
+          "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+        },
+        "dataset_manifest_sha256": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5",
+        "files": {
+          ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "game-000000.parquet": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e",
+          "game-000001.parquet": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb",
+          "game-000002.parquet": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb",
+          "game-000003.parquet": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7",
+          "game-000004.parquet": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50",
+          "game-000005.parquet": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8",
+          "manifest.json": "9232e7f5a629da084d567a5ab7f928c0975de2323c803a8c27be03936c0a81e5"
+        },
+        "generate_seconds": 26.878345076000073,
+        "parquet_bytes": 133610,
+        "regenerate_seconds": 26.86483213400004,
+        "regenerated_bytes_match": true,
+        "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+        "supervisor": {
+          "elapsed": 95.00481254699991,
+          "peak_rss": 481239040,
+          "reason": "completed",
+          "returncode": 0
+        },
+        "validate_seconds": 41.13558233999993,
+        "validation": {
+          "duplicates": 5,
+          "eligible_rows": 385,
+          "eligible_sources": {
+            "random": 129,
+            "rules": 128,
+            "search": 128
+          },
+          "eligible_splits": {
+            "train": 320,
+            "val": 65
+          },
+          "eligible_teachers": 126,
+          "games": 6,
+          "rows": 390,
+          "sources": {
+            "random": 130,
+            "rules": 130,
+            "search": 130
+          },
+          "valid_teachers": 128
+        }
+      },
+      "eligible_teacher_depths": {
+        "2": 126
+      },
+      "eligible_teacher_stop_reasons": {
+        "depth": 126
+      }
+    },
+    "longer-12-w4": {
+      "job": {
+        "approved": true,
+        "approved_seconds": 221,
+        "config": {
+          "engine_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "games": 12,
+          "initial": null,
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "max_plies": 64,
+          "search_opening_plies": 16,
+          "seed": 17,
+          "sources": [
+            "random",
+            "rules",
+            "search"
+          ],
+          "table_capacity": 4096
+        },
+        "gpu_model": "rtx5090",
+        "hourly_usd": 1,
+        "max_cost_usd": 2,
+        "minimum_eligible_rows": 1,
+        "provider": "cloudrift",
+        "purpose": "representative",
+        "schema": 1,
+        "workers": 4
+      },
+      "report": {
+        "complete": true,
+        "context": {
+          "gpu": {
+            "driver": "580.159.03",
+            "memory_mib": 32607,
+            "name": "NVIDIA GeForce RTX 5090"
+          },
+          "job_sha256": "9a19123caa258426fc4f61f284f4ab899c7af363b261e02c96a124664e705eb0",
+          "logical_cpus": 7,
+          "measurement_kind": "external-cpu-production",
+          "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+          "python": "3.14.9",
+          "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+          "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+        },
+        "dataset_manifest_sha256": "c466fd0d9c37c7a75a17616f4b63ef9dd0d7e426b841b1be3906eb31999f8d82",
+        "files": {
+          ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "game-000000.parquet": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e",
+          "game-000001.parquet": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb",
+          "game-000002.parquet": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb",
+          "game-000003.parquet": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7",
+          "game-000004.parquet": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50",
+          "game-000005.parquet": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8",
+          "game-000006.parquet": "ed98ebabb304ffd98e1d37ed46e764589ef51a11ef9f74d4cecf7485be299ec4",
+          "game-000007.parquet": "5ecb9ea91333f686ef6f70250280b36d0c88e41e200b37a43276f41540f8ec9f",
+          "game-000008.parquet": "77a2f61e7c49bb6fd0719135f5f52e6951435fe3f35234fafb42d41b71c25ccf",
+          "game-000009.parquet": "2b31ec0c7573c9381ed83f575b230b97a33a8c27c20561f597edff88a07aca9e",
+          "game-000010.parquet": "9e926bbfac8167433aece2b58306ab8026aaea307d6a94238ecf0bc99292dc22",
+          "game-000011.parquet": "edff1f59230ab60231ee23eee0baffa8a3a5c80a0880e1e2ba98f7c8eff3824f",
+          "manifest.json": "c466fd0d9c37c7a75a17616f4b63ef9dd0d7e426b841b1be3906eb31999f8d82"
+        },
+        "generate_seconds": 37.830048551000004,
+        "parquet_bytes": 255402,
+        "regenerate_seconds": 37.78801178000003,
+        "regenerated_bytes_match": true,
+        "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+        "supervisor": {
+          "elapsed": 138.34813392599995,
+          "peak_rss": 486248448,
+          "reason": "completed",
+          "returncode": 0
+        },
+        "validate_seconds": 62.61800525900003,
+        "validation": {
+          "duplicates": 11,
+          "eligible_rows": 769,
+          "eligible_sources": {
+            "random": 257,
+            "rules": 256,
+            "search": 256
+          },
+          "eligible_splits": {
+            "train": 704,
+            "val": 65
+          },
+          "eligible_teachers": 252,
+          "games": 12,
+          "rows": 780,
+          "sources": {
+            "random": 260,
+            "rules": 260,
+            "search": 260
+          },
+          "valid_teachers": 256
+        }
+      },
+      "eligible_teacher_depths": {
+        "2": 252
+      },
+      "eligible_teacher_stop_reasons": {
+        "depth": 252
+      }
+    }
+  },
+  "cross_worker_files_match": true,
+  "session_budget": {
+    "schema": 1,
+    "spent_seconds": 508.75037509099985
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "by_case_profile": {
+    "opening-b:d1": {
+      "completed_depths": {
+        "1": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 410.2362701118086,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 410.2362701118086,
+      "total_search_seconds": 0.00731285899996692,
+      "unlabelled_count": 0
+    },
+    "opening-b:d2": {
+      "completed_depths": {
+        "2": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 5.163942550126695,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 5.163942550126695,
+      "total_search_seconds": 0.580951467000034,
+      "unlabelled_count": 0
+    },
+    "opening-w:d1": {
+      "completed_depths": {
+        "1": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 384.96125749805,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 384.96125749805,
+      "total_search_seconds": 0.007792992000020149,
+      "unlabelled_count": 0
+    },
+    "opening-w:d2": {
+      "completed_depths": {
+        "2": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 4.931241675509629,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 4.931241675509629,
+      "total_search_seconds": 0.6083660459999578,
+      "unlabelled_count": 0
+    },
+    "sparse-hands:d1": {
+      "completed_depths": {
+        "1": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 687.8235063166301,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 687.8235063166301,
+      "total_search_seconds": 0.004361584000037055,
+      "unlabelled_count": 0
+    },
+    "sparse-hands:d2": {
+      "completed_depths": {
+        "2": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 37.546242421481246,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 37.546242421481246,
+      "total_search_seconds": 0.07990147100002787,
+      "unlabelled_count": 0
+    },
+    "sparse-mate:d1": {
+      "completed_depths": {
+        "1": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 1994.944809835157,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 1994.944809835157,
+      "total_search_seconds": 0.0015038010000125723,
+      "unlabelled_count": 0
+    },
+    "sparse-mate:d2": {
+      "completed_depths": {
+        "2": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 727.5692227595437,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 727.5692227595437,
+      "total_search_seconds": 0.00412331899997298,
+      "unlabelled_count": 0
+    },
+    "trajectory-64:d1": {
+      "completed_depths": {
+        "1": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 370.25851572993037,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 370.25851572993037,
+      "total_search_seconds": 0.008102446999998847,
+      "unlabelled_count": 0
+    },
+    "trajectory-64:d2": {
+      "completed_depths": {
+        "2": 3
+      },
+      "sample_count": 3,
+      "samples_per_second": 8.07342376317886,
+      "stop_reasons": {
+        "depth": 3
+      },
+      "teacher_count": 3,
+      "teacher_samples_per_second": 8.07342376317886,
+      "total_search_seconds": 0.37158956199999693,
+      "unlabelled_count": 0
+    }
+  },
+  "complete": true,
+  "context": {
+    "cgroup": {
+      "cpu.max": null,
+      "cpuset.cpus.effective": "0-6",
+      "memory.max": null
+    },
+    "cpu_model": "AMD Ryzen 9 9950X 16-Core Processor",
+    "gpu": {
+      "driver": "580.159.03",
+      "memory_mib": 32607,
+      "name": "NVIDIA GeForce RTX 5090"
+    },
+    "gpu_training_tested": false,
+    "logical_cpus": 7,
+    "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+    "provider": "cloudrift",
+    "python": "3.14.9",
+    "schema": 1,
+    "selected_gpu_model": "rtx5090",
+    "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+    "system_ram_bytes": 50509873152
+  },
+  "dataset": {
+    "config": {
+      "engine_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+      "games": 6,
+      "initial": null,
+      "max_depth": 2,
+      "max_nodes": 10000,
+      "max_plies": 16,
+      "search_opening_plies": 0,
+      "seed": 17,
+      "sources": [
+        "random",
+        "rules",
+        "search"
+      ],
+      "table_capacity": 4096
+    },
+    "files": {
+      ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "game-000000.parquet": "042491048586b975bc7f14c5345e58a87bcf05b1e3a5783bb16f389a08f39437",
+      "game-000001.parquet": "a14da5223ce794445516342a7139a608eb991d8b6df59e9948b869fb24aac5b4",
+      "game-000002.parquet": "914a86908d1ce0fa773cb9c39740873f35096b49b0ffff3a64d803e8e908275b",
+      "game-000003.parquet": "3344796ff18c70c8fbb64cf241b604b0b4494ddf82bbddfd2a160fc0e423fe99",
+      "game-000004.parquet": "9f6918b9c5715a6fc9b6045f4b3b7c12b17f17be0f1535f4f459bcded532a080",
+      "game-000005.parquet": "3fda355e8ca6d544e21bdffa8ed8f3685aaaf895b9fe94a0c77b10791e70bfe5",
+      "manifest.json": "7bd865f09fbd8852147b3fa18724ac3bba752e0816f2ac54c85d9240079347ca"
+    },
+    "generate_seconds": 6.452000324999972,
+    "parquet_bytes": 64888,
+    "regenerate_seconds": 6.519148223999991,
+    "regenerated_bytes_match": true,
+    "validate_seconds": 6.4168319270000325,
+    "validation": {
+      "duplicates": 21,
+      "eligible_rows": 81,
+      "eligible_sources": {
+        "random": 33,
+        "rules": 32,
+        "search": 16
+      },
+      "eligible_splits": {
+        "train": 64,
+        "val": 17
+      },
+      "eligible_teachers": 15,
+      "games": 6,
+      "rows": 102,
+      "sources": {
+        "random": 34,
+        "rules": 34,
+        "search": 34
+      },
+      "valid_teachers": 32
+    }
+  },
+  "expected_samples": 30,
+  "input_sha256": "d8f7231e089819b0382f724404852e37e02726cc7058b90af3eb563c29a664df",
+  "measurement_kind": "approved-remote-cpu-pilot",
+  "overall": {
+    "completed_depths": {
+      "1": 15,
+      "2": 15
+    },
+    "sample_count": 30,
+    "samples_per_second": 17.92108755902376,
+    "stop_reasons": {
+      "depth": 30
+    },
+    "teacher_count": 30,
+    "teacher_samples_per_second": 17.92108755902376,
+    "total_search_seconds": 1.674005548000025,
+    "unlabelled_count": 0
+  },
+  "profiles": [
+    {
+      "max_depth": 1,
+      "max_nodes": 1000,
+      "name": "d1"
+    },
+    {
+      "max_depth": 2,
+      "max_nodes": 10000,
+      "name": "d2"
+    }
+  ],
+  "supervisor": {
+    "elapsed": 22.098053732999972,
+    "peak_rss": 114262016,
+    "reason": "completed",
+    "returncode": 0
+  }
+}
