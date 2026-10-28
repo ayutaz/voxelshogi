@@ -39,6 +39,38 @@ uv run --locked python -m training.production runs/m4/approved-job.json runs/m4/
 
 生成と再生成の双方を外部ホストに置く。Macへ回収するのは小さい集計・manifest・hash・receiptだけ。公開用stagingには検証済みParquet、manifest、検証記録、Dataset Cardと確定済みLICENSEだけを用意し、[HF公開スキルとハーネス](HF_PUBLICATION.md)で`voxelshogi/`配下へ直接送る。固定Hub revisionの全ファイルを外部Linuxでダウンロード・照合し、完了receiptを確認してから資源を終了する。ライセンスやゲートの確認待ちがある場合は、生成前に保持方法・費用も決める。
 
+## 本生成の起動・公開ハーネス
+
+`training.rental_control`は制御側だけで使う。既存の承認済み累積予算ledgerをロックして旧SKUはUS$12、[CPU少なめの代替SKU](M4_PRODUCTION_QUOTE.md#空き状況に応じた代替構成)はUS$24を予約し、選択SKU・地域の単価US$1/時以下・GPU1枚・空き・公開IPと、別のVoxelShogi実機が稼働していないことを起動前に確認する。専用SSH公開鍵を使い、providerキーは制御側の`.env`からだけ読む。新規入金・自動チャージ・追加volumeを行わない。
+
+起動要求と不変の期限を保存し、独立した終了guardianを先に起動してから1台だけ要求する。同じ状態ディレクトリで要求を再発行しない。旧SKUは11時間45分、代替SKUは23時間45分で終了要求を開始し、各12／24時間まで15分の余裕を置く。応答断でIDが不明な場合も所有tagから回収して終了し、空の一覧を資源解放の証拠にしない。終了後はID指定の`Inactive`・`resources_released=true`と永続volumeを確認する。終了APIが確認できない場合は、その事実を記録して同じ資源のcleanupを続ける。
+
+```bash
+# 制御側。承認済みledgerと専用SSH鍵を準備し、PR必須CI・通常merge後だけ実行する。
+uv run --locked --no-sync python -m training.rental_control runs/m4/production-control rent
+uv run --locked --no-sync python -m training.rental_control runs/m4/production-control status
+# 実行・公開・照合後、または停止時。対象はこの状態ディレクトリの所有実機だけ。
+uv run --locked --no-sync python -m training.rental_control runs/m4/production-control terminate
+```
+
+`training.production_release`はジョブ作成と、既存試料を保持した本生成の公開を担当する。実行するcleanな40桁SHAをジョブへ固定する。認証はHF CLI等の承認済み資格情報を一時的な環境／メモリで渡し、値を引数・ログへ書かない。
+
+```bash
+# 外部Linux。checkoutした統合済みの40桁SHAを使う。
+uv run --locked python -m training.production_release preflight runs/m4/production
+uv run --locked python -m training.production_release job runs/m4/approved-job.json --source "$(git rev-parse HEAD)"
+uv run --locked python -m training.production runs/m4/approved-job.json runs/m4/production
+uv run --locked python -m training.production_release publish runs/m4/production
+```
+
+`preflight`は生成前に認証アカウント・HF親commit・public/manual・Community OFFを確認する。`publish`は、生成・検証・全再生成の完了、10万有効件数、件数内訳、manifest・実ファイルhashを確認する。試料2 configは固定した既存Hub commitから取得して全hashを確認し、`production-64`を追加する。Dataset Cardは実際の件数・生成元・教師・split・使い方・制約・ライセンスから作成する。
+
+上記コマンドは旧SKUの12時間枠。代替SKUを選ぶ場合は`rent`と`job`の両コマンドへ`--sku rtx59-3-24-750-xam.1`を追加し、24時間枠とする。`status`・`terminate`・guardianは保存済み所有ID・期限を使う。
+
+送信時の親commitを固定し、別の変更を上書きしない。返されたHub commitへ固定した全ファイルを外部Linuxへ並列取得し、各ファイルのbytes・SHA-256を全件照合してから`publication/complete.json`を確定する。検証用cacheを公開stagingへ混ぜない。アップロード後のreceiptは先に保存し、再開時は同じcommitの検証を続けて二重アップロードを避ける。認証・通信が失敗しても本生成を最初から再実行せず、同じプロセス・report・receiptを調べる。
+
+この起動前準備だけでは本生成完了ではない。[M4計画](M4_PLAN.md)の全件生成・検証・再生成・公開・資源終了まで実行し、結果と費用を固定記録へ残す。
+
 ## 検証
 
 Macでは固定seedの手選択、対局順の重複処理、全工程を含む費用計算、未承認・予算超過・10万未満・Mac実行の拒否だけを純粋／軽量テストで確認する。実Rust・Parquetの1/2/4ワーカー一致、ワーカー数変更を含む停止再開、再hash後の序盤着手改ざん検出、CLIの子プロセス監視と全再生成、小規模データを本生成完了としないことはLinux CIで確認する。

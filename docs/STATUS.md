@@ -27,7 +27,7 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 試料はHF commit `83dd4523817908770dcaf11319243a5405addf26`に2 configとDataset Cardを公開済み。public/manual・Community OFFを再確認した。これまで使用した4実機は全て`Inactive`・資源解放済み、永続volume 0件。利用上限枠の累計US$5を控除した未予約額はUS$95で、実請求額は未回収。
 
-次は[M4-5aの起動前準備 → 本生成 → HF公開・資源終了](M4_PLAN.md#次に実行する単位)。本生成の全体上限は12時間／US$12。M4完了後は[M6の教師固定・学習実装 → CUDA試行・本学習・評価 → 変換・モデル観戦](M6_PLAN.md)へ進む。学習ループ・CUDA依存はこれから実装し、現在のCPU版torchや未学習デモを学習済みと扱わない。M5は実棋譜がそろい次第、独立して実施する。
+次は[M4-5aの起動前準備 → 本生成 → HF公開・資源終了](M4_PLAN.md#次に実行する単位)。本生成の全体上限は12時間／US$12。M4完了後は[M6の教師固定・学習実装 → CUDA試行・本学習・評価 → 変換・モデル観戦](M6_PLAN.md)へ進む。学習ループ・CUDA依存はこれから実装し、現在のCPU版torchや未学習デモを学習済みと扱わない。M5の固定3局の検証は完了（[結果](M5_PLAN.md)）。
 
 ## M3完了時の公開・品質の確認元
 
@@ -49,7 +49,8 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | 試料のHF公開 | ✅ 2 configを公開済み。Dataset Card、public/manual・Community OFF、固定Hub commitで28ファイル全hash一致、実機終了・資源解放を確認。[公開記録](M4_HF_PILOT_RELEASE.md) | 試料の公開は完了。本生成でもカード・Community OFF・全件照合を継続する |
 | 有効10万局面 | 本生成CLIは実装済み、実データは未生成。[最大12時間・US$12の見積もり](M4_PRODUCTION_QUOTE.md) | 総行数・重複除外後の件数・教師内訳・対局分割を確認し、全検証・全再生成・HF照合を行う |
 | 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開の各試行US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
-| M5・M6 | 実棋譜互換性、CUDA学習・棋力評価・学習済みモデル対局は未実行 | M5は棋譜がそろい次第独立して実施。M6は同じGPUサービスで学習速度と配布条件を確認 |
+| M5 | ✅ 改定後の固定3局145手、各局面の盤／持ち駒と投了結果が一致。PR #42を必須CI成功後に通常merge。[結果・制約](M5_PLAN.md) | 全棋譜・全終局条件の完全互換は主張しない。原本を学習や公開へ含めない |
+| M6 | CUDA学習・棋力評価・学習済みモデル対局は未実行 | 同じGPUサービスで学習速度と配布条件を確認 |
 
 Macは編集・読み取り・軽量確認のみ。探索・生成・計測・学習はVast.ai／CloudRift、重い回帰はLinux CIで行う。データと学習checkpointは外部LinuxからHFの`voxelshogi/`配下へ直接送り、Macへ中継しない。public/manualはダウンロード申請を人が承認する設定で、公開自体の再承認待ちではない。M3の既承認配布は維持し、学習済みモデルのライセンスと取得ゲートに沿うWeb配信はM6で別に確定する。
 
@@ -106,7 +107,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。試料公開済み、次のM4本生成とM6、固定ツールとコマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
-| [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5互換性は未実施 |
+| [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5は固定した改定後3局の全件一致を確認。完全互換は未検証 |
 | [CI_CD_PLAN](CI_CD_PLAN.md)、[DEPLOYMENT](DEPLOYMENT.md) | 現行のCI・main保護・認証の配置・配信・復旧手順。過去のrunは固定記録として保持 |
 | [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3の形式・backend・配信はADR-019、M4のPython境界・外部生成・HF公開はADR-020。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
