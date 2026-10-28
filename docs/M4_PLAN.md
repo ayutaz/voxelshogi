@@ -1,6 +1,6 @@
 # M4 実行計画：GPUサービス上でのPython連携とデータ生成
 
-策定・更新: 2026-10-28 JST。**M4-0〜2を実装・統合済み。初回利用は承認済みで、M4-3の初回と代表試行の計測が成功。** 契約は [M4_DATA_CONTRACT](M4_DATA_CONTRACT.md)、完了済みの検証は [M4_VALIDATION](M4_VALIDATION.md)。ユーザー指定でMac計測を行わず、Vast.ai／CloudRiftのGPUサーバーのCPUで生成を計測し、後のGPU学習も同じサービスで行う。[初回試行の見積もりと準備](M4_REMOTE_PLAN.md)。初回・代表試行の計測と資源終了を確認。試料のHF公開・Dataset Card・Community OFF・固定Hub commit全件照合は完了し、本生成は未実行。[ROADMAP](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)の完了条件を具体化する。
+策定・更新: 2026-10-28 JST。**M4-0〜2を実装・統合済み。初回利用は承認済みで、M4-3の初回と代表試行の計測が成功。** 契約は [M4_DATA_CONTRACT](M4_DATA_CONTRACT.md)、完了済みの検証は [M4_VALIDATION](M4_VALIDATION.md)。ユーザー指定でMac計測を行わず、Vast.ai／CloudRiftのGPUサーバーのCPUで生成を計測し、後のGPU学習も同じサービスで行う。[初回試行の見積もりと準備](M4_REMOTE_PLAN.md)。初回・代表試行の計測と資源終了を確認。試料のHF公開・Dataset Card・Community OFF・固定Hub commit全件照合は完了し、本生成は[実行中・未完了](M4_PRODUCTION_RUN.md)。[ROADMAP](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)の完了条件を具体化する。
 
 ## 目的とゴール
 
@@ -43,10 +43,10 @@
 | M4-3 | 初回実機で速度と資源を測る | ✅ CloudRiftで固定30探索・102行の生成／検証／全再生成が成功。実機終了・資源解放も確認 |
 | M4-4 | 長い対局と並列から総費用を判断 | ✅ 64手・1／2／4ワーカーと12対局で全検証・再生成一致。有効769局面・教師252件、本生成の実測見積もりを作成 |
 | 試料公開 | 計測に使ったデータをHFで取得できるようにする | ✅ 2 config・Dataset Cardを公開。歴史的hash、public/manual・Community OFF、固定Hub commitの28ファイル全件照合と実機終了・資源解放を確認。[公開記録](M4_HF_PILOT_RELEASE.md) |
-| M4-5 | 重複除外後100,000局面以上を作る | ⬜ 本生成CLIは実装済み。実データの生成・全件検証・固定環境の全再生成とhash一致、生成元・教師内訳・splitを記録し、HFへ退避する |
+| M4-5 | 重複除外後100,000局面以上を作る | 🔄 [本生成を実行中](M4_PRODUCTION_RUN.md)。実データの生成・全件検証・固定環境の全再生成とhash一致、生成元・教師内訳・splitを記録し、HFへ退避する |
 | M4-6 | 配布・再現・費用の完了記録をそろえる | 🔄 公開ハーネスとカードは用意済み。本規模データの実公開・固定revision照合と全ゴールを確認してM4完了とする |
 
-外部本生成の並列化・序盤分岐・重複と有効教師の集計・全再生成は[本生成の契約](M4_PRODUCTION.md)に実装済み。本生成は未完了。[試料のHF公開](M4_HF_PILOT_RELEASE.md)は完了。次は有効10万局面の本生成。ユーザーはM4データv1のCC-BY-4.0と費用合計US$100までを承認済み。初回上限US$2・試料公開US$1・[本生成最大US$12](M4_PRODUCTION_QUOTE.md)を同じ累積予算で管理し、追加の入金・自動チャージ・学習を含めない。
+外部本生成の並列化・序盤分岐・重複と有効教師の集計・全再生成は[本生成の契約](M4_PRODUCTION.md)に実装済み。本生成は[実行中で未完了](M4_PRODUCTION_RUN.md)。[試料のHF公開](M4_HF_PILOT_RELEASE.md)は完了。ユーザーはM4データv1のCC-BY-4.0と費用合計US$100までを承認済み。初回上限US$2・試料公開US$1・[本生成最大US$12](M4_PRODUCTION_QUOTE.md)を同じ累積予算で管理し、追加の入金・自動チャージ・学習を含めない。
 
 ## 次に実行する単位
 
