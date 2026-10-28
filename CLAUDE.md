@@ -105,5 +105,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
   1. M4: Python境界・生成・検証・再生成の実装、CloudRiftでの初回／代表試行と資源終了は確認済み。最大試料は有効769局面・探索教師252件。再認証後に試料2 configをDataset Card付きでHFへ公開し、歴史的hash・public/manual・Community OFF・固定Hub commitの全28ファイルを照合済み。全実機は終了・資源解放済み（`docs/M4_HF_PILOT_RELEASE.md`）。その後は最大12時間・US$12の本生成案（`docs/M4_PRODUCTION_QUOTE.md`）で有効10万局面へ進む。費用合計US$100、M4データv1のCC-BY-4.0、HF public/manualはユーザー承認済み。10万有効局面とM6学習は未実行。
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
-  3. M6: Transformer-S の学習
+  3. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜5。教師・学習／再開の実装 → 外部CUDA小規模試行の見積もり・承認・実測 → 本学習・評価 → 全変換版のHF公開とブラウザ観戦。現状のLinux torchはCPU版で、CUDA学習は未実装・未実行。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

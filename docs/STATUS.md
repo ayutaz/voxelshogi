@@ -17,9 +17,17 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
 | 次はM4〜M6 | M4の試料HF公開を完了。有効10万局面の本生成へ進む。M6で学習・棋力評価・全変換版の対局／観戦へ接続する。M5の実棋譜互換性は独立して挿入できる。[各フェーズの目的・ゴール](ROADMAP.md) |
 
-M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、有料GPU・R2は未使用。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
+M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。現在はM4でGPUサービスのCPU利用実績があり、CUDA学習・R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
+
+## 最新の統合・公開確認（PR #40）
+
+[PR #40](https://github.com/ayutaz/voxelshogi/pull/40)を必須8チェック成功後に通常merge。固定した確認元はmain `5065d98685c77e8d50215870555d98e68ddec98c`、[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40669143635)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40669143626)は成功。Python3.14.9の129テスト、Pythonモデル16・training35変異、公開21 E2E・C0追加3件・モデル6件、配信55ファイル照合と公開SHA一致を確認した。[小さい固定記録](experiments/m4-next-plan-baseline-2026-10-28.json)。後続の文書PRで公開SHAが変わっても、この検証対象を上書きしない。
+
+試料はHF commit `83dd4523817908770dcaf11319243a5405addf26`に2 configとDataset Cardを公開済み。public/manual・Community OFFを再確認した。これまで使用した4実機は全て`Inactive`・資源解放済み、永続volume 0件。利用上限枠の累計US$5を控除した未予約額はUS$95で、実請求額は未回収。
+
+次は[M4-5aの起動前準備 → 本生成 → HF公開・資源終了](M4_PLAN.md#次に実行する単位)。本生成の全体上限は12時間／US$12。M4完了後は[M6の教師固定・学習実装 → CUDA試行・本学習・評価 → 変換・モデル観戦](M6_PLAN.md)へ進む。学習ループ・CUDA依存はこれから実装し、現在のCPU版torchや未学習デモを学習済みと扱わない。M5は実棋譜がそろい次第、独立して実施する。
 
 ## M3完了時の公開・品質の確認元
 
@@ -60,7 +68,7 @@ Macは編集・読み取り・軽量確認のみ。探索・生成・計測・�
 | M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。現在の確認元は上のM3表を参照 |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
-| 未導入・保留 | M3の未学習モデル推論は公開済み。学習済みAI対局はM6の対象。R2・COOP/COEP・有料GPUは未導入、9王の正式採用は保留 |
+| 未導入・保留 | M3の未学習モデル推論は公開済み。学習済みAI対局はM6の対象。R2・COOP/COEP・CUDA学習は未導入。M4でGPUサービスのCPUは利用済み、9王の正式採用は保留 |
 | ローカル準備 | 空き容量は2026-10-27確認で約27.2 GiB。[取得記録](experiments/documentation-baseline-2026-10-27.json)。Pythonは3.14.9、依存導入直前に容量と互換性を再確認 |
 
 ## 過去の課題：C0で対応済み
@@ -95,7 +103,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 
 | 文書 | 用途・今回の扱い |
 |---|---|
-| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M3完了、次のM4、固定ツールとコマンドへそろえる |
+| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。試料公開済み、次のM4本生成とM6、固定ツールとコマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5互換性は未実施 |
@@ -107,7 +115,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [TECH_STACK_RESEARCH](TECH_STACK_RESEARCH.md)、[COST_ESTIMATE](COST_ESTIMATE.md) | 固定済み構成と公開実測を更新。初回の外部版・GPU相場・為替・ドメイン価格は取得日付き参考値で、採用／課金時に再取得する |
 | [AGENTS](../AGENTS.md)、[CONTRIBUTING](../CONTRIBUTING.md)、[SECURITY](../SECURITY.md)、[PRテンプレート](../.github/pull_request_template.md)、[ci-checks](../.agents/skills/ci-checks/SKILL.md) | ブランチ・TDD・PR・秘密情報・最短10分間隔のCI確認という現行方針と整合を確認。追加の承認フローや人間同士の対局は導入しない |
 
-外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M3は完了し、M4の実装開始にユーザー側の追加準備はなく、モデル／データのライセンスや有料GPUはROADMAP記載の時点で確定する。
+外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M3は完了し、M4の実装開始にユーザー側の追加準備はなく、M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6の学習予算・学習済みモデルのライセンスは記載の時点で別に確定する。
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 
