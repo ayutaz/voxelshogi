@@ -116,6 +116,8 @@ jobs:
       - run: uv run --locked ruff check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
       - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
       - run: uv run --locked pytest -q
+      - name: Verify remote pilot on CI CPU without claiming GPU measurements
+        run: uv run --locked python -m training.pilot runs/m4/ci-pilot --provider ci --allow-no-gpu --smoke --seconds 30
       - run: uv run --locked python scripts/ci/mutation-python.py
       - run: uv run --locked python scripts/ci/mutation-training.py
 

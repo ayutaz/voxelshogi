@@ -2,6 +2,8 @@
 
 2026-10-28 JST。[実行計画](M4_PLAN.md)のM4-0〜2を対象とする。本生成・外部CPUの選定・データ公開は後続の作業。
 
+**実行方針の更新**: この文書のMac確認はM4-0〜2時点の履歴。以後のエージェント作業ではMacで生成・探索・計測・学習を行わず、CIと承認済みVast.ai／CloudRiftを使う。[Linux専用pilotと初回利用案](M4_REMOTE_PLAN.md)。既存generate／validateの上限は保持するが、Macでの実行を再開する手順とはしない。
+
 ## Python境界と環境
 
 `crates/voxelshogi-python`はPyO3／maturinのuv workspace member。`uv sync --locked`でRust拡張をビルドする。Python3.14.9、PyO30.30.1、maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2を使用。Rustは既存の1.97.1、MSRVは1.85を維持する。

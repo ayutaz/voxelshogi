@@ -12,6 +12,48 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "pilot-selected-gpu",
+        "training/pilot.py",
+        'gpu["name"] not in names',
+        "False",
+        "test_pilot.py",
+    ),
+    (
+        "pilot-vram-boundary",
+        "training/pilot.py",
+        '"rtx5090": ("RTX 5090", 30000)',
+        '"rtx5090": ("RTX 5090", 29999)',
+        "test_pilot.py",
+    ),
+    (
+        "pilot-throughput",
+        "training/pilot.py",
+        '"samples_per_second": len(samples) / total',
+        '"samples_per_second": teachers / total',
+        "test_pilot.py",
+    ),
+    (
+        "pilot-teacher-depth",
+        "training/pilot.py",
+        'sample["completed_depth"] >= 1',
+        'sample["completed_depth"] >= 0',
+        "test_pilot.py",
+    ),
+    (
+        "pilot-single-gpu",
+        "training/pilot.py",
+        "len(rows) != 1",
+        "len(rows) < 1",
+        "test_pilot.py",
+    ),
+    (
+        "pilot-linux-only",
+        "training/pilot.py",
+        'system != "linux"',
+        'system not in ("linux", "darwin")',
+        "test_pilot.py",
+    ),
+    (
         "atomic-initial-ownership",
         "training/data.py",
         "(directory / OWNER_FILE).touch(exist_ok=False)",

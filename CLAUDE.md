@@ -4,8 +4,10 @@
 
 **主用途はAI vs AIの対局を見て・眺める観戦で、そのためのモデル開発と研究を行う。** ゲームの面白さ、初見での分かりやすさ、見映え、モデル比較の再現性を重視する。人間 vs AIは補助的な参加方法とし、人間同士の対局・マルチプレイは対象にしない（2026-10-26 ユーザー指定）。
 
+**実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。外部実機はまだ未計測・未契約で、Mac計測へ戻さない。
+
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/ROADMAP.md` のM4と `docs/M4_PLAN.md`（Pythonバインディングとデータ生成）。Macは開発と短い試行、本生成・全件検証・再生成は外部CPUを第一候補とし、具体的な見積もり承認後に実行する。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
+- 次の実行計画: `docs/ROADMAP.md` のM4、`docs/M4_PLAN.md` と `docs/M4_REMOTE_PLAN.md`。初回の具体的な見積もり承認後にVast.ai／CloudRift上で計測し、本生成を再見積もりする。Macでは編集・軽量確認のみ。M3の公開・実機検証結果は `docs/M3_VALIDATION.md`、契約は `docs/MODEL_CONTRACT.md`。M2の契約・公開実測は `docs/M2_PLAN.md` と `docs/M2_VALIDATION.md`
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -100,7 +102,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M4: M4-0〜2のPython連携・少量生成／検証・停止再開を実装。検証と統合の確認元は `docs/M4_VALIDATION.md`。次はM4-3の上限付き計測と外部CPU見積もり。本生成・外部契約・データ公開は未実施
+  1. M4: M4-0〜2を実装・統合済み。検証は `docs/M4_VALIDATION.md`。CloudRift認証と代替候補を調査し、M4-3は米国RTX 5090×1・最大60分／基本$1・消費上限$2を提案。次は現行4090限定pilotの5090対応・CI統合、起動前確認と具体的な利用承認（`docs/M4_REMOTE_PLAN.md`）。外部実機の計測・本生成・課金・データ公開は未実施
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   3. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
