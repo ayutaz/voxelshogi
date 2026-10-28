@@ -12,6 +12,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "mutation-runtime-exclude",
+        "scripts/ci/mutation-training.py",
+        'stream.write("\\n/results.xml\\n")',
+        "pass",
+        "test_mutation_harness.py",
+    ),
+    (
         "production-opening-diversity",
         "training/production.py",
         "ply >= opening_plies",
@@ -231,13 +238,44 @@ MUTATIONS = [
 ]
 
 
+def prepare_baseline_checkout(work):
+    if (work / ".git").exists():
+        raise ValueError("mutation baseline must have its own new Git checkout")
+
+    def git(*args):
+        return subprocess.run(
+            ["git", *args],
+            cwd=work,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        ).stdout.strip()
+
+    git("init", "--quiet", "--initial-branch=mutation-baseline")
+    with (work / ".git/info/exclude").open("a") as stream:
+        stream.write("\n/results.xml\n")
+    git("add", ".")
+    git(
+        "-c",
+        "user.name=VoxelShogi CI",
+        "-c",
+        "user.email=ci@voxelshogi.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "Isolated mutation baseline",
+    )
+    return git("rev-parse", "HEAD")
+
+
 def main():
     output = ROOT / "coverage/training-mutations"
     output.mkdir(parents=True, exist_ok=True)
     results = []
     with tempfile.TemporaryDirectory(prefix="voxelshogi-training-mutations-") as tmp:
         work = Path(tmp)
-        for name in ("pyproject.toml", "uv.lock", ".python-version"):
+        for name in ("pyproject.toml", "uv.lock", ".python-version", ".gitignore"):
             shutil.copy2(ROOT / name, work / name)
         for name in ("training", "export", "crates"):
             shutil.copytree(
@@ -245,6 +283,9 @@ def main():
                 work / name,
                 ignore=shutil.ignore_patterns("target", "pkg", "__pycache__"),
             )
+        (work / "scripts/ci").mkdir(parents=True)
+        shutil.copy2(Path(__file__), work / "scripts/ci/mutation-training.py")
+        prepare_baseline_checkout(work)
         env = {
             **os.environ,
             "UV_PROJECT_ENVIRONMENT": str(ROOT / ".venv"),

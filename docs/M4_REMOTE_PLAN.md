@@ -103,7 +103,7 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 新規の集計・GPU一覧検査・Linux／CI実行制限は、手計算の期待値を持つ9件の軽量テストでRED/GREENを確認した。速度の分母、教師の深さ、GPU複数枚の拒否、Mac実行の拒否、選定GPUとVRAM下限を変異6件で検出した。Macで行ったのはこれらの小さい純粋関数と構文・文書の確認だけで、探索・生成・性能計測は実行していない。
 
-全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知31変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
+全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知32変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
 
 ## 生成物の保存とHF公開
 

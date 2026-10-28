@@ -42,3 +42,5 @@ uv run --locked python -m training.production runs/m4/approved-job.json runs/m4/
 ## 検証
 
 Macでは固定seedの手選択、対局順の重複処理、全工程を含む費用計算、未承認・予算超過・10万未満・Mac実行の拒否だけを純粋／軽量テストで確認する。実Rust・Parquetの1/2/4ワーカー一致、ワーカー数変更を含む停止再開、再hash後の序盤着手改ざん検出、CLIの子プロセス監視と全再生成、小規模データを本生成完了としないことはLinux CIで確認する。
+
+変異テストの基準実行にもCLIの来歴条件を適用するため、隔離コピーへ専用の`mutation-baseline`ブランチと初期commitを作る。コピーした.gitignoreとJUnit出力の除外を使い、実行結果だけではdirtyにならず、ソース変異はdirtyとして検出する。元リポジトリのGit履歴やremoteをコピーせず、外部へpushしない。通常のLinux CIでCLIを含む全基準テストを実行する。
