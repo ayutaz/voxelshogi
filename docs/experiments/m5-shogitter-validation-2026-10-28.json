@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "source_commit": "95e65c95ccf07fa4e9126b033ff7be21f0a0c9a3",
+  "run_url": "https://github.com/ayutaz/voxelshogi/actions/runs/40683069613",
+  "python_job": 122798434940,
+  "summary": {
+    "schema": "voxelshogi-shogitter-validation-v1",
+    "complete": true,
+    "selection": "Three completed public rule166 resignation games after 2026-10-17, selected by source metadata before replay; no substitution after failures. Clock losses and unfinished games are outside this cohort.",
+    "ruleset_id": "voxelshogi-standard-v1",
+    "records": [
+      {
+        "id": 21377,
+        "source_url": "https://shogitter.com/kifu/21377",
+        "source_sha256": "72de74ae942897f5bed950153871ed55639ff3679a797a896b3b722a5bf1b5c0",
+        "record_sha256": "84b31d3a1560b7f193d4ff9980585566271bbe8ad59a85b4bc57963b5c6fd53c",
+        "source_started_at": "2026-10-22T16:04:16.113Z",
+        "rule_id": 166,
+        "complete": true,
+        "plies": 68,
+        "terminal": "Resignation",
+        "winner": "White",
+        "final_hash": "788a725d4f43d9f6",
+        "captures": 18,
+        "drops": 6,
+        "promotions": 6,
+        "layer_changes": 24
+      },
+      {
+        "id": 21292,
+        "source_url": "https://shogitter.com/kifu/21292",
+        "source_sha256": "298679af4a5ef69d9d108fcfa42e16a8d3026a50db24bf7a2300abebe6cda067",
+        "record_sha256": "fae03c3fc7b53e36d29b248f4f8eca6a14975e3f2ad9d8fa2cbcb30b6da7d7cf",
+        "source_started_at": "2026-10-22T05:12:05.721Z",
+        "rule_id": 166,
+        "complete": true,
+        "plies": 23,
+        "terminal": "Resignation",
+        "winner": "Black",
+        "final_hash": "0c87b2021c18dd91",
+        "captures": 4,
+        "drops": 2,
+        "promotions": 3,
+        "layer_changes": 4
+      },
+      {
+        "id": 21205,
+        "source_url": "https://shogitter.com/kifu/21205",
+        "source_sha256": "a5a618582157a8249fcba5aecd60b58fc80610f438925d1e5af352720e9b6fc1",
+        "record_sha256": "d6c100b3cf4173a070011a1459e8491972b9f7e0faf92ff1f0b5a124601bb11a",
+        "source_started_at": "2026-10-20T12:06:29.500Z",
+        "rule_id": 166,
+        "complete": true,
+        "plies": 54,
+        "terminal": "Resignation",
+        "winner": "White",
+        "final_hash": "c68afcc938e2320c",
+        "captures": 14,
+        "drops": 8,
+        "promotions": 3,
+        "layer_changes": 0
+      }
+    ],
+    "limitations": "Selected public games only; this is not proof for all rules or all Shogitter games. Raw sources remain private and are not training data."
+  },
+  "totals": {
+    "records": 3,
+    "plies": 145,
+    "captures": 36,
+    "drops": 16,
+    "promotions": 12,
+    "layer_changes": 28
+  },
+  "canonical_records_match_initial_attempt": true,
+  "initial_attempt": "m5-initial-translation-attempt-2026-10-28.json",
+  "environment": "GitHub Actions Ubuntu Linux / Python 3.14.9 / real Rust extension",
+  "raw_source_retention": "Only ignored Linux runner workspace; no game record bodies uploaded or committed."
+}

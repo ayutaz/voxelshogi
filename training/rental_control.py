@@ -1,0 +1,381 @@
+"""Control-side only: one quoted CloudRift rental, budget and deadline guardian."""
+
+import argparse
+import fcntl
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+SKU = "rtx59-7-48-750-xam.1"
+DC = "na_west_us_gr_1"
+QUOTES = {SKU: 43200, "rtx59-3-24-750-xam.1": 86400}
+TERMINAL = {"Inactive", "Failed", "Deleted", "Terminated"}
+
+
+def save(path, value):
+    path = Path(path)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w") as stream:
+        os.chmod(tmp, 0o600)
+        json.dump(value, stream, indent=2)
+        stream.flush()
+        os.fsync(stream.fileno())
+    tmp.replace(path)
+
+
+class Rental:
+    def __init__(
+        self, state, api, *, tag, budget, clock=time.time, pause=time.sleep, sku=SKU
+    ):
+        self.state, self.api, self.tag, self.budget, self.clock = (
+            Path(state),
+            api,
+            tag,
+            Path(budget),
+            clock,
+        )
+        self.pause = pause
+        self.sku = sku
+        self.state.mkdir(parents=True, exist_ok=True)
+
+    def reserve(self):
+        maximum_seconds = QUOTES[self.sku]
+        cap = maximum_seconds / 3600
+        with self.budget.open("r+") as stream:
+            fcntl.flock(stream, fcntl.LOCK_EX)
+            data = json.load(stream)
+            reserved = sum(item["maximum_usd"] for item in data["reservations"])
+            if (
+                data["approved_total_usd"] != 100
+                or reserved + cap > 100
+                or any(item.get("tag") == self.tag for item in data["reservations"])
+            ):
+                raise ValueError(
+                    "production exceeds the remaining approved budget or was already reserved"
+                )
+            data["reservations"].append(
+                {
+                    "task": "m4-production",
+                    "tag": self.tag,
+                    "maximum_usd": cap,
+                    "maximum_seconds": maximum_seconds,
+                    "state": "reserved; invoice not retrieved",
+                }
+            )
+            data.update(
+                reserved_total_usd=reserved + cap,
+                remaining_unreserved_usd=100 - reserved - cap,
+            )
+            stream.seek(0)
+            json.dump(data, stream, indent=2)
+            stream.truncate()
+            stream.flush()
+            os.fsync(stream.fileno())
+
+    def rent(self, start_guard):
+        if self.sku not in QUOTES:
+            raise ValueError("SKU has no production quote")
+        maximum_seconds = QUOTES[self.sku]
+        cap = maximum_seconds / 3600
+        if (self.state / "rent-request.json").exists():
+            raise ValueError(
+                "rental request exists; audit it instead of creating another"
+            )
+        catalog = self.api(
+            "/api/v1/instance-types/list",
+            {
+                "selector": {
+                    "ByServiceAndLocation": {"services": ["vm"], "datacenters": [DC]}
+                }
+            },
+        )
+        offers = [
+            v
+            for group in catalog["instance_types"]
+            for v in group["variants"]
+            if v["name"] == self.sku
+        ]
+        if len(offers) != 1:
+            raise ValueError("selected SKU is not uniquely available")
+        offer = offers[0]
+        if not (
+            0 < offer["cost_per_hour"] <= 100
+            and offer["gpu_count"] == 1
+            and offer["available_nodes_per_dc"].get(DC, 0) > 0
+            and offer["ip_availability_per_dc"].get(DC, {}).get("public_ips")
+        ):
+            raise ValueError(
+                "selected price, stock or IP differs from the approved quote"
+            )
+        existing = self.api(
+            "/api/v1/instances/list",
+            {
+                "selector": {
+                    "ByStatus": {
+                        "statuses": ["Initializing", "Active", "Deactivating"],
+                        "scope": "Personal",
+                        "limit": 1000,
+                    }
+                },
+                "mask": {"with_usage_info": True},
+            },
+        )["instances"]
+        if any(
+            row["status"] not in TERMINAL
+            and any(str(tag).startswith("voxelshogi-") for tag in row.get("tags", []))
+            for row in existing
+        ):
+            raise ValueError("another VoxelShogi rental is active")
+        public_key = (self.state / "id_ed25519.pub").read_text().strip()
+        if not public_key.startswith("ssh-ed25519 "):
+            raise ValueError("dedicated public SSH key is missing")
+        self.reserve()
+        now = self.clock()
+        save(
+            self.state / "deadline.json",
+            {
+                "requested_at": now,
+                "stop_at": now + maximum_seconds - 900,
+                "maximum_end_at": now + maximum_seconds,
+                "hourly_usd": offer["cost_per_hour"] / 100,
+                "consumption_cap_usd": cap,
+            },
+        )
+        save(
+            self.state / "preflight.json",
+            {
+                "sku": self.sku,
+                "datacenter": DC,
+                "cost_per_hour_cents": offer["cost_per_hour"],
+                "available_nodes": offer["available_nodes_per_dc"][DC],
+                "checked_at": now,
+            },
+        )
+        save(
+            self.state / "rent-request.json",
+            {"at": now, "tag": self.tag, "sku": self.sku, "datacenter": DC},
+        )
+        start_guard()  # Must be alive before the API can create a paid resource.
+        payload = {
+            "selector": {
+                "ByInstanceTypeAndLocation": {
+                    "instance_type": self.sku,
+                    "datacenters": [DC],
+                }
+            },
+            "config": {
+                "VirtualMachine": {
+                    "image_url": "https://storage.googleapis.com/cloudrift-vm-disks/disks/github/ubuntu-noble-server-gpu-580-129-20260716-134310.img",
+                    "cloudinit_url": "https://storage.googleapis.com/cloudrift-vm-disks/cloudinit/ubuntu-base.cloudinit",
+                    "ssh_key": {"PublicKeys": [public_key]},
+                    "ports": ["22"],
+                }
+            },
+            "with_public_ip": True,
+            "tags": [self.tag],
+            "name": self.tag,
+        }
+        result = self.api("/api/v1/instances/rent", payload)
+        save(self.state / "rent-response.json", result)
+        if len(result.get("instance_ids", [])) != 1:
+            self.terminate()
+            raise ValueError("rental did not create exactly one instance")
+        return {
+            "instance_ids": result["instance_ids"],
+            "stop_at": now + maximum_seconds - 900,
+        }
+
+    def owned(self):
+        response = self.state / "rent-response.json"
+        ids = (
+            json.loads(response.read_text()).get("instance_ids", [])
+            if response.exists()
+            else []
+        )
+        selector = {"ById": ids} if ids else {"ByTags": {"all": [self.tag], "any": []}}
+        rows = self.api(
+            "/api/v1/instances/list",
+            {
+                "selector": selector,
+                "mask": {"with_connection_info": True, "with_usage_info": True},
+            },
+        )["instances"]
+        if any(
+            self.tag not in row.get("tags", []) or (ids and row["id"] not in ids)
+            for row in rows
+        ):
+            raise ValueError("instance ownership differs; refuse to terminate")
+        return rows
+
+    def status(self):
+        rows = [
+            {
+                k: row.get(k)
+                for k in (
+                    "id",
+                    "status",
+                    "resources_released",
+                    "host_address",
+                    "port_mappings",
+                )
+            }
+            for row in self.owned()
+        ]
+        result = {"checked_at": self.clock(), "instances": rows}
+        save(self.state / "status.json", result)
+        return result
+
+    def terminate(self):
+        rows = self.owned()
+        response_path = self.state / "rent-response.json"
+        if rows and not response_path.exists():
+            save(
+                response_path,
+                {
+                    "instance_ids": [row["id"] for row in rows],
+                    "recovered_from_tag": True,
+                },
+            )
+        active = [row["id"] for row in rows if row["status"] not in TERMINAL]
+        if active:
+            self.api("/api/v1/instances/terminate", {"selector": {"ById": active}})
+            save(
+                self.state / "termination-request.json",
+                {"at": self.clock(), "instance_ids": active},
+            )
+        result = self.status()
+        expected_path = self.state / "rent-response.json"
+        expected = (
+            json.loads(expected_path.read_text()).get("instance_ids", [])
+            if expected_path.exists()
+            else []
+        )
+        actual = result["instances"]
+        result["complete"] = (
+            bool(actual)
+            and bool(expected)
+            and {row["id"] for row in actual} == set(expected)
+            and all(
+                row["status"] in TERMINAL and row["resources_released"] is True
+                for row in actual
+            )
+        )
+        if result["complete"]:
+            save(self.state / "terminal.json", result)
+        return result
+
+    def guard(self):
+        limits = json.loads((self.state / "deadline.json").read_text())
+        while self.clock() < limits["stop_at"]:
+            if (self.state / "terminal.json").exists():
+                return
+            self.pause(min(60, max(0.1, limits["stop_at"] - self.clock())))
+        while self.clock() < limits["maximum_end_at"]:
+            try:
+                if self.terminate()["complete"]:
+                    return
+            except Exception:
+                save(
+                    self.state / "guardian-error.json",
+                    {"at": self.clock(), "status": "termination not confirmed"},
+                )
+            self.pause(60)
+        # Keep attempting cleanup after an unconfirmed provider response. Never
+        # interpret an observation timeout as proof that billing has stopped.
+        save(
+            self.state / "deadline-exceeded.json",
+            {"at": self.clock(), "complete": False},
+        )
+        while True:
+            try:
+                if self.terminate()["complete"]:
+                    return
+            except Exception:
+                pass
+            self.pause(60)
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("state", type=Path)
+    parser.add_argument("command", choices=("rent", "status", "terminate", "guard"))
+    parser.add_argument("--budget", type=Path)
+    parser.add_argument("--sku", choices=tuple(QUOTES), default=SKU)
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parents[1]
+    state = args.state.resolve()
+    if not state.is_relative_to(root / "runs") or not re.fullmatch(
+        r"[a-z0-9-]+", state.name
+    ):
+        parser.error("control state must be a dedicated ignored runs/ directory")
+    budget = (args.budget or root / "runs/m4/cost-budget.json").resolve()
+    if not budget.is_relative_to(root / "runs"):
+        parser.error("budget must remain in ignored runs/")
+    tag = "voxelshogi-m4-" + state.name
+    key = ""
+    for line in (root / ".env").read_text().splitlines():
+        match = re.match(r"^\s*(?:export\s+)?CLOUDRIFT_API_KEY\s*=\s*(.*?)\s*$", line)
+        if match:
+            key = match[1].strip().strip("\"'")
+    if not key:
+        parser.error("CloudRift credential is missing")
+
+    def api(path, data):
+        request = urllib.request.Request(
+            "https://api.cloudrift.ai" + path,
+            data=json.dumps({"version": "2026-09-08", "data": data}).encode(),
+            headers={"X-API-Key": key, "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.build_opener(NoRedirect).open(
+                request, timeout=40
+            ) as response:
+                return json.load(response)["data"]
+        except urllib.error.HTTPError as error:
+            raise RuntimeError("CloudRift HTTP " + str(error.code)) from None
+
+    control = Rental(state, api, tag=tag, budget=budget, sku=args.sku)
+
+    def start_guard():
+        with (state / "guardian.log").open("a") as stream:
+            child = subprocess.Popen(
+                [
+                    sys.executable,
+                    str(Path(__file__).resolve()),
+                    str(state),
+                    "guard",
+                    "--budget",
+                    str(budget),
+                ],
+                stdout=stream,
+                stderr=stream,
+                start_new_session=True,
+            )
+        if child.poll() is not None:
+            raise RuntimeError("deadline guardian failed to start")
+        save(state / "guardian.json", {"pid": child.pid, "at": time.time()})
+
+    if args.command == "rent":
+        result = control.rent(start_guard)
+    elif args.command == "guard":
+        control.guard()
+        return
+    else:
+        result = getattr(control, args.command)()
+    print(json.dumps(result))
+
+
+if __name__ == "__main__":
+    main()
