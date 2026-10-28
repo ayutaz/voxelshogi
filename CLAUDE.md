@@ -102,7 +102,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M4: M4-0〜2を実装・統合済み。検証は `docs/M4_VALIDATION.md`。M4-3はLinux専用pilotと初回GPUサービス見積もりを準備。CloudRift認証は成功したがRTX 4090×1は空き0で、利用可能な構成の再確認と利用承認を待つ（`docs/M4_REMOTE_PLAN.md`）。外部実機の計測・本生成・課金・データ公開は未実施
+  1. M4: M4-0〜2を実装・統合済み。検証は `docs/M4_VALIDATION.md`。CloudRift認証と代替候補を調査し、M4-3は米国RTX 5090×1・最大60分／基本$1・消費上限$2を提案。次は現行4090限定pilotの5090対応・CI統合、起動前確認と具体的な利用承認（`docs/M4_REMOTE_PLAN.md`）。外部実機の計測・本生成・課金・データ公開は未実施
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   3. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

@@ -1,0 +1,108 @@
+{
+  "checked_at_utc": "2026-10-28T03:50:27.702261+00:00",
+  "provider": "CloudRift",
+  "endpoint": "https://api.cloudrift.ai/api/v1/instance-types/list",
+  "api_version": "2026-09-08",
+  "selector": {
+    "ByServiceAndLocation": {
+      "services": [
+        "vm"
+      ]
+    }
+  },
+  "price_unit": "API cost_per_hour is US cents per instance-hour; usd_per_hour = cost_per_hour / 100",
+  "price_unit_source": "https://api.cloudrift.ai/api-docs/openapi.json#/components/schemas/InstanceVariantInfo/properties/cost_per_hour",
+  "availability_note": "Estimated available nodes at retrieval; not reserved; variants can share nodes. Reconfirm before renting.",
+  "read_only": true,
+  "recommended_variant": "rtx59-7-48-750-xam.1",
+  "variants": [
+    {
+      "name": "rtx59-7-48-750-xam.1",
+      "gpu_count": 1,
+      "logical_cpu_count": 14,
+      "cpu_count": 7,
+      "cpu_sharing_policy": "Dedicated",
+      "dram": 51539607552,
+      "vram": 34190917632,
+      "disk": 805306368000,
+      "cost_per_hour": 100.0,
+      "usd_per_hour": "1.0",
+      "available_nodes": 1,
+      "available_nodes_per_dc": {
+        "na_west_us_gr_1": 1
+      },
+      "ip_availability_per_dc": {
+        "na_west_us_gr_1": {
+          "public_ips": true
+        }
+      }
+    },
+    {
+      "name": "rtx59-14-23-800-ig-ht.1",
+      "gpu_count": 1,
+      "logical_cpu_count": 28,
+      "cpu_count": 14,
+      "cpu_sharing_policy": "Packed",
+      "dram": 24696061952,
+      "vram": 34359738368,
+      "disk": 858993459200,
+      "cost_per_hour": 65.0,
+      "usd_per_hour": "0.65",
+      "available_nodes": 6,
+      "available_nodes_per_dc": {
+        "ap_northeast_kr_se_1": 6
+      },
+      "ip_availability_per_dc": {
+        "ap_northeast_kr_se_1": {
+          "public_ips": false
+        }
+      }
+    },
+    {
+      "name": "l40s-24c-kn.1",
+      "gpu_count": 1,
+      "logical_cpu_count": 22,
+      "cpu_count": 11,
+      "cpu_sharing_policy": "Dedicated",
+      "dram": 243465738854,
+      "vram": 51539607552,
+      "disk": 424747144396,
+      "cost_per_hour": 63.0,
+      "usd_per_hour": "0.63",
+      "available_nodes": 1,
+      "available_nodes_per_dc": {
+        "ap-east-tw-kn-2": 1
+      },
+      "ip_availability_per_dc": {
+        "ap-east-tw-kn-2": {
+          "public_ips": false
+        }
+      }
+    },
+    {
+      "name": "v100-6-52-400-generic.1",
+      "gpu_count": 1,
+      "logical_cpu_count": 12,
+      "cpu_count": 6,
+      "cpu_sharing_policy": "Dedicated",
+      "dram": 55834574848,
+      "vram": 17179869184,
+      "disk": 429496729600,
+      "cost_per_hour": 25.0,
+      "usd_per_hour": "0.25",
+      "available_nodes": 3,
+      "available_nodes_per_dc": {
+        "usny01_a01": 1,
+        "ustx1a_a01": 2
+      },
+      "ip_availability_per_dc": {
+        "ustx1a_a01": {
+          "public_ips": true
+        },
+        "usny01_a01": {
+          "public_ips": true
+        }
+      }
+    }
+  ]
+}
