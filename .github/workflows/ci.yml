@@ -70,6 +70,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
       - run: rustup toolchain install 1.85.0 --profile minimal
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
@@ -95,11 +98,13 @@ jobs:
           NEEDS_JSON: ${{ toJSON(needs) }}
 
   python:
-    name: Python model contracts
+    name: Python engine and model contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: .python-version
@@ -108,10 +113,11 @@ jobs:
           version: '0.11.23'
           enable-cache: true
       - run: uv sync --locked
-      - run: uv run --locked ruff check export scripts/ci/mutation-python.py
-      - run: uv run --locked ruff format --check export scripts/ci/mutation-python.py
+      - run: uv run --locked ruff check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
+      - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
       - run: uv run --locked pytest -q
       - run: uv run --locked python scripts/ci/mutation-python.py
+      - run: uv run --locked python scripts/ci/mutation-training.py
 
   models:
     name: Browser model inference (real WASM)
@@ -160,6 +166,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - run: cargo fmt --all --check

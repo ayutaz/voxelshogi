@@ -1,0 +1,29 @@
+[build-system]
+requires = ["maturin==1.15.0"]
+build-backend = "maturin"
+
+[project]
+name = "voxelshogi"
+version = "0.1.0"
+description = "Rust rules and deterministic search for VoxelShogi research"
+requires-python = ">=3.14,<3.15"
+license = "Apache-2.0"
+dependencies = ["numpy>=2.5.4", "gymnasium>=1.2"]
+
+[tool.maturin]
+module-name = "voxelshogi._native"
+python-source = "python"
+locked = true
+profile = "python"
+config = ["build.jobs=1"]
+
+[tool.uv]
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "src/**/*.rs" },
+    { file = "python/**/*.py" },
+    { file = "../../Cargo.toml" },
+    { file = "../../Cargo.lock" },
+    { file = "../voxelshogi-core/src/**/*.rs" },
+]

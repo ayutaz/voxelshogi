@@ -1,0 +1,400 @@
+{
+  "schema": 1,
+  "date_jst": "2026-10-28",
+  "implementation_commit": "b8c7655f5b5a23ed2cbd3d5570adefa8ab70a398",
+  "scope": "M4-0 through M4-2; small local correctness smoke, not a production throughput benchmark",
+  "environment": {
+    "machine": "Apple M1",
+    "ram_gib": 8,
+    "python": "3.14.9",
+    "rust": "1.97.1",
+    "msrv": "1.85.0"
+  },
+  "configuration": {
+    "engine_commit": "b8c7655f5b5a23ed2cbd3d5570adefa8ab70a398",
+    "games": 3,
+    "initial": null,
+    "max_depth": 1,
+    "max_nodes": 1000,
+    "max_plies": 2,
+    "seed": 17,
+    "sources": [
+      "random",
+      "rules",
+      "search"
+    ],
+    "table_capacity": 4096
+  },
+  "dataset_complete": true,
+  "dataset_files": [
+    {
+      "file": ".voxelshogi-dataset-v1",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "game-000000.parquet",
+      "sha256": "8164d6d998ff4c59282f600ce8aac75c6a5c83c6a0587d9595720c2b167ce7c0",
+      "bytes": 8363
+    },
+    {
+      "file": "game-000001.parquet",
+      "sha256": "3340e221c005c3167e59d427713f474380ef10d55a41baa64d31da593dda731e",
+      "bytes": 8434
+    },
+    {
+      "file": "game-000002.parquet",
+      "sha256": "87e0532e19340a35f8039f03a24d25f698888ad16976e9676a133273d28e6c99",
+      "bytes": 8404
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "fa95127c4ae52c977cb4aebf4ab0554d862f4e9262b877cf3e4d762d0d669c61",
+      "bytes": 839
+    }
+  ],
+  "generate": {
+    "reason": "completed",
+    "returncode": 0,
+    "elapsed": 0.4452528750989586,
+    "peak_rss": 74186752,
+    "validation": {
+      "duplicates": 2,
+      "eligible_splits": {
+        "train": 4,
+        "val": 3
+      },
+      "games": 3,
+      "rows": 9,
+      "sources": {
+        "random": 3,
+        "rules": 3,
+        "search": 3
+      }
+    }
+  },
+  "validate": {
+    "elapsed": 0.3249235419789329,
+    "peak_rss": 69451776,
+    "reason": "completed",
+    "returncode": 0,
+    "validation": {
+      "duplicates": 2,
+      "eligible_splits": {
+        "train": 4,
+        "val": 3
+      },
+      "games": 3,
+      "rows": 9,
+      "sources": {
+        "random": 3,
+        "rules": 3,
+        "search": 3
+      }
+    }
+  },
+  "session_budget_after": {
+    "schema": 1,
+    "spent_seconds": 0.7742822498548776
+  },
+  "tests": {
+    "rust_core": 153,
+    "wasm_boundary": 5,
+    "python_native_boundary": 2,
+    "existing_python_model": 48,
+    "final_python_training": 40,
+    "node_ci_controls": 67
+  },
+  "mutations": {
+    "rust": [
+      {
+        "name": "forward-direction",
+        "outcome": "caught"
+      },
+      {
+        "name": "checkmate-winner",
+        "outcome": "caught"
+      },
+      {
+        "name": "hash-seed",
+        "outcome": "caught"
+      },
+      {
+        "name": "kind-index",
+        "outcome": "caught"
+      },
+      {
+        "name": "promotion-status",
+        "outcome": "caught"
+      },
+      {
+        "name": "japanese-label",
+        "outcome": "caught"
+      },
+      {
+        "name": "error-message",
+        "outcome": "caught"
+      },
+      {
+        "name": "hand-count",
+        "outcome": "caught"
+      },
+      {
+        "name": "all-hand-kinds",
+        "outcome": "caught"
+      },
+      {
+        "name": "capture-target-boundary",
+        "outcome": "caught"
+      },
+      {
+        "name": "capture-score-winner",
+        "outcome": "caught"
+      },
+      {
+        "name": "capture-repetition",
+        "outcome": "caught"
+      },
+      {
+        "name": "capture-record-hash",
+        "outcome": "caught"
+      },
+      {
+        "name": "capture-king-value",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-material-sign",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-terminal-before-material",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-node-budget",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-tt-history",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-tt-bound",
+        "outcome": "caught"
+      },
+      {
+        "name": "search-incomplete-result",
+        "outcome": "caught"
+      },
+      {
+        "name": "baseline-move-counter",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-termination-import",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-validated-result",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-termination-cursor",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-termination-branch",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-terminal-play",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-terminal-resign",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-safe-integer",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-time-scale",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-node-budget",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-absolute-ply",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-null-score",
+        "outcome": "caught"
+      },
+      {
+        "name": "wasm-abandoned-fallback",
+        "outcome": "caught"
+      },
+      {
+        "name": "python-play-omitted",
+        "outcome": "caught"
+      },
+      {
+        "name": "python-node-budget",
+        "outcome": "caught"
+      },
+      {
+        "name": "python-fallback-score",
+        "outcome": "caught"
+      },
+      {
+        "name": "python-record-termination",
+        "outcome": "caught"
+      },
+      {
+        "name": "python-finished-mask",
+        "outcome": "caught"
+      }
+    ],
+    "python_model": [
+      {
+        "name": "white-axes",
+        "outcome": "caught"
+      },
+      {
+        "name": "hand-owner",
+        "outcome": "caught"
+      },
+      {
+        "name": "promotion-label",
+        "outcome": "caught"
+      },
+      {
+        "name": "output-tolerance",
+        "outcome": "caught"
+      },
+      {
+        "name": "finite-reference",
+        "outcome": "caught"
+      },
+      {
+        "name": "attention-axis",
+        "outcome": "caught"
+      },
+      {
+        "name": "policy-layout",
+        "outcome": "caught"
+      },
+      {
+        "name": "model-seed",
+        "outcome": "caught"
+      },
+      {
+        "name": "unused-block-weights",
+        "outcome": "caught"
+      },
+      {
+        "name": "package-hash",
+        "outcome": "caught"
+      },
+      {
+        "name": "quant-rounding",
+        "outcome": "caught"
+      },
+      {
+        "name": "quant-scale",
+        "outcome": "caught"
+      },
+      {
+        "name": "quant-zero-point",
+        "outcome": "caught"
+      },
+      {
+        "name": "quant-missing-dequant",
+        "outcome": "caught"
+      },
+      {
+        "name": "fp16-io-types",
+        "outcome": "caught"
+      },
+      {
+        "name": "quant-extra-approximation",
+        "outcome": "caught"
+      }
+    ],
+    "python_training": [
+      {
+        "name": "atomic-initial-ownership",
+        "outcome": "caught"
+      },
+      {
+        "name": "interrupted-group-cleanup",
+        "outcome": "caught"
+      },
+      {
+        "name": "teacher-verification",
+        "outcome": "caught"
+      },
+      {
+        "name": "white-features",
+        "outcome": "caught"
+      },
+      {
+        "name": "white-actions",
+        "outcome": "caught"
+      },
+      {
+        "name": "promoted-action",
+        "outcome": "caught"
+      },
+      {
+        "name": "actor-reward",
+        "outcome": "caught"
+      },
+      {
+        "name": "resume-config",
+        "outcome": "caught"
+      },
+      {
+        "name": "shard-hash",
+        "outcome": "caught"
+      },
+      {
+        "name": "duplicate-exclusion",
+        "outcome": "caught"
+      },
+      {
+        "name": "teacher-eligibility",
+        "outcome": "caught"
+      },
+      {
+        "name": "time-boundary",
+        "outcome": "caught"
+      },
+      {
+        "name": "rss-boundary",
+        "outcome": "caught"
+      },
+      {
+        "name": "session-budget",
+        "outcome": "caught"
+      },
+      {
+        "name": "pressure-stop",
+        "outcome": "caught"
+      }
+    ]
+  },
+  "limits": {
+    "single_worker": true,
+    "single_job_seconds": 300,
+    "session_seconds": 600,
+    "rss_stop_bytes": 1073741824
+  },
+  "no_external_rental_or_dataset_publication": true,
+  "note": "Only counts, configuration and digests are recorded; generated Parquet files are not published. RSS covers the worker process group and is a sampled peak."
+}

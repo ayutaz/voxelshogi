@@ -48,6 +48,11 @@ const mutations = [
   { name: 'wasm-absolute-ply', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'max_game_ply: c.max_game_ply,', after: 'max_game_ply: c.max_game_ply.map(|n| n + session.state().ply()),', args: ['--test', 'search_api', 'adapter_matches_native_and_hand_counted_corner_king_tree_without_changing_cursor'] },
   { name: 'wasm-null-score', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: '"score":r.score,', after: '"score":r.score.or(Some(0)),', args: ['--test', 'search_api', 'incomplete_iterations_have_null_scores_and_clock_is_injected'] },
   { name: 'wasm-abandoned-fallback', crate: 'voxelshogi-wasm', file: 'search_api.rs', before: 'session.state().result().is_none() && session.termination().is_some()', after: 'false', args: ['--test', 'search_api', 'terminal_records_do_not_produce_fallback_moves'] },
+  { name: 'python-play-omitted', crate: 'voxelshogi-python', file: 'lib.rs', before: 'self.session.play(text).map_err(PyValueError::new_err)', after: '{ let _ = text; Ok(()) }', args: ['--lib'] },
+  { name: 'python-node-budget', crate: 'voxelshogi-python', file: 'lib.rs', before: '                max_nodes,', after: '                max_nodes: Some(0),', args: ['--lib'] },
+  { name: 'python-fallback-score', crate: 'voxelshogi-python', file: 'lib.rs', before: '"score":r.score,', after: '"score":r.score.or(Some(0)),', args: ['--lib'] },
+  { name: 'python-record-termination', crate: 'voxelshogi-python', file: 'lib.rs', before: 'self.session.state().result().is_none() && self.session.termination().is_some()', after: 'false', args: ['--lib'] },
+  { name: 'python-finished-mask', crate: 'voxelshogi-python', file: 'lib.rs', before: 'if self.session.is_finished() {', after: 'if false {', args: ['--lib'] },
 ];
 
 function main() {
@@ -70,6 +75,7 @@ function main() {
     cpSync(join(root, 'crates'), join(work, 'crates'), { recursive: true, filter: (source) => !['target', 'pkg'].includes(basename(source)) });
     assert.equal(run('baseline', []), 'passed', 'Original tests must pass before injecting mutations');
     assert.equal(run('wasm-baseline', [], 'voxelshogi-wasm'), 'passed', 'WASM adapter tests must pass before injecting mutations');
+    assert.equal(run('python-baseline', ['--lib'], 'voxelshogi-python'), 'passed', 'Python boundary tests must pass before injecting mutations');
     for (const mutation of mutations) {
       const path = join(work, 'crates', mutation.crate ?? 'voxelshogi-core', 'src', mutation.file);
       const original = readFileSync(path, 'utf8');
@@ -84,7 +90,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 33);
+    assert.equal(results.length, 38);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
