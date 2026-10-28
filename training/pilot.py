@@ -60,6 +60,16 @@ def check_execution_host(system, *, allow_no_gpu, ci):
         raise ValueError("no-GPU mode is limited to CI correctness smoke")
 
 
+def check_gpu_configuration(gpu, *, model="rtx5090"):
+    name, minimum = {
+        "rtx5090": ("RTX 5090", 30000),
+        "rtx4090": ("RTX 4090", 20000),
+    }[model]
+    names = {name, f"NVIDIA {name}", f"NVIDIA GeForce {name}"}
+    if gpu["name"] not in names or gpu["memory_mib"] < minimum:
+        raise ValueError(f"pilot requires the selected single {name} configuration")
+
+
 def _cases(smoke):
     from voxelshogi import Game
 
@@ -230,6 +240,9 @@ def main():
     parser.add_argument("--seconds", type=float, default=240)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--allow-no-gpu", action="store_true")
+    parser.add_argument(
+        "--gpu-model", choices=["rtx5090", "rtx4090"], default="rtx5090"
+    )
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--commit", help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -259,10 +272,10 @@ def main():
             timeout=10,
         )
         gpu = parse_gpu_inventory(raw)
-        if "RTX 4090" not in gpu["name"] or gpu["memory_mib"] < 20000:
-            parser.error(
-                "this pilot requires the approved single RTX 4090 configuration"
-            )
+        try:
+            check_gpu_configuration(gpu, model=args.gpu_model)
+        except ValueError as error:
+            parser.error(str(error))
     import psutil
 
     from .data import canonical
@@ -292,6 +305,7 @@ def main():
         "cgroup": cgroup,
         "system_ram_bytes": psutil.virtual_memory().total,
         "gpu": gpu,
+        "selected_gpu_model": args.gpu_model,
         "gpu_training_tested": False,
     }
     (args.output / "context.json").write_text(canonical(context) + "\n")

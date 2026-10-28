@@ -108,3 +108,26 @@ def test_pilot_refuses_mac_and_no_gpu_outside_ci():
         check_execution_host("linux", allow_no_gpu=True, ci=False)
     check_execution_host("linux", allow_no_gpu=False, ci=False)
     check_execution_host("linux", allow_no_gpu=True, ci=True)
+
+
+def test_selected_gpu_model_and_vram_are_checked_before_remote_work():
+    from training.pilot import check_gpu_configuration
+
+    check_gpu_configuration({"name": "NVIDIA GeForce RTX 5090", "memory_mib": 32607})
+    check_gpu_configuration({"name": "NVIDIA RTX 5090", "memory_mib": 30000})
+    for name, memory in [
+        ("NVIDIA GeForce RTX 4090", 24564),
+        ("NVIDIA A100", 80000),
+        ("NVIDIA GeForce RTX 5090 D", 32607),
+        ("NVIDIA GeForce RTX 5090", 29999),
+    ]:
+        with pytest.raises(ValueError):
+            check_gpu_configuration({"name": name, "memory_mib": memory})
+    check_gpu_configuration(
+        {"name": "NVIDIA GeForce RTX 4090", "memory_mib": 24564}, model="rtx4090"
+    )
+    with pytest.raises(ValueError):
+        check_gpu_configuration(
+            {"name": "NVIDIA GeForce RTX 4090", "memory_mib": 19999},
+            model="rtx4090",
+        )
