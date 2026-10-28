@@ -103,8 +103,14 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 新規の集計・GPU一覧検査・Linux／CI実行制限は、手計算の期待値を持つ9件の軽量テストでRED/GREENを確認した。速度の分母、教師の深さ、GPU複数枚の拒否、Mac実行の拒否、選定GPUとVRAM下限を変異6件で検出した。Macで行ったのはこれらの小さい純粋関数と構文・文書の確認だけで、探索・生成・性能計測は実行していない。
 
-全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知26変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
+全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知32変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
 
 ## 生成物の保存とHF公開
 
 公開先は`voxelshogi/`配下。データ・学習checkpointをMacへ中継せず、外部Linuxから直接アップロード・固定Hub revisionで全ファイルhashを確認する。Macへ回収するのは小さい集計・manifest・receiptと、必要な検証用モデルだけ。[hf-publicationスキルとハーネス](HF_PUBLICATION.md)を使い、manualの意味・対象ライセンス・転送先の権限を確定する。公開前に待機が必要なら、保持先・保持費を本生成見積もりへ含める。公開未完了のまま元データを消さず、無断で課金を延長しない。
+
+## 準備の取り込みと実行待ち
+
+PR #34は必須8チェック・Python98件・既知21変異とCI pilot smokeを確認して通常mergeした。統合`d9cf136`のmain CI/Security・自動公開・公開E2Eと配信SHAも確認済み。HF公開スキル・ハーネスはPR #35で必須8チェック・Python111件・既知26変異を確認して通常mergeした。これらは実機計測や本生成の完了ではない。
+
+有料起動は自動承認レビューが具体的な時間・金額の明示承認不足として拒否したため未実行。最大60分・消費上限US$2の回答を待ち、承認前に別経路で起動しない。[本生成の実装・検証契約](M4_PRODUCTION.md)を先行準備する。
