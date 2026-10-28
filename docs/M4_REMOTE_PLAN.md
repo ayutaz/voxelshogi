@@ -62,7 +62,11 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 ## 認証情報
 
-確認時点ではリポジトリ直下と`apps/web`に`.env`／`.dev.vars`はなく、実行環境のVast.ai／CloudRift用変数も見つからなかった。これは他の端末・アカウント設定を調べた結果ではない。[.env.example](../.env.example)は空の変数名だけを用意している。
+2026-10-28 03:45 UTCに、ユーザーがローカル`.env`へ保存したCloudRiftキーで認証付きの構成一覧取得に成功した。ファイルはgitignore対象・権限0600で、キーの値は表示・記録していない。Vast.aiのキーは未設定。[.env.example](../.env.example)は空の変数名だけを用意している。
+
+この時点のCloudRift一覧ではRTX 4090×1の全SKUが空き0だった。L40S・V100・RTX 5090の一部には空きがあったが、GPU系統・CPU割当・接続経路が異なるため代替を起動していない。APIの`cost_per_hour`の通貨単位も一次資料で確定しておらず、公開ページのドル単価と同じ単位と仮定して課金判断しない。上記4090案は予約・起動可能な確定見積もりではない。次は起動前に空きと総額を再確認するか、Vast.aiの認証付き候補を確認し、利用可能な構成の見積もりを提示する。
+
+構成一覧にはAPIバージョン`2026-09-08`・`POST /api/v1/instance-types/list`を使用した。これは読み取り操作。終了方法は公式クライアントの`POST /api/v1/instances/terminate`・`ById`指定を確認しただけで、作成・起動・終了等の変更APIは呼んでいない。残高・決済・保持費の確認も起動前の未完了項目として残す。認証の成功を費用の承認や実機計測の完了とはしない。
 
 ローカル制御用に`.env.example`を`.env`へコピーし、`CLOUDRIFT_API_KEY`（必要なら`VAST_API_KEY`）をローカルのエディタで入力する。`.env`はgitignore対象。キーを会話・ログ・PRへ貼らず、GPUホストへコピーしない。pilotは`.env`を読み込まず、キーが設定されただけで契約・起動を始めない。実行前に認証付きで構成・残高・費用・終了方法を読み取り確認する。
 
@@ -70,6 +74,7 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 - [CloudRift料金・付属保存と転送](https://www.cloudrift.ai/pricing)
 - [CloudRift公開GPU構成](https://www.cloudrift.ai/gpu-rentals)、[RTX 4090](https://www.cloudrift.ai/rtx4090)
+- [CloudRift公式クライアントのAPI・認証・構成一覧・終了仕様](https://github.com/cloudrift-ai/emmy/blob/main/emmy/provisioning/cloudrift.py)
 - [Vast.ai検索API・CPU/RAM・allocated_storage](https://docs.vast.ai/api-reference/search/search-offers)
 - [Vast.ai課金の構成](https://github.com/vast-ai/docs/blob/main/guides/pricing.mdx)、[保存領域](https://docs.vast.ai/guides/instances/storage/types)
 
