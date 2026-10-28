@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "observation": "2026-10-28T13:30:00Z",
+  "state": "running; not complete",
+  "production_source": "ae37ea25a7280774837e9aaac8f35d11decb2c32",
+  "preparation_pr": 43,
+  "main_ci": 40690773220,
+  "main_security": 40690773634,
+  "representative": {
+    "complete": true,
+    "context": {
+      "gpu": {
+        "driver": "580.159.03",
+        "memory_mib": 32607,
+        "name": "NVIDIA GeForce RTX 5090"
+      },
+      "job_sha256": "0f392f8f177e0c9e4ae8ddafc0a5df2d478f810c118a21ae4daaac11dd3a4223",
+      "logical_cpus": 7,
+      "measurement_kind": "external-cpu-production",
+      "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+      "python": "3.14.9",
+      "source_commit": "ae37ea25a7280774837e9aaac8f35d11decb2c32",
+      "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+    },
+    "dataset_manifest_sha256": "9ba47a8fdbb0096e277268888acffadca9cefdbcae41abb67fa87201f6dab793",
+    "files": {
+      ".voxelshogi-dataset-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "game-000000.parquet": "936fb08aaaac030f738dee139c14a87d3146c3dde88a8846aabe4a6a365e4d8e",
+      "game-000001.parquet": "0f7353ce238701173caeb7a555620b071f631e25d1cf760315c63204d75695bb",
+      "game-000002.parquet": "96efa16af99a1449fc05236356687c3c1fb71d0ed155dc1b431068d711989fbb",
+      "game-000003.parquet": "0719404f63cd0baec102bae111e0e6bfb25c1f59d4be4ebc16e95322b0b128d7",
+      "game-000004.parquet": "0322294ac2c4adf9b18aab8ea9533219593045d69ed9410cefe0cd5d07a61d50",
+      "game-000005.parquet": "2a6870fbd8fc0d8d44c7bb871ca439b1ab39852609445f38f947ec1a78c7e7a8",
+      "game-000006.parquet": "ed98ebabb304ffd98e1d37ed46e764589ef51a11ef9f74d4cecf7485be299ec4",
+      "game-000007.parquet": "5ecb9ea91333f686ef6f70250280b36d0c88e41e200b37a43276f41540f8ec9f",
+      "game-000008.parquet": "77a2f61e7c49bb6fd0719135f5f52e6951435fe3f35234fafb42d41b71c25ccf",
+      "game-000009.parquet": "2b31ec0c7573c9381ed83f575b230b97a33a8c27c20561f597edff88a07aca9e",
+      "game-000010.parquet": "9e926bbfac8167433aece2b58306ab8026aaea307d6a94238ecf0bc99292dc22",
+      "game-000011.parquet": "edff1f59230ab60231ee23eee0baffa8a3a5c80a0880e1e2ba98f7c8eff3824f",
+      "manifest.json": "9ba47a8fdbb0096e277268888acffadca9cefdbcae41abb67fa87201f6dab793"
+    },
+    "generate_seconds": 37.858264824,
+    "parquet_bytes": 255402,
+    "regenerate_seconds": 37.73476923000004,
+    "regenerated_bytes_match": true,
+    "source_commit": "ae37ea25a7280774837e9aaac8f35d11decb2c32",
+    "supervisor": {
+      "elapsed": 138.46816384599998,
+      "peak_rss": 490602496,
+      "reason": "completed",
+      "returncode": 0
+    },
+    "validate_seconds": 62.694118269,
+    "validation": {
+      "duplicates": 11,
+      "eligible_rows": 769,
+      "eligible_sources": {
+        "random": 257,
+        "rules": 256,
+        "search": 256
+      },
+      "eligible_splits": {
+        "train": 704,
+        "val": 65
+      },
+      "eligible_teachers": 252,
+      "games": 12,
+      "rows": 780,
+      "sources": {
+        "random": 260,
+        "rules": 260,
+        "search": 260
+      },
+      "valid_teachers": 256
+    }
+  },
+  "production_job": {
+    "schema": 1,
+    "purpose": "production",
+    "provider": "cloudrift",
+    "approved": true,
+    "approved_seconds": 38700,
+    "hourly_usd": 1.0,
+    "max_cost_usd": 12.0,
+    "workers": 4,
+    "minimum_eligible_rows": 100000,
+    "gpu_model": "rtx5090",
+    "config": {
+      "engine_commit": "ae37ea25a7280774837e9aaac8f35d11decb2c32",
+      "seed": 17,
+      "games": 1800,
+      "max_plies": 64,
+      "sources": [
+        "random",
+        "rules",
+        "search"
+      ],
+      "initial": null,
+      "max_depth": 2,
+      "max_nodes": 10000,
+      "table_capacity": 4096,
+      "search_opening_plies": 16
+    }
+  },
+  "hf_preflight": {
+    "community_disabled": true,
+    "gated": "manual",
+    "hub_parent": "83dd4523817908770dcaf11319243a5405addf26",
+    "private": false,
+    "repo_id": "voxelshogi/voxelshogi-synthetic-v1"
+  },
+  "rental_deadline": {
+    "requested_at": 1793193554.144002,
+    "stop_at": 1793235854.144002,
+    "maximum_end_at": 1793236754.144002,
+    "hourly_usd": 1.0,
+    "consumption_cap_usd": 12.0
+  },
+  "initial_progress": {
+    "pid": 3397,
+    "first_manifest_games": 17,
+    "first_manifest_complete": false
+  },
+  "budget": {
+    "approved_total_usd": 100,
+    "reserved_caps_total_usd": 41,
+    "remaining_unreserved_usd": 59,
+    "invoice_retrieved": false
+  },
+  "prior_setup_only_attempt": {
+    "generation_started": false,
+    "inactive": true,
+    "resources_released": true,
+    "persistent_volumes": 0,
+    "reason": "awaiting explicit credential-handoff approval; terminated before reply; replacement subsequently authorized"
+  },
+  "limitations": [
+    "Production, full validation, full regeneration and HF production publication are not complete at this observation.",
+    "Representative measurements are not production counts.",
+    "Reservation caps are not invoiced spending or account balance.",
+    "Dataset rows remain on external Linux."
+  ]
+}

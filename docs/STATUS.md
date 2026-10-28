@@ -21,13 +21,19 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
-## 最新の統合・公開確認（PR #40）
+## 現在の本生成（2026-10-28 13:30 UTC開始確認）
+
+[PR #43](https://github.com/ayutaz/voxelshogi/pull/43)と統合後mainのCI・公開が成功。CloudRiftの元の計測と同じ7ゲストCPU構成で代表12局の全検証・再生成一致を再確認し、1,800局の本生成を開始した。[条件・実測・開始記録と残るゴール](M4_PRODUCTION_RUN.md)。有効10万件・本生成の全検証・HF公開はまだ完了していない。
+
+現在の実機は最大12時間／US$12。生成せず終了した準備実機の上限US$24も保守的に残し、予約上限累計US$41・未予約額US$59（実請求ではない）。HFの事前確認はpublic/manual・Community OFF・固定親commit一致。認証の一時送信・アップロード・同目的の所有実機の置き換えは継続承認済み。
+
+## PR #40時点の統合・公開確認（固定した履歴）
 
 [PR #40](https://github.com/ayutaz/voxelshogi/pull/40)を必須8チェック成功後に通常merge。固定した確認元はmain `5065d98685c77e8d50215870555d98e68ddec98c`、[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40669143635)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40669143626)は成功。Python3.14.9の129テスト、Pythonモデル16・training35変異、公開21 E2E・C0追加3件・モデル6件、配信55ファイル照合と公開SHA一致を確認した。[小さい固定記録](experiments/m4-next-plan-baseline-2026-10-28.json)。後続の文書PRで公開SHAが変わっても、この検証対象を上書きしない。
 
-試料はHF commit `83dd4523817908770dcaf11319243a5405addf26`に2 configとDataset Cardを公開済み。public/manual・Community OFFを再確認した。これまで使用した4実機は全て`Inactive`・資源解放済み、永続volume 0件。利用上限枠の累計US$5を控除した未予約額はUS$95で、実請求額は未回収。
+以下は本生成開始前の固定記録。試料はHF commit `83dd4523817908770dcaf11319243a5405addf26`に2 configとDataset Cardを公開済み。public/manual・Community OFFを再確認した。これまで使用した4実機は全て`Inactive`・資源解放済み、永続volume 0件。利用上限枠の累計US$5を控除した未予約額はUS$95で、実請求額は未回収。
 
-次は[M4-5aの起動前準備 → 本生成 → HF公開・資源終了](M4_PLAN.md#次に実行する単位)。本生成の全体上限は12時間／US$12。M4完了後は[M6の教師固定・学習実装 → CUDA試行・本学習・評価 → 変換・モデル観戦](M6_PLAN.md)へ進む。学習ループ・CUDA依存はこれから実装し、現在のCPU版torchや未学習デモを学習済みと扱わない。M5の固定3局の検証は完了（[結果](M5_PLAN.md)）。
+この時点の次の計画は[M4-5aの起動前準備 → 本生成 → HF公開・資源終了](M4_PLAN.md#次に実行する単位)。本生成の全体上限は12時間／US$12。M4完了後は[M6の教師固定・学習実装 → CUDA試行・本学習・評価 → 変換・モデル観戦](M6_PLAN.md)へ進む。学習ループ・CUDA依存はこれから実装し、現在のCPU版torchや未学習デモを学習済みと扱わない。M5の固定3局の検証は完了（[結果](M5_PLAN.md)）。
 
 ## M3完了時の公開・品質の確認元
 
