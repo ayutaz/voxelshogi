@@ -53,14 +53,14 @@ M5の実棋譜互換性は棋譜がそろった時点で挟む。観戦対象は
 |---|---|
 | 0〜15分 | 正確なSKU・CPU/RAM・GPU・ドライバ・費用・接続を確認。ソースを指定コミットで取得し、Rust1.97.1、uv0.11.23、Python3.14.9と依存lockを準備 |
 | 15〜35分 | Python境界の短い確認と、下記pilotを1回実行。pilot内は1ワーカー・最大240秒、所有子プロセス群RSS1 GiB、セッション合計10分。終了しなかった試行も失敗として保持 |
-| 35〜45分 | report・context・完了済みのsamples・worker.logを回収し、件数・停止理由・入力hashと再生成一致を確認。Macで再探索しない。raw Parquet・入力棋譜は公開しない |
+| 35〜45分 | report・context・完了済みのsamples・worker.logを回収し、件数・停止理由・入力hashと再生成一致を確認。Macで再探索しない。raw Parquet・入力棋譜をMacへ回収せず、pilotの入力は実機の作業用に残す |
 | 45〜60分 | 計算資源を終了し、残る有料volume・ディスク・予約・請求状態を確認。保持が必要なら別途見積もる |
 
 pilotの時間制限はプロセスを止める機能で、レンタル課金の自動終了ではない。GPU起動前に、アカウント側で使える終了方法と、接続が切れた場合も制御側から終了できる経路を確認する。60分の終了責任をpilotコマンドだけへ任せない。準備や回収が時間内に収まらなければ、延長せず終了して残作業を再計画する。
 
 ## 計測コマンドと取得する証拠
 
-新しいコマンドはLinux専用。Macでは実行を拒否する。リポジトリのcleanな指定コミットを使い、APIキーをGPUホストへ持ち込まない。Rustとuvを導入済みのGPUホストで、次を実行する。
+新しいコマンドはLinux専用。Macでは実行を拒否する。リポジトリのcleanな指定コミットを使い、provider APIキーをGPUホストへ持ち込まない。Rustとuvを導入済みのGPUホストで、次を実行する。
 
 ```bash
 uv --version
@@ -103,4 +103,8 @@ uv run --locked python -m training.pilot runs/m4/remote-pilot --provider cloudri
 
 新規の集計・GPU一覧検査・Linux／CI実行制限は、手計算の期待値を持つ9件の軽量テストでRED/GREENを確認した。速度の分母、教師の深さ、GPU複数枚の拒否、Mac実行の拒否、選定GPUとVRAM下限を変異6件で検出した。Macで行ったのはこれらの小さい純粋関数と構文・文書の確認だけで、探索・生成・性能計測は実行していない。
 
-全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知21変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
+全Pythonテスト、実Rustによる64手入力の再生、pilotの子プロセス起動・少量生成・検証・再生成、既知26変異はPRのLinux CIで実行する。必須CIの成功・通常merge・統合後の公開検証を取り込みの条件とする。CIのsmoke成功を、CloudRift／Vast.aiでの実機計測やCUDA学習の証拠にはしない。
+
+## 生成物の保存とHF公開
+
+公開先は`voxelshogi/`配下。データ・学習checkpointをMacへ中継せず、外部Linuxから直接アップロード・固定Hub revisionで全ファイルhashを確認する。Macへ回収するのは小さい集計・manifest・receiptと、必要な検証用モデルだけ。[hf-publicationスキルとハーネス](HF_PUBLICATION.md)を使い、manualの意味・対象ライセンス・転送先の権限を確定する。公開前に待機が必要なら、保持先・保持費を本生成見積もりへ含める。公開未完了のまま元データを消さず、無断で課金を延長しない。

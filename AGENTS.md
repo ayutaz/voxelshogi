@@ -8,3 +8,4 @@
 - 人間同士の対局・マルチプレイは実装しない。Python は3.14を基本とし、依存が未対応の場合は3.13を使う。
 - Pythonは `uv run` から実行し、ライブラリは `uv add` で管理する。`pyproject.toml` と `uv.lock` を更新し、CIでは `--locked` で検証する。
 - Macは編集・読み取り・軽量な静的／単体確認に限る。探索・データ生成・性能計測・学習・重い回帰検証は、GitHub Actionsまたは承認済みのVast.ai／CloudRift環境で行う。ローカル計測を省いた分をCIの性能値で代用しない。
+- Hugging Faceのrepo作成・データ／モデル公開は [.agents/skills/hf-publication/SKILL.md](.agents/skills/hf-publication/SKILL.md) と公開ハーネスを使う。公開先は`voxelshogi/`配下。データと学習checkpointをMacへ中継せず、外部Linuxから転送・hash照合する。Macには必要な検証用モデルと小さい実行記録だけを保存する。
