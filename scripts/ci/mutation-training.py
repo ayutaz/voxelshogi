@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "shogitter-layer",
+        "training/shogitter.py",
+        "(packed_y - 1) // 9",
+        "(packed_y - 1) // 8",
+        "test_shogitter.py",
+    ),
+    (
+        "shogitter-source-board",
+        "training/shogitter.py",
+        'if actual["board"] != board or actual["hands"] != hands:',
+        "if False:",
+        "test_shogitter.py",
+    ),
+    (
+        "shogitter-capture-hand",
+        "training/shogitter.py",
+        "if hands != expected:",
+        "if False:",
+        "test_shogitter.py",
+    ),
+    (
         "hub-community-after-upload",
         "training/hub_release.py",
         'if (\n        api.community_disabled(repo_id=plan["repo_id"], repo_type=plan["repo_type"])\n        is not True\n    ):',
