@@ -29,7 +29,9 @@
 | `scripts/build-wasm.sh` | WASM を `apps/web/src/wasm/pkg`（git管理外）にビルドする |
 | `scripts/cf.sh` | プロジェクト専用ログイン（`.cloudflare-cli/`、git管理外）で wrangler を起動する（ADR-010） |
 | `export/` | uv管理の特徴量・行動契約、未学習代表モデルとONNX変換・数値比較 |
-| 予定 | `crates/voxelshogi-python`（PyO3）、`training/`、`infrastructure/` |
+| `crates/voxelshogi-python` | PyO3／maturinのPython境界と行動マスク付きGymnasium環境。ルールはRust coreを呼ぶ |
+| `training/` | 少量Parquet生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
+| 予定 | 外部CPUの本生成実行、学習ループ、`infrastructure/` |
 
 ## 開発規約（必読）
 
@@ -98,7 +100,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M4: Python バインディングとデータ生成
+  1. M4: M4-0〜2のPython連携・少量生成／検証・停止再開を実装。検証と統合の確認元は `docs/M4_VALIDATION.md`。次はM4-3の上限付き計測と外部CPU見積もり。本生成・外部契約・データ公開は未実施
   2. M5: 将棋ったー棋譜との互換性検証（棋譜がそろい次第、いつでも）
   3. M6: Transformer-S の学習
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

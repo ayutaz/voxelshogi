@@ -12,6 +12,11 @@ version = 2
 allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
 confidence-threshold = 0.93
 
+[[licenses.exceptions]]
+name = "target-lexicon"
+version = "=0.13.5"
+allow = ["Apache-2.0 WITH LLVM-exception"]
+
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"

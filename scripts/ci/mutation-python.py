@@ -102,6 +102,12 @@ def main():
         work = Path(tmp)
         for name in ["pyproject.toml", "uv.lock", ".python-version"]:
             shutil.copy2(ROOT / name, work / name)
+        # uv verifies workspace members even when using the existing environment.
+        shutil.copytree(
+            ROOT / "crates/voxelshogi-python",
+            work / "crates/voxelshogi-python",
+            ignore=shutil.ignore_patterns("__pycache__", "*.so", "target"),
+        )
         shutil.copytree(
             ROOT / "export",
             work / "export",
