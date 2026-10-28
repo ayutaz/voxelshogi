@@ -154,11 +154,47 @@ def run_bounded(
     sample=sample_resources,
     log=None,
 ):
+    return _run_bounded(
+        command,
+        ledger=ledger,
+        seconds=seconds,
+        rss_limit=rss_limit,
+        sample=sample,
+        log=log,
+        max_seconds=MAX_SECONDS,
+        session_seconds=SESSION_SECONDS,
+    )
+
+
+def run_remote_bounded(command, *, ledger, seconds, approved_seconds, log=None):
+    if sys.platform != "linux":
+        raise ValueError("remote production requires Linux")
+    if (
+        type(approved_seconds) not in (int, float)
+        or not math.isfinite(approved_seconds)
+        or not 0 < approved_seconds <= 86400
+    ):
+        raise ValueError("invalid approved remote duration")
+    return _run_bounded(
+        command,
+        ledger=ledger,
+        seconds=seconds,
+        rss_limit=MAX_RSS,
+        sample=sample_resources,
+        log=log,
+        max_seconds=approved_seconds,
+        session_seconds=approved_seconds,
+    )
+
+
+def _run_bounded(
+    command, *, ledger, seconds, rss_limit, sample, log, max_seconds, session_seconds
+):
     if (
         isinstance(seconds, bool)
         or not isinstance(seconds, (int, float))
         or not math.isfinite(seconds)
-        or not 0 < seconds <= MAX_SECONDS
+        or not 0 < seconds <= max_seconds
         or type(rss_limit) is not int
         or not 0 < rss_limit <= MAX_RSS
     ):
@@ -182,7 +218,7 @@ def run_bounded(
             or spent < 0
         ):
             raise ValueError("invalid session budget")
-        remaining = SESSION_SECONDS - spent
+        remaining = session_seconds - spent
         if remaining <= 0:
             raise ValueError("session budget exhausted")
         seconds = min(seconds, remaining)

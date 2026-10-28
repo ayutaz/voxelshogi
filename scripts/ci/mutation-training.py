@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "production-opening-diversity",
+        "training/production.py",
+        "ply >= opening_plies",
+        "True",
+        "test_production.py",
+    ),
+    (
+        "production-global-duplicate",
+        "training/production.py",
+        'row["duplicate_of"] = seen.get(key)',
+        'row["duplicate_of"] = None',
+        "test_production.py",
+    ),
+    (
+        "production-regeneration-cost",
+        "training/production.py",
+        "generate_seconds + validate_seconds + regenerate_seconds",
+        "generate_seconds + validate_seconds",
+        "test_production.py",
+    ),
+    (
+        "production-cost-approval",
+        "training/production.py",
+        'if not smoke and job.get("approved") is not True:',
+        "if False:",
+        "test_production.py",
+    ),
+    (
+        "production-eligible-target",
+        "training/production.py",
+        '100000 if job["purpose"] == "production" else 1',
+        '1 if job["purpose"] == "production" else 1',
+        "test_production.py",
+    ),
+    (
         "hub-namespace",
         "training/hub_release.py",
         'r"voxelshogi/[A-Za-z0-9][A-Za-z0-9._-]*"',

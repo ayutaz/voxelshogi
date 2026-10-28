@@ -65,6 +65,7 @@ class GenerationConfig:
     max_depth: int = 1
     max_nodes: int = 1000
     table_capacity: int = 4096
+    search_opening_plies: int = 0
 
     def __post_init__(self):
         if not isinstance(self.engine_commit, str) or not re.fullmatch(
@@ -78,6 +79,7 @@ class GenerationConfig:
             ("max_depth", 0, 64),
             ("max_nodes", 0, 2**63 - 1),
             ("table_capacity", 0, 1000000),
+            ("search_opening_plies", 0, self.max_plies),
         ]:
             value = getattr(self, name)
             if type(value) is not int or not low <= value <= high:
@@ -185,6 +187,8 @@ def _owned(directory):
 
 
 def _rows(config, index, seen):
+    from .production import trajectory_move
+
     game_id = f"g{index:06d}"
     source = config.sources[index % len(config.sources)]
     game = Game(config.initial)
@@ -199,13 +203,14 @@ def _rows(config, index, seen):
         if not final:
             if source == "search":
                 teacher = game.search(**config.search_limits())
-                played = teacher["best_move"]
-            else:
-                # Stable across workers and scheduling, without process-global RNG.
-                random_id = hashlib.sha256(
-                    f"move:{config.seed}:{game_id}:{ply}".encode()
-                ).digest()
-                played = moves[int.from_bytes(random_id, "big") % len(moves)]
+            played = trajectory_move(
+                config.seed,
+                game_id,
+                ply,
+                moves,
+                teacher["best_move"] if teacher is not None else None,
+                config.search_opening_plies,
+            )
         key = position_key(snapshot["vsfen"])
         duplicate = seen.get(key)
         seen.setdefault(key, f"{game_id}:{ply}")
@@ -253,11 +258,13 @@ def _rows(config, index, seen):
     return rows
 
 
-def generate_dataset(directory, config, *, max_games=None):
+def generate_dataset(directory, config, *, max_games=None, workers=1):
     """Commit complete games only. Resume verifies every committed row first."""
     directory = Path(directory)
     if max_games is not None and (type(max_games) is not int or max_games < 0):
         raise ValueError("invalid max_games")
+    if type(workers) is not int or not 1 <= workers <= 4:
+        raise ValueError("workers must be between 1 and 4")
     # Validate initial state before creating an owned dataset.
     Game(config.initial)
     directory.mkdir(parents=True, exist_ok=True)
@@ -282,8 +289,10 @@ def generate_dataset(directory, config, *, max_games=None):
     seen = report.pop("_seen")
     start = len(manifest["shards"])
     end = config.games if max_games is None else min(config.games, start + max_games)
-    for index in range(start, end):
-        rows = _rows(config, index, seen)
+    from .production import game_rows, merge_duplicates
+
+    for index, rows in enumerate(game_rows(config, start, end, workers), start):
+        merge_duplicates(rows, seen)
         name = f"game-{index:06d}.parquet"
         target = directory / name
         temporary = target.with_name(name + ".tmp")
@@ -319,8 +328,8 @@ def validate_dataset(directory, *, require_complete=True):
     manifest, config = _load(directory)
     if require_complete and (not manifest["complete"] or not manifest["shards"]):
         raise ValueError("incomplete dataset")
-    seen, sources, splits = {}, Counter(), Counter()
-    total, duplicates = 0, 0
+    seen, sources, splits, eligible_sources = {}, Counter(), Counter(), Counter()
+    total, duplicates, valid_teachers, eligible_teachers = 0, 0, 0, 0
     for index, entry in enumerate(manifest["shards"]):
         table = pq.read_table(directory / entry["file"])
         if not table.schema.equals(SCHEMA, check_metadata=True):
@@ -371,6 +380,7 @@ def validate_dataset(directory, *, require_complete=True):
                 duplicates += 1
             else:
                 splits[row["split"]] += 1
+                eligible_sources[source] += 1
             final = s["finished"] or ply == config.max_plies
             if (ply == len(rows) - 1) != final:
                 raise ValueError("missing/extra final row")
@@ -391,12 +401,15 @@ def validate_dataset(directory, *, require_complete=True):
             )
             if row["teacher_valid"] != valid:
                 raise ValueError("invalid teacher eligibility")
+            valid_teachers += valid
+            eligible_teachers += valid and row["duplicate_of"] is None
             if final:
                 if row["played_move"] is not None:
                     raise ValueError("move after termination")
             else:
                 played = row["played_move"]
-                if teacher is None:
+                seeded = teacher is None or ply < config.search_opening_plies
+                if seeded:
                     random_id = hashlib.sha256(
                         f"move:{config.seed}:{game_id}:{ply}".encode()
                     ).digest()
@@ -405,7 +418,7 @@ def validate_dataset(directory, *, require_complete=True):
                         raise ValueError("invalid seeded move")
                 if (
                     played not in actions.values()
-                    or teacher is not None
+                    or not seeded
                     and played != teacher["best_move"]
                 ):
                     raise ValueError("invalid played move")
@@ -418,5 +431,9 @@ def validate_dataset(directory, *, require_complete=True):
         "sources": dict(sources),
         "eligible_splits": dict(splits),
         "duplicates": duplicates,
+        "eligible_rows": total - duplicates,
+        "eligible_sources": dict(eligible_sources),
+        "valid_teachers": valid_teachers,
+        "eligible_teachers": eligible_teachers,
         **({"_seen": seen} if not require_complete else {}),
     }
