@@ -12,6 +12,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "shogitter-hand-owner",
+        "training/shogitter.py",
+        "amount, side, kind = change",
+        "side, amount, kind = change",
+        "test_shogitter.py",
+    ),
+    (
         "shogitter-layer",
         "training/shogitter.py",
         "(packed_y - 1) // 9",

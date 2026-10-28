@@ -116,7 +116,7 @@ def convert_move(move):
     target = targets[0]
     after = piece(target[3]) - 1 - side * 14
     if len(changes) == 1 and not origins and not target[2] and after in HAND:
-        if hands != [[side, -1, target[3][1]]]:
+        if hands != [[-1, side, target[3][1]]]:
             raise ValueError("drop does not consume its hand piece")
         return "PLNSGBR"[HAND[after]] + "*" + notation(target)
     if len(changes) != 2 or len(origins) != 1 or origins[0][2][0] != side:
@@ -131,7 +131,7 @@ def convert_move(move):
         if captured // 14 == side or captured % 14 == 7:
             raise ValueError("invalid source capture")
         base = BASE.get(captured % 14, captured % 14)
-        expected = [[side, 1, "a" + KINDS[base]]]
+        expected = [[1, side, "a" + KINDS[base]]]
     if hands != expected:
         raise ValueError("capture hand delta differs")
     return notation(origins[0]) + notation(target) + ("+" if promoted else "")
@@ -147,7 +147,7 @@ def apply_delta(board, hands, move):
                 raise ValueError("source old board differs")
             updated_board[at] = piece(change[3])
         else:
-            side, amount, kind = change
+            amount, side, kind = change
             base = KINDS.index(kind[1])
             at = 7 * side + HAND[base]
             updated_hands[at] += amount

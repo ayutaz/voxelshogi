@@ -39,7 +39,7 @@ def test_transport_decodes_only_the_requested_record_without_executing_script():
             [1, [3, 61, [0, "aa"], [1, "am"]], [3, 11, [1, "af"], []], [1, 1, "aa"]],
             "322377+",
         ),
-        ([0, [5, 41, [], [0, "ag"]], [0, -1, "ag"]], "R*555"),
+        ([0, [5, 41, [], [0, "ag"]], [-1, 0, "ag"]], "R*555"),
         ([0, [5, 41, [], [0, "am"]], [5, 42, [0, "am"], []]], "565555"),
     ],
 )
@@ -83,7 +83,7 @@ def test_source_deltas_require_matching_old_board_and_nonnegative_hands():
     with pytest.raises(ValueError):
         apply_delta(board, hands, move)
     with pytest.raises(ValueError):
-        apply_delta([0] * 729, [0] * 14, [0, [5, 41, [], [0, "ag"]], [0, -1, "ag"]])
+        apply_delta([0] * 729, [0] * 14, [0, [5, 41, [], [0, "ag"]], [-1, 0, "ag"]])
 
 
 @pytest.mark.parametrize("terminal", ["Resignation", "Checkmate"])
@@ -177,3 +177,15 @@ def test_final_holdings_are_independently_decoded_and_negative_counts_rejected()
     record["players"][0]["mochigoma"]["aa"] = -1
     with pytest.raises(ValueError):
         final_hands(record)
+
+
+def test_capture_hand_tuple_is_count_then_owner_not_owner_then_count():
+    from training.shogitter import apply_delta, convert_move
+
+    move = [0, [7, 24, [1, "aa"], [0, "ag"]], [7, 25, [0, "ag"], []], [1, 0, "aa"]]
+    assert convert_move(move) == "773763"
+    board, hands = [0] * 729, [0] * 14
+    board[213] = 15
+    board[222] = 7
+    apply_delta(board, hands, move)
+    assert hands == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

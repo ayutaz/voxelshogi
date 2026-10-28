@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "source_commit": "c72f2d562d9d3de6536c3fc235b6271b19dc38ce",
+  "run_url": "https://github.com/ayutaz/voxelshogi/actions/runs/40682094190",
+  "python_job": 122795108266,
+  "summary": {
+    "schema": "voxelshogi-shogitter-validation-v1",
+    "complete": false,
+    "selection": "Three completed public rule166 resignation games after 2026-10-17, selected by source metadata before replay; no substitution after failures. Clock losses and unfinished games are outside this cohort.",
+    "ruleset_id": "voxelshogi-standard-v1",
+    "records": [
+      {
+        "id": 21377,
+        "source_url": "https://shogitter.com/kifu/21377",
+        "source_sha256": "d7ebcca0f8765ff2990d743e41ccb1fe09efb0f3bb605c972185bf9d323429de",
+        "record_sha256": "84b31d3a1560b7f193d4ff9980585566271bbe8ad59a85b4bc57963b5c6fd53c",
+        "source_started_at": "2026-10-22T16:04:16.113Z",
+        "rule_id": 166,
+        "complete": false,
+        "error_type": "ValueError",
+        "error": "capture hand delta differs"
+      },
+      {
+        "id": 21292,
+        "source_url": "https://shogitter.com/kifu/21292",
+        "source_sha256": "61948980baded6b332877ef1ed6c4f91fe818e4924b4a0d9d10fd3ee57a78cdc",
+        "record_sha256": "fae03c3fc7b53e36d29b248f4f8eca6a14975e3f2ad9d8fa2cbcb30b6da7d7cf",
+        "source_started_at": "2026-10-22T05:12:05.721Z",
+        "rule_id": 166,
+        "complete": false,
+        "error_type": "ValueError",
+        "error": "capture hand delta differs"
+      },
+      {
+        "id": 21205,
+        "source_url": "https://shogitter.com/kifu/21205",
+        "source_sha256": "06d994ea39228a9b36938ca91eb5c07a34ba9b90d31f0fe9584508dfbb48d05e",
+        "record_sha256": "d6c100b3cf4173a070011a1459e8491972b9f7e0faf92ff1f0b5a124601bb11a",
+        "source_started_at": "2026-10-20T12:06:29.500Z",
+        "rule_id": 166,
+        "complete": false,
+        "error_type": "ValueError",
+        "error": "capture hand delta differs"
+      }
+    ],
+    "limitations": "Selected public games only; this is not proof for all rules or all Shogitter games. Raw sources remain private and are not training data."
+  },
+  "diagnosis": "The adapter interpreted the hand tuple as owner/count/kind; the observed format is count/owner/kind. Corrected with disambiguating Black capture/drop fixtures; no game substitution and no rule change."
+}
