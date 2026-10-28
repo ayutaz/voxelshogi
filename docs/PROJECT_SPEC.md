@@ -29,7 +29,7 @@
 
 標準1王のM1全幅探索とM2のブラウザ内ライブ探索は実装・検証・公開済み（[M1記録](M1_VALIDATION.md)・[M2記録](M2_VALIDATION.md)）。M2では両AIのEasy/Normal設定、停止・1手送り・速度変更・中断／再試行、人間先手／後手の補助モードを利用できる。
 
-M3も完了し、約502万パラメータの未学習TransformerをFP32・FP16・INT8重み版へ変換して [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で選択・実行できる。実機M1／Chromeでは全3形式のWASM、FP32／INT8重みのWebGPUが数値基準を満たした。FP16×M1 WebGPUの基準未達も表示し、別形式・backendへ自動置換しない。未学習の技術デモであり、通常対局の探索AIやM6の学習済みAI対局とは別の機能。M4のPython境界・少量Parquet生成・全件検証・再生成・資源監視と本生成CLIを実装済み。CloudRiftのCPUで初回・64手の並列試行も完了し、有効769局面・探索教師252件を確認した。試料のHF公開を進めている。約10万有効局面の本生成、M5の実棋譜互換性、M6の学習・棋力評価・モデル対局は未完了。[M4の証拠と制約](M4_VALIDATION.md)
+M3も完了し、約502万パラメータの未学習TransformerをFP32・FP16・INT8重み版へ変換して [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で選択・実行できる。実機M1／Chromeでは全3形式のWASM、FP32／INT8重みのWebGPUが数値基準を満たした。FP16×M1 WebGPUの基準未達も表示し、別形式・backendへ自動置換しない。未学習の技術デモであり、通常対局の探索AIやM6の学習済みAI対局とは別の機能。M4のPython境界・少量Parquet生成・全件検証・再生成・資源監視と本生成CLIを実装済み。CloudRiftのCPUで初回・64手の並列試行も完了し、有効769局面・探索教師252件を確認した。試料2 configはDataset Card付きでHFに公開し、public/manual・Community OFFと固定Hub commitの全28ファイルhash一致を確認済み。約10万有効局面の本生成、M5の実棋譜互換性、M6の学習・棋力評価・モデル対局は未完了。[M4の証拠と制約](M4_VALIDATION.md)
 
 ## スコープ
 

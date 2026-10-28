@@ -15,7 +15,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
-| 次はM4〜M6 | M4の試料HF公開と有効10万局面の本生成へ進む。M6で学習・棋力評価・全変換版の対局／観戦へ接続する。M5の実棋譜互換性は独立して挿入できる。[各フェーズの目的・ゴール](ROADMAP.md) |
+| 次はM4〜M6 | M4の試料HF公開を完了。有効10万局面の本生成へ進む。M6で学習・棋力評価・全変換版の対局／観戦へ接続する。M5の実棋譜互換性は独立して挿入できる。[各フェーズの目的・ゴール](ROADMAP.md) |
 
 M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、有料GPU・R2は未使用。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
@@ -37,8 +37,8 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 |---|---|---|
 | Python連携・生成実装 | 実装済み。PyO3境界、行動マスク、履歴・教師の全件検証、停止再開、本生成CLI。[契約](M4_DATA_CONTRACT.md)・[検証](M4_VALIDATION.md) | 同じRust coreを共有し、Pythonへルールを再実装しない |
 | 初回・代表試行 | 完了。30固定探索、初回102行、64手の1／2／4ワーカー比較と12対局が成功。最大試料は有効769局面・深さ2の探索教師252件。[集計](experiments/m4-cloudrift-representative-2026-10-28.json) | 小標本を10万局面の完了としない。CPU速度をCUDA学習速度へ読み替えない |
-| 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回ParquetはHF退避できず、再生成が必要。Macには小さい設定・集計・hashだけ |
-| 試料のHF公開 | ログイン済みHF CLIの組織repo作成がHTTP403。再認可待ちで、実機は早期終了・資源解放済み。[公開計画・試行記録](M4_HF_PILOT_RELEASE.md) | 外部Linuxで歴史的hashに一致させ、public/manual・固定Hub commitの全ファイルを照合して完了 |
+| 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回Parquetは当時HF退避できず、その後の再生成・歴史的hash照合とHF公開で回復。Macには小さい記録だけ |
+| 試料のHF公開 | ✅ 2 configを公開済み。Dataset Card、public/manual・Community OFF、固定Hub commitで28ファイル全hash一致、実機終了・資源解放を確認。[公開記録](M4_HF_PILOT_RELEASE.md) | 試料の公開は完了。本生成でもカード・Community OFF・全件照合を継続する |
 | 有効10万局面 | 本生成CLIは実装済み、実データは未生成。[最大12時間・US$12の見積もり](M4_PRODUCTION_QUOTE.md) | 総行数・重複除外後の件数・教師内訳・対局分割を確認し、全検証・全再生成・HF照合を行う |
 | 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開の各試行US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
 | M5・M6 | 実棋譜互換性、CUDA学習・棋力評価・学習済みモデル対局は未実行 | M5は棋譜がそろい次第独立して実施。M6は同じGPUサービスで学習速度と配布条件を確認 |

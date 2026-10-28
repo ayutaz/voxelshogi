@@ -1,30 +1,73 @@
-# M4データセット公開カード案
+---
+license: cc-by-4.0
+pretty_name: VoxelShogi Synthetic Pilots v1
+size_categories:
+- n<1K
+tags:
+- voxelshogi
+- synthetic
+- shogi
+- game-ai
+configs:
+- config_name: pilot-16
+  default: true
+  data_files:
+  - split: train
+    path:
+    - pilot-16/game-000001.parquet
+    - pilot-16/game-000002.parquet
+    - pilot-16/game-000003.parquet
+    - pilot-16/game-000004.parquet
+    - pilot-16/game-000005.parquet
+  - split: validation
+    path:
+    - pilot-16/game-000000.parquet
+- config_name: representative-64
+  data_files:
+  - split: train
+    path:
+    - representative-64/game-000001.parquet
+    - representative-64/game-000002.parquet
+    - representative-64/game-000003.parquet
+    - representative-64/game-000004.parquet
+    - representative-64/game-000005.parquet
+    - representative-64/game-000006.parquet
+    - representative-64/game-000007.parquet
+    - representative-64/game-000008.parquet
+    - representative-64/game-000009.parquet
+    - representative-64/game-000010.parquet
+    - representative-64/game-000011.parquet
+  - split: validation
+    path:
+    - representative-64/game-000000.parquet
+---
+# VoxelShogi Synthetic Pilots v1
 
-2026-10-28。**M4合成データv1のCC-BY-4.0はユーザー承認済み。試料のHF公開は、ログイン済みCLIによる組織repo作成の403で停止。組織アクセスの再認可待ち。**
+Small, reproducible synthetic datasets for research on standard single-king 9x9x9 shogi. These are CPU-search pilot samples, not the planned 100,000-position training release or a trained model. Generated independently by the VoxelShogi Rust engine; no third-party game records are included.
 
-## 対象と公開条件
+| Configuration | Games / maximum plies | Rows | Nonduplicate positions | Nonduplicate search teachers |
+|---|---|---:|---:|---:|
+| pilot-16 | 6 / 16 | 102 | 81 | 15 |
+| representative-64 | 12 / 64 | 780 | 769 | 252 |
 
-- 候補repo: `voxelshogi/voxelshogi-synthetic-v1`（dataset）。標準1王ルールの自作合成データ。第三者棋譜を含めない。
-- public、`gated="manual"`。ダウンロード申請は人が承認する。ユーザー確認済み。
-- 確定ライセンス: **CC-BY-4.0**。ユーザー承認対象はM4の合成データv1（初回試料と本生成）。コード、M6の学習済みモデルとは別に扱う。
-- 用途: 三次元将棋モデルの開発・再現実験。random／rulesの着手を探索の最善手ラベルとして扱わない。
+Counts are per configuration. Configurations overlap, and their eligible counts must not be summed as independent positions. The first six representative games also reproduce the 1/2/4-worker comparison, not additional independent samples.
 
-## 生成方法と限界
+## Generation and provenance
 
-ルールはRust core、PythonはPyO3境界を通して呼ぶ。初回試料のソースは`a6e31aed1c2cad3614b718276d848c35e83aa461`、Python 3.14.9、固定依存lock。CloudRiftのLinux上で生成した。
+Source commit: a6e31aed1c2cad3614b718276d848c35e83aa461 of https://github.com/ayutaz/voxelshogi . Python 3.14.9 and the source uv.lock were used on CloudRift Linux. Ruleset: voxelshogi-standard-v1; schema: voxelshogi-dataset-v1; seed: 17. Sources random/rules/search have equal game counts. Search limits are depth 2, 10,000 nodes, and table capacity 4,096. Search games use 0 seeded opening plies in pilot-16 and 16 in representative-64; the played opening move may differ from the search recommendation. Generation settings are in each configuration's generation.json and manifest.json.
 
-初回試料はseed17、random／rules／searchを各2対局、最大16手、探索教師は深さ2・10,000ノード上限。102行、重複除外後81局面、重複除外後の有効探索教師15局面、Parquet合計64,888 bytes。全履歴・合法性・教師の検証と全再生成のバイト一致を確認した。[計測・hashの記録](experiments/m4-cloudrift-pilot-2026-10-28.json)。これは少量試料であり、10万局面の生成完了や強い教師の証明ではない。
+Every game stays in one split. HF validation corresponds to the row value val. These samples have no test games and are not a full evaluation set. duplicate_of marks positions excluded from training and evaluation; keep the duplicate rows for history replay and filter them for model fitting. random/rules moves are not best-move teachers. teacher_valid and duplicate_of jointly define usable search teachers. Scores are material/terminal search scores, not win probabilities, and limited-depth search is not proof of optimal play. The final position in each truncated game has no teacher.
 
-追加の代表試料は12対局・最大64手・序盤分岐16手で780行、重複除外後769局面、探索教師252局面。全教師が深さ2を完了し、全件検証・再生成一致を確認した（Parquet255,402 bytes）。[代表試行の集計・hash](experiments/m4-cloudrift-representative-2026-10-28.json)。初回実機は終了済みのため、試料は[再生成・HF公開計画](M4_HF_PILOT_RELEASE.md)に従い歴史的hashと照合して送る。本生成は[実測に基づく予算案](M4_PRODUCTION_QUOTE.md)を、承認済み費用総枠US$100の残額内で実行する。序盤16手の固定seedによる分岐、長い対局、並列数も生成設定へ記録する。総行数と重複除外後の局面数、探索教師の件数、train／valの対局単位分割を別々に示す。深さ・ノード上限のある探索教師は完全解析の最適手を保証しない。
+## Usage and schema
 
-## 公開するファイル
+After manual access approval, use datasets.load_dataset('voxelshogi/voxelshogi-synthetic-v1', 'pilot-16', token=True) or select representative-64. Pin the release Hub revision for reproducible use. Rows store VSFEN positions, game/split provenance, move labels and search scores; consult https://github.com/ayutaz/voxelshogi/blob/a6e31aed1c2cad3614b718276d848c35e83aa461/docs/M4_DATA_CONTRACT.md for the exact field types and semantics. Filter duplicate_of and teacher_valid as described above before using search supervision.
 
-| ファイル | 内容 |
-|---|---|
-| `game-NNNNNN.parquet` | 検証済みの対局単位データ。初回試料は6ファイル。本生成の実数は公開planで固定 |
-| `manifest.json` | 生成設定、エンジンコミット、対局ファイルのhash |
-| `validation.json` | 全件検証、件数・重複・教師、全再生成一致、実行環境と時間の記録 |
-| `README.md` | この案を実際の公開件数・確定条件へ更新したDataset Card |
-| `LICENSE` | 承認された対象ライセンスの本文 |
+## Verification
 
-入力用棋譜、プロセスログ、秘密情報、所有マーカー、途中ファイル、再生成側の重複コピーは配布しない。実ファイル一覧・bytes・SHA-256は[hf-publicationハーネス](HF_PUBLICATION.md)で固定する。データは外部Linuxから直接送り、固定Hub commitで全ファイルを照合する。Macへはデータ本体を保存しない。
+All histories, legal actions and search teachers were validated through the same Rust rules implementation. Both configurations were fully regenerated and byte-compared, then matched to the historical pilot manifests and every file hash recorded in the GitHub documentation. Each configuration contains the original generation manifest, generation settings and validation report. Root manifest.json indexes these separate configurations; it is not a single generation manifest. The original empty local ownership marker is excluded from public artifacts. validation.json contains the combined release evidence. Process logs, credentials, raw input fixtures and the second generation copies are excluded.
+
+To reproduce, use the pinned source and lockfile on external Linux, construct GenerationConfig from generation.json, call generate_dataset into a new directory and validate_dataset on it. Compare all Parquet and manifest SHA-256 values to the included manifest and validation.json. The generator creates its own empty ownership marker. The marker should not be confused with training data.
+
+## Access and license
+
+Community discussions and pull requests are disabled. This is a public repository with manually approved download requests. Request access on Hugging Face; download after approval. Access requests are not automatically accepted. These synthetic data are licensed under CC-BY-4.0; see LICENSE (https://creativecommons.org/licenses/by/4.0/). Attribution: ayutaz and VoxelShogi contributors, VoxelShogi Synthetic Pilots v1, with the source commit above. Code remains separately licensed Apache-2.0. Future trained models have separate licensing decisions.

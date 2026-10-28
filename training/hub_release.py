@@ -8,6 +8,42 @@ import re
 from pathlib import Path
 
 
+class PublicationApi:
+    """SDK adapter for the Hub community settings not exposed by HfApi."""
+
+    def __init__(self, api, session, headers):
+        self.api, self.session, self.headers = api, session, headers
+
+    def __getattr__(self, name):
+        return getattr(self.api, name)
+
+    def _url(self, repo_id, repo_type):
+        return f"https://huggingface.co/api/{repo_type}s/{repo_id}"
+
+    def disable_community(self, *, repo_id, repo_type):
+        response = self.session.put(
+            self._url(repo_id, repo_type) + "/settings",
+            headers=self.headers,
+            json={"discussionsDisabled": True},
+            timeout=30,
+        )
+        response.raise_for_status()
+
+    def community_disabled(self, *, repo_id, repo_type):
+        response = self.session.get(
+            self._url(repo_id, repo_type) + "/discussions",
+            headers=self.headers,
+            timeout=30,
+        )
+        if (
+            response.status_code == 403
+            and response.json().get("error") == "Discussions are disabled for this repo"
+        ):
+            return True
+        response.raise_for_status()
+        return False
+
+
 def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
@@ -102,6 +138,20 @@ def plan_release(
     card = (Path(folder) / "README.md").read_text()
     if not re.search(rf"(?m)^license:\s*{re.escape(license_id)}\s*$", card):
         raise ValueError("card license differs from approved license")
+    if repo_type == "dataset":
+        for title in (
+            "Generation and provenance",
+            "Usage and schema",
+            "Verification",
+            "Access and license",
+        ):
+            section = re.search(
+                rf"^## {re.escape(title)}[ \t]*\n(.*?)(?=^## |\Z)",
+                card,
+                re.MULTILINE | re.DOTALL,
+            )
+            if section is None or not section.group(1).strip():
+                raise ValueError(f"Dataset Card requires a populated section: {title}")
     plan["files"] = _inventory(folder, repo_type)
     return plan
 
@@ -153,6 +203,9 @@ def create_release_repository(plan, api, *, execute=False, system=None):
     if info.private:
         raise ValueError("refusing to expose an existing private repository")
     api.update_repo_settings(**destination, gated="manual")
+    api.disable_community(**destination)
+    if api.community_disabled(**destination) is not True:
+        raise ValueError("Community OFF has not been confirmed")
     info = api.repo_info(**destination)
     if info.private or info.gated != "manual":
         raise ValueError("public/manual Hub settings have not been confirmed")
@@ -178,6 +231,11 @@ def verify_release(plan, receipt, api, fetch, *, system=None):
     info = api.repo_info(**destination)
     if info.private or info.gated != "manual" or info.sha != receipt["hub_commit"]:
         raise ValueError("Hub settings or immutable revision mismatch")
+    if (
+        api.community_disabled(repo_id=plan["repo_id"], repo_type=plan["repo_type"])
+        is not True
+    ):
+        raise ValueError("Community OFF has not been confirmed")
     for file in plan["files"]:
         path = Path(fetch(**destination, filename=file["path"]))
         digest = hashlib.sha256()
@@ -186,7 +244,7 @@ def verify_release(plan, receipt, api, fetch, *, system=None):
                 digest.update(chunk)
         if path.stat().st_size != file["bytes"] or digest.hexdigest() != file["sha256"]:
             raise ValueError(f"Hub file hash mismatch: {file['path']}")
-    return {**receipt, "verified": True}
+    return {**receipt, "verified": True, "community_disabled": True}
 
 
 def main():
@@ -201,8 +259,13 @@ def main():
     api = None
     if args.execute:
         from huggingface_hub import HfApi
+        from huggingface_hub.utils import build_hf_headers, get_session
 
-        api = HfApi(endpoint="https://huggingface.co")
+        api = PublicationApi(
+            HfApi(endpoint="https://huggingface.co"),
+            get_session(),
+            build_hf_headers(token=True),
+        )
     if args.create_repo:
         info = create_release_repository(plan, api, execute=args.execute)
         receipt = {
