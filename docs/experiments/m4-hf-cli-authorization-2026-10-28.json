@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "source_commit": "a6e31aed1c2cad3614b718276d848c35e83aa461",
+  "account": "ayousanz",
+  "hf_cli_logged_in": true,
+  "voxelshogi_membership_verified": true,
+  "stored_cli_credentials": 1,
+  "credential_type": "oauth",
+  "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+  "repo_type": "dataset",
+  "repository_preflight": {
+    "success": false,
+    "step": "create_repo",
+    "http_status": 403,
+    "error_type": "HfHubHTTPError",
+    "message": "You don't have the rights to create a dataset under the namespace \"voxelshogi\""
+  },
+  "generation_started": false,
+  "dataset_uploaded": false,
+  "forced_cli_login_started": false,
+  "forced_cli_login_review": "Rejected because organization, granted scopes and credential persistence were not explicitly approved for expanded access",
+  "required_user_action": "Run hf auth login --force and authorize voxelshogi organization access, or provide a dedicated token via the ignored .env HF_TOKEN",
+  "provider": "cloudrift",
+  "instance_status": "Inactive",
+  "resources_released": true,
+  "persistent_volume_count": 0,
+  "approved_budget_usd": 100,
+  "maximum_reserved_caps_usd": 4,
+  "remaining_unreserved_usd": 96,
+  "actual_invoice_retrieved": false
+}

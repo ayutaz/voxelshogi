@@ -38,9 +38,9 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | Python連携・生成実装 | 実装済み。PyO3境界、行動マスク、履歴・教師の全件検証、停止再開、本生成CLI。[契約](M4_DATA_CONTRACT.md)・[検証](M4_VALIDATION.md) | 同じRust coreを共有し、Pythonへルールを再実装しない |
 | 初回・代表試行 | 完了。30固定探索、初回102行、64手の1／2／4ワーカー比較と12対局が成功。最大試料は有効769局面・深さ2の探索教師252件。[集計](experiments/m4-cloudrift-representative-2026-10-28.json) | 小標本を10万局面の完了としない。CPU速度をCUDA学習速度へ読み替えない |
 | 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回ParquetはHF退避できず、再生成が必要。Macには小さい設定・集計・hashだけ |
-| 試料のHF公開 | 生成前のHF APIエラーで停止、今回実機も早期終了。認証の追加確認待ち。[公開計画・試行記録](M4_HF_PILOT_RELEASE.md) | 外部Linuxで歴史的hashに一致させ、public/manual・固定Hub commitの全ファイルを照合して完了 |
+| 試料のHF公開 | ログイン済みHF CLIの組織repo作成がHTTP403。再認可待ちで、実機は早期終了・資源解放済み。[公開計画・試行記録](M4_HF_PILOT_RELEASE.md) | 外部Linuxで歴史的hashに一致させ、public/manual・固定Hub commitの全ファイルを照合して完了 |
 | 有効10万局面 | 本生成CLIは実装済み、実データは未生成。[最大12時間・US$12の見積もり](M4_PRODUCTION_QUOTE.md) | 総行数・重複除外後の件数・教師内訳・対局分割を確認し、全検証・全再生成・HF照合を行う |
-| 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
+| 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開の各試行US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
 | M5・M6 | 実棋譜互換性、CUDA学習・棋力評価・学習済みモデル対局は未実行 | M5は棋譜がそろい次第独立して実施。M6は同じGPUサービスで学習速度と配布条件を確認 |
 
 Macは編集・読み取り・軽量確認のみ。探索・生成・計測・学習はVast.ai／CloudRift、重い回帰はLinux CIで行う。データと学習checkpointは外部LinuxからHFの`voxelshogi/`配下へ直接送り、Macへ中継しない。public/manualはダウンロード申請を人が承認する設定で、公開自体の再承認待ちではない。M3の既承認配布は維持し、学習済みモデルのライセンスと取得ゲートに沿うWeb配信はM6で別に確定する。
@@ -112,3 +112,5 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 
 M4全体を完了とするには、試料公開だけでなく重複除外後100,000局面の実データ・全件検証・全再生成一致・HF照合が必要。[本生成契約](M4_PRODUCTION.md)・[実行順とゴール](M4_PLAN.md)を確認する。
+
+文書更新[PR #38](https://github.com/ayutaz/voxelshogi/pull/38)も必須8チェック成功後に通常mergeし、統合`b2fbe71284902dc2c93cfaaa02cf5bb0d9ffdfc9`のCI・Security・自動公開・公開SHA・21＋3＋6 E2E・55ファイル照合を確認した。[固定した文書更新の公開記録](experiments/m4-docs-publication-2026-10-28.json)。これはデータセットのHF公開成功を意味しない。

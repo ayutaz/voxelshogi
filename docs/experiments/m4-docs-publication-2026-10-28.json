@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "source_commit": "b2fbe71284902dc2c93cfaaa02cf5bb0d9ffdfc9",
+  "pr": 38,
+  "required_checks_success": true,
+  "required_checks_count": 8,
+  "merged": true,
+  "main_ci_run": 40657312976,
+  "main_security_run": 40657312932,
+  "main_ci_success": true,
+  "main_security_success": true,
+  "public_commit": "b2fbe71284902dc2c93cfaaa02cf5bb0d9ffdfc9",
+  "deploy_job_id": 122713739484,
+  "public_e2e": {
+    "passed": 21,
+    "seconds": 37.1
+  },
+  "c0_additional": {
+    "passed": 3,
+    "seconds": 55.3
+  },
+  "model_e2e": {
+    "passed": 6,
+    "seconds": 57.8
+  },
+  "distribution_files_verified": 55
+}
