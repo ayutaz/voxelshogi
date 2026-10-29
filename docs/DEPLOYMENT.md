@@ -8,7 +8,7 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 - `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
 - `apps/web/public/_headers`: `/assets/*` とモデル／runtimeのhash付きファイルはimmutable、`/build-info.json`・`/inference-build.json`・モデルindexはno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
-- R0の比較室: [9王ルール比較室](https://voxelshogi.yousan-apps.workers.dev/?experiment=1)。実際のCPU探索棋譜を再生する。ライブ推論・学習モデルではない。
+- R0の比較実験: [研究記録](NINE_KINGS_EXPERIMENT.md)を保持する。比較室の公開画面・導線は撤去し、旧`/?experiment=1`も通常の観戦画面を開く。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。
 - デプロイ先は、ユーザーの個人 Cloudflare アカウント（ka1357amnbpdr@gmail.com）。
 
@@ -80,7 +80,7 @@ published_commit='REPLACE_WITH_PUBLISHED_COMMIT_SHA'
 E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_commit" pnpm e2e
 ```
 
-既存の対局E2Eは通常対局5件・配信SHA1件・R0比較室3件とWorker観戦12件の計21件。M3の実モデル6件は別設定で実行し、公開後にも両方とC0追加3件を確認する。ローカルは既存Chrome、CIはubuntu-24.04の実行ライブラリとPlaywrightのChromium本体を使う。以下の2405e86では当時の9件を検証した。M2の公開確認は [別記録](M2_VALIDATION.md) で追う。当時の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
+既存の対局E2Eは通常対局5件・配信SHA1件・公開ナビゲーション／旧URL3件とWorker観戦12件の計21件。M3の実モデル6件は別設定で実行し、公開後にも両方とC0追加3件を確認する。ローカルは既存Chrome、CIはubuntu-24.04の実行ライブラリとPlaywrightのChromium本体を使う。以下の2405e86では当時の9件を検証した。M2の公開確認は [別記録](M2_VALIDATION.md) で追う。当時の確認元 `2405e86a0313d4b454119bd472937f2e10622bf5` のmain CIで公開E2Eまで成功し、400／800手の両manifestと全6棋譜のSHAも独立照合した。[サイズ・hash・ヘッダー](experiments/documentation-baseline-2026-10-26.json)。これは確認時点の記録であり、以後の版は配信情報で確認する。
 
 以下は過去の公開検証の記録。2026-10-25 の初回デプロイでは、公開 URL に対して E2E 5件がすべて成功した。HTTP レベルでも次を確認した: HTML、JS、WASM（`application/wasm`）が配信されている、`/assets/*` が immutable キャッシュ、セキュリティヘッダーが付いている、SPA へのフォールバックが効いている。
 

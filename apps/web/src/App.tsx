@@ -8,6 +8,7 @@ import { GameStore, MAX_IMPORT_BYTES } from './game/store';
 import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus, type ArenaDifficulty } from './ai/arena-controller';
 import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type ModelChoice, type ModelLibrary } from './ai/model-library';
 import { arenaConditions } from './ai/arena-record';
+import { ARENA_LINKS } from './navigation';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
 const ModelLibraryPanel = lazy(() => import('./inference/ModelLibraryPanel'));
@@ -180,8 +181,7 @@ export function App() {
       <header>
         <h1>VoxelShogi Arena</h1>
         <span className="subtitle">9×9×9 三次元将棋</span>
-        <a href="/?experiment=1">9王ルール比較室</a>
-        <a href="/?models=1">モデル推論ラボ</a>
+        {ARENA_LINKS.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}
         <span className="status" data-testid="status" role="status">
           {status}
         </span>

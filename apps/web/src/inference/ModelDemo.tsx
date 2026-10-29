@@ -8,6 +8,7 @@ import { loadPackage, type ModelPackage } from './runtime';
 import type { Backend, Precision } from './manifest';
 import { assetUrl } from './assets';
 import './model-demo.css';
+import { MODEL_LINKS } from '../navigation';
 
 const Board3D = lazy(() => import('../renderer/Board3D').then(m => ({ default: m.Board3D })));
 const labels: Record<Precision, string> = { fp32: 'FP32', fp16: 'FP16', int8: 'INT8（重み）' };
@@ -74,7 +75,7 @@ export default function ModelDemo() {
   const busy = state === 'loading' || state === 'initializing' || state === 'running';
   const selected = pkg?.model.variants.find(v => v.id === variant);
   return <div className="model-demo">
-    <header><h1>モデル推論ラボ</h1><nav><a href="/">AI対局の観戦へ</a><a href="/?experiment=1">9王ルール比較室</a></nav></header>
+    <header><h1>モデル推論ラボ</h1><nav>{MODEL_LINKS.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}</nav></header>
     <p className="model-intro">未学習モデルの技術デモです。変換したモデルを、この端末のブラウザで実行します。棋力や勝率を示すものではありません。</p>
     {loadError ? <section><p role="alert">モデルを読み込めません：{loadError}</p><button onClick={() => { setLoadError(''); setAttempt(n => n + 1); }}>読み込みを再試行</button></section> : null}
     {!pkg && !loadError ? <p role="status">モデルの配布情報を確認中…</p> : null}

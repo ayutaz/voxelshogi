@@ -15,6 +15,9 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  {"name": "retired-comparison-route", "file": "navigation.ts", "before": "const query = new URLSearchParams(search);", "after": "const query = new URLSearchParams(search); if (query.has('experiment')) return 'models';", "test": "navigation"},
+  {"name": "retired-arena-comparison-link", "file": "navigation.ts", "before": "export const ARENA_LINKS = [", "after": "export const ARENA_LINKS = [{ href: '/?experiment=1', label: '9王ルール比較室' }, ", "test": "navigation"},
+  {"name": "retired-model-comparison-link", "file": "navigation.ts", "before": "export const MODEL_LINKS = [", "after": "export const MODEL_LINKS = [{ href: '/?experiment=1', label: '9王ルール比較室' }, ", "test": "navigation"},
   { name: 'model-panel-current-parent', file: 'inference/ModelLibraryPanel.tsx', before: 'loaded.current({ release:', after: 'onLoaded({ release:', test: 'model-library-panel', extension: 'tsx' },
   { name: 'model-unload-preserve-black', file: 'App.tsx', before: "difficulty.b === 'model' && library.choices.b", after: 'library.choices.b', test: 'app-models', extension: 'tsx' },
   { name: 'model-unload-preserve-white', file: 'App.tsx', before: "difficulty.w === 'model' && library.choices.w", after: 'library.choices.w', test: 'app-models', extension: 'tsx' },
@@ -184,7 +187,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 124);
+    assert.equal(results.length, 127);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
