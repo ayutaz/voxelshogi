@@ -1,10 +1,10 @@
 # 現在の状態と文書の案内
 
-**M6の最新記録（2026-10-29 UTC）**：[ブラウザ向け3形式・最終HF配布](M6_PORTABLE.md)。[再学習とHF復旧](M6_RETRY.md)後、全3形式を固定test・各60局で再評価し、HFの最終revisionで全37ファイルを照合した。候補実機計測は全48条件・40実切替に成功。公開catalogへの登録後の実機検証・資源終了は未完了で、M6全体の完了記録ではない。
+**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5〜7は未着手。
 
-**初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の再試行記録を参照。
+**初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
 
-確認: **2026-10-29（JST）**。M4 / Phase 3と、固定3局を照合したM5まで完了。次はM6の教師・評価条件と学習実装。[M4の完了証拠](M4_COMPLETION.md)・[M5の対象と結果](M5_PLAN.md)。性能・公開の過去記録は日時と対象SHAを固定して保持し、現在の公開SHAは`build-info.json`と対応する成功CIから確認する。
+確認: **2026-10-30（JST）**。M4／Phase3、固定3局のM5、M6-5／Phase4まで完了。[M6完了証拠](M6_COMPLETION.md)。次はPhase5〜7の計画。過去の性能・公開記録は日時と対象SHAを保持し、現在の公開SHAは`build-info.json`と対応する成功CIから確認する。
 
 M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903d96fbc2`（[最終公開記録](experiments/m2-final-publication.json)）。性能計測の対象 `3a500cd` と最終版の実行ファイルは同一であり、計測JSONの元SHAは保持する。これは固定した検証対象であり、後続の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。M1時点の `2405e86` の記録は後半に保持する。
 
@@ -19,9 +19,9 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
-| M4・M5、次はM6 | M4は有効113,321局面・教師36,894件の全検証・全再生成・Card付きHF公開と全hash照合・資源終了まで完了。M5は固定3局145手が一致。次はM6の教師・学習・評価・モデル観戦。[各目的・ゴール](ROADMAP.md) |
+| M4〜M6完了 | M4の全生成・検証・HF公開、M5固定3局145手の一致、M6の学習・復旧・全3形式・公開実機・資源終了まで完了。[目的とゴール](ROADMAP.md)・[M6証拠](M6_COMPLETION.md) |
 
-M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。現在はM4のCPU利用に加えM6-2の少量CUDA学習・再開も確認済み。R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
+M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。その後のM6学習・公開実GPU検証は[完了記録](M6_COMPLETION.md)を参照。R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
@@ -29,13 +29,13 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 [小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
 
-現在は[M6-2の実GPU試行](M6_TRIAL.md)を完了し、次は本学習・固定評価・学習済みモデルの公開観戦。固定教師はtrain29,884／val3,421／test3,589件。RTX5090・Python3.14.9・CUDA13.0でbatch4約185局面/秒、64連続／32＋32再開が完全一致した。HFへ公開したJSON＋safetensorsを固定revisionから新runへ復旧し、追加64更新も一致。Linuxブラウザの物理WebGPU／WebGLの基礎検査が成功し、試行実機は終了・資源解放済み。[固定記録](experiments/m6-cuda-trial-2026-10-29.json)。最初の操作スクリプト失敗・adapter取得失敗も保持する。学習・評価・変換・公開profile・観戦UI・費用制御の実装はPR #47〜#63で必須CI成功後に取り込み済み。実ONNXの対局E2E全6件とmain公開検証は[PR #59の固定記録](experiments/m6-arena-integration-2026-10-29.json)。[GPU・保存・ライセンスと不足時の追加GPU／データ生成](M6_RUN_PROPOSAL.md)はPR #64で記録済み。次の実機は最大8時間／US$8、M6累積予約US$12の計画で基本枠US$24内。本学習・固定test／対局評価・学習済み推論パッケージ公開・Arenaの実GPU同時検証は未実施。
+M6-5まで完了。固定教師train29,884／val3,421／test3,589、RTX5090で3 epoch／22,413更新を学習し、HFの新run復旧とmodel／optimizer／RNGの完全一致を確認した。初期／Torch／各ONNXの固定評価、FP32・FP16重み・INT8重みのpublic/manual・Community OFF公開と全37ファイル照合、公開catalog差し替えなしの実機48条件／40切替・全3GPU形式の着手・7実モデルE2E、資源解放まで成功。[完了記録](M6_COMPLETION.md)。旧数値・FP16・カメラ操作の失敗は保持し、棋力向上は未確認。
 
 ## M4・M5の完了確認（2026-10-29 JST）
 
 [本生成の完了記録](M4_COMPLETION.md)。1,800局・116,921行から重複3,600行を除いた有効113,321局面・探索教師36,894件を全件検証。全再生成のバイト一致後、HF commit `6e7fb29d2469b56a895042fbb089d86e7b4d074f`へ`production-64`とDataset Cardを公開し、対象1,831ファイルの全hashが一致した。public/manual・Community OFF、CC-BY-4.0を確認。実機は終了・資源解放、稼働中VoxelShogi実機0・永続volume 0件。
 
-生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6基本枠US$24は既存US$100内に個別配分済み。不足時の追加GPU予算US$100も承認済み（M6最大US$124・全体最大US$200）だが、実測見積もりで不足を記録するまで有効化しない。初回M6試行の予約US$4を加えた累積予約はUS$45・未予約US$55。本学習は未実行。HF送信と同目的の所有実機の置き換えは継続承認済み。
+生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6は基本枠US$24内で予約上限US$20、プロジェクト全体US$61／基本枠100、追加US$100は未使用。GPUは解放済みで、予約上限と実請求は区別する。[M6の費用・終了](M6_COMPLETION.md#費用と資源終了)。HF送信と同目的の所有実機の置き換えは継続承認済み。
 
 実装・公開準備はPR #43、開始記録と継続承認はPR #44を必須8チェック成功後に通常merge。統合後のmain CI・公開検証も成功した。M5は[PR #42・固定3局145手の全件一致](M5_PLAN.md)で、全棋譜の完全互換は主張しない。
 
@@ -66,9 +66,9 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回Parquetは当時HF退避できず、その後の再生成・歴史的hash照合とHF公開で回復。Macには小さい記録だけ |
 | 試料のHF公開 | ✅ 2 configを公開済み。Dataset Card、public/manual・Community OFF、固定Hub commitで28ファイル全hash一致、実機終了・資源解放を確認。[公開記録](M4_HF_PILOT_RELEASE.md) | 試料の公開は完了。本生成でもカード・Community OFF・全件照合を継続する |
 | 有効10万局面 | ✅ 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HF公開と全1,831対象ファイル照合・実機終了まで完了。[記録](M4_COMPLETION.md) | M6は固定revisionを使用。各splitの探索教師数は学習前に外部Linuxで集計・凍結する |
-| 承認・予算 | M4データv1のCC-BY-4.0・HF public/manual・合計US$100は承認済み。予約上限累計US$41・未予約US$59、実請求未回収 | M6のGPU試行・本学習・checkpoint保持費は別に見積もる。HF送信・公開の継続承認を毎回の確認へ戻さない |
+| 承認・予算 | M4データCC-BY-4.0、M6モデル／再開状態Apache-2.0、HF public/manual・Community OFF。予約上限は全体US$61／100・M6 US$20／24、追加100未使用、実請求未回収 | M6 GPUは資源解放済み。後続段階は見積もり・割当と照合する |
 | M5 | ✅ 改定後の固定3局145手、各局面の盤／持ち駒と投了結果が一致。PR #42を必須CI成功後に通常merge。[結果・制約](M5_PLAN.md) | 全棋譜・全終局条件の完全互換は主張しない。原本を学習や公開へ含めない |
-| M6 | 少量CUDA学習・HF復旧・物理GPUブラウザ基礎検査が成功。本学習・最終評価・モデル対局は未実行 | [実測と最大8時間／US$8の次の実行単位](M6_TRIAL.md) |
+| M6 | ✅ 学習・中断再開・HF復旧・固定評価・3形式HF公開・公開実機と資源終了まで完了 | [完了記録](M6_COMPLETION.md)。Phase5〜7の計画へ |
 
 Macは編集・読み取り・軽量確認のみ。探索・生成・計測・学習はVast.ai／CloudRift、重い回帰はLinux CIで行う。データと学習checkpointは外部LinuxからHFの`voxelshogi/`配下へ直接送り、Macへ中継しない。public/manualはダウンロード申請を人が承認する設定で、公開自体の再承認待ちではない。M3の既承認配布は維持し、学習済みモデルのライセンスと取得ゲートに沿うWeb配信はM6で別に確定する。
 

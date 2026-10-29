@@ -1,0 +1,664 @@
+{
+  "schema": "voxelshogi-m6-completion-v1",
+  "recorded_at_utc": "2026-10-29T19:32:54.476504+00:00",
+  "complete_m6": true,
+  "scope": "M6-0 through M6-5 / Phase4 supervised baseline, not Phase5-7 or a playing-strength improvement claim",
+  "application_commit": "564715ab7bedd549bed5038e417b8cbedc32e134",
+  "model": {
+    "id": "voxelshogi-transformer-s-m6-314159-v1",
+    "trained": true,
+    "numericContract": "voxelshogi-trained-numeric-v1",
+    "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+    "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+    "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+    "variants": [
+      {
+        "precision": "fp32",
+        "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63",
+        "bytes": 20461391
+      },
+      {
+        "precision": "fp16",
+        "sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a",
+        "bytes": 10463104,
+        "fp16WeightOnly": true
+      },
+      {
+        "precision": "int8",
+        "sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9",
+        "bytes": 5467835
+      }
+    ]
+  },
+  "measurement_helper": {
+    "complete": true,
+    "source_commit": "f279649cc95ab76ae88ab86371a5f53c3552b991",
+    "python": "3.14.9 (main, Oct 21 2026, 17:48:02) [Clang 23.1.3 ]",
+    "node": "v24.22.1",
+    "pnpm": "10.32.1",
+    "files": {
+      "scripts/measure-trained-models.mjs": "6408811491c436eb188fcd1d119e70024a597f3625cdc9b5bb4b474b1e6ceb31",
+      "scripts/trained-benchmark.mjs": "809893f5168a0948c5fa3eb7021b969a8d2d4a61c504a434d9096eb02634c586",
+      "scripts/trained-browser-evidence.mjs": "e8d61e5ae6508d021afa4c31fd7cffb7f048ef49d2164a26ac53c375da2d20ce",
+      "apps/web/src/wasm/pkg/voxelshogi_wasm_bg.wasm": "3f624733ccd8764a8137e87fb006b82e68d44d4d425038f4726d589d8a3f8475"
+    },
+    "dataset_downloaded": false,
+    "training_state_downloaded": false
+  },
+  "physical_preflight": {
+    "schema": "voxelshogi-linux-browser-gpu-preflight-v1",
+    "verified": true,
+    "startedAt": "2026-10-29T18:57:58.110Z",
+    "args": [
+      "--enable-gpu",
+      "--use-angle=vulkan",
+      "--enable-features=Vulkan",
+      "--disable-vulkan-surface",
+      "--enable-unsafe-webgpu"
+    ],
+    "modelInferenceTested": false,
+    "arena3DTested": false,
+    "chromiumSource": "locked Playwright 1.64.1 browser",
+    "references": [
+      "https://chromium.googlesource.com/chromium/src/+/HEAD/docs/gpu/using-gpu-hardware-in-headless-chrome.md"
+    ],
+    "gpu": {
+      "devices": [
+        {
+          "vendorId": 4318,
+          "deviceId": 11141,
+          "vendorString": "",
+          "deviceString": "",
+          "driverVendor": "NVIDIA",
+          "driverVersion": "580.159.3.0"
+        },
+        {
+          "vendorId": 4115,
+          "deviceId": 184,
+          "vendorString": "",
+          "deviceString": "",
+          "driverVendor": "",
+          "driverVersion": ""
+        }
+      ],
+      "featureStatus": {
+        "2d_canvas": "enabled",
+        "direct_rendering_display_compositor": "disabled_off_ok",
+        "gpu_compositing": "enabled",
+        "multiple_raster_threads": "enabled_on",
+        "opengl": "enabled_on",
+        "rasterization": "enabled",
+        "raw_draw": "disabled_off_ok",
+        "skia_graphite": "disabled_off",
+        "trees_in_viz": "disabled_off",
+        "video_decode": "enabled",
+        "video_encode": "disabled_software",
+        "vulkan": "enabled_on",
+        "webgl": "enabled",
+        "webgpu": "enabled",
+        "webgpu_on_vk_via_gl_interop": "disabled_off",
+        "webnn": "disabled_off"
+      },
+      "auxAttributes": {
+        "amdSwitchable": false,
+        "canSupportThreadedTextureMailbox": false,
+        "directRenderingVersion": "",
+        "displayType": "ANGLE_VULKAN",
+        "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_image GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_logic_op GL_ANGLE_memory_object_flags GL_ANGLE_memory_size GL_ANGLE_multi_draw GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_read_only_depth_stencil_feedback_loops GL_ANGLE_relaxed_vertex_attribute_type GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_rgbx_internal_format GL_ANGLE_robust_client_memory GL_ANGLE_robust_fragment_shader_output GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_ANGLE_vulkan_image GL_ANGLE_yuv_internal_format GL_ARM_rgba8 GL_ARM_shader_framebuffer_fetch GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_array GL_EXT_EGL_image_external_wrap_modes GL_EXT_EGL_image_storage GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_buffer_storage GL_EXT_clear_texture GL_EXT_clip_control GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_compressed_ETC1_RGB8_sub_texture GL_EXT_conservative_depth GL_EXT_copy_image GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_fragment_shading_rate GL_EXT_fragment_shading_rate_primitive GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_memory_object GL_EXT_memory_object_fd GL_EXT_multisample_compatibility GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_sRGB_write_control GL_EXT_semaphore GL_EXT_semaphore_fd GL_EXT_separate_shader_objects GL_EXT_shader_framebuffer_fetch GL_EXT_shader_framebuffer_fetch_non_coherent GL_EXT_shader_non_constant_global_initializers GL_EXT_shader_texture_lod GL_EXT_shadow_samplers GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_decode GL_EXT_texture_shadow_lod GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_blend_equation_advanced GL_KHR_blend_equation_advanced_coherent GL_KHR_debug GL_KHR_robustness GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_polygon_mode GL_NV_read_depth GL_NV_read_depth_stencil GL_NV_read_stencil GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_EGL_sync GL_OES_compressed_ETC1_RGB8_texture GL_OES_compressed_paletted_texture GL_OES_copy_image GL_OES_depth24 GL_OES_depth32 GL_OES_depth_texture GL_OES_depth_texture_cube_map GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_shading GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_3D GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OES_vertex_half_float GL_OES_vertex_type_10_10_10_2 GL_OVR_multiview GL_OVR_multiview2 GL_QCOM_shading_rate GL_QCOM_texture_lod_bias ",
+        "glImplementationParts": "(gl=egl-angle,angle=vulkan)",
+        "glRenderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA-580.159.3.0)",
+        "glResetNotificationStrategy": 33362,
+        "glVendor": "Google Inc. (NVIDIA)",
+        "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+        "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_surface_orientation EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_EXT_image_gl_colorspace EGL_KHR_gl_colorspace EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_texture_3D_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_fence_sync EGL_KHR_wait_sync EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_KHR_swap_buffers_with_damage EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_IMG_context_priority EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_EXT_buffer_age EGL_KHR_mutable_render_buffer EGL_ANGLE_create_surface_swap_interval EGL_ANGLE_vulkan_image EGL_KHR_partial_update EGL_ANGLE_global_fence_sync EGL_ANGLE_memory_usage_report ",
+        "glWsVendor": "Google Inc. (NVIDIA)",
+        "glWsVersion": "1.5 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+        "hardwareSupportsVulkan": true,
+        "inProcessGpu": false,
+        "initializationTime": 1.765738,
+        "isAsan": false,
+        "isClangCoverage": false,
+        "jpegDecodeAcceleratorSupported": false,
+        "maxMsaaSamples": "8",
+        "optimus": false,
+        "passthroughCmdDecoder": true,
+        "pixelShaderVersion": "3.00",
+        "processCrashCount": 0,
+        "sandboxed": false,
+        "skiaBackendType": "GaneshVulkan",
+        "subpixelFontRendering": true,
+        "targetCpuBits": 64,
+        "vertexShaderVersion": "3.00",
+        "visibilityCallbackCallCount": 0
+      },
+      "driverBugWorkarounds": [
+        "enable_webgl_timer_query_extensions",
+        "exit_on_context_lost",
+        "disabled_extension_GL_KHR_blend_equation_advanced",
+        "disabled_extension_GL_KHR_blend_equation_advanced_coherent"
+      ]
+    },
+    "chrome": "156.0.8078.4",
+    "facts": {
+      "secureContext": true,
+      "webgpu": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false,
+        "result": 42
+      },
+      "webgl": {
+        "renderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA)",
+        "pixel": [
+          0,
+          0,
+          255,
+          255
+        ]
+      }
+    }
+  },
+  "final_checks": {
+    "complete": true,
+    "application_commit": "564715ab7bedd549bed5038e417b8cbedc32e134",
+    "matrix": {
+      "successfulCases": 48,
+      "unsupportedCases": 0,
+      "actualSwitches": 40
+    },
+    "gpu_arena_formats": 3,
+    "wasm_ui_and_driver_e2e": 7,
+    "elapsed_seconds": 520.4184178390001
+  },
+  "raw_evidence": {
+    "m6-public-browser-full.json": {
+      "bytes": 1516521,
+      "sha256": "016d7e170ba81b6532e244841c993fc526f1fb8eda46d4ab7657151b5aae64fe"
+    },
+    "m6-public-arena-gpu.json": {
+      "bytes": 54850,
+      "sha256": "bbc7a1f64fd09b907833a7a6ac5b62e25709ad9188931a89ca839af21673711d"
+    },
+    "m6-public-arena-wasm.json": {
+      "bytes": 11102,
+      "sha256": "46e4fe3069de682fb63d4ff38bccee71f275a01d9fbe99aee496fd6e1d808de5"
+    }
+  },
+  "public_build_before_and_after": {
+    "schema": 1,
+    "commit": "564715ab7bedd549bed5038e417b8cbedc32e134",
+    "files": [
+      {
+        "path": "assets/Board3D-CQOTHSru.js",
+        "bytes": 952072,
+        "sha256": "265a86109ac626f59b0ec7cfaf3b19f3daf7f4f7c40fde61c9eba40aafe14dc4"
+      },
+      {
+        "path": "assets/index-BEhT3P4F.css",
+        "bytes": 4549,
+        "sha256": "14bff7930235b9fc8bafcfc8c022fd887e3cdb2d8f0cb799d75af2e37fa0a5ed"
+      },
+      {
+        "path": "assets/index-CKotS4Wr.js",
+        "bytes": 274389,
+        "sha256": "d6fde9e68c48d968c6d151aa98d4348a8363b18970a26426b53ffde718794cf1"
+      },
+      {
+        "path": "assets/inference.worker-Pv-a1Tmk.js",
+        "bytes": 15428,
+        "sha256": "69bc0acbaedeb2e0829c46309bdcc9a68a66bcf2c5a9df6b20eaba658bf9da5e"
+      },
+      {
+        "path": "assets/ModelDemo-Dc4dD9K3.css",
+        "bytes": 1413,
+        "sha256": "8400ac66b0cbd2dbbfa56927e71951c3f31c5ea2f6d59b929809e5928e7f64f8"
+      },
+      {
+        "path": "assets/ModelDemo-fRWs0kdW.js",
+        "bytes": 14529,
+        "sha256": "26acbd8c15574e2f91b315404b24068755b3523b8cb8f9c7aa1a99238d9a8191"
+      },
+      {
+        "path": "assets/ModelLibraryPanel-Dx3k0kqr.js",
+        "bytes": 2372,
+        "sha256": "a4d6380fadf0bb26584e9c5daeb24efe96d0ed4da84ba798b3e4b05aa75fc37c"
+      },
+      {
+        "path": "assets/policy-client-Drrh4MEw.js",
+        "bytes": 2630,
+        "sha256": "8691b41ae70c15d17e7f65a9688c5d4f3beed8de2fb26d5aa1428436672977ff"
+      },
+      {
+        "path": "assets/policy-protocol-BdgqJHnS.js",
+        "bytes": 9551,
+        "sha256": "df30a1af5bf2ffb316b6dcc78c669b6f22c05dbdc4a9a0791dfa44f7228f80d5"
+      },
+      {
+        "path": "assets/policy.worker-CwNRagJt.js",
+        "bytes": 33859,
+        "sha256": "a3f9c2015b4cb49038c6bae3a38976aac190e7f764af3a7c49e46628fa3933fd"
+      },
+      {
+        "path": "assets/search.worker-B1wHbOjO.js",
+        "bytes": 11784,
+        "sha256": "cd6937275f4e9432bf0bdc82378c86257067bab40b55b485a56b99b4c00a0eb9"
+      },
+      {
+        "path": "assets/voxelshogi_wasm_bg-CI9aIt9Z.wasm",
+        "bytes": 361183,
+        "sha256": "f0ff6f99d6482f4d40da757503a43c46a3e1e4953c440f35fe6d1b2b86e5881d"
+      }
+    ],
+    "catalog": {
+      "path": "models/m6/catalog.json",
+      "bytes": 865,
+      "sha256": "b3f379d99327eedd6ee2371aa50857ea07229d3b4982cc6d05975a53f55c2679"
+    }
+  },
+  "public_catalog": {
+    "schema": 1,
+    "releases": [
+      {
+        "approved": true,
+        "id": "voxelshogi-transformer-s-m6-314159-v1",
+        "license": "Apache-2.0",
+        "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+        "repo": "voxelshogi/voxelshogi-transformer-s",
+        "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+        "manifest": {
+          "path": "manifest.json",
+          "bytes": 28477,
+          "sha256": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae"
+        },
+        "notices": [
+          {
+            "path": "README.md",
+            "bytes": 14208,
+            "sha256": "4e83b3fc66f0611ec7d5ef090fc897232933444edcf3e2ff86343fc3c6c4b1ec"
+          },
+          {
+            "path": "LICENSE",
+            "bytes": 11358,
+            "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+          }
+        ]
+      }
+    ]
+  },
+  "runtime_index": {
+    "version": "1.31.1",
+    "license": "MIT",
+    "bundle": {
+      "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort.webgpu.bundle.min.mjs",
+      "bytes": 122491,
+      "sha256": "c90275ffcd0e74e8929f527840ce9339399bfd45f11a74887e4b81a893907b70"
+    },
+    "bootstrap": {
+      "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.mjs",
+      "bytes": 53457,
+      "sha256": "59cf781530e1a16df2a291d78798e3ec1152467edaec402d6f9599d85047c302"
+    },
+    "wasm": {
+      "path": "ort-wasm-simd-threaded.asyncify.wasm",
+      "bytes": 28747738,
+      "sha256": "ca319e9539cd0f1e291cf56074760121eaf39650f5dbf84b6e52c07f4b2944ec",
+      "parts": [
+        {
+          "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-000.bin",
+          "bytes": 16777216,
+          "sha256": "273f77c856c0eae1945c74e67aa0a655cf96eaa9665f05c3e33d9b4a6930bfd3"
+        },
+        {
+          "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ort-wasm-simd-threaded.asyncify.wasm.part-001.bin",
+          "bytes": 11970522,
+          "sha256": "26d616bf5474508679753aef352929a74a42209b3ff179487d952f0ae58017a2"
+        }
+      ]
+    },
+    "notices": [
+      {
+        "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/LICENSE",
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+      },
+      {
+        "path": "runtime/7ca804cc8b2fa4425d069b3ed04b2a907874083c473bfb063bd7c769cb59487a/ThirdPartyNotices.txt",
+        "bytes": 338088,
+        "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3"
+      }
+    ]
+  },
+  "public_before_after_exact_bytes_equal": true,
+  "new_instance_hf_download": {
+    "complete": true,
+    "hub_commit": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+    "files": 37,
+    "public_manual_community_off": true,
+    "elapsed_seconds": 19.34712495499997,
+    "dataset_downloaded": false,
+    "training_state_downloaded": false
+  },
+  "hf_receipt": {
+    "dry_run": false,
+    "release_sha256": "4b3c4a136eaa96dc57d52aca31cf1cfb36fac09cdd958b73e8e45e089834b187",
+    "verified": true,
+    "hub_commit": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+    "repo_id": "voxelshogi/voxelshogi-transformer-s",
+    "repo_type": "model",
+    "community_disabled": true
+  },
+  "state_restore": {
+    "all_file_hashes_verified": true,
+    "comparisons": {
+      "best": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "latest": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      }
+    },
+    "completed_training": true,
+    "hub_commit": "02228242fc6b7fa39f6c051584b35d755d3b7ce5",
+    "new_run_restore": true,
+    "test_used": false,
+    "verified": true
+  },
+  "comparison_record": "m6-portable-release.json",
+  "selected_learning": {
+    "initial": {
+      "cache_sha256": "a5964be6625d6dd8fe69abffab83f33a25dda3d029a57fdbda00b3007419361e",
+      "source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da",
+      "test_used": false,
+      "train_probe": {
+        "examples": 2048,
+        "loss": 6.289685341529548,
+        "ordered_ids_sha256": "eadba8d6d93b6edaa4579e6ae9f1f36afef93cf4dfc72bb4605f919bb231810a",
+        "policy_loss": 6.042254260741174,
+        "split": "train",
+        "value_mse": 0.24743106867026654
+      },
+      "val": {
+        "examples": 3421,
+        "loss": 6.199511940316895,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 6.000658970135619,
+        "policy_top1": 0.013446360713241743,
+        "policy_top5": 0.08798596901490792,
+        "raw_legal_rate": 0.0,
+        "value_mae": 0.3540873688342661,
+        "value_mse": 0.19885296361219792
+      },
+      "weights": {
+        "bytes": 20092056,
+        "path": "student.safetensors",
+        "sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c"
+      }
+    },
+    "selected": {
+      "best_checkpoint": {
+        "binding": {
+          "cache_sha256": "a5964be6625d6dd8fe69abffab83f33a25dda3d029a57fdbda00b3007419361e",
+          "config": {
+            "batch_size": 4,
+            "device": "cuda",
+            "epochs": 3,
+            "learning_rate": 0.0003,
+            "optimizer": {
+              "betas": [
+                0.9,
+                0.999
+              ],
+              "eps": 1e-08,
+              "foreach": false,
+              "fused": false,
+              "name": "AdamW"
+            },
+            "precision": "float32",
+            "save_every": 100,
+            "seed": 314159,
+            "selection_split": "val",
+            "threads": 3,
+            "weight_decay": 0.01
+          },
+          "contract": {
+            "config": "production-64",
+            "evaluation": {
+              "cutoff_is_draw": false,
+              "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+              "max_plies": 256,
+              "opening_plies": 8,
+              "opening_seeds": {
+                "random": [
+                  7000,
+                  7001,
+                  7002,
+                  7003,
+                  7004,
+                  7005,
+                  7006,
+                  7007,
+                  7008,
+                  7009,
+                  7010,
+                  7011,
+                  7012,
+                  7013,
+                  7014,
+                  7015,
+                  7016,
+                  7017,
+                  7018,
+                  7019
+                ],
+                "search": [
+                  8000,
+                  8001,
+                  8002,
+                  8003,
+                  8004,
+                  8005,
+                  8006,
+                  8007,
+                  8008,
+                  8009
+                ]
+              },
+              "opponent_seed": "100000 + opening seed",
+              "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+              "primary_win_rate": "wins / games_started",
+              "schema": "voxelshogi-evaluation-v1",
+              "search_limits": {
+                "max_depth": 2,
+                "max_nodes": 10000,
+                "table_capacity": 4096
+              },
+              "swap_model_colors": true
+            },
+            "features": "voxelshogi-standard-features-v1",
+            "loss_policy": "mean cross entropy over engine-supplied legal actions",
+            "loss_value": "mean squared error",
+            "loss_value_weight": 1,
+            "mate_score": 1000000,
+            "policy_actions": 1067985,
+            "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+            "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+            "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+            "ruleset_id": "voxelshogi-standard-v1",
+            "schema": "voxelshogi-supervision-v1",
+            "selection_split": "val",
+            "test_role": "final selected checkpoint and predeclared conversion comparison only",
+            "training_seed": 314159,
+            "value_scale": 1000,
+            "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+          },
+          "environment": {
+            "capability": [
+              12,
+              0
+            ],
+            "cuda": "13.0",
+            "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+            "cudnn": 92400,
+            "deterministic": true,
+            "device": "cuda",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "tf32": false,
+            "torch": "2.14.1+cu130"
+          },
+          "source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da"
+        },
+        "bytes": 60371971,
+        "progress": {
+          "best_val_loss": 0.8743949341787136,
+          "epoch": 3,
+          "examples": 89652,
+          "next_batch": 0,
+          "step": 22413
+        },
+        "schema": "voxelshogi-checkpoint-v1",
+        "sha256": "7530bff31a743351606d9b5f9b8798a50d9d0b68c6746c14d0137bb75d774d38",
+        "step": 22413,
+        "verified": true
+      },
+      "cache_sha256": "a5964be6625d6dd8fe69abffab83f33a25dda3d029a57fdbda00b3007419361e",
+      "source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da",
+      "test_used": false,
+      "train_probe": {
+        "examples": 2048,
+        "loss": 0.789803011252161,
+        "ordered_ids_sha256": "eadba8d6d93b6edaa4579e6ae9f1f36afef93cf4dfc72bb4605f919bb231810a",
+        "policy_loss": 0.7545845371174096,
+        "split": "train",
+        "value_mse": 0.03521847129047728
+      },
+      "val": {
+        "examples": 3421,
+        "loss": 0.8743949341787136,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 0.8477765907151756,
+        "policy_top1": 0.7760888629055832,
+        "policy_top5": 0.9634609763227127,
+        "raw_legal_rate": 0.0,
+        "value_mae": 0.10713934788174952,
+        "value_mse": 0.026618343994825332
+      }
+    },
+    "test_used": false,
+    "additional_data_generated": false
+  },
+  "publication_ci": {
+    "pr74_head": "fc5f0f6cc7d4d72ae6075f2e0c0c2bd0b35db2e4",
+    "PR_CI": 40934308241,
+    "PR_Quality": 40934308131,
+    "PR_Security": 40934308289,
+    "main_CI": 40935461524,
+    "main_Security": 40935461571,
+    "public_e2e": {
+      "passed": 21,
+      "seconds": 31.7,
+      "flaky": 0
+    },
+    "public_camera_regression": {
+      "passed": 3,
+      "seconds": 49.2,
+      "retries": 0
+    },
+    "public_untrained_lab_e2e": {
+      "passed": 6,
+      "seconds": 56.7
+    },
+    "audited_distribution_responses": 57
+  },
+  "gpu_ui": {
+    "precisions": [
+      "fp32",
+      "fp16",
+      "int8"
+    ],
+    "plies_per_format": 2,
+    "public_catalog_intercepted": false
+  },
+  "ui_suite": {
+    "stats": {
+      "startTime": "2026-10-29T19:21:46.745Z",
+      "duration": 63140.07,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "catalog_intercepted": true,
+    "same_exact_published_catalog": true,
+    "note": "UI suite uses its verified local catalog fixture; final full matrix and GPU UI separately fetch and require the real public catalog without interception."
+  },
+  "leases": [
+    {
+      "id": "55607c82-d3ac-11f1-8a85-1383f5decdec",
+      "status": "Inactive",
+      "resources_released": true,
+      "requested_at": 1793287253.077128,
+      "termination_requested_at": 1793299775.820811,
+      "release_confirmed_at": 1793299826.070362,
+      "hourly_usd": 1.0,
+      "maximum_reserved_usd": 4.0,
+      "reference_elapsed_usd": 3.492498120599323,
+      "invoice_retrieved": false
+    },
+    {
+      "id": "b7e48156-d3c9-11f1-af7f-7febb26930d6",
+      "status": "Inactive",
+      "resources_released": true,
+      "requested_at": 1793299873.764606,
+      "termination_requested_at": 1793302152.41345,
+      "release_confirmed_at": 1793302263.1751769,
+      "hourly_usd": 1.0,
+      "maximum_reserved_usd": 4.0,
+      "reference_elapsed_usd": 0.6637251585721969,
+      "invoice_retrieved": false
+    }
+  ],
+  "budget": {
+    "project_reserved_max_usd": 61.0,
+    "project_base_approved_usd": 100,
+    "m6_reserved_max_usd": 20.0,
+    "m6_base_approved_usd": 24,
+    "extra100_activated": false,
+    "invoice_retrieved": false,
+    "note": "Reservations are conservative maxima, not actual charges; elapsed-rate reference is not a provider invoice."
+  },
+  "limitations": [
+    "No observed playing-strength improvement over M1 in capped cohorts",
+    "Synthetic generation covers64 plies; limited long-game/endgame distribution",
+    "Physical compatibility measured on Linux RTX5090 Chromium only",
+    "FP16 weight storage uses FP32 computation",
+    "Main JS heap excludes Workers/GPU; Chrome RSS can double-count shared pages; native GPU allocation total unavailable",
+    "Frozen measured application SHA differs from later documentation-only publication; compare executable/runtime/catalog hashes without relabeling the measurement."
+  ]
+}

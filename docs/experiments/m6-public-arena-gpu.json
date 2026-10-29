@@ -1,0 +1,1300 @@
+{
+  "schema": 1,
+  "complete": true,
+  "platform": "linux",
+  "base": "https://voxelshogi.yousan-apps.workers.dev",
+  "startedAt": "2026-10-29T19:21:29.982Z",
+  "rows": [
+    {
+      "precision": "fp32",
+      "status": "done",
+      "renderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA)",
+      "record": {
+        "schema": 1,
+        "kind": "voxelshogi-arena-record",
+        "record": {
+          "ruleset_id": "voxelshogi-standard-v1",
+          "initial": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1",
+          "moves": [
+            "171161",
+            "111121"
+          ],
+          "result": null,
+          "termination": null
+        },
+        "viewCursor": 2,
+        "positionHash": "277cb6bce84bb0fc",
+        "observationsThroughCursor": [
+          {
+            "root": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 1,
+              "roundTripMs": 2573.5,
+              "result": {
+                "bestMove": "171161",
+                "value": 0.13175009191036224,
+                "rawAction": 134139,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp32",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp32",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000286102294921875,
+                        "maxRelative": 0.06786327111547057,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 2.682209014892578e-7,
+                        "maxRelative": 0.0000020358349937641243,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000026702880859375,
+                        "maxRelative": 5.084332803571224,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 2.5331974029541016e-7,
+                        "maxRelative": 0.0000017630928049530877,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000209808349609375,
+                        "maxRelative": 6.807865752970611,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0,
+                        "maxRelative": 0,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.00001430511474609375,
+                        "maxRelative": 0.8568904840062873,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000011324882507324219,
+                        "maxRelative": 0.000002916594007658055,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1104
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "Gemm": 120,
+                    "Add": 104,
+                    "LayerNormalization": 48,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "SkipLayerNormalization": 4,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                }
+              },
+              "inferenceMs": 16.300000000046566
+            }
+          },
+          {
+            "root": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 2,
+              "roundTripMs": 14.399999999906868,
+              "result": {
+                "bestMove": "111121",
+                "value": 0.1800222545862198,
+                "rawAction": 134137,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp32",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp32",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000286102294921875,
+                        "maxRelative": 0.06786327111547057,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 2.682209014892578e-7,
+                        "maxRelative": 0.0000020358349937641243,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000026702880859375,
+                        "maxRelative": 5.084332803571224,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 2.5331974029541016e-7,
+                        "maxRelative": 0.0000017630928049530877,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000209808349609375,
+                        "maxRelative": 6.807865752970611,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0,
+                        "maxRelative": 0,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.00001430511474609375,
+                        "maxRelative": 0.8568904840062873,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000011324882507324219,
+                        "maxRelative": 0.000002916594007658055,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1104
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "Gemm": 120,
+                    "Add": 104,
+                    "LayerNormalization": 48,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "SkipLayerNormalization": 4,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                }
+              },
+              "inferenceMs": 12.799999999813735
+            }
+          }
+        ],
+        "selectedAgents": {
+          "mode": "r-r",
+          "b": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "fp32",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          },
+          "w": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "fp32",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          }
+        },
+        "applicationCommit": "564715ab7bedd549bed5038e417b8cbedc32e134"
+      }
+    },
+    {
+      "precision": "fp16",
+      "status": "done",
+      "renderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA)",
+      "record": {
+        "schema": 1,
+        "kind": "voxelshogi-arena-record",
+        "record": {
+          "ruleset_id": "voxelshogi-standard-v1",
+          "initial": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1",
+          "moves": [
+            "171161",
+            "111121"
+          ],
+          "result": null,
+          "termination": null
+        },
+        "viewCursor": 2,
+        "positionHash": "277cb6bce84bb0fc",
+        "observationsThroughCursor": [
+          {
+            "root": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 1,
+              "roundTripMs": 2300.4000000001397,
+              "result": {
+                "bestMove": "171161",
+                "value": 0.1317315399646759,
+                "rawAction": 134139,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp16",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp16",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000041961669921875,
+                        "maxRelative": 0.8577771740762764,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.7881393432617188e-7,
+                        "maxRelative": 0.0000013574098628948167,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000030517578125,
+                        "maxRelative": 8.246185145826562,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 3.129243850708008e-7,
+                        "maxRelative": 0.0000021786860800737684,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000019073486328125,
+                        "maxRelative": 0.3149802696614982,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 5.960464477539063e-8,
+                        "maxRelative": 6.558334350968213e-8,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.00001633167266845703,
+                        "maxRelative": 2.472415809024527,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000011622905731201172,
+                        "maxRelative": 0.000002994109435160487,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1104
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "Gemm": 120,
+                    "Add": 104,
+                    "LayerNormalization": 48,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "SkipLayerNormalization": 4,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                },
+                "fp16WeightOnly": true
+              },
+              "inferenceMs": 21.699999999953434
+            }
+          },
+          {
+            "root": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 2,
+              "roundTripMs": 12.699999999953434,
+              "result": {
+                "bestMove": "111121",
+                "value": 0.17995885014533997,
+                "rawAction": 134137,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp16",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "fp16",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000041961669921875,
+                        "maxRelative": 0.8577771740762764,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.7881393432617188e-7,
+                        "maxRelative": 0.0000013574098628948167,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000030517578125,
+                        "maxRelative": 8.246185145826562,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 3.129243850708008e-7,
+                        "maxRelative": 0.0000021786860800737684,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000019073486328125,
+                        "maxRelative": 0.3149802696614982,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 5.960464477539063e-8,
+                        "maxRelative": 6.558334350968213e-8,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.00001633167266845703,
+                        "maxRelative": 2.472415809024527,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000011622905731201172,
+                        "maxRelative": 0.000002994109435160487,
+                        "exceeded": 0,
+                        "atol": 0.001,
+                        "rtol": 0.01
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1104
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "Gemm": 120,
+                    "Add": 104,
+                    "LayerNormalization": 48,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "SkipLayerNormalization": 4,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                },
+                "fp16WeightOnly": true
+              },
+              "inferenceMs": 10.800000000046566
+            }
+          }
+        ],
+        "selectedAgents": {
+          "mode": "r-r",
+          "b": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "fp16",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          },
+          "w": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "fp16",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          }
+        },
+        "applicationCommit": "564715ab7bedd549bed5038e417b8cbedc32e134"
+      }
+    },
+    {
+      "precision": "int8",
+      "status": "done",
+      "renderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA)",
+      "record": {
+        "schema": 1,
+        "kind": "voxelshogi-arena-record",
+        "record": {
+          "ruleset_id": "voxelshogi-standard-v1",
+          "initial": "lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL|lnnnnnnnl/1rbbbbbb1/ppppppppp/9/9/9/PPPPPPPPP/1BRRRRRR1/LNNNNNNNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL|lnsgggsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGGGSNL|lnsssssnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSSSSSNL|lnnnnnnnl/1rrrrrrb1/ppppppppp/9/9/9/PPPPPPPPP/1BBBBBBR1/LNNNNNNNL|lllllllll/9/ppppppppp/9/9/9/PPPPPPPPP/9/LLLLLLLLL b - 1",
+          "moves": [
+            "171161",
+            "111121"
+          ],
+          "result": null,
+          "termination": null
+        },
+        "viewCursor": 2,
+        "positionHash": "277cb6bce84bb0fc",
+        "observationsThroughCursor": [
+          {
+            "root": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 0,
+              "cursor": 0,
+              "side": "b",
+              "hash": "043b66e12f6b84fd",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 1,
+              "roundTripMs": 2284.399999999907,
+              "result": {
+                "bestMove": "171161",
+                "value": 0.13121671974658966,
+                "rawAction": 134139,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "int8",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "int8",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000041961669921875,
+                        "maxRelative": 0.11351943004557737,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.043081283569336e-7,
+                        "maxRelative": 7.949307944606497e-7,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000247955322265625,
+                        "maxRelative": 1.1905471750674506,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.341104507446289e-7,
+                        "maxRelative": 9.221205658295724e-7,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000019073486328125,
+                        "maxRelative": 0.5708221005019735,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 5.960464477539063e-8,
+                        "maxRelative": 6.573369086326018e-8,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000016689300537109375,
+                        "maxRelative": 3.85229706612374,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000010132789611816406,
+                        "maxRelative": 0.000002486265212835271,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1232
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "DequantizeLinear": 124,
+                    "Gemm": 120,
+                    "Add": 108,
+                    "LayerNormalization": 52,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                }
+              },
+              "inferenceMs": 16.600000000093132
+            }
+          },
+          {
+            "root": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1"
+            },
+            "reply": {
+              "revision": 1,
+              "cursor": 1,
+              "side": "w",
+              "hash": "8e58bd4197156fe9",
+              "ruleset": "voxelshogi-standard-v1",
+              "requestId": 2,
+              "roundTripMs": 12.600000000093132,
+              "result": {
+                "bestMove": "111121",
+                "value": 0.17725583910942078,
+                "rawAction": 134137,
+                "rawLegal": false
+              },
+              "kind": "model-result",
+              "model": {
+                "sourceId": "local-1",
+                "repo": "voxelshogi/voxelshogi-transformer-s",
+                "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+                "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+                "license": "Apache-2.0",
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "int8",
+                  "backend": "webgpu"
+                }
+              },
+              "validation": {
+                "selection": {
+                  "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                  "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                  "precision": "int8",
+                  "backend": "webgpu"
+                },
+                "fixtures": [
+                  {
+                    "name": "initial-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000041961669921875,
+                        "maxRelative": 0.11351943004557737,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.043081283569336e-7,
+                        "maxRelative": 7.949307944606497e-7,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "after-one-w",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.0000247955322265625,
+                        "maxRelative": 1.1905471750674506,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 1.341104507446289e-7,
+                        "maxRelative": 9.221205658295724e-7,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "mate-in-one-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000019073486328125,
+                        "maxRelative": 0.5708221005019735,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 5.960464477539063e-8,
+                        "maxRelative": 6.573369086326018e-8,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  },
+                  {
+                    "name": "material-b",
+                    "comparison": {
+                      "policy": {
+                        "elements": 1067985,
+                        "maxAbs": 0.000016689300537109375,
+                        "maxRelative": 3.85229706612374,
+                        "exceeded": 0,
+                        "atol": 0.0001,
+                        "rtol": 0.0001
+                      },
+                      "value": {
+                        "elements": 1,
+                        "maxAbs": 0.0000010132789611816406,
+                        "maxRelative": 0.000002486265212835271,
+                        "exceeded": 0,
+                        "atol": 0.00001,
+                        "rtol": 0.0001
+                      }
+                    }
+                  }
+                ],
+                "information": {
+                  "backend": "webgpu",
+                  "adapter": {
+                    "vendor": "nvidia",
+                    "architecture": "blackwell",
+                    "device": "",
+                    "description": ""
+                  },
+                  "features": [
+                    "timestamp-query"
+                  ],
+                  "runtimeBytes": 29262847,
+                  "computePrecision": "float32"
+                },
+                "profile": {
+                  "providers": {
+                    "WebGpuExecutionProvider": 1232
+                  },
+                  "operators": {
+                    "Reshape": 288,
+                    "DequantizeLinear": 124,
+                    "Gemm": 120,
+                    "Add": 108,
+                    "LayerNormalization": 52,
+                    "Slice": 72,
+                    "Squeeze": 72,
+                    "Transpose": 112,
+                    "MatMul": 52,
+                    "Div": 28,
+                    "Softmax": 24,
+                    "Pow": 28,
+                    "Mul": 112,
+                    "Tanh": 32,
+                    "ReduceMean": 4,
+                    "Concat": 4
+                  }
+                }
+              },
+              "inferenceMs": 10.800000000046566
+            }
+          }
+        ],
+        "selectedAgents": {
+          "mode": "r-r",
+          "b": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "int8",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          },
+          "w": {
+            "controller": "ai",
+            "difficulty": "model",
+            "model": {
+              "sourceId": "local-1",
+              "repo": "voxelshogi/voxelshogi-transformer-s",
+              "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+              "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+              "license": "Apache-2.0",
+              "selection": {
+                "modelId": "voxelshogi-transformer-s-m6-314159-v1",
+                "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+                "precision": "int8",
+                "backend": "webgpu"
+              }
+            },
+            "decision": "legal-policy-argmax-smallest-action-tie"
+          }
+        },
+        "applicationCommit": "564715ab7bedd549bed5038e417b8cbedc32e134"
+      }
+    }
+  ],
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 11141,
+        "vendorString": "",
+        "deviceString": "",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "580.159.3.0"
+      },
+      {
+        "vendorId": 4115,
+        "deviceId": 184,
+        "vendorString": "",
+        "deviceString": "",
+        "driverVendor": "",
+        "driverVersion": ""
+      }
+    ],
+    "auxAttributes": {
+      "amdSwitchable": false,
+      "canSupportThreadedTextureMailbox": false,
+      "directRenderingVersion": "",
+      "displayType": "ANGLE_VULKAN",
+      "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_image GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_logic_op GL_ANGLE_memory_object_flags GL_ANGLE_memory_size GL_ANGLE_multi_draw GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_read_only_depth_stencil_feedback_loops GL_ANGLE_relaxed_vertex_attribute_type GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_rgbx_internal_format GL_ANGLE_robust_client_memory GL_ANGLE_robust_fragment_shader_output GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_ANGLE_vulkan_image GL_ANGLE_yuv_internal_format GL_ARM_rgba8 GL_ARM_shader_framebuffer_fetch GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_array GL_EXT_EGL_image_external_wrap_modes GL_EXT_EGL_image_storage GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_buffer_storage GL_EXT_clear_texture GL_EXT_clip_control GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_compressed_ETC1_RGB8_sub_texture GL_EXT_conservative_depth GL_EXT_copy_image GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_fragment_shading_rate GL_EXT_fragment_shading_rate_primitive GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_memory_object GL_EXT_memory_object_fd GL_EXT_multisample_compatibility GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_sRGB_write_control GL_EXT_semaphore GL_EXT_semaphore_fd GL_EXT_separate_shader_objects GL_EXT_shader_framebuffer_fetch GL_EXT_shader_framebuffer_fetch_non_coherent GL_EXT_shader_non_constant_global_initializers GL_EXT_shader_texture_lod GL_EXT_shadow_samplers GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_decode GL_EXT_texture_shadow_lod GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_blend_equation_advanced GL_KHR_blend_equation_advanced_coherent GL_KHR_debug GL_KHR_robustness GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_polygon_mode GL_NV_read_depth GL_NV_read_depth_stencil GL_NV_read_stencil GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_EGL_sync GL_OES_compressed_ETC1_RGB8_texture GL_OES_compressed_paletted_texture GL_OES_copy_image GL_OES_depth24 GL_OES_depth32 GL_OES_depth_texture GL_OES_depth_texture_cube_map GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_shading GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_3D GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OES_vertex_half_float GL_OES_vertex_type_10_10_10_2 GL_OVR_multiview GL_OVR_multiview2 GL_QCOM_shading_rate GL_QCOM_texture_lod_bias ",
+      "glImplementationParts": "(gl=egl-angle,angle=vulkan)",
+      "glRenderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA-580.159.3.0)",
+      "glResetNotificationStrategy": 33362,
+      "glVendor": "Google Inc. (NVIDIA)",
+      "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_surface_orientation EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_EXT_image_gl_colorspace EGL_KHR_gl_colorspace EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_texture_3D_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_fence_sync EGL_KHR_wait_sync EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_KHR_swap_buffers_with_damage EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_IMG_context_priority EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_EXT_buffer_age EGL_KHR_mutable_render_buffer EGL_ANGLE_create_surface_swap_interval EGL_ANGLE_vulkan_image EGL_KHR_partial_update EGL_ANGLE_global_fence_sync EGL_ANGLE_memory_usage_report ",
+      "glWsVendor": "Google Inc. (NVIDIA)",
+      "glWsVersion": "1.5 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "hardwareSupportsVulkan": true,
+      "inProcessGpu": false,
+      "initializationTime": 1.372508,
+      "isAsan": false,
+      "isClangCoverage": false,
+      "jpegDecodeAcceleratorSupported": false,
+      "maxMsaaSamples": "8",
+      "optimus": false,
+      "passthroughCmdDecoder": true,
+      "pixelShaderVersion": "3.00",
+      "processCrashCount": 0,
+      "sandboxed": false,
+      "skiaBackendType": "GaneshVulkan",
+      "subpixelFontRendering": true,
+      "targetCpuBits": 64,
+      "vertexShaderVersion": "3.00",
+      "visibilityCallbackCallCount": 0
+    },
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "disabled_software",
+      "vulkan": "enabled_on",
+      "webgl": "enabled",
+      "webgpu": "enabled",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "driverBugWorkarounds": [
+      "enable_webgl_timer_query_extensions",
+      "exit_on_context_lost",
+      "disabled_extension_GL_KHR_blend_equation_advanced",
+      "disabled_extension_GL_KHR_blend_equation_advanced_coherent"
+    ],
+    "videoDecoding": [],
+    "videoEncoding": []
+  },
+  "applicationCommit": "564715ab7bedd549bed5038e417b8cbedc32e134",
+  "finishedAt": "2026-10-29T19:21:46.265Z"
+}
