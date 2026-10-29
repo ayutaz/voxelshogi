@@ -1,0 +1,26 @@
+{
+  "schema": "voxelshogi-m6-execution-approval-v1",
+  "approved_on": "2026-10-29",
+  "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+  "license": "Apache-2.0",
+  "license_approved": true,
+  "inference_repository": "voxelshogi/voxelshogi-transformer-s",
+  "state_repository": "voxelshogi/voxelshogi-transformer-s-training-state",
+  "state_publication_approved": true,
+  "private": false,
+  "gated": "manual",
+  "community_disabled": true,
+  "gpu": {
+    "existing_project_maximum_usd": 100,
+    "m6_base_maximum_usd": 24,
+    "initial_trial_maximum_usd": 4,
+    "initial_trial_maximum_seconds": 14400,
+    "conditional_additional_usd": 100,
+    "conditional_project_ceiling_usd": 200,
+    "conditional_m6_ceiling_usd": 124,
+    "additional_budget_activated": false,
+    "activation_condition": "Use the additional GPU budget only when measured estimates show the base allocation is insufficient; record the estimate before activation."
+  },
+  "state_maximum_cumulative_new_upload_bytes": 1073741824,
+  "paid_storage_upgrade_approved": false
+}

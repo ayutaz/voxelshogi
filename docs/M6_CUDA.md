@@ -45,6 +45,6 @@ uv run --project infrastructure/cuda --locked python -m training.cuda_trial runs
 
 同01:41 UTCの全28 instance typeのカタログでは、提供される永続volume種別がすべて空だった。保存先の第一案だった同サービスvolumeは現時点では使える前提にしない。停止VMの課金・耐久性は未確認で、terminate後の旧diskの猶予期間も恒久的な退避には数えない。**保存方法・保持期限・費用を確定するまで有料試行は始めない。**
 
-ユーザーの既存のHF送信承認は利用する。M6モデルのライセンスとGPU学習費は未確定であり、実行に必要な具体案をまとめて提示する。M4用のUS$100承認を自動転用しない。開発やCI待ちの間はGPUを保持しない。
+2026-10-29にM6基本枠US$24（既存US$100内）、初回最大4時間／US$4、成果物のApache-2.0、別HF repoへの再開状態公開を個別承認済み。不足時の追加GPU予算US$100も承認済みで、実測による不足を記録してから使う。保存方針は[確定案](M6_RUN_PROPOSAL.md)、承認元は[実行承認記録](../export/m6-approval.json)。既存のHF送信承認も利用する。開発やCI待ちの間はGPUを保持しない。
 
 一次資料：[uvのPyTorch index設定](https://docs.astral.sh/uv/guides/integration/pytorch/)、[公式CUDA13.0 torch index](https://download.pytorch.org/whl/cu130/torch/)、[NVIDIAのCUDA13.x／driver580互換性](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)、[CloudRiftの料金方針](https://www.cloudrift.ai/pricing)。料金と空きの具体値は一般の広告価格ではなく、上記時点のAPI結果を用いた。

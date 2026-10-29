@@ -1,6 +1,6 @@
 # 再開状態の公開profileとアップロード上限
 
-[再開archive](M6_RESUME_ARCHIVE.md)専用の`artifact_role="training-state"`を準備する。**optimizer・乱数状態の公開方針と学習済み成果物のライセンスはまだ確認待ち。実repo作成・転送・GPU起動は行っていない。** [具体案](M6_RUN_PROPOSAL.md)が確定するまで、実際のplanで公開承認をtrueにしない。
+[再開archive](M6_RESUME_ARCHIVE.md)専用の`artifact_role="training-state"`を準備する。**2026-10-29にoptimizer・乱数状態の別HF repo公開と成果物のApache-2.0をユーザーが承認済み。実repo作成・転送・GPU起動は未実施。** [確定方針](M6_RUN_PROPOSAL.md)と[承認記録](../export/m6-approval.json)に基づき、実planを作る。
 
 ## 目的と送信範囲
 

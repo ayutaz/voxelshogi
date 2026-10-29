@@ -7,7 +7,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M6_PLAN.md` のM6-2起動前準備（M6-0〜1の実装とCPU CIは取り込み済み）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。教師契約／検査器はPR #47で取り込み済み。読み込み・損失・更新／評価はPR #48でLinux CI成功後に取り込み済み。学習CLI／checkpointもPR #49のCPU CI成功後に取り込み済み。CUDA依存・probe・試行コードもPR #50で取り込み済み。固定test／対局評価・評価した重みからの3形式変換・JSONとsafetensorsの保存復元もPR #51〜#53で取り込み済み。端末内モデル読込はPR #54、特徴量・同形式照合sessionもPR #55〜#56で取り込み済み。PR #56のLinux CIでWeb240テスト・80既知変異と、実WASMからPython入力hashへの4件照合が成功。Worker通信と観戦制御もPR #57〜#58の必須CI成功後に取り込み済み。モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2EはPR #59で全6件と必須CI成功後に取り込み、mainの公開検証も成功（`docs/M6_ARENA.md`）。推論用HFパッケージprofileもPR #60で取り込み済み。再開状態の公開profileはPR #61の必須CI成功後に取り込み済み。M6用途別の費用・終了制御はPR #62で最新mainに対するCI検証中。GPUの費用・保存・ライセンス案は判断待ち。実データのsplit別教師数は未集計で、外部GPU試行の冒頭に確定してから学習する。
+- 次の実行計画: `docs/M6_PLAN.md` のM6-2起動前準備（M6-0〜1の実装とCPU CIは取り込み済み）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。教師契約／検査器はPR #47で取り込み済み。読み込み・損失・更新／評価はPR #48でLinux CI成功後に取り込み済み。学習CLI／checkpointもPR #49のCPU CI成功後に取り込み済み。CUDA依存・probe・試行コードもPR #50で取り込み済み。固定test／対局評価・評価した重みからの3形式変換・JSONとsafetensorsの保存復元もPR #51〜#53で取り込み済み。端末内モデル読込はPR #54、特徴量・同形式照合sessionもPR #55〜#56で取り込み済み。PR #56のLinux CIでWeb240テスト・80既知変異と、実WASMからPython入力hashへの4件照合が成功。Worker通信と観戦制御もPR #57〜#58の必須CI成功後に取り込み済み。モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2EはPR #59で全6件と必須CI成功後に取り込み、mainの公開検証も成功（`docs/M6_ARENA.md`）。推論用HFパッケージprofileもPR #60で取り込み済み。再開状態の公開profileはPR #61の必須CI成功後に取り込み済み。M6用途別の費用・終了制御もPR #62の必須CI成功後に取り込み済み。2026-10-29にM6基本枠US$24（既存総枠US$100内）、成果物のApache-2.0、別HF repoへの再開状態公開が承認済み。不足時の追加GPU予算US$100も承認済みで、実測見積もりにより不足を確認してから使う。詳細は `export/m6-approval.json` と `docs/M6_RUN_PROPOSAL.md`。実データのsplit別教師数は未集計で、外部GPU試行の冒頭に確定してから学習する。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -79,9 +79,9 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 
 - 対局モードはAI vs AI観戦を主とし、人間 vs AIを補助機能とする。人間同士の対局（ローカル・オンライン）とマルチプレイは実装しない。
 - GitHub は `ayutaz/voxelshogi`。2026-10-25 に Public 化した。GitHub Actions（Public は無料）を最大限活用し、すべてのテストを CI で回す。
-- コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。M4自作合成データv1（初回試料と本生成）のCC-BY-4.0は2026-10-28にユーザー承認済み。M6学習済みモデルは公開前に別途確認する。
-- 費用は2026-10-28のユーザー承認で合計US$100まで。初回・試料公開・本生成を同じ累積予算で管理する。各ジョブの単価・時間・上限・残額を記録し、承認済み同目的・総枠内の利用を再承認待ちに戻さない。学習等の別目的や総枠超過は着手前に確認する。
-- M3の未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版は、2026-10-27にApache-2.0での初回公開をユーザーが承認した。設定は `export/publication.json`。承認はこの検証用モデルだけを対象とし、M6の学習済みモデルとデータセットは別途確認する。
+- コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。M4自作合成データv1（初回試料と本生成）のCC-BY-4.0は2026-10-28にユーザー承認済み。M6の `voxelshogi-transformer-s-m6-314159-v1` と再開状態のApache-2.0は2026-10-29に個別承認済み（`export/m6-approval.json`）。
+- 費用は2026-10-28のユーザー承認で合計US$100まで。初回・試料公開・本生成を同じ累積予算で管理する。各ジョブの単価・時間・上限・残額を記録し、承認済み同目的・総枠内の利用を再承認待ちに戻さない。2026-10-29にM6基本枠US$24をこの総枠内に明示配分し、不足時の追加GPU予算US$100も承認された。M6上限は条件付きUS$124、全体はUS$200。追加枠は実測見積もりで不足を確認・記録してから有効化し、各レンタル前にledgerと制御の上限を一致させる。有料保存の追加は含まない。
+- M3の未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版は、2026-10-27にApache-2.0での初回公開をユーザーが承認した。設定は `export/publication.json`。この承認は検証用モデルだけを対象とする。M4データとM6成果物はそれぞれ上記の別の明示承認に基づく。
 - Pythonの実行は `uv run`、ライブラリ管理は `uv add` と `uv.lock` を使う。Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
 - データセット・モデルの公開先はHugging Faceの`voxelshogi/`配下（2026-10-28ユーザー指定）。認証アカウントは`ayousanz`。[hf-publicationスキル](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。public/manualの取得ゲート・Community OFF・Dataset Cardとライセンスを確認し、外部Linuxから直接転送・hash照合する。Macには検証用モデルと小さい実行記録だけを保存し、データセット・学習checkpointを置かない。
@@ -107,5 +107,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、小規模CUDA試行を見積もり・承認後に実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開の試行コードを準備中。実GPUでは未実行。M4の費用承認を学習へ転用しない。
+  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、承認済みの最大4時間／US$4のCUDA試行を実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開の試行コードを準備中。実GPUでは未実行。M6の個別承認と実測見積もりを使い、追加GPU枠は不足時だけ有効化する。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

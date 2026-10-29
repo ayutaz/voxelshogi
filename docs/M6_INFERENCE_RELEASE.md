@@ -1,6 +1,6 @@
 # 学習済み推論パッケージのHF公開
 
-[HF公開ハーネス](HF_PUBLICATION.md)に`artifact_role="inference-package"`を追加する。対象はM6のval選択・固定評価済みの重みから作った3形式と同形式の照合データ。通常のmodel／datasetの許可範囲は広げず、任意の`.f32`やoptimizerを追加可能にはしない。**実データ監査・実学習・学習済みモデルの公開はまだ行っていない。** [費用・ライセンス・再開状態公開の具体案](M6_RUN_PROPOSAL.md)も確認待ち。
+[HF公開ハーネス](HF_PUBLICATION.md)に`artifact_role="inference-package"`を追加する。対象はM6のval選択・固定評価済みの重みから作った3形式と同形式の照合データ。通常のmodel／datasetの許可範囲は広げず、任意の`.f32`やoptimizerを追加可能にはしない。**実データ監査・実学習・学習済みモデルの公開はまだ行っていない。** [費用・ライセンス・再開状態公開の方針](M6_RUN_PROPOSAL.md)は2026-10-29に個別承認済み。
 
 ## 目的と範囲
 
@@ -26,7 +26,7 @@ NOTICEなしで37ファイル。固定の相対パス以外、隠しファイル
 
 ## 外部Linuxでの実行
 
-生成・変換の検証済みフォルダーへ元の`evaluation.json`・`test.json`と完成したCard／LICENSEをコピーする。Macへモデルや評価データを中継しない。以下の`license_approved=True`は、対象の学習済み成果物のライセンスが確定してからだけ使う。既存のM3許可を流用しない。
+生成・変換の検証済みフォルダーへ元の`evaluation.json`・`test.json`と完成したCard／LICENSEをコピーする。Macへモデルや評価データを中継しない。以下の`license_approved=True`は、2026-10-29に個別承認されたM6対象モデルのApache-2.0に基づく（[承認記録](../export/m6-approval.json)）。既存のM3許可の流用ではない。
 
 ```python
 from training.hub_release import plan_release

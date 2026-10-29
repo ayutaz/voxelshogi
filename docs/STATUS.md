@@ -25,13 +25,13 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 [小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
 
-現在着手しているのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、上記は文書更新時の固定基準。その後[M6教師契約・検査器](M6_TRAINING_CONTRACT.md)は[PR #47](https://github.com/ayutaz/voxelshogi/pull/47)の必須8チェック成功後、main `bbc51c6`へ取り込み済み。[M6-1の読み込み・損失・学習CLI・保存再開](M6_RUNTIME.md)もPR #48〜#49の必須CI成功後に取り込み済み。PR #49はLinuxの全255テストと85変異に成功し、main `6a285d6`へ統合した。[CUDA準備](M6_CUDA.md)・固定評価・評価した重みからの変換・再開archiveもPR #50〜#53で取り込み済み。[端末内モデル読込](M6_LOCAL_MODEL.md)と[特徴量・session](M6_SESSION.md)もPR #54〜#56で必須CI成功後に取り込み済み。PR #56のLinux CIはWeb240テスト・80既知変異、実WASMとPython入力hashの4件照合に成功。[Worker通信](M6_WORKER.md)と観戦制御もPR #57〜#58で取り込み済み。[モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2E](M6_ARENA.md)はPR #59の必須8チェックと全6実ブラウザE2E成功後に取り込み、mainの公開検証も成功。[固定記録](experiments/m6-arena-integration-2026-10-29.json)。[推論パッケージの公開profile](M6_INFERENCE_RELEASE.md)もPR #60で取り込み済み。[再開状態公開profile](M6_STATE_RELEASE.md)もPR #61の必須CI成功後に取り込み済み。[M6の用途別予算・終了制御](M6_RENTAL_CONTROL.md)はPR #62で最新mainに対するCI検証中。実データ監査・レンタル・GPU学習は未実施で、[費用・保存・ライセンス案](M6_RUN_PROPOSAL.md)の判断待ち。
+現在着手しているのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、上記は文書更新時の固定基準。その後[M6教師契約・検査器](M6_TRAINING_CONTRACT.md)は[PR #47](https://github.com/ayutaz/voxelshogi/pull/47)の必須8チェック成功後、main `bbc51c6`へ取り込み済み。[M6-1の読み込み・損失・学習CLI・保存再開](M6_RUNTIME.md)もPR #48〜#49の必須CI成功後に取り込み済み。PR #49はLinuxの全255テストと85変異に成功し、main `6a285d6`へ統合した。[CUDA準備](M6_CUDA.md)・固定評価・評価した重みからの変換・再開archiveもPR #50〜#53で取り込み済み。[端末内モデル読込](M6_LOCAL_MODEL.md)と[特徴量・session](M6_SESSION.md)もPR #54〜#56で必須CI成功後に取り込み済み。PR #56のLinux CIはWeb240テスト・80既知変異、実WASMとPython入力hashの4件照合に成功。[Worker通信](M6_WORKER.md)と観戦制御もPR #57〜#58で取り込み済み。[モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2E](M6_ARENA.md)はPR #59の必須8チェックと全6実ブラウザE2E成功後に取り込み、mainの公開検証も成功。[固定記録](experiments/m6-arena-integration-2026-10-29.json)。[推論パッケージの公開profile](M6_INFERENCE_RELEASE.md)もPR #60で取り込み済み。[再開状態公開profile](M6_STATE_RELEASE.md)もPR #61の必須CI成功後に取り込み済み。[M6の用途別予算・終了制御](M6_RENTAL_CONTROL.md)もPR #62の必須CI成功後に取り込み済み。実データ監査・レンタル・GPU学習は未実施。[費用・保存・ライセンス方針](M6_RUN_PROPOSAL.md)は2026-10-29に個別承認済みで、次は最大4時間／US$4の実GPU試行。[承認記録](../export/m6-approval.json)。
 
 ## M4・M5の完了確認（2026-10-29 JST）
 
 [本生成の完了記録](M4_COMPLETION.md)。1,800局・116,921行から重複3,600行を除いた有効113,321局面・探索教師36,894件を全件検証。全再生成のバイト一致後、HF commit `6e7fb29d2469b56a895042fbb089d86e7b4d074f`へ`production-64`とDataset Cardを公開し、対象1,831ファイルの全hashが一致した。public/manual・Community OFF、CC-BY-4.0を確認。実機は終了・資源解放、稼働中VoxelShogi実機0・永続volume 0件。
 
-生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6学習は未実行で別途見積もる。HF送信と同目的の所有実機の置き換えは継続承認済み。
+生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6基本枠US$24は既存US$100内に個別配分済み。不足時の追加GPU予算US$100も承認済み（M6最大US$124・全体最大US$200）だが、実測見積もりで不足を記録するまで有効化しない。M6学習は未実行。HF送信と同目的の所有実機の置き換えは継続承認済み。
 
 実装・公開準備はPR #43、開始記録と継続承認はPR #44を必須8チェック成功後に通常merge。統合後のmain CI・公開検証も成功した。M5は[PR #42・固定3局145手の全件一致](M5_PLAN.md)で、全棋譜の完全互換は主張しない。
 
@@ -130,7 +130,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [TECH_STACK_RESEARCH](TECH_STACK_RESEARCH.md)、[COST_ESTIMATE](COST_ESTIMATE.md) | 固定済み構成と公開実測を更新。初回の外部版・GPU相場・為替・ドメイン価格は取得日付き参考値で、採用／課金時に再取得する |
 | [AGENTS](../AGENTS.md)、[CONTRIBUTING](../CONTRIBUTING.md)、[SECURITY](../SECURITY.md)、[PRテンプレート](../.github/pull_request_template.md)、[ci-checks](../.agents/skills/ci-checks/SKILL.md) | ブランチ・TDD・PR・秘密情報・最短10分間隔のCI確認という現行方針と整合を確認。追加の承認フローや人間同士の対局は導入しない |
 
-外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M4・M5は完了し、M6-0〜1の実装準備にユーザー側の追加作業はない。M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6の学習予算・学習済みモデルのライセンスは記載の時点で別に確定する。
+外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M4・M5は完了し、M6-0〜1の実装準備にユーザー側の追加作業はない。M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6基本枠US$24と不足時の追加GPU予算US$100、対象モデル・再開状態のApache-2.0、別repoへのpublic/manual・Community OFF公開は2026-10-29に個別承認済み。追加枠は不足の実測見積もりを記録後に有効化する。
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 
