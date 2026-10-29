@@ -15,6 +15,15 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'policy-white-rotation', file: 'inference/policy-contract.ts', before: "board[side === 'b' ? cell : 728 - cell]", after: 'board[cell]', test: 'policy-contract' },
+  { name: 'policy-white-ownership', file: 'inference/policy-contract.ts', before: '(piece - 1 + 14) % 28 + 1', after: 'piece', test: 'policy-contract' },
+  { name: 'policy-hand-normalization', file: 'inference/policy-contract.ts', before: "hands[side === 'b' ? i : (i + 7) % 14]! / HAND_TOTALS[i % 7]!", after: "hands[side === 'b' ? i : (i + 7) % 14]! / 162", test: 'policy-contract' },
+  { name: 'policy-drop-kind', file: 'inference/policy-contract.ts', before: 'HAND_KINDS.indexOf(move.drop!)', after: '(6 - HAND_KINDS.indexOf(move.drop!))', test: 'policy-contract' },
+  { name: 'policy-promotion', file: 'inference/policy-contract.ts', before: '+ Number(move.promote)', after: '+ 0', test: 'policy-contract' },
+  { name: 'policy-legal-only', file: 'inference/policy-contract.ts', before: 'const choices = legal.map(move =>', after: "const choices = ['111111', ...legal].map(move =>", test: 'policy-contract' },
+  { name: 'policy-canonical-tie', file: 'inference/policy-contract.ts', before: '.sort((a, b) => a.action - b.action)', after: '.sort((a, b) => b.action - a.action)', test: 'policy-contract' },
+  { name: 'policy-value-perspective', file: 'inference/policy-contract.ts', before: 'value: value[0]!, rawAction', after: "value: side === 'w' ? -value[0]! : value[0]!, rawAction", test: 'policy-contract' },
+  { name: 'policy-last-finite', file: 'inference/policy-contract.ts', before: 'action < POLICY_ELEMENTS;', after: 'action < POLICY_ELEMENTS - 1;', test: 'policy-contract' },
   { name: 'local-model-approval', file: 'inference/local-model.ts', before: 'if (release.approved !== true)', after: 'if (false)', test: 'local-model' },
   { name: 'local-model-descriptor-snapshot', file: 'inference/local-model.ts', before: 'known.set(file.path, { ...file });', after: 'known.set(file.path, file);', test: 'local-model' },
   { name: 'local-model-unlisted-file', file: 'inference/local-model.ts', before: 'const expected = known.get(file.path);', after: 'const expected = file;', test: 'local-model' },
@@ -119,7 +128,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 59);
+    assert.equal(results.length, 68);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
