@@ -40,13 +40,22 @@ export function parseTrainedCatalog(value: unknown): TrainedRelease[] {
       typeof release.repo !== 'string' || !/^voxelshogi\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(release.repo) || typeof release.revision !== 'string' || !/^[0-9a-f]{40}$/.test(release.revision)) throw new Error('invalid trained release identity');
     const manifest = descriptor(release.manifest);
     if (manifest.path !== 'manifest.json' || manifest.bytes > 1024 * 1024) throw new Error('invalid trained manifest descriptor');
-    if (!Array.isArray(release.notices) || release.notices.length < 2 || release.notices.length > 16) throw new Error('trained release requires card/license notices');
+    if (!Array.isArray(release.notices) || release.notices.length < 2 || release.notices.length > 3) throw new Error('trained release requires card/license notices');
     const notices = release.notices.map(descriptor), paths = notices.map(file => file.path);
-    if (!paths.includes('README.md') || !paths.includes('LICENSE') || new Set(paths).size !== paths.length || paths.includes('manifest.json')) throw new Error('invalid trained card/license descriptors');
+    if (!paths.includes('README.md') || !paths.includes('LICENSE') || new Set(paths).size !== paths.length || notices.some(file => !['README.md', 'LICENSE', 'NOTICE'].includes(file.path) || file.bytes > 1024 * 1024)) throw new Error('invalid trained card/license notice descriptors');
     return structuredClone({ ...release, manifest, notices }) as unknown as TrainedRelease;
   });
   if (new Set(releases.map(release => release.id)).size !== releases.length) throw new Error('duplicate trained model identity');
   return releases;
+}
+
+export async function readTrainedCatalog(url: string, fetcher: typeof fetch = fetch, signal?: AbortSignal): Promise<unknown> {
+  const response = await fetcher(url, { cache: 'no-store', credentials: 'omit', redirect: 'error', ...(signal ? { signal } : {}) });
+  if (!response.ok) throw new Error(`model catalog download failed: ${response.status}`);
+  const text = await response.text();
+  if (text.length > 1024 * 1024) throw new Error('oversized model catalog');
+  signal?.throwIfAborted();
+  try { return JSON.parse(text); } catch { throw new Error('invalid model catalog JSON'); }
 }
 
 /** Indexes only metadata. Model bytes are read lazily by the dedicated Worker. */

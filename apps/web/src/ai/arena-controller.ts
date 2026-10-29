@@ -3,6 +3,7 @@ import type { SearchClient } from './search-client';
 import type { SearchConfig, SearchInput, SearchSuccess } from './search-protocol';
 import { ArenaClient } from './arena-client';
 import { modelSeatKey, type ModelCompleted, type ModelDecision, type ModelSeat } from './arena-model';
+import { ArenaJournal } from './arena-record';
 
 export type ArenaMode = 'r-r' | 'h-r' | 'r-h';
 export type ArenaDifficulty = 'easy' | 'normal' | 'model';
@@ -35,6 +36,7 @@ type Store = Pick<GameStore, 'subscribe' | 'searchState' | 'applyAiMove'> & { sn
 
 /** Owns asynchronous turn scheduling; React only renders state and sends actions. */
 export class ArenaController {
+  readonly journal = new ArenaJournal();
   private options = { ...DEFAULT_AI_OPTIONS };
   private key = this.searchKey(this.options);
   private state: AiStatus = { phase: 'paused', error: null, last: null };
@@ -52,6 +54,7 @@ export class ArenaController {
   constructor(private readonly store: Store, private readonly client: Client = new ArenaClient()) {
     this.unsubscribe = store.subscribe(() => {
       if (this.applying || this.disposed) return;
+      this.journal.reconcile(store.searchState().recordJson);
       this.invalidate();
       this.state = { ...this.state, last: null, error: null };
       this.schedule();
@@ -148,8 +151,9 @@ export class ArenaController {
       this.publish('thinking');
       const root = this.store.searchState();
       const difficulty = root.side === 'b' ? this.options.bDifficulty : this.options.wDifficulty;
+      const search = { seed: (this.options.seed + root.revision) >>> 0, limits: structuredClone(this.options.limits) };
       void this.decide({ ...root, schema: 1, kind: 'search', difficulty,
-        seed: (this.options.seed + root.revision) >>> 0, limits: this.options.limits }).then((reply) => {
+        seed: search.seed, limits: search.limits }).then((reply) => {
         if (this.disposed || generation !== this.generation) return;
         this.pending = false;
         this.applying = true;
@@ -162,6 +166,7 @@ export class ArenaController {
           else {
             const applied = this.store.applyAiMove(reply, reply.result.bestMove);
             if (!applied.ok) error = applied.error;
+            else this.journal.accept(root, search, reply);
           }
         } finally { this.applying = false; }
         this.state = { ...this.state, last: reply, error };

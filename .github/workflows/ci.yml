@@ -121,8 +121,8 @@ jobs:
       - run: uv sync --locked
       - name: Validate external CUDA lock without installing GPU packages
         run: uv lock --project infrastructure/cuda --check
-      - run: uv run --locked ruff check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
-      - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
+      - run: uv run --locked ruff check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py scripts/ci/prepare-m6-model.py
+      - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py scripts/ci/prepare-m6-model.py
       - run: uv run --locked pytest -q
       - name: Verify remote pilot on CI CPU without claiming GPU measurements
         run: uv run --locked python -m training.pilot runs/m4/ci-pilot --provider ci --allow-no-gpu --smoke --seconds 30
@@ -163,12 +163,19 @@ jobs:
       - run: pnpm --dir apps/web install --frozen-lockfile
       - run: pnpm --dir apps/web wasm
       - run: uv run --locked python -m export.generate runs/m3/ci
+      - name: Prepare synthetic private arena fixture without training or publication
+        run: uv run --locked python scripts/ci/prepare-m6-model.py
       - name: Prepare local-only models without publishing binaries
         run: node scripts/prepare-inference.mjs runs/m3/ci apps/web/public/models/m3 --local
       - run: pnpm --dir apps/web build
       - run: pnpm --dir apps/web exec playwright install chromium
       - name: Verify all formats and real Worker interaction
         run: pnpm exec playwright test -c model-playwright.config.ts
+        working-directory: apps/web
+        env:
+          PW_CHANNEL: ''
+      - name: Verify local-file models in AI spectator and human versus AI
+        run: pnpm exec playwright test -c arena-model-playwright.config.ts
         working-directory: apps/web
         env:
           PW_CHANNEL: ''

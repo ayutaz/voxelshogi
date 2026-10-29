@@ -3,6 +3,14 @@ import { indexLocalFolder, loadLocalModel, parseTrainedCatalog } from '../src/in
 import { digest, ref, releaseFixture, trainedFixture } from './local-model-fixtures';
 
 afterEach(() => vi.unstubAllGlobals());
+it('limits main-thread notices to small card/license text, never model bodies', () => {
+  for (const notice of [ref('weights.onnx', 'abc'), { ...ref('NOTICE', 'abc'), bytes: 1024 * 1024 + 1 }]) {
+    const release = releaseFixture(); release.notices.push(notice);
+    expect(() => parseTrainedCatalog({ schema: 1, releases: [release] })).toThrow(/notice|descriptor/i);
+  }
+  const release = releaseFixture(); release.notices.push(ref('NOTICE', 'attribution'));
+  expect(parseTrainedCatalog({ schema: 1, releases: [release] })[0]!.notices).toHaveLength(3);
+});
 function entry(path: string, text: string, size = new TextEncoder().encode(text).length) {
   const arrayBuffer = vi.fn(async () => new TextEncoder().encode(text).buffer);
   return { name: path.split('/').at(-1)!, webkitRelativePath: path, size, arrayBuffer };

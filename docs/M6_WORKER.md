@@ -1,6 +1,6 @@
 # M6のモデル用Worker通信
 
-M6-5の[端末内読込](M6_LOCAL_MODEL.md)と[数値検証付きsession](M6_SESSION.md)を専用Workerへ接続する。**観戦UIとの接続・学習済みモデル公開・実GPUでの実行は未完了。** 公開catalogは空で、未承認のモデルを登録したり、実学習が済んだように表示したりしない。
+M6-5の[端末内読込](M6_LOCAL_MODEL.md)と[数値検証付きsession](M6_SESSION.md)を専用Workerへ接続する。Workerと観戦制御はPR #57〜#58で取り込み済み。[観戦UIと実ONNXのE2E](M6_ARENA.md)を追加してCIで検証する。**学習済みモデル公開・実GPUでの実行は未完了。** 公開catalogは空で、未承認のモデルを登録したり、実学習が済んだように表示したりしない。
 
 ## ファイルと実行先
 

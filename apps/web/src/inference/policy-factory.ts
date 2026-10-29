@@ -1,7 +1,7 @@
 import init, { Game } from '../wasm/pkg/voxelshogi_wasm.js';
 import wasmUrl from '../wasm/pkg/voxelshogi_wasm_bg.wasm?url';
 import { openBackend } from './backend';
-import { loadLocalModel, parseTrainedCatalog } from './local-model';
+import { loadLocalModel, parseTrainedCatalog, readTrainedCatalog } from './local-model';
 import { localFile, type ModelFile, type PolicyPhase } from './policy-protocol';
 import { PolicySession, parsePolicySelection, type PolicyDependencies, type PolicySelection } from './policy-session';
 import { loadRuntimeIndex } from './runtime';
@@ -15,13 +15,7 @@ interface FactoryDependencies {
   init: () => Promise<void>;
   make: (deps: PolicyDependencies) => Pick<PolicySession, 'initialize' | 'bestMove' | 'dispose'>;
 }
-export async function readTrainedCatalog(url: string, fetcher: typeof fetch = fetch): Promise<unknown> {
-  const response = await fetcher(url, { cache: 'no-store', credentials: 'omit', redirect: 'error' });
-  if (!response.ok) throw new Error(`model catalog download failed: ${response.status}`);
-  const text = await response.text();
-  if (text.length > 1024 * 1024) throw new Error('oversized model catalog');
-  try { return JSON.parse(text); } catch { throw new Error('invalid model catalog JSON'); }
-}
+export { readTrainedCatalog } from './local-model';
 
 /** Called inside the dedicated Worker. The request cannot override catalog or runtime URLs. */
 export async function createPolicyRuntime(files: ModelFile[], value: PolicySelection, phase: (value: PolicyPhase) => void = () => {}, overrides: Partial<FactoryDependencies> = {}): Promise<PolicyRuntime> {
