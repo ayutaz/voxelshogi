@@ -30,7 +30,9 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。
 
-CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。学習済みモデルの対局・観戦は次のM6で開発します。
+CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。
+
+観戦画面には[取得済みモデルの読み込み・両AIの形式選択・AI条件付き棋譜保存](docs/M6_ARENA.md)を実装しました。学習済みモデルはまだ公開していないため、現在のモデル一覧は空です。M6で外部GPUによる学習・評価と実機検証を進めます。
 
 詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。M4と、固定3局145手を照合したM5は完了し、M6の[教師契約・学習と保存再開](docs/M6_RUNTIME.md)はLinux CPU CIで確認済みです。次は[CUDAの起動前準備](docs/M6_CUDA.md)と見積もり後の外部GPU試行、本学習・評価、変換済みモデルの観戦へ進みます。Macでは学習せず、GPU学習はM6-2から始めます。
 

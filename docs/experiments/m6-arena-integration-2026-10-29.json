@@ -1,0 +1,20 @@
+{
+  "schema": "voxelshogi-m6-arena-integration-v1",
+  "date": "2026-10-29",
+  "repository": "ayutaz/voxelshogi",
+  "pr": 59,
+  "tested_head": "c277e50a3cba1465c59c72d5b1c72c15343d292c",
+  "main_commit": "a16394058cc4620563a103c85f67b1a7b4545c10",
+  "ci_run": 40855804478,
+  "required_checks": {"CI Gate": true, "CodeQL (rust)": true, "CodeQL (javascript-typescript)": true, "CodeQL (actions)": true, "CodeQL (python)": true, "Rust core coverage": true, "Web unit coverage": true, "Known mutation regressions": true},
+  "validation": {
+    "m3_model_e2e": 6,
+    "arena_model_e2e": 6,
+    "web_mutations": 121,
+    "fixture": "Untrained M3 ONNX and references with synthetic M6 metadata receipts; private Linux CI only",
+    "trained_model": false,
+    "physical_gpu": false
+  },
+  "public_main": {"ci_run": 40857404983, "security_run": 40857404982, "conclusion": "success"},
+  "limitations": ["M6 corpus audit, CUDA trial and training remain unexecuted", "Trained model publication and physical WebGPU plus 3D remain unverified", "Public trained-model catalog remains empty"]
+}

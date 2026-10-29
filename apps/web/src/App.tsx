@@ -222,7 +222,7 @@ export function App() {
             {entry.release.id}<br />SHA-256: {entry.release.manifest.sha256}<br />
             <button type="button" aria-label="モデルを外す" onClick={() => {
               pause();
-              setDifficulty({ b: library.choices.b?.sourceId === entry.sourceId ? 'normal' : difficulty.b, w: library.choices.w?.sourceId === entry.sourceId ? 'normal' : difficulty.w });
+              setDifficulty({ b: difficulty.b === 'model' && library.choices.b?.sourceId === entry.sourceId ? 'normal' : difficulty.b, w: difficulty.w === 'model' && library.choices.w?.sourceId === entry.sourceId ? 'normal' : difficulty.w });
               setLibrary(removeModel(library, entry.sourceId));
             }}>モデルを外す</button>
           </p>)}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { LoadedModel } from '../ai/model-library';
 import { loadLocalModel, parseTrainedCatalog, readTrainedCatalog, type TrainedRelease } from './local-model';
 import { localFile, packModelFiles } from './policy-protocol';
@@ -10,6 +10,8 @@ export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Pac
   const [message, setMessage] = useState('配布情報を読み込み中…');
   const [error, setError] = useState<string | null>(null);
   const generation = useRef(0), read = useRef<AbortController | null>(null);
+  const loaded = useRef(onLoaded);
+  useLayoutEffect(() => { loaded.current = onLoaded; }, [onLoaded]);
   useEffect(() => {
     let active = true;
     const abort = new AbortController();
@@ -30,7 +32,7 @@ export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Pac
       const packed = packModelFiles(files);
       const source = await loadLocalModel(packed.map(localFile), release, abort.signal);
       if (current !== generation.current) return;
-      onLoaded({ release: source.release, model: source.model, files: packed });
+      loaded.current({ release: source.release, model: source.model, files: packed });
       setMessage('フォルダーを追加しました。AI開始時にモデルと同形式の参照値をWorkerで検査します。');
     } catch (reason) {
       if (current === generation.current) { setError(String(reason)); setMessage(''); }
