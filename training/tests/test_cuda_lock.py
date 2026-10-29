@@ -25,6 +25,7 @@ def test_cuda_lock_pins_python314_and_official_wheel_without_changing_cpu_ci():
     result = validate_environment_files(ROOT)
     assert result["python"] == "3.14.9" and result["torch"] == "2.14.1+cu130"
     assert result["cuda"] == "13.0" and len(result["lock_sha256"]) == 64
+    assert result["setuptools"] == "84.1.0"  # Fixes all reported 78.1.0 advisories.
 
 
 @pytest.mark.parametrize(
@@ -39,6 +40,7 @@ def test_cuda_lock_pins_python314_and_official_wheel_without_changing_cpu_ci():
         ),
         ("infrastructure/cuda/.python-version", "3.14.9", "3.13.11"),
         ("pyproject.toml", "pytorch-cpu", "pytorch-cu130"),
+        ("infrastructure/cuda/uv.lock", 'version = "84.1.0"', 'version = "78.1.0"'),
     ],
 )
 def test_stale_or_wrong_environment_source_is_rejected(tmp_path, file, before, after):

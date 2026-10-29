@@ -56,7 +56,9 @@ def validate_environment_files(root):
         ]
         or cpu["tool"]["uv"]["sources"]["torch"]
         != [{"index": "pytorch-cpu", "marker": "sys_platform == 'linux'"}]
-        or set(dependencies) != pinned | {"torch==2.14.1", "voxelshogi"}
+        or set(dependencies)
+        != pinned | {"torch==2.14.1", "voxelshogi", "setuptools==84.1.0"}
+        or packages["setuptools"]["version"] != "84.1.0"
         or any(
             packages[name]["version"] != cpu_versions[name]
             for name in names - {"torch", "voxelshogi"}
@@ -79,6 +81,7 @@ def validate_environment_files(root):
         "python": "3.14.9",
         "torch": "2.14.1+cu130",
         "cuda": "13.0",
+        "setuptools": packages["setuptools"]["version"],
         "lock_sha256": file_hash(folder / "uv.lock"),
     }
 
