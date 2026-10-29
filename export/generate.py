@@ -147,14 +147,28 @@ def source_context():
         return {"sourceCommit": None, "sourceDirty": True}
 
 
-def generate(output, *, seed=SEED, license=None):
+def generate(output, *, seed=SEED, license=None, selected_evaluation=None):
     output = Path(output)
-    output.mkdir(parents=True, exist_ok=True)
+    if selected_evaluation is not None and output.exists():
+        raise FileExistsError("trained conversion requires a new output directory")
     torch.set_num_threads(1)
     torch.use_deterministic_algorithms(True)
+    context = source_context()
+    review = None
+    if selected_evaluation is not None:
+        from export.trained import load_evaluated_weights
+
+        state, review = load_evaluated_weights(
+            selected_evaluation, context=context, seed=seed
+        )
     model = make_model(seed)
+    if review is not None:
+        model.load_state_dict(state, strict=True)
+    output.mkdir(parents=True, exist_ok=selected_evaluation is None)
     checkpoint = output / "model.safetensors"
     save_file(model.state_dict(), checkpoint)
+    if review is not None and digest(checkpoint) != review["weights"]["sha256"]:
+        raise ValueError("converted checkpoint differs from evaluated weight bytes")
     positions = json.loads((ROOT / "export/fixtures/positions.json").read_text())
     fixtures = []
     for position in positions:
@@ -210,13 +224,16 @@ def generate(output, *, seed=SEED, license=None):
         "export/model.py",
         "export/generate.py",
         "export/variants.py",
+        "export/trained.py",
         "export/fixtures/positions.json",
         "uv.lock",
     ]
     manifest = {
         "schema": 1,
-        "id": f"voxelshogi-transformer-s-untrained-{seed}-v1",
-        "trained": False,
+        "id": review["model_id"]
+        if review
+        else f"voxelshogi-transformer-s-untrained-{seed}-v1",
+        "trained": review is not None,
         "license": license,
         "inputSchema": INPUT_SCHEMA,
         "seed": seed,
@@ -229,7 +246,7 @@ def generate(output, *, seed=SEED, license=None):
             "value": {"shape": [1, 1], "dtype": "float32"},
         },
         "sourceFiles": {name: digest(ROOT / name) for name in sources},
-        **source_context(),
+        **context,
         "environment": {
             "python": platform.python_version(),
             "system": platform.system(),
@@ -266,6 +283,8 @@ def generate(output, *, seed=SEED, license=None):
             }
         ],
     }
+    if review is not None:
+        manifest["training"] = review["training"]
     manifest["variants"].extend(
         [
             low_precision_variant(
@@ -286,6 +305,18 @@ def validate_package(root):
     manifest = json.loads((root / "manifest.json").read_text())
     if manifest.get("schema") != 1 or manifest.get("inputSchema") != INPUT_SCHEMA:
         raise ValueError("unsupported manifest schema")
+    if type(manifest.get("trained")) is not bool:
+        raise ValueError("manifest must declare trained status")
+    if manifest["trained"]:
+        if "training" not in manifest:
+            raise ValueError(
+                "trained manifest requires selection/evaluation provenance"
+            )
+        from export.trained import validate_training_manifest
+
+        validate_training_manifest(manifest)
+    elif "training" in manifest:
+        raise ValueError("untrained manifest must not contain trained provenance")
     if not manifest.get("fixtures") or not manifest.get("variants"):
         raise ValueError("manifest must contain fixtures and variants")
     if manifest.get("inputs") != {
@@ -374,8 +405,14 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--seed", type=int, default=SEED)
     parser.add_argument("--license", choices=["Apache-2.0"])
+    parser.add_argument("--selected-evaluation", type=Path)
     args = parser.parse_args()
-    manifest = generate(args.output, seed=args.seed, license=args.license)
+    manifest = generate(
+        args.output,
+        seed=args.seed,
+        license=args.license,
+        selected_evaluation=args.selected_evaluation,
+    )
     print(
         json.dumps(
             {

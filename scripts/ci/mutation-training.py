@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "trained-evaluated-bytes",
+        "export/trained.py",
+        'raise ValueError("evaluated artifact size/hash differs")',
+        "pass",
+        "test_trained_metadata.py",
+    ),
+    (
+        "trained-complete-cohort",
+        "export/trained.py",
+        "or len(files) != 60",
+        "or False",
+        "test_trained_metadata.py",
+    ),
+    (
+        "trained-load-weights",
+        "export/generate.py",
+        "model.load_state_dict(state, strict=True)",
+        "pass",
+        "test_trained_export.py",
+    ),
+    (
+        "trained-replay-summary",
+        "export/trained.py",
+        'raise ValueError("evaluated cohort summary differs from replayed games")',
+        "pass",
+        "test_trained_replay.py",
+    ),
+    (
+        "trained-package-provenance",
+        "export/generate.py",
+        "validate_training_manifest(manifest)",
+        "pass",
+        "test_trained_export.py",
+    ),
+    (
         "evaluation-cutoff",
         "training/evaluation.py",
         'return "cutoff"',
