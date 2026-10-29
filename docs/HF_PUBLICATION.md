@@ -63,6 +63,8 @@ uv run --locked python -m training.hub_release runs/release/model runs/release-p
 
 ## 検証と限界
 
+M6の学習済みモデルと全3形式の参照値は、[専用の推論パッケージprofile](M6_INFERENCE_RELEASE.md)を使う。`artifact_role="inference-package"`でmanifestが列挙した固定入力・全出力だけを追加対象とし、通常profileで任意の`.f32`を許可しない。実学習とライセンス確定・実モデル検証の後、既存の公開／全hash照合を行い、検証済みreceiptから固定revisionのWeb catalog項目を作る。
+
 純粋テストは、送信先違い、private/auto、未承認ライセンス、変更されたファイル、Macでの公開、秘密ファイル・symlink・optimizer、未確認のHub gateを拒否し、API変更前に止まることを検証する。記録用fakeで新規repoのpublic設定、manual設定確認後の送信、親commit固定と転送後のhash不一致も確認する。これらを通常Linux CIと既知変異の回帰へ含める。実repoの作成・公開・実権限・実転送の確認は別の実行記録を必要とする。
 
 一次資料：[Hubへのアップロード](https://huggingface.co/docs/huggingface_hub/guides/upload)、[APIのrepo設定](https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.update_repo_settings)、[モデルのmanual gate](https://huggingface.co/docs/hub/models-gated)、[データのmanual gate](https://huggingface.co/docs/hub/datasets-gated)。

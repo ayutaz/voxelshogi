@@ -162,7 +162,7 @@ def test_secret_files_symlinks_and_checkpoints_cannot_enter_release(tmp_path):
     from training.hub_release import plan_release
 
     release(tmp_path)
-    for name in [".env", "worker.log", "optimizer.pt"]:
+    for name in [".env", "worker.log", "optimizer.pt", "unlisted.f32"]:
         path = tmp_path / name
         path.write_text("must not upload")
         with pytest.raises(ValueError):

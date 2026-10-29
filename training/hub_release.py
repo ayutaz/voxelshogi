@@ -49,6 +49,11 @@ def _canonical(value):
 
 
 def _policy(plan):
+    role = plan.get("artifact_role", "artifacts")
+    if role not in ("artifacts", "inference-package") or (
+        role == "inference-package" and plan["repo_type"] != "model"
+    ):
+        raise ValueError("unsupported artifact publication role")
     if not re.fullmatch(r"voxelshogi/[A-Za-z0-9][A-Za-z0-9._-]*", plan["repo_id"]):
         raise ValueError("release destination must be voxelshogi/NAME")
     if plan["repo_type"] not in ("model", "dataset"):
@@ -65,7 +70,7 @@ def _policy(plan):
         raise ValueError("release requires an immutable source commit")
 
 
-def _inventory(folder, repo_type):
+def _inventory(folder, repo_type, *, expected=None):
     folder = Path(folder)
     if folder.is_symlink() or not folder.is_dir():
         raise ValueError("release folder must be a real directory")
@@ -97,8 +102,23 @@ def _inventory(folder, repo_type):
                 )
             )
         )
-        if not allowed:
+        if (expected is not None and relative.as_posix() not in expected) or (
+            expected is None and not allowed
+        ):
             raise ValueError(f"unexpected release artifact: {relative}")
+        if expected is not None:
+            descriptor = expected[relative.as_posix()]
+            maximum = (
+                16 * 1024 * 1024
+                if relative.as_posix() == "evaluation.json"
+                else 64 * 1024 * 1024
+            )
+            if path.stat().st_size > maximum or (
+                descriptor is not None
+                and "bytes" in descriptor
+                and path.stat().st_size != descriptor["bytes"]
+            ):
+                raise ValueError("inference artifact size differs before hashing")
         digest = hashlib.sha256()
         with path.open("rb") as stream:
             while chunk := stream.read(1024 * 1024):
@@ -111,6 +131,17 @@ def _inventory(folder, repo_type):
             }
         )
     names = {f["path"] for f in files}
+    if expected is not None:
+        if sum(file["bytes"] for file in files) > 512 * 1024 * 1024:
+            raise ValueError("inference package exceeds browser folder limit")
+        if names != set(expected):
+            raise ValueError("incomplete inference package inventory")
+        for file in files:
+            descriptor = expected[file["path"]]
+            if descriptor is not None and any(
+                file[key] != value for key, value in descriptor.items()
+            ):
+                raise ValueError("inference artifact size/hash differs from manifest")
     if not {"README.md", "LICENSE"} <= names:
         raise ValueError("release requires a card and license file")
     suffix = ".parquet" if repo_type == "dataset" else (".onnx", ".safetensors")
@@ -122,7 +153,14 @@ def _inventory(folder, repo_type):
 
 
 def plan_release(
-    folder, *, repo_id, repo_type, license_id, license_approved, source_commit
+    folder,
+    *,
+    repo_id,
+    repo_type,
+    license_id,
+    license_approved,
+    source_commit,
+    artifact_role="artifacts",
 ):
     plan = {
         "schema": 1,
@@ -134,10 +172,16 @@ def plan_release(
         "license_approved": license_approved,
         "source_commit": source_commit,
     }
+    if artifact_role != "artifacts":
+        plan["artifact_role"] = artifact_role
     _policy(plan)
     manifest_path = Path(folder) / "manifest.json"
     if manifest_path.is_symlink():
         raise ValueError("publication manifest must not be a symlink")
+    if artifact_role == "inference-package" and (
+        not manifest_path.is_file() or manifest_path.stat().st_size > 1024 * 1024
+    ):
+        raise ValueError("invalid inference manifest size")
     if manifest_path.is_file():
         try:
             manifest = json.loads(manifest_path.read_text())
@@ -150,7 +194,12 @@ def plan_release(
             raise ValueError(
                 "resume archives require a separately approved publication policy"
             )
-    card = (Path(folder) / "README.md").read_text()
+    card_path = Path(folder) / "README.md"
+    if artifact_role == "inference-package" and (
+        card_path.is_symlink() or card_path.stat().st_size > 1024 * 1024
+    ):
+        raise ValueError("invalid inference Model Card")
+    card = card_path.read_text()
     if not re.search(rf"(?m)^license:\s*{re.escape(license_id)}\s*$", card):
         raise ValueError("card license differs from approved license")
     if repo_type == "dataset":
@@ -167,7 +216,12 @@ def plan_release(
             )
             if section is None or not section.group(1).strip():
                 raise ValueError(f"Dataset Card requires a populated section: {title}")
-    plan["files"] = _inventory(folder, repo_type)
+    expected = None
+    if artifact_role == "inference-package":
+        from training.inference_release import inference_inventory
+
+        expected = inference_inventory(folder, plan, card)
+    plan["files"] = _inventory(folder, repo_type, expected=expected)
     return plan
 
 
@@ -180,6 +234,7 @@ def publish_release(folder, plan, api, *, execute=False, system=None):
         license_id=plan["license"],
         license_approved=plan["license_approved"],
         source_commit=plan["source_commit"],
+        artifact_role=plan.get("artifact_role", "artifacts"),
     )
     if current != plan:
         raise ValueError("release artifacts changed since review")
