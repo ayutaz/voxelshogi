@@ -13,7 +13,7 @@ export function fixedPositions(manifest, makeGame, actionIndex) {
 }
 export function switchPrecisions(available) {
   const formats = ['fp32', 'fp16', 'int8'].filter(p => available.includes(p));
-  if (formats.length < 2 || !formats.includes('fp32') || formats.length !== available.length) throw new Error('switches require FP32 and another measured format');
+  if (formats.length < 2 || formats.length !== available.length) throw new Error('switches require two measured formats');
   return Array.from({ length: 20 }, (_, i) => formats[(i + 1) % formats.length]);
 }
 

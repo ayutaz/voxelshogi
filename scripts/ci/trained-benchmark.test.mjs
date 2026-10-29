@@ -19,11 +19,12 @@ test('root generation frees a rejected side and refuses empty legal positions', 
     assert.equal(freed, 1);
   }
 });
-test('twenty switches exclude the initial FP32 load and use only measured working formats', () => {
+test('twenty switches exclude the initial load and use only measured working formats', () => {
   assert.deepEqual(switchPrecisions(['fp32', 'fp16', 'int8']).slice(0, 4), ['fp16', 'int8', 'fp32', 'fp16']);
   const steps = switchPrecisions(['fp32', 'int8']); assert.equal(steps.length, 20);
   assert.deepEqual(steps.slice(0, 4), ['int8', 'fp32', 'int8', 'fp32']);
-  for (const formats of [[], ['fp32'], ['fp16', 'int8'], ['fp32', 'other']]) assert.throws(() => switchPrecisions(formats));
+  assert.deepEqual(switchPrecisions(['fp16', 'int8']).slice(0,4), ['int8', 'fp16', 'int8', 'fp16']);
+  for (const formats of [[], ['fp32'], ['fp32', 'other']]) assert.throws(() => switchPrecisions(formats));
 });
 function fake() {
   const workers = []; let tick = 0;

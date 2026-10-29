@@ -114,10 +114,10 @@ export async function measureTrainedModels({browser,base,modelFolder,catalog,out
       const available=manifest.variants.map(v=>v.id).filter(p=>report.rows.filter(r=>r.backend===backend && r.precision===p).every(r=>r.status==='done'));
       if(smoke) available.splice(0,available.length,'fp32','fp16');
       const steps=smoke?['fp16','fp32']:switchPrecisions(available);
-      const {context,page,lifecycle}=await pageFor(false),group={backend,initial:'fp32',steps:[]};report.switches.push(group);
+      const {context,page,lifecycle}=await pageFor(false),group={backend,initial:available[0],steps:[]};report.switches.push(group);
       try {
         const measured=await sampleMemory(cdp,page,async()=>{
-          for(const precision of ['fp32',...steps]) {
+          for(const precision of [group.initial,...steps]) {
             const selection={modelId:manifest.id,packageHash:release.manifest.sha256,precision,backend};
             await page.evaluate(s=>window.trainedBenchmark.select(s),selection);
             const packet=await page.evaluate(runPolicyRequests,{root:fixtures[0].root});if(packet.error)throw Object.assign(new Error(packet.error.message),{stage:packet.error.stage});const reply=packet.samples[0];
