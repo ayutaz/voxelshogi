@@ -40,6 +40,8 @@ Valueはfloat32、shape `[batch,1]`、手番側の勝ちを+1・負けを−1と
 
 変換前PyTorch対FP32 ONNX、各変換版の基準実装対browser、FP32対各低精度版を分ける。最大絶対／相対誤差・超過件数と全要素数を保存する。Top-1だけで成功扱いにしない。閾値変更は原因と根拠を先に記録し、該当比較を再実行する。
 
+M6の学習済みモデルは、[初回失敗・FP64診断と再試行前の基準](M6_MAIN.md#fp32変換の失敗と次の基準)に基づく `numericContract=voxelshogi-trained-numeric-v1` を必須とする。FP32／INT8のPolicyだけatol=1e-4／rtol=1e-4、Valueは1e-5／1e-4、FP16は両出力1e-3／1e-2。M3未学習の上記基準は保持する。Pythonの変換・Web Worker・応答検証・実機記録で同じ出力別の基準を使用する。
+
 M3-0の小演算テスト `y=2*x+1` は依存・dynamo exporter・CPU ORTの動作確認に限る。これが通っただけでは代表モデルやWebGPUが動いたとは扱わない。
 
 ## 公開版の実機対応（2026-10-28 JST）

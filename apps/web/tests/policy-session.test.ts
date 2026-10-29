@@ -130,6 +130,27 @@ it('rejects a last-element numeric mismatch and frees all outputs/session/backen
   expect(f.session.release).toHaveBeenCalledTimes(1); expect(f.port.dispose).toHaveBeenCalledTimes(1);
 });
 
+it('uses the trained Policy bound for reference runs and retains the tighter Value bound', async () => {
+  const f = setup(), roundoff = f.policy.slice(); roundoff[POLICY_ELEMENTS - 1] = .00009;
+  f.session.run.mockResolvedValue({ policy: roundoff, value: f.value, dispose: f.outputDispose });
+  const ready = await f.engine.initialize(selection());
+  expect(ready.fixtures[0]!.comparison.policy.atol).toBe(.0001);
+  expect(ready.fixtures[0]!.comparison.value.atol).toBe(.00001);
+  await f.engine.dispose();
+  const g = setup();
+  g.session.run.mockResolvedValue({ policy: g.policy, value: new Float32Array([.25009]), dispose: g.outputDispose });
+  await expect(g.engine.initialize(selection())).rejects.toThrow(/tolerance/);
+  expect(g.port.dispose).toHaveBeenCalledTimes(1);
+});
+
+it('rejects absent or unknown trained numeric contracts before reading or opening a model', async () => {
+  for (const marker of [undefined, 'unknown']) {
+    const f = setup(); Reflect.set(f.source.model, 'numericContract', marker);
+    await expect(f.engine.initialize(selection())).rejects.toThrow(/numeric/);
+    expect(f.source.read).not.toHaveBeenCalled(); expect(f.open).not.toHaveBeenCalled();
+  }
+});
+
 it('does not accept a different provider or relabel a CPU backend as WebGPU', async () => {
   const f = setup();
   await expect(f.engine.initialize({ ...selection(), backend: 'webgpu' })).rejects.toThrow(/backend|placement/);

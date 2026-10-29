@@ -6,7 +6,7 @@
 
 - Linux実機、固定したアプリcommit、学習済みモデルのsource／Hub revision／manifestと全3ONNXのhashを記録する。
 - FP32／FP16／INT8重み版×WASM／WebGPU×固定4局面×3Dあり／なしの48条件を列挙し、欠落・重複を拒否する。初回、準備10回、測定30回を区別する。
-- 成功した条件には、Rustの合法な手とaction、全4入力・Policy全1,067,985要素とValueの同形式参照照合、実行providerとoperatorの記録を要求する。
+- 成功した条件には、Rustの合法な手とaction、全4入力・Policy全1,067,985要素とValueの同形式参照照合、実行providerとoperatorの記録を要求する。[学習済み数値契約](M6_MAIN.md#fp32変換の失敗と次の基準)のmarkerと出力別atol／rtolを照合し、広い上限や非有限な差を拒否する。
 - WebGPUはNVIDIAのadapter、3DはNVIDIAのrendererを確認する。実際に準備・推論したbackendと選択条件を照合する。
 - 3Dありでは、反復推論中の実描画・trusted camera入力を記録する。描画と資源観測の5秒超の空白、資源サンプル不足を完了へ含めない。RSSは共有ページを重複計上し得る観測値、main JS heapはWorker／GPUを含まない値として扱う。
 - WASMの全3形式を測定する。GPUの未対応・数値基準未達は実際の初期化エラーとして残し、404や一般的な実行失敗を未対応へ分類しない。GPUモデルの成功条件も必要。
@@ -16,6 +16,6 @@
 
 ## ローカルとCI
 
-手書きのopaque metadataによる6テストをREDから実装した。欠落・重複、CPU代替、数値照合不一致、別モデル混入、初回を含む切替、未対応の誤分類、描画／資源観測不足、候補・smoke・Macの混同を拒否する。Macではこの小さいmetadataテストだけを実行し、モデル・GPU・ブラウザ計測を行わない。
+手書きのopaque metadataによる7テストをREDから実装した。欠落・重複、CPU代替、数値照合不一致、別モデル混入、初回を含む切替、未対応の誤分類、描画／資源観測不足、候補・smoke・Macの混同を拒否する。Macではこの小さいmetadataテストだけを実行し、モデル・GPU・ブラウザ計測を行わない。
 
-追加11件の既知変異は`mutation-controls.mjs`に含め、CI制御の合計30変異を実行する。通常の`node --test scripts/ci/*.test.mjs`と必須CIへ自動で含まれる。これらのテスト成功自体は実モデルの実機検証ではない。
+追加14件の既知変異は`mutation-controls.mjs`に含め、CI制御の合計33変異を実行する。通常の`node --test scripts/ci/*.test.mjs`と必須CIへ自動で含まれる。これらのテスト成功自体は実モデルの実機検証ではない。

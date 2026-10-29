@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "trained-export-numeric-contract",
+        "export/generate.py",
+        "numeric_contract=TRAINED_NUMERIC_CONTRACT if review else None,",
+        "numeric_contract=None,",
+        "test_trained_export.py",
+    ),
+    (
+        "trained-numeric-marker",
+        "export/trained.py",
+        'or manifest.get("numericContract") != TRAINED_NUMERIC_CONTRACT',
+        "or False",
+        "test_trained_metadata.py",
+    ),
+    (
         "m6-rental-approval",
         "training/m6_rental_control.py",
         'or approval.get("approved") is not True',

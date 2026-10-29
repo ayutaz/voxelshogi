@@ -46,6 +46,10 @@ def test_evaluated_weight_bytes_survive_all_three_conversions(tmp_path, monkeypa
     manifest = export_evaluated(evaluated, output)
     assert replays == [evaluated]
     assert manifest["trained"] is True and manifest["license"] is None
+    assert manifest["numericContract"] == "voxelshogi-trained-numeric-v1"
+    for row in manifest["variants"][0]["torchComparison"].values():
+        assert row["policy"]["atol"] == 0.0001 and row["policy"]["rtol"] == 0.0001
+        assert row["value"]["atol"] == 0.00001 and row["value"]["rtol"] == 0.0001
     assert manifest["id"] == "voxelshogi-transformer-s-m6-314159-v1"
     assert (
         manifest["checkpoint"]["sha256"]
@@ -75,7 +79,13 @@ def test_evaluated_weight_bytes_survive_all_three_conversions(tmp_path, monkeypa
                 / variant["references"][manifest["fixtures"][0]["name"]][name]["path"],
                 dtype="<f4",
             ).reshape(result.shape)
-            compare_outputs(saved, result, precision=variant["id"])
+            compare_outputs(
+                saved,
+                result,
+                precision=variant["id"],
+                output=name,
+                numeric_contract=manifest["numericContract"],
+            )
     changed = copy.deepcopy(manifest)
     changed["training"]["evaluated_weights_sha256"] = "d" * 64
     (output / "manifest.json").write_text(json.dumps(changed))

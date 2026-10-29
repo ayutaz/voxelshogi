@@ -21,6 +21,34 @@ MUTATIONS = [
     for name, before, after in CONTRACT_MUTATIONS
 ] + [
     (
+        "trained-policy-bound",
+        "numeric.py",
+        "return 1e-4, 1e-4",
+        "return 1e-3, 1e-4",
+        "test_trained_numeric.py",
+    ),
+    (
+        "trained-value-isolation",
+        "numeric.py",
+        'and output == "policy"',
+        "and True",
+        "test_trained_numeric.py",
+    ),
+    (
+        "trained-default-isolation",
+        "numeric.py",
+        "numeric_contract == TRAINED_NUMERIC_CONTRACT",
+        "True",
+        "test_trained_numeric.py",
+    ),
+    (
+        "trained-unknown-contract",
+        "numeric.py",
+        "if numeric_contract not in (None, TRAINED_NUMERIC_CONTRACT):",
+        "if False:",
+        "test_trained_numeric.py",
+    ),
+    (
         "attention-axis",
         "model.py",
         "scores.softmax(dim=-1)",

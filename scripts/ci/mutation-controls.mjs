@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'trained-evidence-contract', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(model.numericContract, 'voxelshogi-trained-numeric-v1', 'trained numeric contract differs');", after: '', test: 'trained-browser-evidence' },
+  { name: 'trained-evidence-absolute-bound', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(stats.atol, atol, 'numeric absolute bound differs');", after: '', test: 'trained-browser-evidence' },
+  { name: 'trained-evidence-relative-bound', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(stats.rtol, rtol, 'numeric relative bound differs');", after: '', test: 'trained-browser-evidence' },
   {"name": "trained-no-unsupported-switch", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.ok(report.rows.filter(row => row.backend === group.backend && row.precision === step.precision).every(row => row.status === 'done'), 'unsupported format cannot be a successful switch');", "after": "", "test": "trained-browser-evidence"},
   {"name": "trained-linux-only", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.equal(platform, 'linux', 'trained browser measurements require external Linux');", "after": "", "test": "trained-browser-evidence"},
   {"name": "trained-public-proof", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.ok(allowCandidate || report.candidate === false, 'candidate is not final public proof');", "after": "", "test": "trained-browser-evidence"},

@@ -3,6 +3,7 @@ import { openBackend, type BackendPort, type Profile, type RuntimeInfo } from '.
 import { loadPackage, type ModelPackage } from './runtime';
 import { POLICY_ELEMENTS, type Backend, type Precision } from './manifest';
 import { collectResourceTimings, type AssetTiming } from './resources';
+import { outputTolerances } from './numeric';
 
 export interface InferenceRequest {
   schema: 1; kind: 'infer'; requestId: number; revision: number; packageHash: string;
@@ -31,9 +32,9 @@ export function parseInferenceRequest(value: unknown): InferenceRequest {
   return r as unknown as InferenceRequest;
 }
 
-export function compare(reference: Float32Array, actual: Float32Array, count: number, precision: Precision): Comparison {
+export function compare(reference: Float32Array, actual: Float32Array, count: number, precision: Precision, numericContract?: string, output: 'policy' | 'value' = 'policy'): Comparison {
   if (reference.length !== count || actual.length !== count) throw new Error('model output length mismatch');
-  const [atol, rtol] = precision === 'fp16' ? [1e-3, 1e-2] : [1e-5, 1e-4];
+  const [atol, rtol] = outputTolerances(precision, output, numericContract);
   let maxAbs = 0, maxRelative = 0, exceeded = 0;
   for (let i = 0; i < count; i++) {
     const ref = reference[i]!, value = actual[i]!;
@@ -98,7 +99,7 @@ export class InferenceEngine {
           times.push(this.deps.now() - tick); // includes CPU readback/GPU completion
           try {
             if (this.disposed) throw new Error('inference engine disposed');
-            const current = { policy: compare(refPolicy, outputs.policy, POLICY_ELEMENTS, variant.precision), value: compare(refValue, outputs.value, 1, variant.precision) };
+            const current = { policy: compare(refPolicy, outputs.policy, POLICY_ELEMENTS, variant.precision, pkg.model.numericContract, 'policy'), value: compare(refValue, outputs.value, 1, variant.precision, pkg.model.numericContract, 'value') };
             if (comparison) for (const name of ['policy', 'value'] as const) {
               current[name].maxAbs = Math.max(current[name].maxAbs, comparison[name].maxAbs);
               current[name].maxRelative = Math.max(current[name].maxRelative, comparison[name].maxRelative);

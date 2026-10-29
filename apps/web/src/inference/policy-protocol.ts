@@ -1,5 +1,6 @@
 import { indexLocalFolder, type LocalFile } from './local-model';
 import { POLICY_ELEMENTS } from './manifest';
+import { outputTolerances, TRAINED_NUMERIC_CONTRACT } from './numeric';
 import { policyAction } from './policy-contract';
 import { parsePolicyPosition, parsePolicySelection, type PolicyPosition, type PolicyRoot, type PolicySelection, type PolicyReply, type PolicyValidation } from './policy-session';
 
@@ -56,12 +57,12 @@ function validation(value: unknown, request: PolicyRequest, expectedFixtures: re
   const result = record(value), selected = parsePolicySelection(result.selection);
   if (!samePolicySelection(selected, request.selection) || !Array.isArray(result.fixtures) || result.fixtures.length !== expectedFixtures.length || result.fixtures.length < 1 || result.fixtures.length > 32) throw new Error('policy validation fixture/model mismatch');
   const names = new Set<string>();
-  const [atol, rtol] = selected.precision === 'fp16' ? [1e-3, 1e-2] : [1e-5, 1e-4];
   for (const item of result.fixtures) {
     const fixture = record(item), comparison = record(fixture.comparison);
     if (typeof fixture.name !== 'string' || !expectedFixtures.includes(fixture.name) || names.has(fixture.name)) throw new Error('incomplete/duplicate policy reference fixtures');
     names.add(fixture.name);
     for (const name of ['policy', 'value'] as const) {
+      const [atol, rtol] = outputTolerances(selected.precision, name, TRAINED_NUMERIC_CONTRACT);
       const stats = record(comparison[name]);
       if (stats.elements !== (name === 'policy' ? POLICY_ELEMENTS : 1) || stats.exceeded !== 0 || stats.atol !== atol || stats.rtol !== rtol || !finite(stats.maxAbs) || !finite(stats.maxRelative)) throw new Error('invalid same-format policy numeric comparison');
     }

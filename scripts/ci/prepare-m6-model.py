@@ -47,6 +47,7 @@ def main():
     manifest.update(
         id=review["model_id"],
         trained=True,
+        numericContract="voxelshogi-trained-numeric-v1",
         license="Apache-2.0",
         training=review["training"],
         ciFixture="Synthetic receipts; untrained M3 weights. Not a learned release.",

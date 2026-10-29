@@ -15,6 +15,14 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'trained-numeric-policy-bound', file: 'inference/numeric.ts', before: 'return [1e-4, 1e-4]', after: 'return [1e-3, 1e-4]', test: 'trained-numeric' },
+  { name: 'trained-numeric-value-isolation', file: 'inference/numeric.ts', before: "output === 'policy'", after: 'true', test: 'trained-numeric' },
+  { name: 'trained-numeric-default-isolation', file: 'inference/numeric.ts', before: 'contract === TRAINED_NUMERIC_CONTRACT', after: 'true', test: 'trained-numeric' },
+  { name: 'trained-numeric-marker', file: 'inference/manifest.ts', before: "if (trained ? m.numericContract !== TRAINED_NUMERIC_CONTRACT : Object.hasOwn(m, 'numericContract'))", after: 'if (false)', test: 'trained-numeric' },
+  { name: 'trained-session-contract', file: 'inference/policy-session.ts', before: "if (source.model.numericContract !== TRAINED_NUMERIC_CONTRACT)", after: 'if (false)', test: 'policy-session' },
+  { name: 'trained-session-policy-bound', file: 'inference/policy-session.ts', before: "selection.precision, model.numericContract, 'policy'", after: "selection.precision, undefined, 'policy'", test: 'policy-session' },
+  { name: 'trained-session-value-bound', file: 'inference/policy-session.ts', before: "selection.precision, model.numericContract, 'value'", after: "selection.precision, model.numericContract, 'policy'", test: 'policy-session' },
+  { name: 'trained-protocol-value-bound', file: 'inference/policy-protocol.ts', before: 'outputTolerances(selected.precision, name, TRAINED_NUMERIC_CONTRACT)', after: "outputTolerances(selected.precision, 'policy', TRAINED_NUMERIC_CONTRACT)", test: 'policy-protocol' },
   {"name": "retired-comparison-route", "file": "navigation.ts", "before": "const query = new URLSearchParams(search);", "after": "const query = new URLSearchParams(search); if (query.has('experiment')) return 'models';", "test": "navigation"},
   {"name": "retired-arena-comparison-link", "file": "navigation.ts", "before": "export const ARENA_LINKS = [", "after": "export const ARENA_LINKS = [{ href: '/?experiment=1', label: '9王ルール比較室' }, ", "test": "navigation"},
   {"name": "retired-model-comparison-link", "file": "navigation.ts", "before": "export const MODEL_LINKS = [", "after": "export const MODEL_LINKS = [{ href: '/?experiment=1', label: '9王ルール比較室' }, ", "test": "navigation"},
@@ -187,7 +195,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 127);
+    assert.equal(results.length, 135);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

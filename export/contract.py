@@ -4,13 +4,14 @@ from numbers import Integral
 
 import numpy as np
 
+from export.numeric import output_tolerances
+
 INPUT_SCHEMA = "voxelshogi-standard-features-v1"
 SQUARES = 729
 FEATURES = 43
 NORMAL_ACTIONS = SQUARES * SQUARES * 2
 ACTIONS = NORMAL_ACTIONS + 7 * SQUARES
 HAND_TOTALS = np.array([162, 64, 48, 32, 16, 24, 24], dtype=np.float32)
-TOLERANCES = {"fp32": (1e-5, 1e-4), "fp16": (1e-3, 1e-2), "int8": (1e-5, 1e-4)}
 
 
 def _side(side: str) -> None:
@@ -84,7 +85,12 @@ def action_index(
 
 
 def compare_outputs(
-    reference: np.ndarray, actual: np.ndarray, *, precision: str = "fp32"
+    reference: np.ndarray,
+    actual: np.ndarray,
+    *,
+    precision: str = "fp32",
+    output: str = "policy",
+    numeric_contract: str | None = None,
 ) -> dict:
     """Check every finite output, with thresholds fixed before measurement."""
     expected, observed = np.asarray(reference), np.asarray(actual)
@@ -94,7 +100,7 @@ def compare_outputs(
         raise ValueError("outputs must be numeric")
     if not np.isfinite(expected).all() or not np.isfinite(observed).all():
         raise ValueError("nonfinite output")
-    atol, rtol = TOLERANCES[precision]
+    atol, rtol = output_tolerances(precision, output, numeric_contract)
     expected, observed = expected.astype(np.float64), observed.astype(np.float64)
     delta = np.abs(observed - expected)
     exceeded = int(np.count_nonzero(delta > atol + rtol * np.abs(expected)))

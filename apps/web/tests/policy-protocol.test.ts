@@ -70,6 +70,12 @@ for (const field of ['id', 'revision', 'cursor', 'hash', 'side', 'model', 'preci
   });
 }
 
+it('rejects a policy reply that widens the Value bound to the Policy bound', () => {
+  const request = policyRequest(), result = policyResult(request);
+  result.validation.fixtures[0]!.comparison.value.atol = .0001;
+  expect(() => parsePolicyResponse(result, request, fixtures)).toThrow(/numeric/);
+});
+
 it('checks root identity on progress/error messages as well as results', () => {
   const request = policyRequest(), { recordJson: _record, ...root } = request.root;
   void _record;
