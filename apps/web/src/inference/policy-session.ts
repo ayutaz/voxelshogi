@@ -2,7 +2,7 @@ import type { Color } from '../game/model';
 import type { BackendPort, OutputData, Profile, RuntimeInfo, SessionPort } from './backend';
 import { compare, type Comparison } from './engine';
 import type { LocalModel } from './local-model';
-import { POLICY_ELEMENTS, type Backend, type Precision } from './manifest';
+import { POLICY_ELEMENTS, fp16WeightOnly, type Backend, type Precision } from './manifest';
 import { encodePosition, selectPolicyMove, type PolicyChoice } from './policy-contract';
 import { TRAINED_NUMERIC_CONTRACT } from './numeric';
 
@@ -21,6 +21,7 @@ export interface PolicyDependencies {
   now: () => number;
 }
 export interface PolicyValidation {
+  fp16WeightOnly?: boolean;
   selection: PolicySelection;
   fixtures: { name: string; comparison: { policy: Comparison; value: Comparison } }[];
   information: RuntimeInfo; profile: Profile;
@@ -85,8 +86,10 @@ export class PolicySession {
     this.selection = selection; this.busy = true;
     try {
       const bytes = await source.read(variant.model); this.live();
-      this.port = await this.deps.open(selection.backend, selection.precision); this.live();
-      if (selection.backend === 'webgpu' && selection.precision === 'fp16' && !this.port.info.features.includes('shader-f16')) throw new Error('shader-f16 is not available');
+      const weightOnly = fp16WeightOnly(variant);
+      this.port = await this.deps.open(selection.backend, weightOnly ? 'fp32' : selection.precision); this.live();
+      if (weightOnly && this.port.info.computePrecision !== 'float32') throw new Error('FP16 weight-only requires FP32 compute');
+      if (selection.backend === 'webgpu' && selection.precision === 'fp16' && !weightOnly && !this.port.info.features.includes('shader-f16')) throw new Error('shader-f16 is not available');
       this.port.resetProfile();
       this.session = await this.port.createSession(bytes, selection.precision); this.live();
       const fixtures: PolicyValidation['fixtures'] = [];
@@ -116,7 +119,7 @@ export class PolicySession {
       // End profiling once after the reference runs, retaining the exact session.
       await this.session.finishProfiling?.();
       this.live(); this.ready = true;
-      return { selection: { ...selection }, fixtures, information: structuredClone(this.port.info), profile: this.placement() };
+      return { selection: { ...selection }, fixtures, information: structuredClone(this.port.info), profile: this.placement(), ...(weightOnly ? { fp16WeightOnly: true } : {}) };
     } catch (error) { this.disposed = true; throw error; }
     finally { this.busy = false; if (this.disposed) await this.close(); }
   }

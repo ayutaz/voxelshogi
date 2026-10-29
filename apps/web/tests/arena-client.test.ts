@@ -124,3 +124,9 @@ it('rejects a missing source ID before retaining or loading a model', () => {
   const f = setup(), invalid = seat(); invalid.sourceId = undefined as unknown as string;
   expect(() => f.client.retainModels([invalid])).toThrow(); expect(f.create).not.toHaveBeenCalled(); f.client.dispose();
 });
+
+it('keeps the package-derived FP16 storage mode when creating the Worker client', async () => {
+  const f=setup(),selected=seat();selected.fp16WeightOnly=true;
+  f.client.retainModels([selected]);await f.client.policy({root:policyRequest().root,model:selected});
+  expect(f.create.mock.calls[0]![0].fp16WeightOnly).toBe(true);f.client.dispose();
+});

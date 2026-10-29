@@ -30,11 +30,15 @@ def review_evaluation(folder, *, context, seed):
     """Pure metadata/hash boundary. Linux loader separately replays every game."""
     folder = Path(folder)
     try:
+        training_source = context.get(
+            "trainingSourceCommit", context.get("sourceCommit", "")
+        )
         if (
             folder.is_symlink()
             or context.get("sourceDirty") is not False
             or not re.fullmatch(r"[0-9a-f]{40}", context.get("sourceCommit", ""))
             or seed != 314159
+            or not re.fullmatch(r"[0-9a-f]{40}", training_source)
         ):
             raise ValueError(
                 "trained export requires fixed seed and clean immutable source"
@@ -46,7 +50,7 @@ def review_evaluation(folder, *, context, seed):
         if (
             inputs["schema"] != "voxelshogi-final-evaluation-v1"
             or any(report.get(key) != value for key, value in inputs.items())
-            or inputs["source_commit"] != context["sourceCommit"]
+            or inputs["source_commit"] != training_source
             or inputs["contract"] != label_contract()
             or report["complete"] is not True
             or inputs["model"]["trained"] is not True
@@ -54,7 +58,7 @@ def review_evaluation(folder, *, context, seed):
             or inputs["model"]["backend"] not in ("torch-cpu", "torch-cuda")
             or inputs["model"]["model_id"] != f"voxelshogi-transformer-s-m6-{seed}-v1"
             or origin["selection_split"] != "val"
-            or origin["source_commit"] != context["sourceCommit"]
+            or origin["source_commit"] != training_source
             or origin["cache_sha256"] != inputs["cache_sha256"]
             or origin["receipt"]["verified"] is not True
             or origin["checkpoint_sha256"] != origin["receipt"]["sha256"]
@@ -72,7 +76,7 @@ def review_evaluation(folder, *, context, seed):
             origin["binding"],
             origin["receipt"],
             cache_sha256=inputs["cache_sha256"],
-            source_commit=context["sourceCommit"],
+            source_commit=training_source,
             train_count=counts["train"],
         )
         _verify(folder / "student.safetensors", weights)
@@ -100,7 +104,7 @@ def review_evaluation(folder, *, context, seed):
             or matches["production_profile"] is not True
             or matches["protocol"] != protocol
             or matches["model"] != inputs["model"]
-            or matches["source_commit"] != context["sourceCommit"]
+            or matches["source_commit"] != training_source
             or len(files) != 60
             or {entry["file"] for entry in files} != names
         ):
@@ -118,6 +122,12 @@ def review_evaluation(folder, *, context, seed):
             "evaluation_game_count": 60,
             "teacher_splits": counts,
         }
+        if "trainingSourceCommit" in context:
+            training["export_provenance"] = {
+                "schema": "voxelshogi-export-lineage-v1",
+                "training_source_commit": training_source,
+                "export_source_commit": context["sourceCommit"],
+            }
         return {
             "model_id": inputs["model"]["model_id"],
             "weights": weights,
@@ -174,6 +184,23 @@ def load_evaluated_weights(folder, *, context, seed):
     return state, review
 
 
+def manifest_training_source(manifest):
+    if "export_provenance" not in manifest["training"]:
+        return manifest["sourceCommit"]
+    provenance = manifest["training"]["export_provenance"]
+    if (
+        not isinstance(provenance, dict)
+        or set(provenance)
+        != {"schema", "training_source_commit", "export_source_commit"}
+        or provenance["schema"] != "voxelshogi-export-lineage-v1"
+        or provenance["export_source_commit"] != manifest["sourceCommit"]
+        or not isinstance(provenance["training_source_commit"], str)
+        or not re.fullmatch(r"[0-9a-f]{40}", provenance["training_source_commit"])
+    ):
+        raise ValueError("invalid explicit export/training lineage")
+    return provenance["training_source_commit"]
+
+
 def validate_training_manifest(manifest):
     from export.numeric import TRAINED_NUMERIC_CONTRACT
 
@@ -202,17 +229,30 @@ def validate_training_manifest(manifest):
             binding,
             receipt,
             cache_sha256=binding["cache_sha256"],
-            source_commit=manifest["sourceCommit"],
+            source_commit=manifest_training_source(manifest),
             train_count=training["teacher_splits"]["train"],
         )
     except (KeyError, TypeError) as error:
         raise ValueError("incomplete trained conversion provenance") from error
 
 
-def export_evaluated(evaluation_folder, output, *, license=None):
+def export_evaluated(
+    evaluation_folder,
+    output,
+    *,
+    license=None,
+    training_source_commit=None,
+    fp16_weights_only=False,
+):
     """No model computation during import; called only by external Linux/CI."""
     if sys.platform != "linux":
         raise ValueError("trained conversion requires external Linux")
     from export.generate import generate
 
-    return generate(output, selected_evaluation=evaluation_folder, license=license)
+    return generate(
+        output,
+        selected_evaluation=evaluation_folder,
+        license=license,
+        training_source_commit=training_source_commit,
+        fp16_weights_only=fp16_weights_only,
+    )

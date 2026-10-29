@@ -137,6 +137,7 @@ def prepare_ort_student(bundle, *, precision, source_commit, cache_sha256, train
     if sys.platform != "linux":
         raise ValueError("ONNX evaluation requires external Linux")
     from export.generate import validate_package
+    from export.trained import manifest_training_source
 
     seed_all(314159)
     bundle = Path(bundle)
@@ -155,7 +156,7 @@ def prepare_ort_student(bundle, *, precision, source_commit, cache_sha256, train
             training.get("binding", {}),
             training.get("receipt", {}),
             cache_sha256=cache_sha256,
-            source_commit=source_commit,
+            source_commit=manifest_training_source(manifest),
             train_count=train_count,
         )
         if training.get("evaluated_weights_sha256") != manifest["checkpoint"]["sha256"]:

@@ -49,7 +49,7 @@ export class ArenaClient {
     try {
       let client = this.models.get(key);
       if (!client) {
-        const source: PolicySource = { selection: { ...seat.selection }, files: seat.files.map(file => ({ ...file })), fixtures: [...seat.fixtures] };
+        const source: PolicySource = { selection: { ...seat.selection }, files: seat.files.map(file => ({ ...file })), fixtures: [...seat.fixtures], ...(seat.fp16WeightOnly ? { fp16WeightOnly: true } : {}) };
         client = await this.create(source);
         if (this.active !== operation || this.disposed || !this.allowed.has(key)) { client.dispose(); throw aborted(); }
         this.models.set(key, client);

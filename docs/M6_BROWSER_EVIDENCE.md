@@ -39,3 +39,5 @@ NVIDIAの実機ブラウザを起動し、SystemInfoでGPUサービスの初期�
 Arenaの操作は既存の[モデルE2E](../apps/web/arena-model-e2e/arena.spec.ts)で、各形式の合法手・棋譜条件・再開／停止・速度・中断・人間対AIを確認する。外部Linuxの `M6_MODEL_FIXTURE` は、検証した実モデルのmodel/とcatalog.json、破損拒否検証専用のcorrupted/を置いた私的フォルダーを指定できる。CIの初期値は従来の合成metadata＋未学習重みであり、学習結果へ読み替えない。
 
 ドライバーの8つの純粋テストは、履歴・手番・解放、初回を除く20切替、ファイルの初回送信、応答ID／progress、Worker交換、中断、エラーstage、準備と測定の分離、手計算した行動IDを検証する。追加10変異を含めCI制御の合計43変異で検出確認する。
+
+FP16重み版はmanifestの`fp16-weight-only`に対応する`model.variants[].fp16WeightOnly`と、Worker検証の同フラグ／`computePrecision=float32`を照合する。混合FP16は従来どおり`shader-f16`を要求する。重み版をnative FP16演算と呼ばず、同じ数値基準と48条件・各20切替を維持する。

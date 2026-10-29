@@ -221,3 +221,23 @@ it('cancels during session creation and releases the late session without runnin
   expect(f.session.run).not.toHaveBeenCalled();
   expect(f.session.release).toHaveBeenCalledTimes(1); expect(f.port.dispose).toHaveBeenCalledTimes(1);
 });
+
+it('runs an explicitly declared FP16 weight-only model through FP32 WebGPU compute', async () => {
+  const f = setup();
+  Object.assign(f.source.model.variants[0]!, { id: 'fp16', precision: 'fp16', conversion: { method: 'fp16-weight-only', compute: 'float32', activations: 'float32', convertedTensors: 1, convertedElements: 6 } });
+  Object.assign(f.port.info, { backend: 'webgpu', computePrecision: 'float32', adapter: { vendor: 'fake', architecture: '', device: '', description: '' } });
+  f.port.profile = () => ({ providers: { WebGpuExecutionProvider: 1 }, operators: { Cast: 1, MatMul: 1 } });
+  const result = await f.engine.initialize({ ...selection(), precision: 'fp16', backend: 'webgpu' });
+  expect(f.open).toHaveBeenCalledWith('webgpu', 'fp32');
+  expect(f.port.createSession).toHaveBeenCalledWith(expect.any(Uint8Array), 'fp16');
+  expect(result.fp16WeightOnly).toBe(true); expect(result.information.computePrecision).toBe('float32');
+  expect(result.fixtures.every(v => v.comparison.policy.atol === .001 && v.comparison.policy.exceeded === 0)).toBe(true);
+  await f.engine.dispose();
+});
+
+it('rejects a weight-only declaration if the backend does not prove FP32 compute', async () => {
+  const f = setup();
+  Object.assign(f.source.model.variants[0]!, { id: 'fp16', precision: 'fp16', conversion: { method: 'fp16-weight-only' } });
+  await expect(f.engine.initialize({ ...selection(), precision: 'fp16' })).rejects.toThrow(/FP32 compute/);
+  expect(f.port.createSession).not.toHaveBeenCalled();
+});

@@ -12,6 +12,21 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "export-explicit-training-role",
+        "export/trained.py",
+        '"trainingSourceCommit", context.get("sourceCommit", "")',
+        '"sourceCommit", ""',
+        "test_export_lineage.py",
+    ),
+    (
+        "export-lineage-export-role",
+        "export/trained.py",
+        'or provenance["export_source_commit"] != manifest["sourceCommit"]',
+        "or False",
+        "test_export_lineage.py",
+    ),
+] + [
+    (
         "m6-shared-payload-ip",
         "training/rental_control.py",
         '"with_public_ip": public_ip,\n            "tags":',

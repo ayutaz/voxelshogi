@@ -90,3 +90,42 @@ def make_fp16(source):
         },
         "castNodes": sum(n.op_type == "Cast" for n in graph.graph.node),
     }
+
+
+def make_fp16_weights(source):
+    """Half storage with explicit FP32 casts; never half activation arithmetic."""
+    graph = copy.deepcopy(source)
+    initializers, nodes, tensors, elements = [], [], 0, 0
+    for weight in graph.graph.initializer:
+        if weight.data_type != TensorProto.FLOAT or len(weight.dims) < 2:
+            initializers.append(weight)
+            continue
+        values = numpy_helper.to_array(weight)
+        if (
+            not values.size
+            or not np.isfinite(values).all()
+            or np.any(np.abs(values) > 65504)
+        ):
+            raise ValueError("FP16 weights must be finite and representable")
+        name = f"m6_fp16__{weight.name}"
+        initializers.append(numpy_helper.from_array(values.astype(np.float16), name))
+        nodes.append(
+            helper.make_node("Cast", [name], [weight.name], to=TensorProto.FLOAT)
+        )
+        tensors += 1
+        elements += values.size
+    if not tensors:
+        raise ValueError("no rank>=2 float32 weights to convert")
+    original = list(graph.graph.node)
+    del graph.graph.node[:]
+    graph.graph.node.extend([*nodes, *original])
+    del graph.graph.initializer[:]
+    graph.graph.initializer.extend(initializers)
+    onnx.checker.check_model(graph)
+    return graph, {
+        "method": "fp16-weight-only",
+        "activations": "float32",
+        "compute": "float32",
+        "convertedTensors": tensors,
+        "convertedElements": elements,
+    }

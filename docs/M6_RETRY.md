@@ -1,6 +1,6 @@
 # M6の数値契約修正後の再実行
 
-2026-10-29 UTC。[初回のFP32変換失敗](M6_MAIN.md)を保持し、学習済み専用の数値契約を含むCI成功済みsourceから学習をやり直した。**3 epochの学習とHF再開状態の復旧検証は完了。固定評価・3形式の推論公開・実モデルのブラウザ検証は実行中で、M6全体は未完了。** [固定した進捗・学習曲線・元記録hash](experiments/m6-numeric-retry-progress.json)。
+2026-10-29 UTC。[初回のFP32変換失敗](M6_MAIN.md)を保持し、学習済み専用の数値契約を含むCI成功済みsourceから学習をやり直した。**3 epochの学習とHF再開状態の復旧、[全5モデルの固定評価・3形式変換・初回HF推論公開](M6_MODELS.md)は完了。実モデルのブラウザ検証・公開catalogは未完了で、M6全体は未完了。** [固定した進捗・学習曲線・元記録hash](experiments/m6-numeric-retry-progress.json)。
 
 ## 学習と選択
 

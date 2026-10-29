@@ -8,7 +8,7 @@ export interface PolicyWorkerPort {
   postMessage: (request: PolicyRequest) => void;
   terminate: () => void;
 }
-export interface PolicySource { selection: PolicySelection; files: ModelFile[]; fixtures: string[] }
+export interface PolicySource { selection: PolicySelection; files: ModelFile[]; fixtures: string[]; fp16WeightOnly?: boolean }
 export type PolicyClientResult = PolicySuccess & { roundTripMs: number };
 interface Pending { request: PolicyRequest; start: number; resolve: (reply: PolicyClientResult) => void; reject: (error: Error) => void; progress?: (phase: PolicyPhase) => void }
 
@@ -24,7 +24,8 @@ export class PolicyClient {
     private readonly createWorker: () => PolicyWorkerPort = () => new Worker(new URL('./policy.worker.ts', import.meta.url), { type: 'module' }),
     private readonly now = () => performance.now()) {
     if (source.fixtures.length < 1 || source.fixtures.length > 32 || new Set(source.fixtures).size !== source.fixtures.length || source.fixtures.some(name => !/^[a-z0-9-]{1,64}$/.test(name))) throw new Error('invalid expected policy fixtures');
-    this.source = { selection: parsePolicySelection(source.selection), files: source.files.map(entry => ({ ...entry })), fixtures: [...source.fixtures] };
+    if (source.fp16WeightOnly !== undefined && typeof source.fp16WeightOnly !== 'boolean') throw new Error('invalid expected policy precision');
+    this.source = { selection: parsePolicySelection(source.selection), files: source.files.map(entry => ({ ...entry })), fixtures: [...source.fixtures], fp16WeightOnly: source.fp16WeightOnly ?? false };
   }
   bestMove(root: PolicyPosition, progress?: Pending['progress']): Promise<PolicyClientResult> {
     if (this.disposed) return Promise.reject(new Error('policy client disposed'));
@@ -42,7 +43,7 @@ export class PolicyClient {
           const pending = this.pending;
           if (data && typeof data === 'object' && 'requestId' in data && typeof data.requestId === 'number' && Number.isSafeInteger(data.requestId) && data.requestId > 0 && data.requestId !== pending.request.requestId) return;
           try {
-            const reply = parsePolicyResponse(data, pending.request, this.source.fixtures);
+            const reply = parsePolicyResponse(data, pending.request, this.source.fixtures, this.source.fp16WeightOnly);
             if (reply.kind === 'progress') { pending.progress?.(reply.phase); return; }
             if (reply.kind === 'error') { this.fail(new Error(`${reply.code}: ${reply.message}`)); return; }
             this.ready = true; this.pending = null;

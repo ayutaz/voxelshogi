@@ -9,6 +9,7 @@ import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus, type ArenaDifficult
 import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type ModelChoice, type ModelLibrary } from './ai/model-library';
 import { arenaConditions } from './ai/arena-record';
 import { ARENA_LINKS } from './navigation';
+import { fp16WeightOnly } from './inference/manifest';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
 const ModelLibraryPanel = lazy(() => import('./inference/ModelLibraryPanel'));
@@ -241,7 +242,7 @@ export function App() {
               choose(side, { ...library.choices[side]!, sourceId: entry.sourceId, precision: entry.model.variants[0]!.precision });
             }}>{library.entries.map(entry => <option key={entry.sourceId} value={entry.sourceId}>{entry.release.id}</option>)}</select></label>
             <label>精度形式<select data-testid={`precision-${side}`} value={library.choices[side].precision} onChange={event => choose(side, { ...library.choices[side]!, precision: event.target.value as ModelChoice['precision'] })}>
-              {library.entries.find(entry => entry.sourceId === library.choices[side]!.sourceId)!.model.variants.map(variant => <option key={variant.precision} value={variant.precision}>{variant.precision === 'int8' ? 'INT8（重み）' : variant.precision.toUpperCase()}</option>)}
+              {library.entries.find(entry => entry.sourceId === library.choices[side]!.sourceId)!.model.variants.map(variant => <option key={variant.precision} value={variant.precision}>{variant.precision === 'int8' ? 'INT8（重み）' : fp16WeightOnly(variant) ? 'FP16（重み）' : variant.precision.toUpperCase()}</option>)}
             </select></label>
             <label>実行先<select data-testid={`backend-${side}`} value={library.choices[side].backend} onChange={event => choose(side, { ...library.choices[side]!, backend: event.target.value as ModelChoice['backend'] })}>
               <option value="wasm">WASM（CPU）</option><option value="webgpu">WebGPU</option>
