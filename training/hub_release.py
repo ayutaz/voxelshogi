@@ -135,6 +135,21 @@ def plan_release(
         "source_commit": source_commit,
     }
     _policy(plan)
+    manifest_path = Path(folder) / "manifest.json"
+    if manifest_path.is_symlink():
+        raise ValueError("publication manifest must not be a symlink")
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text())
+        except json.JSONDecodeError:
+            manifest = None
+        if (
+            isinstance(manifest, dict)
+            and manifest.get("schema") == "voxelshogi-resume-archive-v1"
+        ):
+            raise ValueError(
+                "resume archives require a separately approved publication policy"
+            )
     card = (Path(folder) / "README.md").read_text()
     if not re.search(rf"(?m)^license:\s*{re.escape(license_id)}\s*$", card):
         raise ValueError("card license differs from approved license")

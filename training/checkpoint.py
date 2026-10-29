@@ -114,6 +114,22 @@ def atomic_json(path, value):
 
 def save_checkpoint(folder, model, optimizer, *, progress, binding, best=False):
     _linux()
+    payload = {
+        "model": model.state_dict(),
+        "optimizer": optimizer.state_dict(),
+        "rng": _rng_state(),
+        "progress": progress,
+        "binding": binding,
+    }
+    return _save_payload(folder, payload, best=best)
+
+
+def _save_payload(folder, payload, *, best=False):
+    """Internal writer shared by normal saves and decoded safe archives."""
+    _linux()
+    if set(payload) != {"model", "optimizer", "rng", "progress", "binding"}:
+        raise ValueError("checkpoint payload fields differ")
+    progress, binding = payload["progress"], payload["binding"]
     _progress(progress)
     if best and progress["best_val_loss"] is None:
         raise ValueError("best checkpoint requires validation selection")
@@ -126,16 +142,7 @@ def save_checkpoint(folder, model, optimizer, *, progress, binding, best=False):
     directory.mkdir()
     state_path = directory / "state.pt"
     with state_path.open("xb") as stream:
-        torch.save(
-            {
-                "model": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "rng": _rng_state(),
-                "progress": progress,
-                "binding": binding,
-            },
-            stream,
-        )
+        torch.save(payload, stream)
         stream.flush()
         os.fsync(stream.fileno())
     receipt = {
