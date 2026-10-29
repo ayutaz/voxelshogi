@@ -7,8 +7,8 @@ import type { AiObservation } from '../src/ai/arena-record';
 import type { Precision } from '../src/inference/manifest';
 import { installInteractionProbe, readInteractionProbe } from '../e2e/interaction-probe';
 
-// Generated only on Linux CI, outside public/. The real released catalog stays empty.
-const fixture = resolve('../../runs/m6/browser-fixture');
+// CI uses a private synthetic fixture. External Linux may select a hash-verified real HF release.
+const fixture = resolve(process.env.M6_MODEL_FIXTURE ?? '../../runs/m6/browser-fixture');
 const catalog = JSON.parse(readFileSync(resolve(fixture, 'catalog.json'), 'utf8')) as { releases: { id: string; manifest: { sha256: string } }[] };
 loadWasm();
 test.afterEach(async ({ page }, info) => {

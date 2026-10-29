@@ -7,6 +7,16 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'benchmark-root-side', file: 'scripts/trained-benchmark.mjs', before: 'if (game.sideToMove() !== fixture.side)', after: 'if (false)', test: 'trained-benchmark' },
+  { name: 'benchmark-root-free', file: 'scripts/trained-benchmark.mjs', before: 'finally { game.free(); }', after: 'finally {}', test: 'trained-benchmark' },
+  { name: 'benchmark-root-history', file: 'scripts/trained-benchmark.mjs', before: "ruleset: 'voxelshogi-standard-v1', recordJson }", after: "ruleset: 'voxelshogi-standard-v1', recordJson: '{}' }", test: 'trained-benchmark' },
+  { name: 'benchmark-initial-not-switch', file: 'scripts/trained-benchmark.mjs', before: 'formats[(i + 1) % formats.length]', after: 'formats[i % formats.length]', test: 'trained-benchmark' },
+  { name: 'benchmark-files-once', file: 'scripts/trained-benchmark.mjs', before: '!sentFiles ? { files:', after: 'true ? { files:', test: 'trained-benchmark' },
+  { name: 'benchmark-reply-id', file: 'scripts/trained-benchmark.mjs', before: 'data.requestId !== active.id || ', after: '', test: 'trained-benchmark' },
+  { name: 'benchmark-ignore-progress', file: 'scripts/trained-benchmark.mjs', before: " || data.kind === 'progress'", after: '', test: 'trained-benchmark' },
+  { name: 'benchmark-worker-close', file: 'scripts/trained-benchmark.mjs', before: 'worker?.terminate();', after: '', test: 'trained-benchmark' },
+  { name: 'benchmark-warmup-exclusion', file: 'scripts/trained-benchmark.mjs', before: 'if(i>=warmup)samples.push(result)', after: 'if(true)samples.push(result)', test: 'trained-benchmark' },
+  { name: 'benchmark-measured-input-only', file: 'scripts/trained-benchmark.mjs', before: 'count>1 && i>=warmup', after: 'count>1', test: 'trained-benchmark' },
   { name: 'trained-evidence-contract', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(model.numericContract, 'voxelshogi-trained-numeric-v1', 'trained numeric contract differs');", after: '', test: 'trained-browser-evidence' },
   { name: 'trained-evidence-absolute-bound', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(stats.atol, atol, 'numeric absolute bound differs');", after: '', test: 'trained-browser-evidence' },
   { name: 'trained-evidence-relative-bound', file: 'scripts/trained-browser-evidence.mjs', before: "assert.equal(stats.rtol, rtol, 'numeric relative bound differs');", after: '', test: 'trained-browser-evidence' },
