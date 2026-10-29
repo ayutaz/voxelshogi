@@ -12,6 +12,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "inference-inventory-complete",
+        "training/hub_release.py",
+        "if names != set(expected):",
+        "if False:",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-inventory-hash",
+        "training/hub_release.py",
+        "file[key] != value for key, value in descriptor.items()",
+        "False for key, value in descriptor.items()",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-ci-not-publishable",
+        "training/inference_release.py",
+        '"ciFixture" in manifest',
+        "False",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-source-bound",
+        "training/inference_release.py",
+        'or manifest["sourceCommit"] != plan["source_commit"]',
+        "or False",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-license-bound",
+        "training/inference_release.py",
+        'or manifest["license"].lower() != plan["license"]',
+        "or False",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-all-formats",
+        "training/inference_release.py",
+        "] != list(PRECISIONS):",
+        '] != [entry["precision"] for entry in variants]:',
+        "test_inference_release.py",
+    ),
+    (
+        "inference-catalog-verified",
+        "training/inference_release.py",
+        'or receipt.get("verified") is not True',
+        "or False",
+        "test_inference_release.py",
+    ),
+    (
+        "inference-catalog-revision",
+        "training/inference_release.py",
+        'or not re.fullmatch(r"[0-9a-f]{40}", receipt.get("hub_commit", ""))',
+        "or False",
+        "test_inference_release.py",
+    ),
+    (
         "resume-archive-publication-link",
         "training/hub_release.py",
         "if manifest_path.is_symlink():",
