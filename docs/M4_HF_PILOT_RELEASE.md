@@ -1,6 +1,6 @@
 # M4試料のHF公開計画
 
-2026-10-28。ユーザーからデータセットのHFアップロードを指示済み。**M4合成データv1のCC-BY-4.0と再生成用の追加30分・US$1はユーザー承認済み。費用合計はUS$100が承認上限。** 本生成の12時間・US$12枠とは別の少量公開作業とする。**再認証後、試料2 configをHFへ公開済み。public/manual・Community OFF、Dataset Cardと固定Hub commitの全28ファイルhash照合、実機終了・資源解放を確認した。** [公開データとカード](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)、[固定した実行記録](experiments/m4-hf-pilot-release-2026-10-28.json)。有効10万局面の本生成と学習は未実行。
+2026-10-28。ユーザーからデータセットのHFアップロードを指示済み。**M4合成データv1のCC-BY-4.0と再生成用の追加30分・US$1はユーザー承認済み。費用合計はUS$100が承認上限。** 本生成の12時間・US$12枠とは別の少量公開作業とする。**再認証後、試料2 configをHFへ公開済み。public/manual・Community OFF、Dataset Cardと固定Hub commitの全28ファイルhash照合、実機終了・資源解放を確認した。** [公開データとカード](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)、[固定した実行記録](experiments/m4-hf-pilot-release-2026-10-28.json)。この試料公開時点では本生成と学習は未実行だった。その後[M4本生成・公開・資源終了](M4_COMPLETION.md)を完了し、M6学習は未実行。
 
 ## 公開完了の記録
 

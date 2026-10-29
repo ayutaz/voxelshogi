@@ -21,6 +21,12 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
+## 今回の更新で再確認した基準（2026-10-29 JST）
+
+[小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
+
+次に着手するのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、今回の更新では実装・レンタル・学習を行っていない。
+
 ## M4・M5の完了確認（2026-10-29 JST）
 
 [本生成の完了記録](M4_COMPLETION.md)。1,800局・116,921行から重複3,600行を除いた有効113,321局面・探索教師36,894件を全件検証。全再生成のバイト一致後、HF commit `6e7fb29d2469b56a895042fbb089d86e7b4d074f`へ`production-64`とDataset Cardを公開し、対象1,831ファイルの全hashが一致した。public/manual・Community OFF、CC-BY-4.0を確認。実機は終了・資源解放、稼働中VoxelShogi実機0・永続volume 0件。
@@ -55,8 +61,8 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | 初回・代表試行 | 完了。30固定探索、初回102行、64手の1／2／4ワーカー比較と12対局が成功。最大試料は有効769局面・深さ2の探索教師252件。[集計](experiments/m4-cloudrift-representative-2026-10-28.json) | 小標本を10万局面の完了としない。CPU速度をCUDA学習速度へ読み替えない |
 | 初回実機の終了 | 07:25 UTCに終了処理。ID指定APIでInactive・resources_released=true、永続volume0を確認。[固定記録](experiments/m4-initial-teardown-2026-10-28.json) | 初回Parquetは当時HF退避できず、その後の再生成・歴史的hash照合とHF公開で回復。Macには小さい記録だけ |
 | 試料のHF公開 | ✅ 2 configを公開済み。Dataset Card、public/manual・Community OFF、固定Hub commitで28ファイル全hash一致、実機終了・資源解放を確認。[公開記録](M4_HF_PILOT_RELEASE.md) | 試料の公開は完了。本生成でもカード・Community OFF・全件照合を継続する |
-| 有効10万局面 | 本生成CLIは実装済み、実データは未生成。[最大12時間・US$12の見積もり](M4_PRODUCTION_QUOTE.md) | 総行数・重複除外後の件数・教師内訳・対局分割を確認し、全検証・全再生成・HF照合を行う |
-| 承認・予算 | M4合成データv1のCC-BY-4.0、HF public/manual、費用合計US$100は承認済み | 初回上限US$2・試料公開の各試行US$1・本生成最大US$12を同じ総枠で管理。未確定の実請求を上限枠で控除し、残額を確認 |
+| 有効10万局面 | ✅ 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HF公開と全1,831対象ファイル照合・実機終了まで完了。[記録](M4_COMPLETION.md) | M6は固定revisionを使用。各splitの探索教師数は学習前に外部Linuxで集計・凍結する |
+| 承認・予算 | M4データv1のCC-BY-4.0・HF public/manual・合計US$100は承認済み。予約上限累計US$41・未予約US$59、実請求未回収 | M6のGPU試行・本学習・checkpoint保持費は別に見積もる。HF送信・公開の継続承認を毎回の確認へ戻さない |
 | M5 | ✅ 改定後の固定3局145手、各局面の盤／持ち駒と投了結果が一致。PR #42を必須CI成功後に通常merge。[結果・制約](M5_PLAN.md) | 全棋譜・全終局条件の完全互換は主張しない。原本を学習や公開へ含めない |
 | M6 | CUDA学習・棋力評価・学習済みモデル対局は未実行 | 同じGPUサービスで学習速度と配布条件を確認 |
 
@@ -106,13 +112,13 @@ Macは編集・読み取り・軽量確認のみ。探索・生成・計測・�
 | 未取り込み依存更新 | [Dependabot PR #1](https://github.com/ayutaz/voxelshogi/pull/1) はopen。mainに採用済みとは扱わず、本更新で依存を変更しない |
 | 配信 | WorkerスクリプトなしのStatic Assets。COOP/COEP・R2・NN runtimeは未導入。公開SHA、JS/WASMのサイズ・hash、2 manifestと全6棋譜の照合は [取得記録](experiments/documentation-baseline-2026-10-26.json) |
 
-M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒、1秒予算で3回とも深さ2を完了。R0の幅制限探索・ブラウザ・GPU学習の速度へ一律換算しない。WASM/WorkerはM2で公開実測済み。M4で生成対象のpilot、M6で学習速度を測る。
+M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒、1秒予算で3回とも深さ2を完了。R0の幅制限探索・ブラウザ・GPU学習の速度へ一律換算しない。WASM/WorkerはM2で公開実測済み。M4のCPU生成実測は完了し、M6では別にCUDA学習速度を測る。
 
 ## 文書の役割と更新範囲
 
 | 文書 | 用途・今回の扱い |
 |---|---|
-| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。試料公開済み、次のM4本生成とM6、固定ツールとコマンドへそろえる |
+| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M4・M5完了、次のM6-0〜1とCUDA試行の判断条件、固定ツールとコマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5は固定した改定後3局の全件一致を確認。完全互換は未検証 |
@@ -124,10 +130,10 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [TECH_STACK_RESEARCH](TECH_STACK_RESEARCH.md)、[COST_ESTIMATE](COST_ESTIMATE.md) | 固定済み構成と公開実測を更新。初回の外部版・GPU相場・為替・ドメイン価格は取得日付き参考値で、採用／課金時に再取得する |
 | [AGENTS](../AGENTS.md)、[CONTRIBUTING](../CONTRIBUTING.md)、[SECURITY](../SECURITY.md)、[PRテンプレート](../.github/pull_request_template.md)、[ci-checks](../.agents/skills/ci-checks/SKILL.md) | ブランチ・TDD・PR・秘密情報・最短10分間隔のCI確認という現行方針と整合を確認。追加の承認フローや人間同士の対局は導入しない |
 
-外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M3は完了し、M4の実装開始にユーザー側の追加準備はなく、M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6の学習予算・学習済みモデルのライセンスは記載の時点で別に確定する。
+外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M4・M5は完了し、M6-0〜1の実装準備にユーザー側の追加作業はない。M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6の学習予算・学習済みモデルのライセンスは記載の時点で別に確定する。
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 
-M4全体を完了とするには、試料公開だけでなく重複除外後100,000局面の実データ・全件検証・全再生成一致・HF照合が必要。[本生成契約](M4_PRODUCTION.md)・[実行順とゴール](M4_PLAN.md)を確認する。
+M4全体は、試料公開に加えて重複除外後113,321局面の実データ・全件検証・全再生成一致・HF照合を確認して完了した。[本生成契約](M4_PRODUCTION.md)・[実行順とゴール](M4_PLAN.md)を確認する。
 
 文書更新[PR #38](https://github.com/ayutaz/voxelshogi/pull/38)も必須8チェック成功後に通常mergeし、統合`b2fbe71284902dc2c93cfaaa02cf5bb0d9ffdfc9`のCI・Security・自動公開・公開SHA・21＋3＋6 E2E・55ファイル照合を確認した。[固定した文書更新の公開記録](experiments/m4-docs-publication-2026-10-28.json)。これはデータセットのHF公開成功を意味しない。
