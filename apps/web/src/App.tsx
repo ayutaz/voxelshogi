@@ -5,9 +5,12 @@ import type { LayerView } from './renderer/Board3D';
 import { clickHand, clickSquare, NO_SELECTION, type ClickResult, type Selection } from './game/interaction';
 import { coordsOf, type Color, type HandKind, type Slice } from './game/model';
 import { GameStore, MAX_IMPORT_BYTES } from './game/store';
-import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus } from './ai/arena-controller';
+import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus, type ArenaDifficulty } from './ai/arena-controller';
+import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type ModelChoice, type ModelLibrary } from './ai/model-library';
+import { arenaConditions } from './ai/arena-record';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
+const ModelLibraryPanel = lazy(() => import('./inference/ModelLibraryPanel'));
 
 type Controller = 'human' | 'ai';
 type Mode = 'h-r' | 'r-h' | 'r-r';
@@ -26,7 +29,10 @@ export function App() {
   const [message, setMessage] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>('r-r');
   const [running, setRunning] = useState(false);
-  const [difficulty, setDifficulty] = useState<Record<Color, 'easy' | 'normal'>>({ b: 'normal', w: 'normal' });
+  const [difficulty, setDifficulty] = useState<Record<Color, ArenaDifficulty>>({ b: 'normal', w: 'normal' });
+  const [library, setLibrary] = useState<ModelLibrary>({ entries: [], choices: {} });
+  const [showModels, setShowModels] = useState(false);
+  const sourceSequence = useRef(0);
   const [budgetMs, setBudgetMs] = useState(1000);
   const [aiStatus, setAiStatus] = useState<AiStatus>({ phase: 'paused', error: null, last: null });
   const [delay, setDelay] = useState(400);
@@ -40,8 +46,8 @@ export function App() {
   const controller: Controller = MODES[mode][snap.side];
   const humanTurn = controller === 'human' && !snap.finished;
   const aiOptions = useMemo(() => ({ ...DEFAULT_AI_OPTIONS, mode, running, delayMs: delay,
-    bDifficulty: difficulty.b, wDifficulty: difficulty.w,
-    limits: { ...DEFAULT_AI_OPTIONS.limits, maxTimeMs: budgetMs } }), [mode, running, delay, difficulty, budgetMs]);
+    bDifficulty: difficulty.b, wDifficulty: difficulty.w, bModel: modelSeat(library, 'b'), wModel: modelSeat(library, 'w'),
+    limits: { ...DEFAULT_AI_OPTIONS.limits, maxTimeMs: budgetMs } }), [mode, running, delay, difficulty, budgetMs, library]);
 
   useEffect(() => {
     const ai = new ArenaController(store);
@@ -70,6 +76,23 @@ export function App() {
     setSelection(NO_SELECTION);
     setPromotion(null);
   };
+  const loadedModel = (packet: Omit<LoadedModel, 'sourceId'>) => {
+    const next = addModel(library, { ...packet, sourceId: `local-${++sourceSequence.current}` });
+    pause(); setLibrary(next);
+  };
+  const choose = (side: Color, choice: ModelChoice) => {
+    const next = chooseModel(library, side, choice);
+    pause(); setLibrary(next);
+  };
+  const selectDifficulty = (side: Color, value: ArenaDifficulty) => {
+    pause();
+    if (value === 'model' && !library.choices[side]) {
+      const first = library.entries[0];
+      if (!first) return;
+      setLibrary(chooseModel(library, side, { sourceId: first.sourceId, precision: first.model.variants[0]!.precision, backend: 'wasm' }));
+    }
+    setDifficulty({ ...difficulty, [side]: value });
+  };
 
   const ctx = { legal: snap.legal, board: snap.board, side: snap.side };
   const apply = (r: ClickResult) => {
@@ -88,6 +111,7 @@ export function App() {
 
   const reset = (m: Mode = mode) => {
     pause();
+    aiRef.current?.journal.clear();
     store.newGame();
     setMode(m);
     setRunning(m !== 'r-r');
@@ -96,13 +120,29 @@ export function App() {
     setMessage(null);
   };
 
-  const exportRecord = () => {
-    const blob = new Blob([store.exportRecord()], { type: 'application/json' });
+  const downloadRecord = (text: string, suffix = '') => {
+    const blob = new Blob([text], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `voxelshogi-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    a.download = `voxelshogi${suffix}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
+  };
+  const exportRecord = () => downloadRecord(store.exportRecord());
+  const exportConditions = async () => {
+    pause();
+    // Freeze game and observations before the asynchronous build-info request.
+    const recordJson = store.exportRecord(), current = store.snapshot();
+    const selectedAgents = arenaConditions(aiOptions);
+    const snapshot = { schema: 1, kind: 'voxelshogi-arena-record', record: JSON.parse(recordJson) as unknown,
+      viewCursor: current.ply, positionHash: current.hash, observationsThroughCursor: aiRef.current?.journal.snapshot(recordJson, current.ply) ?? [] };
+    try {
+      const response = await fetch('/build-info.json', { cache: 'no-store', credentials: 'omit', redirect: 'error' });
+      if (!response.ok) throw new Error('実装バージョンを取得できません');
+      const build = await response.json() as { commit?: unknown };
+      if (typeof build.commit !== 'string' || !/^[0-9a-f]{40}$/.test(build.commit)) throw new Error('実装バージョンが不正です');
+      downloadRecord(JSON.stringify({ ...snapshot, selectedAgents, applicationCommit: build.commit }, null, 2), '-with-ai');
+    } catch (error) { setMessage(`保存できません: ${String(error)}`); }
   };
   const importRecord = async (file: File) => {
     pause();
@@ -118,6 +158,7 @@ export function App() {
       const text = await file.text();
       if (generation !== importGeneration.current) return;
       const r = store.importRecord(text);
+      if (r.ok) aiRef.current?.journal.clear();
       setMessage(r.ok ? '棋譜を読み込みました' : `読み込めません: ${r.error}`);
     } catch (error) {
       if (generation === importGeneration.current) setMessage(`読み込めません: ${String(error)}`);
@@ -129,8 +170,8 @@ export function App() {
   const status = snap.result
     ? resultText(snap.result)
     : snap.finished ? '対局中断' : `${snap.ply + 1}手目 ${snap.side === 'b' ? '☗先手' : '☖後手'}の番${snap.inCheck[snap.side] ? '（王手）' : ''}`;
-  const phaseText = { paused: '一時停止中', waiting: '次の着手待ち', thinking: `${snap.side === 'b' ? '先手' : '後手'} ${difficulty[snap.side] === 'normal' ? 'Normal' : 'Easy'} 思考中…`,
-    human: '人間の手番', history: '履歴表示中：1手指すと分岐します', finished: '対局終了', error: '探索エラー' }[aiStatus.phase];
+  const phaseText = { paused: '一時停止中', waiting: '次の着手待ち', thinking: `${snap.side === 'b' ? '先手' : '後手'} ${difficulty[snap.side] === 'model' ? 'モデル準備・思考中…' : `${difficulty[snap.side] === 'normal' ? 'Normal' : 'Easy'} 思考中…`}`,
+    human: '人間の手番', history: '履歴表示中：1手指すと分岐します', finished: '対局終了', error: 'AIエラー' }[aiStatus.phase];
 
   const sideHands = (c: Color) => <Hands snap={snap} color={c} selection={selection} onHand={onHand} />;
 
@@ -175,13 +216,39 @@ export function App() {
               1手進む ▶
             </button>
           </div>
-          {(['b', 'w'] as const).map((side) => <label key={side}>
+          <button type="button" onClick={() => setShowModels(!showModels)}>{showModels ? 'モデル読み込みを閉じる' : '学習済みモデルを読み込む'}</button>
+          {showModels && <Suspense fallback={<p>読み込み中…</p>}><ModelLibraryPanel onLoaded={loadedModel} /></Suspense>}
+          {library.entries.map(entry => <p className="muted model-source" key={entry.sourceId}>
+            {entry.release.id}<br />SHA-256: {entry.release.manifest.sha256}<br />
+            <button type="button" aria-label="モデルを外す" onClick={() => {
+              pause();
+              setDifficulty({ b: library.choices.b?.sourceId === entry.sourceId ? 'normal' : difficulty.b, w: library.choices.w?.sourceId === entry.sourceId ? 'normal' : difficulty.w });
+              setLibrary(removeModel(library, entry.sourceId));
+            }}>モデルを外す</button>
+          </p>)}
+          {(['b', 'w'] as const).map((side) => <div key={side}><label>
             {side === 'b' ? '☗先手' : '☖後手'}のAI
             <select value={difficulty[side]} disabled={MODES[mode][side] === 'human'} data-testid={`difficulty-${side}`}
-              onChange={(e) => { pause(); setDifficulty({ ...difficulty, [side]: e.target.value as 'easy' | 'normal' }); }}>
+              onChange={(e) => selectDifficulty(side, e.target.value as ArenaDifficulty)}>
               <option value="easy">Easy（ランダム）</option><option value="normal">Normal（探索）</option>
+              <option value="model" disabled={!library.entries.length}>学習済みモデル</option>
             </select>
-          </label>)}
+          </label>
+          {difficulty[side] === 'model' && library.choices[side] && <fieldset disabled={MODES[mode][side] === 'human'}>
+            <legend>{side === 'b' ? '先手' : '後手'}のモデル条件</legend>
+            <label>モデル<select data-testid={`model-${side}`} value={library.choices[side].sourceId} onChange={event => {
+              const entry = library.entries.find(item => item.sourceId === event.target.value)!;
+              choose(side, { ...library.choices[side]!, sourceId: entry.sourceId, precision: entry.model.variants[0]!.precision });
+            }}>{library.entries.map(entry => <option key={entry.sourceId} value={entry.sourceId}>{entry.release.id}</option>)}</select></label>
+            <label>精度形式<select data-testid={`precision-${side}`} value={library.choices[side].precision} onChange={event => choose(side, { ...library.choices[side]!, precision: event.target.value as ModelChoice['precision'] })}>
+              {library.entries.find(entry => entry.sourceId === library.choices[side]!.sourceId)!.model.variants.map(variant => <option key={variant.precision} value={variant.precision}>{variant.precision === 'int8' ? 'INT8（重み）' : variant.precision.toUpperCase()}</option>)}
+            </select></label>
+            <label>実行先<select data-testid={`backend-${side}`} value={library.choices[side].backend} onChange={event => choose(side, { ...library.choices[side]!, backend: event.target.value as ModelChoice['backend'] })}>
+              <option value="wasm">WASM（CPU）</option><option value="webgpu">WebGPU</option>
+            </select></label>
+            <p className="muted">対応しない形式・実行先は開始時に理由を表示します。</p>
+          </fieldset>}
+          </div>)}
           <label>Normalの思考上限
             <select value={budgetMs} data-testid="thinking-budget" onChange={(e) => { pause(); setBudgetMs(Number(e.target.value)); }}>
               <option value={100}>0.1秒</option><option value={1000}>約1秒</option><option value={3000}>約3秒</option>
@@ -227,6 +294,7 @@ export function App() {
             <button type="button" onClick={exportRecord}>
               保存
             </button>
+            <button type="button" data-testid="export-ai-record" onClick={() => void exportConditions()}>棋譜＋AI条件</button>
             <button type="button" onClick={() => fileInput.current?.click()}>
               読み込み
             </button>

@@ -4,7 +4,7 @@ import { profileNode } from './profile';
 import { inferenceOptions } from './options';
 
 export interface OutputData { policy: Float32Array; value: Float32Array; dispose: () => void }
-export interface SessionPort { run: (features: Float32Array) => Promise<OutputData>; release: () => Promise<void> }
+export interface SessionPort { run: (features: Float32Array) => Promise<OutputData>; finishProfiling?: () => Promise<void>; release: () => Promise<void> }
 export interface Profile { providers: Record<string, number>; operators: Record<string, number> }
 export interface RuntimeInfo {
   backend: string; adapter: { vendor: string; architecture: string; device: string; description: string } | null;
@@ -62,6 +62,7 @@ export async function openBackend(pkg: RuntimeIndex, backend: Backend, precision
         ort.env.wasm.wasmBinary = undefined;
         return {
           release: () => session.release(),
+          finishProfiling: async () => { session.endProfiling(); await Promise.resolve(); },
           run: async (features) => {
             const input = new ort.Tensor('float32', features, [1, 729, 43]);
             let outputs: Awaited<ReturnType<typeof session.run>> | undefined;

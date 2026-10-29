@@ -15,6 +15,20 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'policy-backend-native-profile', file: 'inference/backend.ts', before: 'session.endProfiling();', after: 'void session;', test: 'inference-backend' },
+  { name: 'policy-session-profile-finish', file: 'inference/policy-session.ts', before: 'await this.session.finishProfiling?.();', after: '', test: 'policy-session' },
+  { name: 'model-notice-text-only', file: 'inference/local-model.ts', before: "!['README.md', 'LICENSE', 'NOTICE'].includes(file.path)", after: 'false', test: 'local-model' },
+  { name: 'model-notice-size', file: 'inference/local-model.ts', before: 'file.bytes > 1024 * 1024', after: 'false', test: 'local-model' },
+  { name: 'model-library-reselected-source', file: 'ai/model-library.ts', before: 'choice?.sourceId === previous.sourceId', after: 'false', test: 'model-library' },
+  { name: 'model-library-precision', file: 'ai/model-library.ts', before: 'precision: choice.precision, backend: choice.backend', after: "precision: 'fp32', backend: choice.backend", test: 'model-library' },
+  { name: 'model-library-remove', file: 'ai/model-library.ts', before: 'state.entries.filter(entry => entry.sourceId !== sourceId)', after: 'state.entries', test: 'model-library' },
+  { name: 'model-library-limit', file: 'ai/model-library.ts', before: 'if (entries.length > 4)', after: 'if (false)', test: 'model-library' },
+  { name: 'model-panel-late-completion', file: 'inference/ModelLibraryPanel.tsx', before: 'if (current !== generation.current) return;', after: '', test: 'model-library-panel', extension: 'tsx' },
+  { name: 'model-panel-unmount-cancel', file: 'inference/ModelLibraryPanel.tsx', before: 'generation.current += 1; read.current?.abort();', after: '', test: 'model-library-panel', extension: 'tsx' },
+  { name: 'arena-record-branch', file: 'ai/arena-record.ts', before: 'if (cursor >= shared)', after: 'if (false)', test: 'arena-record' },
+  { name: 'arena-record-cursor', file: 'ai/arena-record.ts', before: 'ply < cursor', after: 'true', test: 'arena-record' },
+  { name: 'arena-record-snapshot', file: 'ai/arena-record.ts', before: "structuredClone({ root, reply, ...(value.kind === 'model-result' ? {} : { search }) })", after: "{ root, reply, ...(value.kind === 'model-result' ? {} : { search }) }", test: 'arena-record' },
+  { name: 'arena-record-accepted-only', file: 'ai/arena-controller.ts', before: 'else this.journal.accept(root, search, reply);', after: 'this.journal.accept(root, search, reply);', test: 'arena-model-controller' },
   { name: 'arena-model-source-key', file: 'ai/arena-model.ts', before: '[seat.sourceId, selection.modelId,', after: '[selection.modelId,', test: 'arena-client' },
   { name: 'arena-model-precision-key', file: 'ai/arena-model.ts', before: 'selection.packageHash, selection.precision, selection.backend', after: 'selection.packageHash, selection.backend', test: 'arena-client' },
   { name: 'arena-model-cache', file: 'ai/arena-client.ts', before: 'this.models.set(key, client);', after: '', test: 'arena-client' },
@@ -167,7 +181,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 107);
+    assert.equal(results.length, 121);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

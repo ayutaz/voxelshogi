@@ -1,7 +1,7 @@
 // Pure fake ports; no ONNX runtime, model execution or Rust search on Mac.
 import { expect, it, vi } from 'vitest';
 import { PolicySession, type PolicySelection } from '../src/inference/policy-session';
-import type { BackendPort } from '../src/inference/backend';
+import type { BackendPort, Profile } from '../src/inference/backend';
 import { parseTrainedCatalog, type LocalModel } from '../src/inference/local-model';
 import { POLICY_ELEMENTS, parseTrainedModel } from '../src/inference/manifest';
 import { releaseFixture, trainedFixture } from './local-model-fixtures';
@@ -15,7 +15,7 @@ function setup() {
   const input = new Float32Array(729 * 43);
   for (let cell = 0; cell < 729; cell++) input[cell * 43] = 1; // Independent empty-board oracle.
   const outputDispose = vi.fn();
-  const session = { run: vi.fn(async () => ({ policy, value, dispose: outputDispose })), release: vi.fn(async () => {}) };
+  const session = { run: vi.fn(async () => ({ policy, value, dispose: outputDispose })), finishProfiling: vi.fn(async () => {}), release: vi.fn(async () => {}) };
   const port: BackendPort = { createSession: vi.fn(async () => session), dispose: vi.fn(async () => {}), resetProfile: vi.fn(),
     profile: vi.fn(() => ({ providers: { CPUExecutionProvider: 1 }, operators: { MatMul: 1 } })),
     info: { backend: 'wasm', adapter: null, features: [], runtimeBytes: 100 } };
@@ -65,6 +65,25 @@ it('replays full history at the requested cursor, then chooses a canonical legal
   expect(f.game).toHaveBeenLastCalledWith(root().recordJson);
   expect(f.games.at(-1)!.goto).toHaveBeenCalledWith(3); expect(f.games.at(-1)!.free).toHaveBeenCalledTimes(1);
   expect(f.session.run).toHaveBeenCalledTimes(3); expect(f.session.release).not.toHaveBeenCalled();
+  await f.engine.dispose();
+});
+
+it('flushes native profiling after all fixtures and keeps that verified session for play', async () => {
+  const f = setup(); let flushed = false;
+  f.session.finishProfiling.mockImplementation(async () => {
+    expect(f.session.run).toHaveBeenCalledTimes(2); flushed = true;
+  });
+  vi.mocked(f.port.profile).mockImplementation((): Profile => flushed
+    ? { providers: { CPUExecutionProvider: 12 }, operators: { MatMul: 12 } }
+    : { providers: {}, operators: {} });
+  const pending = f.engine.initialize(selection());
+  await expect(pending).resolves.toMatchObject({ profile: { providers: { CPUExecutionProvider: 12 } } });
+  const validation = await pending;
+  expect(validation.profile.providers).toEqual({ CPUExecutionProvider: 12 });
+  expect(f.session.finishProfiling).toHaveBeenCalledTimes(1);
+  await f.engine.bestMove(root());
+  expect(f.port.createSession).toHaveBeenCalledTimes(1);
+  expect(f.session.release).not.toHaveBeenCalled();
   await f.engine.dispose();
 });
 

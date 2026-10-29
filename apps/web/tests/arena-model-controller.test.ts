@@ -15,7 +15,7 @@ function setup() {
   const listeners = new Set<() => void>();
   const store = { snapshot: () => state,
     subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    searchState: () => ({ revision: state.revision, cursor: state.ply, side: state.side, hash: '1'.repeat(16), ruleset: 'voxelshogi-standard-v1', recordJson: '{}' }),
+    searchState: () => ({ revision: state.revision, cursor: state.ply, side: state.side, hash: '1'.repeat(16), ruleset: 'voxelshogi-standard-v1', recordJson: JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: Array(state.ply).fill('111211') }) }),
     applyAiMove: vi.fn(() => { state.ply++; state.moveCount = state.ply; state.revision++; state.side = state.side === 'b' ? 'w' : 'b'; for (const listener of listeners) listener(); return { ok: true as const }; }),
   };
   const queue: { input: ModelDecision; resolve: (reply: ModelCompleted) => void }[] = [];
@@ -41,6 +41,7 @@ it('steps a selected model exactly once and forwards its verified root and condi
   f.reply(); await vi.advanceTimersByTimeAsync(0);
   expect(f.store.applyAiMove).toHaveBeenCalledWith(expect.objectContaining({ revision: 1, cursor: 0, side: 'b', hash: '1'.repeat(16) }), '111211');
   expect(f.state.ply).toBe(1); expect(f.ai.snapshot()).toMatchObject({ phase: 'paused', last: { kind: 'model-result', model: { sourceId: 'local-1' } } }); f.ai.dispose();
+  expect(f.ai.journal.snapshot(f.store.searchState().recordJson, 1)).toHaveLength(1);
 });
 
 it('ignores a late model result after pausing and resuming the same board and model', async () => {
@@ -84,4 +85,16 @@ it('rejects a model response for different conditions before touching the game',
   const f = setup(); f.ai.step(); await vi.advanceTimersByTimeAsync(0);
   f.reply(0, { model: { ...f.black, sourceId: 'unselected' } }); await vi.advanceTimersByTimeAsync(0);
   expect(f.store.applyAiMove).not.toHaveBeenCalled(); expect(f.ai.snapshot().phase).toBe('error'); f.ai.dispose();
+  expect(f.ai.journal.snapshot(f.store.searchState().recordJson, 1)).toEqual([]);
+});
+
+it('does not record a model decision that the game refuses to apply', async () => {
+  const f = setup();
+  f.store.applyAiMove.mockReturnValueOnce({ ok: false, error: 'stale AI response' } as never);
+  f.ai.step(); await vi.advanceTimersByTimeAsync(0); f.reply(); await vi.advanceTimersByTimeAsync(0);
+  expect(f.ai.snapshot().phase).toBe('error');
+  // Even a later human/imported move with identical text must not acquire the
+  // provenance of a rejected AI response.
+  f.state.ply = 1;
+  expect(f.ai.journal.snapshot(f.store.searchState().recordJson, 1)).toEqual([]); f.ai.dispose();
 });

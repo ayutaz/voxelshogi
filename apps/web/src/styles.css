@@ -47,6 +47,10 @@ header h1 { font-size: 18px; margin: 0; }
 .panel.left { border-right: 1px solid var(--line); }
 .panel.right { border-left: 1px solid var(--line); }
 .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 14px 0 4px; }
+.model-source, .model-library { overflow-wrap: anywhere; }
+.model-library input { max-width: 100%; }
+.panel fieldset { min-width: 0; margin: 6px 0; padding: 6px; border: 1px solid var(--line); }
+.panel fieldset select { max-width: 100%; }
 main { display: flex; flex-direction: column; min-height: 0; padding: 8px; gap: 8px; overflow: auto; }
 .message { background: #3a2424; border: 1px solid #6b3434; padding: 6px 10px; border-radius: 6px; }
 

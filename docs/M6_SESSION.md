@@ -8,6 +8,8 @@ M6-5の専用Worker内で使う`PolicySession`の実装。[端末内読込](M6_L
 
 起動時にはmanifestの全fixtureをRustで履歴付き再生し、43chの特徴量を作る。入力全bytesが同じPython参照と一致したことを確認し、各同形式のPolicy全1,067,985要素とValueをM3以来の固定誤差基準で照合する。実行providerのprofileも確認し、CPU実行をWebGPU成功に置き換えない。全fixtureを検証し終えるまで対局の指し手を返さない。
 
+ORT 1.31.1のnative profileは終了時に出力される。全fixtureの照合後に`endProfiling`を一度呼んで実providerの記録を確定し、同じsessionを解放せず対局で再利用する。記録は起動時の参照局面を対象とし、各着手の新しいprofileやkernel実行時間とは表示しない。M3の1回ごとにsessionを解放する推論では、従来どおり解放後のprofileを使う。WebGPUのCPU fallback禁止も維持する。
+
 ## 1手を返す
 
 要求は履歴を含む棋譜、cursor、revision、局面hash、手番、rulesetで識別する。棋譜の文字数・bytesと整数範囲も制限する。Rustの`Game.fromRecordJson`と`goto(cursor)`で復元し、hash・手番・手数が一致した場合だけ特徴量と合法手を取得する。終局なら推論せず`choice=null`を返す。
