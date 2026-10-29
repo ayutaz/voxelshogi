@@ -50,10 +50,19 @@ def _canonical(value):
 
 def _policy(plan):
     role = plan.get("artifact_role", "artifacts")
-    if role not in ("artifacts", "inference-package") or (
-        role == "inference-package" and plan["repo_type"] != "model"
+    if role not in ("artifacts", "inference-package", "training-state") or (
+        role in ("inference-package", "training-state") and plan["repo_type"] != "model"
     ):
         raise ValueError("unsupported artifact publication role")
+    if role == "training-state" and (
+        plan.get("state_publication_approved") is not True
+        or plan["repo_id"] != "voxelshogi/voxelshogi-transformer-s-training-state"
+        or not isinstance(plan.get("expected_binding"), dict)
+        or plan["expected_binding"].get("source_commit") != plan["source_commit"]
+    ):
+        raise ValueError(
+            "separate training-state approval, repo and binding are required"
+        )
     if not re.fullmatch(r"voxelshogi/[A-Za-z0-9][A-Za-z0-9._-]*", plan["repo_id"]):
         raise ValueError("release destination must be voxelshogi/NAME")
     if plan["repo_type"] not in ("model", "dataset"):
@@ -161,6 +170,8 @@ def plan_release(
     license_approved,
     source_commit,
     artifact_role="artifacts",
+    state_publication_approved=False,
+    expected_binding=None,
 ):
     plan = {
         "schema": 1,
@@ -174,11 +185,20 @@ def plan_release(
     }
     if artifact_role != "artifacts":
         plan["artifact_role"] = artifact_role
+    if artifact_role == "training-state":
+        plan.update(
+            state_publication_approved=state_publication_approved,
+            expected_binding=expected_binding,
+        )
+    elif state_publication_approved or expected_binding is not None:
+        raise ValueError(
+            "training-state settings require the separate publication role"
+        )
     _policy(plan)
     manifest_path = Path(folder) / "manifest.json"
     if manifest_path.is_symlink():
         raise ValueError("publication manifest must not be a symlink")
-    if artifact_role == "inference-package" and (
+    if artifact_role in ("inference-package", "training-state") and (
         not manifest_path.is_file() or manifest_path.stat().st_size > 1024 * 1024
     ):
         raise ValueError("invalid inference manifest size")
@@ -190,12 +210,13 @@ def plan_release(
         if (
             isinstance(manifest, dict)
             and manifest.get("schema") == "voxelshogi-resume-archive-v1"
+            and artifact_role != "training-state"
         ):
             raise ValueError(
                 "resume archives require a separately approved publication policy"
             )
     card_path = Path(folder) / "README.md"
-    if artifact_role == "inference-package" and (
+    if artifact_role in ("inference-package", "training-state") and (
         card_path.is_symlink() or card_path.stat().st_size > 1024 * 1024
     ):
         raise ValueError("invalid inference Model Card")
@@ -221,11 +242,17 @@ def plan_release(
         from training.inference_release import inference_inventory
 
         expected = inference_inventory(folder, plan, card)
+    elif artifact_role == "training-state":
+        from training.state_release import state_inventory
+
+        expected = state_inventory(folder, plan, card)
     plan["files"] = _inventory(folder, repo_type, expected=expected)
     return plan
 
 
-def publish_release(folder, plan, api, *, execute=False, system=None):
+def publish_release(
+    folder, plan, api, *, execute=False, system=None, upload_budget=None
+):
     _policy(plan)
     current = plan_release(
         folder,
@@ -235,6 +262,8 @@ def publish_release(folder, plan, api, *, execute=False, system=None):
         license_approved=plan["license_approved"],
         source_commit=plan["source_commit"],
         artifact_role=plan.get("artifact_role", "artifacts"),
+        state_publication_approved=plan.get("state_publication_approved", False),
+        expected_binding=plan.get("expected_binding"),
     )
     if current != plan:
         raise ValueError("release artifacts changed since review")
@@ -245,6 +274,12 @@ def publish_release(folder, plan, api, *, execute=False, system=None):
     }
     if not execute:
         return receipt
+    if plan.get("artifact_role") == "training-state":
+        if (system or platform.system().lower()) != "linux":
+            raise ValueError("publish training state only from external Linux")
+        from training.state_release import reserve_state_upload
+
+        reserve_state_upload(upload_budget, plan)
     info = create_release_repository(plan, api, execute=True, system=system)
     destination = {"repo_id": plan["repo_id"], "repo_type": plan["repo_type"]}
     commit = api.upload_folder(
@@ -324,6 +359,7 @@ def main():
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--create-repo", action="store_true")
     parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--upload-budget", type=Path)
     args = parser.parse_args()
     plan = json.loads(args.plan.read_text())
     api = None
@@ -344,7 +380,13 @@ def main():
             "gated": info.gated if args.execute else "manual",
         }
     else:
-        receipt = publish_release(args.folder, plan, api, execute=args.execute)
+        receipt = publish_release(
+            args.folder,
+            plan,
+            api,
+            execute=args.execute,
+            upload_budget=args.upload_budget,
+        )
         if args.execute:
             if args.receipt:
                 args.receipt.write_text(_canonical(receipt) + "\n")

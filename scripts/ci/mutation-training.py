@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "state-release-separate-approval",
+        "training/hub_release.py",
+        'plan.get("state_publication_approved") is not True',
+        "False",
+        "test_training_state_release.py",
+    ),
+    (
+        "state-release-separate-repo",
+        "training/hub_release.py",
+        'or plan["repo_id"] != "voxelshogi/voxelshogi-transformer-s-training-state"',
+        "or False",
+        "test_training_state_release.py",
+    ),
+    (
+        "state-release-upload-budget",
+        "training/hub_release.py",
+        "reserve_state_upload(upload_budget, plan)",
+        "pass",
+        "test_training_state_release.py",
+    ),
+    (
+        "state-release-budget-duplicate",
+        "training/state_release.py",
+        'if any(row["release_sha256"] == release for row in reservations):',
+        "if False:",
+        "test_training_state_release.py",
+    ),
+    (
+        "state-release-budget-total",
+        "training/state_release.py",
+        'sum(row["maximum_bytes"] for row in reservations) + amount\n            > MAXIMUM_NEW_BYTES',
+        "False",
+        "test_training_state_release.py",
+    ),
+    (
         "inference-inventory-complete",
         "training/hub_release.py",
         "if names != set(expected):",
