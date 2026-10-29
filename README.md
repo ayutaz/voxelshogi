@@ -12,7 +12,7 @@
 
 | デモ | できること |
 |---|---|
-| **[AI対局を観戦する](https://voxelshogi.yousan-apps.workers.dev)** | 探索AI同士の対局を観戦。一時停止・1手送り・速度変更、2D／3D表示、人間対AIも利用できます |
+| **[AI対局を観戦する](https://voxelshogi.yousan-apps.workers.dev)** | 探索AI同士・取得済み学習モデルの対局を観戦。一時停止・1手送り・速度変更、2D／3D表示、人間対AIも利用できます |
 | [モデル推論ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) | FP32・FP16・INT8重み版のモデルを選び、自分の端末で推論と数値比較を実行できます |
 
 通常の対局はEasy（ランダム）とNormal（探索）を選べます。推論ラボは**未学習モデルによる技術デモ**です。検証した端末・精度形式・実行先は [モデルの検証記録](docs/M3_VALIDATION.md) にまとめています。
@@ -39,11 +39,11 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。
 
-CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging FaceにModel Card付きで公開](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)しました。取得にはHFでの申請と承認が必要です。教師手の再現精度は固定testで約75.6%ですが、今回の対局評価では探索AIに対する棋力向上は確認できていません。[評価結果と制約](docs/M6_MODELS.md)を公開しています。
+CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging FaceにModel Card付きで公開](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)しました。取得にはHFでの申請と承認が必要です。教師手の再現精度は固定testで約75.6%ですが、今回の対局評価では探索AIに対する棋力向上は確認できていません。[評価結果と制約](docs/M6_COMPLETION.md)を公開しています。
 
-観戦画面には[取得済みモデルの読み込み・両AIの形式選択・AI条件付き棋譜保存](docs/M6_ARENA.md)があります。ブラウザ向けの全3形式をHFで公開し、固定revisionとファイルhashをモデル一覧に登録しました。候補検証ではLinux実GPUで全48条件・40回の形式切替に成功しています。最終の公開後検証・資源終了は引き続き確認中です。初回の混合精度FP16と計測手順の失敗も[記録](docs/M6_PORTABLE.md)へ残しています。
+観戦画面には[取得済みモデルの読み込み・両AIの形式選択・AI条件付き棋譜保存](docs/M6_ARENA.md)があります。ブラウザ向けの全3形式をHFで公開し、固定revisionとファイルhashをモデル一覧に登録しました。Linux実GPUで公開後の全48条件・40回の形式切替、各形式の実着手・7件の実モデルE2Eを確認し、GPUの資源解放まで完了しました（[M6完了記録](docs/M6_COMPLETION.md)）。初回の混合精度FP16と計測手順の失敗も[記録](docs/M6_PORTABLE.md)へ残しています。
 
-詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。M4と、固定3局145手を照合したM5は完了しています。M6では[学習・中断再開・HFからの復旧](docs/M6_RETRY.md)、固定評価と初回公開まで進みました。計算とモデルの転送は外部Linuxで行い、Macでは編集と軽量な確認を行います。
+詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。M4と、固定3局145手を照合したM5は完了しています。M6／Phase4は[学習・再開・評価・3形式公開と実機観戦](docs/M6_COMPLETION.md)まで完了しました。計算とモデルの転送は外部Linuxで行い、Macでは編集と軽量な確認を行います。
 
 ### ルールについて
 
@@ -71,9 +71,9 @@ pnpm --dir apps/web dev
 [http://localhost:5173](http://localhost:5173) を開くと、探索AIの観戦と人間対AIを試せます。
 
 <details>
-<summary>モデル推論ラボもローカルで動かす</summary>
+<summary>モデル推論ラボの開発環境を作る（生成は外部Linux）</summary>
 
-Python 3.14.9とuvを使います。上のWeb起動手順を終えてから、別のターミナルでリポジトリのルートへ移動し、次を実行してください。
+モデル生成はVast.ai／CloudRift等の外部Linuxで行います。Python 3.14.9とuvを使い、上のWeb起動手順を終えてから、Linuxのリポジトリルートで次を実行します。Macは編集と軽量な確認に使います。
 
 ```bash
 uv sync --locked

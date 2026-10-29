@@ -1,8 +1,8 @@
 # CLAUDE.md — VoxelShogi
 
-**M6の最新記録（2026-10-29 UTC）**：[ブラウザ向け3形式・最終HF配布](docs/M6_PORTABLE.md)。[再学習とHF復旧](docs/M6_RETRY.md)後、全3形式を固定test・各60局で再評価し、HFの最終revisionで全37ファイルを照合した。候補実機計測は全48条件・40実切替に成功。公開catalogへの登録後の実機検証・資源終了は未完了で、M6全体の完了記録ではない。
+**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](docs/M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5〜7は未着手。
 
-**初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](docs/M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の再試行記録を参照。
+**初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](docs/M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
 
 9×9×9（729マス・372枚）の三次元将棋を題材にした、再現可能な三次元将棋 AI 研究プラットフォームです。対象は、ルールエンジン、ブラウザゲーム、合成データセット、Transformer モデル、分散学習です。
 
@@ -11,7 +11,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M6_TRIAL.md` の本学習・評価・公開観戦。M4・M5は完了。M6の学習／再開、固定評価・変換、HF公開profile、Workerと観戦UI、費用・終了制御はPR #47〜#63の必須CI成功後に取り込み済み。M6-2の実RTX5090試行では教師train29,884／val3,421／test3,589を監査し、batch4約185局面/秒、CUDA再開とHFからの新run復旧・継続一致、Linuxブラウザの物理GPU利用を確認。試行実機は終了・資源解放済み。本学習・最終評価・学習済み推論公開・Arenaの実機検証は未実施。M6基本枠US$24、成果物Apache-2.0・別HF repo再開状態公開、不足時の追加GPU予算US$100・追加合成データ生成はPR #64に記録済み。追加枠はまだ未使用。詳細は `export/m6-approval.json`、`docs/M6_PLAN.md`。
+- 次の実行計画: M6-5まで完了（`docs/M6_COMPLETION.md`）。次は`docs/ROADMAP.md`のPhase5〜7を、実学習約185〜194局面/秒・固定棋力評価と実機性能から具体化する。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、プロジェクトUS$61／基本枠100、追加US$100は未使用。GPUはすべて資源解放済み。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -111,6 +111,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
   - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
+  - M6 / Phase4: 3 epoch／22,413更新、固定test・各60局、3形式のHF公開、公開実GPU48条件／40切替・3形式着手・7 E2E、資源解放まで完了（[記録](docs/M6_COMPLETION.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、承認済みの最大4時間／US$4のCUDA試行を実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開は実RTX5090で成功済み。M6の個別承認と実測見積もりを使い、追加GPU枠は不足時だけ有効化する。
+  1. Phase5〜7の実行単位・比較条件・費用をM6実測から計画する。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。後続GPUの起動・学習はまだ行わない。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
