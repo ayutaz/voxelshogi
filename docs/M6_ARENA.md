@@ -32,7 +32,9 @@ human／読込済みの手にはAIの出所を付けない。適用に失敗し�
 
 ## 追加した検証
 
-Macではモデル計算を行わず、対象の軽量7ファイル45テスト、追加12変異の実行済みassertionによる検出、型・lintを確認した。Web既知変異は119件になる。Linux CIの`Browser model inference (real WASM)`に6件のarena E2Eを追加し、3形式の先後別推論・全参照照合・合法棋譜・条件保存、準備中の3D操作と中断、破損ローカルONNX、GPUなし時の明示エラーとWASMを選んだ人間対AIを検証する。
+Macではモデル計算を行わず、対象の軽量7ファイル45テスト、追加12変異の実行済みassertionによる検出、型・lintを確認した。初回Linux CIはWeb326単体テストと119変異に成功したが、arena E2Eで着手前に停止した。ORT 1.31.1のnative profileは終了時まで記録を出力しないため、全参照局面を照合した後にprofilingを確定し、実providerを確認して同じsessionを対局へ使うよう修正する。profile確定を待つfakeで再現し、専用の2変異も追加する。Web既知変異は121件になる。
+
+Linux CIの`Browser model inference (real WASM)`に6件のarena E2Eを追加し、3形式の先後別推論・全参照照合・合法棋譜・条件保存、準備中の3D操作と中断、破損ローカルONNX、GPUなし時の明示エラーとWASMを選んだ人間対AIを検証する。初回失敗を成功とは数えず、修正後の実ブラウザ検証を通してから取り込む。
 
 CIの試験パッケージはM3未学習モデルの実ONNX／参照値と**合成したM6のmetadata receipt**を使う。実学習をした証拠にはしない。Linux CI内の`runs/m6/browser-fixture`だけに生成し、Playwrightがcatalogを試験時だけ差し替える。公開catalog・公開配布物・artifact・HFには含めない。準備中の操作検証はWorker moduleの取得を待たせたもので、推論kernel実行中や物理GPUとの同時描画の性能測定とは区別する。
 

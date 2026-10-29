@@ -11,6 +11,13 @@ import { installInteractionProbe, readInteractionProbe } from '../e2e/interactio
 const fixture = resolve('../../runs/m6/browser-fixture');
 const catalog = JSON.parse(readFileSync(resolve(fixture, 'catalog.json'), 'utf8')) as { releases: { id: string; manifest: { sha256: string } }[] };
 loadWasm();
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus) console.info('Arena model failure:', JSON.stringify({
+    status: await page.getByTestId('status').textContent().catch(() => null),
+    phase: await page.getByTestId('ai-phase').textContent().catch(() => null),
+    error: await page.getByTestId('ai-error').textContent().catch(() => null),
+  }));
+});
 async function prepare(page: Page, context: BrowserContext, folder = 'model') {
   await context.route('**/models/m6/catalog.json', route => route.fulfill({ json: catalog }));
   await page.goto('/');

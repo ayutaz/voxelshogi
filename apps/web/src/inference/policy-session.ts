@@ -106,11 +106,13 @@ export class PolicySession {
           this.live();
           const comparison = { policy: compare(floats(policy), outputs.policy, POLICY_ELEMENTS, selection.precision), value: compare(floats(expectedValue), outputs.value, 1, selection.precision) };
           if (Math.abs(outputs.value[0]!) > 1) throw new Error('Value exceeds tanh range');
-          this.placement();
           fixtures.push({ name: fixture.name, comparison });
         } finally { outputs.dispose(); }
       }
       if (fixtures.length === 0) throw new Error('policy session has no validated fixtures');
+      // ORT 1.31.1 buffers native profile events until endProfiling/release.
+      // End profiling once after the reference runs, retaining the exact session.
+      await this.session.finishProfiling?.();
       this.live(); this.ready = true;
       return { selection: { ...selection }, fixtures, information: structuredClone(this.port.info), profile: this.placement() };
     } catch (error) { this.disposed = true; throw error; }
