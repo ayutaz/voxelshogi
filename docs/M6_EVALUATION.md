@@ -1,12 +1,12 @@
 # M6の固定評価ハーネス
 
-M6-3〜4の評価コードを学習前に準備した。**実データでの学習・test評価・60局の対局はまだ実行していない。** 事前条件は[M6教師・評価契約](M6_TRAINING_CONTRACT.md)、全体の完了条件は[M6計画](M6_PLAN.md)を参照する。
+M6-3〜4の評価コードはPR #51で必須CI成功後、main `c404168`へ取り込み済み。Linux CPUの304テストと101既知変異を確認した。**実データでの学習・test評価・60局の対局はまだ実行していない。** 事前条件は[M6教師・評価契約](M6_TRAINING_CONTRACT.md)、全体の完了条件は[M6計画](M6_PLAN.md)を参照する。
 
 ## 評価する重みを固定する
 
 `training.evaluate`は、未学習seed314159、val最良checkpoint、または実際の変換済みONNXを受け付ける。学習済み候補は完了epochのbest参照だけから読む。入力cacheのhash・教師契約・学習config・コードcommit・step／学習例数・val選択を照合し、途中epochやtestで選んだという設定を拒否する。optimizerを公開用の重みに含めず、選択したmodelのTensorだけをsafetensorsに固定する。
 
-変換版は配布packageの全ファイルhashを検証し、指定したFP32・FP16・INT8ファイルを読む。学習済みpackageには選択元のbinding／receiptと、Torchで評価したsafetensorsのhashを要求する。この来歴の追加は後続の学習済みexport実装へ接続する。別形式への自動置換はしない。
+変換版は配布packageの全ファイルhashを検証し、指定したFP32・FP16・INT8ファイルを読む。学習済みpackageには選択元のbinding／receiptと、Torchで評価したsafetensorsのhashを要求する。この来歴は[学習済みexport実装](M6_EXPORT.md)へ接続する。別形式への自動置換はしない。
 
 ```bash
 # 外部Linuxのみ。CUDA環境・承認済みの実機で実行する形。まだ実行していない。

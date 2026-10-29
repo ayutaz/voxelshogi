@@ -111,6 +111,8 @@ def prepare_torch_student(folder, *, cache, source_commit, device, training_run=
             "cache_sha256": cache.sha256,
             "selection_split": "val",
             "selected_progress": progress,
+            "binding": binding,
+            "receipt": receipt,
         }
     torch.set_num_threads(config.threads)
     descriptor = _write_weights(
@@ -263,6 +265,7 @@ def main():
             "schema": "voxelshogi-final-evaluation-v1",
             "source_commit": source,
             "cache_sha256": cache.sha256,
+            "counts": cache.manifest["audit"]["counts"],
             "contract": label_contract(),
             "model": info,
             "lineage": lineage,

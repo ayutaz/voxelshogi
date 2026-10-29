@@ -141,6 +141,7 @@ def test_manifest_and_hash_validation_rejects_changed_files(package, tmp_path):
         "variant-precision",
         "missing-difference",
         "nonfinite-difference",
+        "unproven-trained",
     ],
 )
 def test_corrupt_manifest_contract_is_rejected(package, tmp_path, field):
@@ -161,6 +162,8 @@ def test_corrupt_manifest_contract_is_rejected(package, tmp_path, field):
         manifest["variants"][1]["precision"] = "fp32"
     elif field == "missing-difference":
         del manifest["variants"][1]["fp32Difference"]
+    elif field == "unproven-trained":
+        manifest["trained"] = True
     else:
         manifest["variants"][1]["fp32Difference"]["initial-b"]["policy"]["rmse"] = (
             float("nan")
