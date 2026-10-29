@@ -22,5 +22,19 @@
     "activation_condition": "Use the additional GPU budget only when measured estimates show the base allocation is insufficient; record the estimate before activation."
   },
   "state_maximum_cumulative_new_upload_bytes": 1073741824,
-  "paid_storage_upgrade_approved": false
+  "paid_storage_upgrade_approved": false,
+  "additional_synthetic_data": {
+    "approved_on": "2026-10-29",
+    "approved_when_insufficient": true,
+    "trigger": "Measured train/validation behavior or coverage shows the existing corpus is insufficient.",
+    "generation_location": "approved external Linux GPU service",
+    "preserve_frozen_validation_and_test": true,
+    "deduplicate_against_existing_corpus": true,
+    "publish_dataset_card": true,
+    "publication_namespace": "voxelshogi",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true,
+    "respect_approved_compute_budget": true
+  }
 }

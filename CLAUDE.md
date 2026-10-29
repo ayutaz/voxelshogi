@@ -82,6 +82,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - コードのライセンスは Apache-2.0（Copyright 2026 ayutaz）。M4自作合成データv1（初回試料と本生成）のCC-BY-4.0は2026-10-28にユーザー承認済み。M6の `voxelshogi-transformer-s-m6-314159-v1` と再開状態のApache-2.0は2026-10-29に個別承認済み（`export/m6-approval.json`）。
 - 費用は2026-10-28のユーザー承認で合計US$100まで。初回・試料公開・本生成を同じ累積予算で管理する。各ジョブの単価・時間・上限・残額を記録し、承認済み同目的・総枠内の利用を再承認待ちに戻さない。2026-10-29にM6基本枠US$24をこの総枠内に明示配分し、不足時の追加GPU予算US$100も承認された。M6上限は条件付きUS$124、全体はUS$200。追加枠は実測見積もりで不足を確認・記録してから有効化し、各レンタル前にledgerと制御の上限を一致させる。有料保存の追加は含まない。
 - M3の未学習モデル `voxelshogi-transformer-s-untrained-314159-v1` のFP32・FP16・INT8重み版は、2026-10-27にApache-2.0での初回公開をユーザーが承認した。設定は `export/publication.json`。この承認は検証用モデルだけを対象とする。M4データとM6成果物はそれぞれ上記の別の明示承認に基づく。
+- 2026-10-29に、データ不足時の追加合成データ生成も承認済み。train／val・分布から不足を判断し、固定val／testを保ち、既存を含む重複と評価への漏洩を除外する。新しいrevision・実件数・生成費を記録して、外部LinuxからHFへDataset Card付きで公開する。詳細は `docs/M6_PLAN.md` の「データが不足する場合」。
 - Pythonの実行は `uv run`、ライブラリ管理は `uv add` と `uv.lock` を使う。Python は可能な限り3.14を使い、依存ツールが未対応の場合は3.13にする（ユーザー指定）。現在の固定値は `.python-version`。古い版が必要な場合は理由と対象を記録する。
 - 公開 Web デモでは、変換済みモデルそのものを対象実機のブラウザで動かす。FP16化・量子化した公開版も選択して対局・観戦できるようにし、評価した配布ファイルとデモで読むファイルの SHA-256 を一致させる。各版の精度・棋力・速度・サイズを記録する（M3・M6）。
 - データセット・モデルの公開先はHugging Faceの`voxelshogi/`配下（2026-10-28ユーザー指定）。認証アカウントは`ayousanz`。[hf-publicationスキル](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。public/manualの取得ゲート・Community OFF・Dataset Cardとライセンスを確認し、外部Linuxから直接転送・hash照合する。Macには検証用モデルと小さい実行記録だけを保存し、データセット・学習checkpointを置かない。
