@@ -19,6 +19,18 @@ vi.mock('../src/components/Panels', () => ({ Hands: () => null, MoveList: () => 
 vi.mock('../src/inference/ModelLibraryPanel', () => ({ default: ({ onLoaded }: { onLoaded: (value: unknown) => void }) => <button onClick={() => onLoaded({ release: releaseFixture(), model: trainedFixture(), files: [] })}>fixture folder</button> }));
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 const options = () => fake.configure.mock.calls.at(-1)![0] as ArenaOptions;
+it.each(['b', 'w'] as const)('preserves the %s Easy seat when an inactive previously used model is removed', async side => {
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: '学習済みモデルを読み込む' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'fixture folder' }));
+  fireEvent.change(screen.getByTestId(`difficulty-${side}`), { target: { value: 'model' } });
+  fireEvent.change(screen.getByTestId(`difficulty-${side}`), { target: { value: 'easy' } });
+  fireEvent.click(screen.getByRole('button', { name: 'モデルを外す' }));
+  expect(options()[side === 'b' ? 'bDifficulty' : 'wDifficulty']).toBe('easy');
+  expect(options()[side === 'b' ? 'wDifficulty' : 'bDifficulty']).toBe('normal');
+  expect(options()[side === 'b' ? 'bModel' : 'wModel']).toBeUndefined();
+  expect(options().running).toBe(false);
+});
 it('selects each seat, pauses on changes, and removes an active source explicitly', async () => {
   render(<App />);
   fireEvent.click(screen.getByRole('button', { name: '学習済みモデルを読み込む' }));

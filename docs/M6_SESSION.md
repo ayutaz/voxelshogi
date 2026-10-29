@@ -1,6 +1,6 @@
 # M6の数値検証付きPolicy session
 
-M6-5の専用Worker内で使う`PolicySession`の実装。[端末内読込](M6_LOCAL_MODEL.md)で検証したファイルと、[特徴量・合法手選択](M6_POLICY.md)を結ぶ。実モデルを使うWorker entry／client・観戦UI・実機検証はまだ未完了。[M6全体](M6_PLAN.md)の完了とは区別する。
+M6-5の専用Worker内で使う`PolicySession`の実装。[端末内読込](M6_LOCAL_MODEL.md)で検証したファイルと、[特徴量・合法手選択](M6_POLICY.md)を結ぶ。Worker entry／clientと[観戦UI・実ONNX E2E](M6_ARENA.md)はPR #59までで取り込み済み。学習済みモデルと実機GPUの検証は未完了。[M6全体](M6_PLAN.md)の完了とは区別する。
 
 ## 起動してよいsession
 

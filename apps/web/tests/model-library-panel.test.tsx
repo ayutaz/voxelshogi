@@ -48,6 +48,19 @@ it('shows failed validation and allows retrying without changing the approved re
   expect((await screen.findByRole('alert')).textContent).toContain('hash mismatch');
   expect(loaded).not.toHaveBeenCalled();
 });
+it('uses the current parent callback if the library changes during a folder read', async () => {
+  fake.catalog.mockResolvedValue({ schema: 1, releases: [releaseFixture()] });
+  const old = vi.fn(), latest = vi.fn();
+  const view = render(<ModelLibraryPanel onLoaded={old} />);
+  await screen.findByTestId('model-folder');
+  let finish!: (value: unknown) => void;
+  fake.pack.mockReturnValue([]); fake.load.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  fireEvent.change(screen.getByTestId('model-folder'), { target: { files: [new File(['a'], 'manifest.json')] } });
+  view.rerender(<ModelLibraryPanel onLoaded={latest} />);
+  await act(async () => finish({ release: releaseFixture(), model: trainedFixture() }));
+  expect(old).not.toHaveBeenCalled();
+  expect(latest).toHaveBeenCalledTimes(1);
+});
 it('rejects a queued successful folder read after the panel is closed', async () => {
   const loaded = await mount();
   let finish!: (value: unknown) => void;

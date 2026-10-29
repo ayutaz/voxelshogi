@@ -15,6 +15,9 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'model-panel-current-parent', file: 'inference/ModelLibraryPanel.tsx', before: 'loaded.current({ release:', after: 'onLoaded({ release:', test: 'model-library-panel', extension: 'tsx' },
+  { name: 'model-unload-preserve-black', file: 'App.tsx', before: "difficulty.b === 'model' && library.choices.b", after: 'library.choices.b', test: 'app-models', extension: 'tsx' },
+  { name: 'model-unload-preserve-white', file: 'App.tsx', before: "difficulty.w === 'model' && library.choices.w", after: 'library.choices.w', test: 'app-models', extension: 'tsx' },
   { name: 'policy-backend-native-profile', file: 'inference/backend.ts', before: 'session.endProfiling();', after: 'void session;', test: 'inference-backend' },
   { name: 'policy-session-profile-finish', file: 'inference/policy-session.ts', before: 'await this.session.finishProfiling?.();', after: '', test: 'policy-session' },
   { name: 'model-notice-text-only', file: 'inference/local-model.ts', before: "!['README.md', 'LICENSE', 'NOTICE'].includes(file.path)", after: 'false', test: 'local-model' },
@@ -181,7 +184,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 121);
+    assert.equal(results.length, 124);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
