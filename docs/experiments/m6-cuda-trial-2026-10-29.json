@@ -1,0 +1,643 @@
+{
+  "schema": "voxelshogi-m6-cuda-trial-evidence-v1",
+  "recorded_at": "2026-10-29T11:35:12Z",
+  "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+  "source_ci": {
+    "pull_request": 62,
+    "workflow_run": 40861033225,
+    "required_checks_passed": 8
+  },
+  "approval_record_commit": "29487d7373574325be21e641f3e5626e5bab6c01",
+  "rental": {
+    "provider": "cloudrift",
+    "sku": "rtx59-7-48-750-xam.1",
+    "gpu_count": 1,
+    "ram_gib": 48,
+    "hourly_usd": 1.0,
+    "reserved_maximum_usd": 4,
+    "maximum_seconds": 14400,
+    "requested_at": "2026-10-29T11:16:20.736362+00:00",
+    "resources_released_observed_at": "2026-10-29T11:35:12.286676+00:00",
+    "terminal": true,
+    "resources_released": true,
+    "elapsed_to_release_observation_seconds": 1131.550313949585,
+    "elapsed_times_rate_reference_usd": 0.31431953165266246,
+    "invoice_retrieved": false,
+    "conditional_extra_gpu_budget_activated": false
+  },
+  "cuda_preflight": {
+    "checked_at": "2026-10-29T11:18:26.440606+00:00",
+    "cpu_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+    "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+    "environment": {
+      "cuda": "13.0",
+      "lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+      "python": "3.14.9",
+      "setuptools": "84.1.0",
+      "torch": "2.14.1+cu130"
+    },
+    "facts": {
+      "capability": [
+        12,
+        0
+      ],
+      "compiled_arches": [
+        "sm_75",
+        "sm_80",
+        "sm_86",
+        "sm_90",
+        "sm_100",
+        "sm_120"
+      ],
+      "cuda": "13.0",
+      "cuda_available": true,
+      "driver": "580.159.03",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "gpu_count": 1,
+      "machine": "x86_64",
+      "python": "3.14.9",
+      "system": "Linux",
+      "torch": "2.14.1+cu130",
+      "vram_mib": 32607
+    },
+    "kernel": {
+      "device": "cuda",
+      "left_gradient": [
+        [
+          11.0,
+          15.0
+        ],
+        [
+          11.0,
+          15.0
+        ]
+      ],
+      "product": [
+        [
+          19.0,
+          22.0
+        ],
+        [
+          43.0,
+          50.0
+        ]
+      ],
+      "right_gradient": [
+        [
+          4.0,
+          4.0
+        ],
+        [
+          6.0,
+          6.0
+        ]
+      ]
+    },
+    "model_learning_tested": false,
+    "schema": "voxelshogi-cuda-preflight-v1"
+  },
+  "dataset": {
+    "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+    "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+    "configuration": "production-64",
+    "download_seconds": 129.157163493,
+    "audit_seconds": 66.49112821900002,
+    "audit_sha256": "52c274ede59625a18ebc49e8915d142900e6dc57d5bc091d9f859b3a2ce14210",
+    "counts": {
+      "duplicates": 3600,
+      "eligible_rows": 113321,
+      "eligible_sources": {
+        "random": 37941,
+        "rules": 37935,
+        "search": 37445
+      },
+      "eligible_splits": {
+        "test": 11298,
+        "train": 90642,
+        "val": 11381
+      },
+      "eligible_teachers": 36894,
+      "exclusions": {
+        "duplicate": 3600,
+        "final": 1751,
+        "unlabelled_or_unfinished": 74676
+      },
+      "games": 1800,
+      "rows": 116921,
+      "sources": {
+        "random": 39000,
+        "rules": 39000,
+        "search": 38921
+      },
+      "teacher_depths": {
+        "1": 1,
+        "2": 36893
+      },
+      "teacher_splits": {
+        "test": 3589,
+        "train": 29884,
+        "val": 3421
+      },
+      "valid_teachers": 38321
+    },
+    "cache": {
+      "count": 36894,
+      "elapsed_seconds": 83.62287779200005,
+      "manifest_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+      "teacher_splits": {
+        "test": 3589,
+        "train": 29884,
+        "val": 3421
+      }
+    }
+  },
+  "trials": {
+    "1": {
+      "atol": 1e-06,
+      "cache_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+      "comparisons": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "output": {
+          "floating_values": 1067986,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "completed_training": false,
+      "config": {
+        "batch_size": 1,
+        "device": "cuda",
+        "epochs": 1,
+        "learning_rate": 0.0003,
+        "optimizer": {
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "foreach": false,
+          "fused": false,
+          "name": "AdamW"
+        },
+        "precision": "float32",
+        "save_every": 64,
+        "seed": 314159,
+        "selection_split": "val",
+        "threads": 3,
+        "weight_decay": 0.01
+      },
+      "elapsed_seconds": 6.060983034999936,
+      "full": {
+        "elapsed_seconds": 1.172124824999969,
+        "new_steps": 64,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 64,
+          "next_batch": 64,
+          "step": 64
+        },
+        "reason": "max_steps"
+      },
+      "full_examples_per_second_including_logging_save": 54.60169312598741,
+      "full_steps_per_second_including_logging_save": 54.60169312598741,
+      "partial": {
+        "elapsed_seconds": 0.5575539210000215,
+        "new_steps": 32,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 32,
+          "next_batch": 32,
+          "step": 32
+        },
+        "reason": "max_steps"
+      },
+      "peak_allocated_bytes": 352970752,
+      "peak_reserved_bytes": 411041792,
+      "resource_samples": [
+        {
+          "memory_used_mib": 739,
+          "monotonic": 532.349930331,
+          "rss_bytes": 1230839808,
+          "utilization_percent": 3
+        },
+        {
+          "memory_used_mib": 1049,
+          "monotonic": 534.369835926,
+          "rss_bytes": 2212634624,
+          "utilization_percent": 31
+        }
+      ],
+      "resumed": {
+        "elapsed_seconds": 0.5317644450000216,
+        "new_steps": 32,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 64,
+          "next_batch": 64,
+          "step": 64
+        },
+        "reason": "max_steps"
+      },
+      "rtol": 1e-05,
+      "same_example_order": true,
+      "schema": "voxelshogi-cuda-trial-v1",
+      "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+      "steps": 64,
+      "test_used": false,
+      "verified": true
+    },
+    "4": {
+      "atol": 1e-06,
+      "cache_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+      "comparisons": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "output": {
+          "floating_values": 1067986,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "completed_training": false,
+      "config": {
+        "batch_size": 4,
+        "device": "cuda",
+        "epochs": 1,
+        "learning_rate": 0.0003,
+        "optimizer": {
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "foreach": false,
+          "fused": false,
+          "name": "AdamW"
+        },
+        "precision": "float32",
+        "save_every": 64,
+        "seed": 314159,
+        "selection_split": "val",
+        "threads": 3,
+        "weight_decay": 0.01
+      },
+      "elapsed_seconds": 3.4938348140000244,
+      "full": {
+        "elapsed_seconds": 1.3839593540000124,
+        "new_steps": 64,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 256,
+          "next_batch": 64,
+          "step": 64
+        },
+        "reason": "max_steps"
+      },
+      "full_examples_per_second_including_logging_save": 184.97653074860298,
+      "full_steps_per_second_including_logging_save": 46.244132687150746,
+      "partial": {
+        "elapsed_seconds": 0.7599730680000221,
+        "new_steps": 32,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 128,
+          "next_batch": 32,
+          "step": 32
+        },
+        "reason": "max_steps"
+      },
+      "peak_allocated_bytes": 1028515328,
+      "peak_reserved_bytes": 1172307968,
+      "resource_samples": [
+        {
+          "memory_used_mib": 1049,
+          "monotonic": 535.234756586,
+          "rss_bytes": 2278748160,
+          "utilization_percent": 3
+        },
+        {
+          "memory_used_mib": 1767,
+          "monotonic": 537.249628273,
+          "rss_bytes": 2289721344,
+          "utilization_percent": 54
+        }
+      ],
+      "resumed": {
+        "elapsed_seconds": 0.7418965370000024,
+        "new_steps": 32,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 256,
+          "next_batch": 64,
+          "step": 64
+        },
+        "reason": "max_steps"
+      },
+      "rtol": 1e-05,
+      "same_example_order": true,
+      "schema": "voxelshogi-cuda-trial-v1",
+      "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+      "steps": 64,
+      "test_used": false,
+      "verified": true
+    }
+  },
+  "state_publication": {
+    "repo_id": "voxelshogi/voxelshogi-transformer-s-training-state",
+    "license": "apache-2.0",
+    "private": false,
+    "gated": "manual",
+    "files": [
+      {
+        "bytes": 11358,
+        "path": "LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "bytes": 2928,
+        "path": "README.md",
+        "sha256": "46d5a0789cf40ad19c79bff822a7accb1098fbd0bcc2827f12cf3640c1608373"
+      },
+      {
+        "bytes": 2198,
+        "path": "config.json",
+        "sha256": "bbd55d16c7f25d16102545fa30c4c616ffc8d9ed1c78687f41bdd44f2c354071"
+      },
+      {
+        "bytes": 20558,
+        "path": "history.json",
+        "sha256": "9c3663c757f0055227d92a961a1bf4743ccf5068eebb2bb514e3bcbd1c36ebfb"
+      },
+      {
+        "bytes": 92391,
+        "path": "latest/config.json",
+        "sha256": "477a07a1ba8f26193211abbb27acf77f5f362396c6efa57f377ec2bc8adf98f4"
+      },
+      {
+        "bytes": 60284492,
+        "path": "latest/state.safetensors",
+        "sha256": "423d01dfa77236de859e8b1b7141b5969de4efba9cc1d17ce9c8d4fd41ebf1b4"
+      },
+      {
+        "bytes": 3185,
+        "path": "manifest.json",
+        "sha256": "f2de0954305bcc63276931146d127a22b74e30dbd3a95b9c7e629ec3ad604c83"
+      }
+    ],
+    "receipt": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "cc0f29219ea426587548451cfca850721ef704ac",
+      "release_sha256": "fdaecd5ae848e1682718a7da8b612a4bf0443da7a888118107cc8a5136f5edac",
+      "repo_id": "voxelshogi/voxelshogi-transformer-s-training-state",
+      "repo_type": "model",
+      "verified": true
+    },
+    "local_codec": {
+      "comparisons": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "progress": {
+        "best_val_loss": null,
+        "epoch": 0,
+        "examples": 256,
+        "next_batch": 64,
+        "step": 64
+      },
+      "verified": true
+    },
+    "new_run_restore_and_continuation": {
+      "all_file_hashes_verified": true,
+      "completed_training": false,
+      "continuation_comparisons": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "continued_steps": 64,
+      "hub_commit": "cc0f29219ea426587548451cfca850721ef704ac",
+      "progress": {
+        "best_val_loss": null,
+        "epoch": 0,
+        "examples": 512,
+        "next_batch": 128,
+        "step": 128
+      },
+      "reports": [
+        {
+          "elapsed_seconds": 1.5492848380000623,
+          "new_steps": 64,
+          "progress": {
+            "best_val_loss": null,
+            "epoch": 0,
+            "examples": 512,
+            "next_batch": 128,
+            "step": 128
+          },
+          "reason": "max_steps"
+        },
+        {
+          "elapsed_seconds": 1.3355627180000056,
+          "new_steps": 64,
+          "progress": {
+            "best_val_loss": null,
+            "epoch": 0,
+            "examples": 512,
+            "next_batch": 128,
+            "step": 128
+          },
+          "reason": "max_steps"
+        }
+      ],
+      "restored_state_exact_comparisons": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "restored_to_new_run": true,
+      "test_used": false,
+      "verified": true
+    },
+    "cumulative_new_upload_bytes": 60417110,
+    "maximum_cumulative_new_upload_bytes": 1073741824
+  },
+  "browser_preflight": {
+    "initial_failure": {
+      "schema": "voxelshogi-linux-browser-gpu-preflight-v1",
+      "verified": false,
+      "startedAt": "2026-10-29T11:29:22.806Z",
+      "args": [
+        "--enable-gpu",
+        "--use-angle=vulkan",
+        "--enable-features=Vulkan",
+        "--disable-vulkan-surface",
+        "--enable-unsafe-webgpu"
+      ],
+      "modelInferenceTested": false,
+      "arena3DTested": false,
+      "chromiumSource": "locked Playwright 1.64.1 browser",
+      "references": [
+        "https://chromium.googlesource.com/chromium/src/+/HEAD/docs/gpu/using-gpu-hardware-in-headless-chrome.md"
+      ],
+      "chrome": "156.0.8078.4",
+      "error": "Error: page.evaluate: Error: WebGPU adapter unavailable\n    at eval (eval at evaluate (:370:30), <anonymous>:4:23)\n    at async <anonymous>:396:30"
+    },
+    "success": {
+      "schema": "voxelshogi-linux-browser-gpu-preflight-v1",
+      "verified": true,
+      "startedAt": "2026-10-29T11:31:57.722Z",
+      "args": [
+        "--enable-gpu",
+        "--use-angle=vulkan",
+        "--enable-features=Vulkan",
+        "--disable-vulkan-surface",
+        "--enable-unsafe-webgpu"
+      ],
+      "chrome": "156.0.8078.4",
+      "chromiumSource": "locked Playwright 1.64.1 browser",
+      "facts": {
+        "secureContext": true,
+        "webgpu": {
+          "vendor": "nvidia",
+          "architecture": "blackwell",
+          "device": "",
+          "description": "",
+          "fallback": false,
+          "result": 42
+        },
+        "webgl": {
+          "renderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA)",
+          "pixel": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      },
+      "modelInferenceTested": false,
+      "arena3DTested": false,
+      "references": [
+        "https://chromium.googlesource.com/chromium/src/+/HEAD/docs/gpu/using-gpu-hardware-in-headless-chrome.md"
+      ]
+    },
+    "gpu_diagnostics": {
+      "devices": [
+        {
+          "vendorId": 4318,
+          "deviceId": 11141,
+          "vendorString": "",
+          "deviceString": "",
+          "driverVendor": "NVIDIA",
+          "driverVersion": "580.159.3.0"
+        },
+        {
+          "vendorId": 4115,
+          "deviceId": 184,
+          "vendorString": "",
+          "deviceString": "",
+          "driverVendor": "",
+          "driverVersion": ""
+        }
+      ],
+      "featureStatus": {
+        "2d_canvas": "enabled",
+        "direct_rendering_display_compositor": "disabled_off_ok",
+        "gpu_compositing": "enabled",
+        "multiple_raster_threads": "enabled_on",
+        "opengl": "enabled_on",
+        "rasterization": "enabled",
+        "raw_draw": "disabled_off_ok",
+        "skia_graphite": "disabled_off",
+        "trees_in_viz": "disabled_off",
+        "video_decode": "enabled",
+        "video_encode": "disabled_software",
+        "vulkan": "enabled_on",
+        "webgl": "enabled",
+        "webgpu": "enabled",
+        "webgpu_on_vk_via_gl_interop": "disabled_off",
+        "webnn": "disabled_off"
+      },
+      "glRenderer": "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 5090 (0x00002B85)), NVIDIA-580.159.3.0)",
+      "initializationTime": 1.401261
+    },
+    "interpretation": "The first adapter request returned null. After inspecting Vulkan and awaiting Chromium SystemInfo initialization the same flags passed. Exact causal attribution is not established; no NVIDIA driver change was made. This is a hardware capability probe, not trained-model inference or Arena 3D validation."
+  },
+  "operation_failures": [
+    {
+      "complete": false,
+      "error_type": "ModuleNotFoundError",
+      "frames": [
+        {
+          "file": "phase1.py",
+          "function": "<module>",
+          "line": 55
+        },
+        {
+          "file": "phase1.py",
+          "function": "main",
+          "line": 16
+        }
+      ]
+    }
+  ],
+  "completed_full_training": false,
+  "final_test_or_matches_run": false,
+  "trained_inference_package_published": false,
+  "arena_3d_model_tested": false,
+  "mac_storage": "Small metadata and operation logs only; no corpus, feature cache, checkpoint or state safetensors copied to Mac."
+}
