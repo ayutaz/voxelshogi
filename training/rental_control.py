@@ -16,6 +16,8 @@ from pathlib import Path
 SKU = "rtx59-7-48-750-xam.1"
 DC = "na_west_us_gr_1"
 QUOTES = {SKU: 43200, "rtx59-3-24-750-xam.1": 86400}
+M6_SHARED_SKU = "rtx59-7-23-800-ig.1"
+M6_SHARED_DC = "ap_northeast_kr_se_1"
 TERMINAL = {"Inactive", "Failed", "Deleted", "Terminated"}
 
 
@@ -47,6 +49,9 @@ class Rental:
 
     def quote_seconds(self):
         return QUOTES[self.sku]
+
+    def configuration(self):
+        return {"skus": tuple(QUOTES), "datacenter": DC, "with_public_ip": True}
 
     def reserve(self):
         maximum_seconds = self.quote_seconds()
@@ -83,7 +88,9 @@ class Rental:
             os.fsync(stream.fileno())
 
     def rent(self, start_guard):
-        if self.sku not in QUOTES:
+        configuration = self.configuration()
+        dc, public_ip = configuration["datacenter"], configuration["with_public_ip"]
+        if self.sku not in configuration["skus"]:
             raise ValueError("SKU has no production quote")
         maximum_seconds = self.quote_seconds()
         cap = maximum_seconds / 3600
@@ -103,7 +110,7 @@ class Rental:
             "/api/v1/instance-types/list",
             {
                 "selector": {
-                    "ByServiceAndLocation": {"services": ["vm"], "datacenters": [DC]}
+                    "ByServiceAndLocation": {"services": ["vm"], "datacenters": [dc]}
                 }
             },
         )
@@ -119,8 +126,11 @@ class Rental:
         if not (
             0 < offer["cost_per_hour"] <= 100
             and offer["gpu_count"] == 1
-            and offer["available_nodes_per_dc"].get(DC, 0) > 0
-            and offer["ip_availability_per_dc"].get(DC, {}).get("public_ips")
+            and offer["available_nodes_per_dc"].get(dc, 0) > 0
+            and (
+                not public_ip
+                or offer["ip_availability_per_dc"].get(dc, {}).get("public_ips")
+            )
         ):
             raise ValueError(
                 "selected price, stock or IP differs from the approved quote"
@@ -163,22 +173,29 @@ class Rental:
             self.state / "preflight.json",
             {
                 "sku": self.sku,
-                "datacenter": DC,
+                "datacenter": dc,
+                "with_public_ip": public_ip,
                 "cost_per_hour_cents": offer["cost_per_hour"],
-                "available_nodes": offer["available_nodes_per_dc"][DC],
+                "available_nodes": offer["available_nodes_per_dc"][dc],
                 "checked_at": now,
             },
         )
         save(
             self.state / "rent-request.json",
-            {"at": now, "tag": self.tag, "sku": self.sku, "datacenter": DC},
+            {
+                "at": now,
+                "tag": self.tag,
+                "sku": self.sku,
+                "datacenter": dc,
+                "with_public_ip": public_ip,
+            },
         )
         start_guard()  # Must be alive before the API can create a paid resource.
         payload = {
             "selector": {
                 "ByInstanceTypeAndLocation": {
                     "instance_type": self.sku,
-                    "datacenters": [DC],
+                    "datacenters": [dc],
                 }
             },
             "config": {
@@ -189,7 +206,7 @@ class Rental:
                     "ports": ["22"],
                 }
             },
-            "with_public_ip": True,
+            "with_public_ip": public_ip,
             "tags": [self.tag],
             "name": self.tag,
         }
@@ -363,7 +380,7 @@ def main():
     parser.add_argument("state", type=Path)
     parser.add_argument("command", choices=("rent", "status", "terminate", "guard"))
     parser.add_argument("--budget", type=Path)
-    parser.add_argument("--sku", choices=tuple(QUOTES), default=SKU)
+    parser.add_argument("--sku", choices=(*QUOTES, M6_SHARED_SKU), default=SKU)
     parser.add_argument("--purpose", choices=("m4", "m6"), default="m4")
     parser.add_argument("--approval", type=Path)
     parser.add_argument("--phase", choices=("trial", "main"), default="trial")

@@ -7,7 +7,7 @@ import math
 import os
 from pathlib import Path
 
-from training.rental_control import QUOTES, Rental, save
+from training.rental_control import M6_SHARED_DC, M6_SHARED_SKU, QUOTES, Rental, save
 
 
 def validate_m6_approval(approval_path, tag, phase, maximum_seconds):
@@ -83,11 +83,22 @@ class M6Rental(Rental):
         self.phase, self.maximum_seconds = phase, maximum_seconds
 
     def quote_seconds(self):
-        if self.sku not in QUOTES:
+        if self.sku not in self.configuration()["skus"]:
             raise ValueError("M6 SKU differs from the proposed quote")
         return validate_m6_approval(
             self.approval, self.tag, self.phase, self.maximum_seconds
         )
+
+    def configuration(self):
+        base = super().configuration()
+        if self.sku == M6_SHARED_SKU:
+            return {
+                **base,
+                "skus": (*QUOTES, M6_SHARED_SKU),
+                "datacenter": M6_SHARED_DC,
+                "with_public_ip": False,
+            }
+        return base
 
     def rent(self, start_guard):
         self.quote_seconds()  # Approval/estimate failures precede even read-only API calls.
