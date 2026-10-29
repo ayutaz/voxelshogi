@@ -15,6 +15,18 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'policy-session-input-reference', file: 'inference/policy-session.ts', before: 'input.some((byte, index) => byte !== encoded[index])', after: 'false', test: 'policy-session' },
+  { name: 'policy-session-all-fixtures', file: 'inference/policy-session.ts', before: 'for (const fixture of model.fixtures)', after: 'for (const fixture of model.fixtures.slice(0, 1))', test: 'policy-session' },
+  { name: 'policy-session-precision', file: 'inference/policy-session.ts', before: 'this.port.createSession(bytes, selection.precision)', after: "this.port.createSession(bytes, 'fp32')", test: 'policy-session' },
+  { name: 'policy-session-cursor', file: 'inference/policy-session.ts', before: 'game.goto(root.cursor);', after: 'game.goto(0);', test: 'policy-session' },
+  { name: 'policy-session-root-hash', file: 'inference/policy-session.ts', before: 'game.hash() !== root.hash', after: 'false', test: 'policy-session' },
+  { name: 'policy-session-release', file: 'inference/policy-session.ts', before: 'await session?.release();', after: '', test: 'policy-session' },
+  { name: 'policy-session-validation-output', file: 'inference/policy-session.ts', before: '} finally { outputs.dispose(); }', after: '} finally { /* mutated missing disposal */ }', test: 'policy-session' },
+  { name: 'policy-session-move-output', file: 'inference/policy-session.ts', before: 'finally { outputs?.dispose(); }', after: 'finally { /* mutated missing disposal */ }', test: 'policy-session' },
+  { name: 'policy-session-late-result', file: 'inference/policy-session.ts', before: 'this.live();\n        const choice = selectPolicyMove', after: 'const choice = selectPolicyMove', test: 'policy-session' },
+  { name: 'policy-session-placement', file: 'inference/policy-session.ts', before: 'if (port.info.backend !== selection.backend || providers.length !== 1 || providers.some(([name, count]) => name !== expected || !Number.isSafeInteger(count) || count <= 0))', after: 'if (false)', test: 'policy-session' },
+  { name: 'policy-session-failed-run', file: 'inference/policy-session.ts', before: '} catch (error) { this.disposed = true; throw error; }\n      finally { outputs?.dispose(); }', after: '} finally { outputs?.dispose(); }', test: 'policy-session' },
+  { name: 'policy-session-rust-free', file: 'inference/policy-session.ts', before: '} finally { game.free(); }\n      this.live();', after: '} finally { /* mutated missing free */ }\n      this.live();', test: 'policy-session' },
   { name: 'policy-white-rotation', file: 'inference/policy-contract.ts', before: "board[side === 'b' ? cell : 728 - cell]", after: 'board[cell]', test: 'policy-contract' },
   { name: 'policy-white-ownership', file: 'inference/policy-contract.ts', before: '(piece - 1 + 14) % 28 + 1', after: 'piece', test: 'policy-contract' },
   { name: 'policy-hand-normalization', file: 'inference/policy-contract.ts', before: "hands[side === 'b' ? i : (i + 7) % 14]! / HAND_TOTALS[i % 7]!", after: "hands[side === 'b' ? i : (i + 7) % 14]! / 162", test: 'policy-contract' },
@@ -128,7 +140,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 68);
+    assert.equal(results.length, 80);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
