@@ -15,6 +15,17 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'arena-model-source-key', file: 'ai/arena-model.ts', before: '[seat.sourceId, selection.modelId,', after: '[selection.modelId,', test: 'arena-client' },
+  { name: 'arena-model-precision-key', file: 'ai/arena-model.ts', before: 'selection.packageHash, selection.precision, selection.backend', after: 'selection.packageHash, selection.backend', test: 'arena-client' },
+  { name: 'arena-model-cache', file: 'ai/arena-client.ts', before: 'this.models.set(key, client);', after: '', test: 'arena-client' },
+  { name: 'arena-model-remove-dispose', file: 'ai/arena-client.ts', before: 'client.dispose(); this.models.delete(key);', after: 'this.models.delete(key);', test: 'arena-client' },
+  { name: 'arena-model-late-import', file: 'ai/arena-client.ts', before: 'if (this.active !== operation || this.disposed || !this.allowed.has(key)) { client.dispose(); throw aborted(); }', after: '', test: 'arena-client' },
+  { name: 'arena-model-late-finally', file: 'ai/arena-client.ts', before: 'finally { if (this.active === operation) this.active = null; }\n  }\n  cancel()', after: 'finally { this.active = null; }\n  }\n  cancel()', test: 'arena-client' },
+  { name: 'arena-model-source-snapshot', file: 'ai/arena-client.ts', before: 'seat.files.map(file => ({ ...file }))', after: 'seat.files', test: 'arena-client' },
+  { name: 'arena-model-no-fallback', file: 'ai/arena-controller.ts', before: "if (input.difficulty !== 'model')", after: 'if (true)', test: 'arena-model-controller' },
+  { name: 'arena-model-selected-conditions', file: 'ai/arena-controller.ts', before: 'modelSeatKey(expected) !== modelSeatKey(reply.model)', after: 'false', test: 'arena-model-controller' },
+  { name: 'arena-model-config-key', file: 'ai/arena-controller.ts', before: "o.bDifficulty === 'model' && o.bModel ? modelSeatKey(o.bModel) : null", after: 'null', test: 'arena-model-controller' },
+  { name: 'arena-model-human-seat', file: 'ai/arena-controller.ts', before: "this.options.mode !== 'h-r' && this.options.bDifficulty", after: 'this.options.bDifficulty', test: 'arena-model-controller' },
   { name: 'policy-client-terminate', file: 'inference/policy-client.ts', before: 'worker.terminate();', after: '', test: 'policy-client' },
   { name: 'policy-client-stale-callback', file: 'inference/policy-client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'policy-client' },
   { name: 'policy-client-stale-error', file: 'inference/policy-client.ts', before: 'if (this.worker === worker) this.fail(new Error(event.message', after: 'if (true) this.fail(new Error(event.message', test: 'policy-client' },
@@ -156,7 +167,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 96);
+    assert.equal(results.length, 107);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

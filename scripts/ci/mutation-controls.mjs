@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'policy-worker-build', file: 'scripts/inference-build.mjs', before: "assert.ok(policyWorker, 'policy Worker is missing from build');", after: '', test: 'model-distribution' },
+  { name: 'policy-worker-served', file: 'scripts/verify-model-distribution.mjs', before: "assert.ok(policyWorker, 'policy Worker missing from tested application');", after: '', test: 'model-distribution' },
   { name: 'catalog-artifact-hash', file: 'scripts/inference-build.mjs', before: "createHash('sha256').update(catalogBytes).digest('hex')", after: "'0'.repeat(64)", test: 'model-distribution' },
   { name: 'catalog-metadata-only', file: 'scripts/inference-build.mjs', before: "assert.deepEqual(readdirSync(resolve(root, 'models/m6')).sort(), ['catalog.json'], 'M6 public assets may contain only catalog metadata');", after: '', test: 'model-distribution' },
   { name: 'catalog-served-bytes', file: 'scripts/verify-model-distribution.mjs', before: "const catalog = await read(new URL(path(application.catalog.path), origin + '/').href, application.catalog, true, null, true);", after: 'const catalog = { schema: 1, releases: [] };', test: 'model-distribution' },

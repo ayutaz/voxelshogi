@@ -37,6 +37,8 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch, 
   assert.equal(application.schema, 1); assert.equal(application.commit, expectedCommit);
   if (expectedArtifact) assert.deepEqual(application, expectedArtifact.application, 'served files differ from tested application artifact');
   assert.ok(application.files.some(f => /^assets\/inference\.worker-.*\.js$/.test(f.path)), 'application Worker manifest missing');
+  const policyWorker = application.files.some(f => /^assets\/policy\.worker-.*\.js$/.test(f.path));
+  assert.ok(policyWorker, 'policy Worker missing from tested application');
   for (const file of application.files) await read(new URL(path(file.path), origin + '/').href, file);
   assert.equal(application.catalog?.path, 'models/m6/catalog.json', 'trained catalog missing from tested artifact');
   assert.ok(application.catalog.bytes <= 1024 * 1024, 'oversized trained catalog');

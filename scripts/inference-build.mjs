@@ -13,6 +13,8 @@ export function inferenceBuild(directory) {
     return { path, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
   }).sort((a, b) => a.path.localeCompare(b.path));
   assert.ok(files.some(f => /^assets\/inference\.worker-.*\.js$/.test(f.path)), 'inference Worker is missing from build');
+  const policyWorker = files.some(f => /^assets\/policy\.worker-.*\.js$/.test(f.path));
+  assert.ok(policyWorker, 'policy Worker is missing from build');
   assert.deepEqual(readdirSync(resolve(root, 'models/m6')).sort(), ['catalog.json'], 'M6 public assets may contain only catalog metadata');
   const catalogBytes = readFileSync(resolve(root, 'models/m6/catalog.json'));
   assert.ok(catalogBytes.length > 0 && catalogBytes.length <= 1024 * 1024, 'catalog exceeds metadata limit');

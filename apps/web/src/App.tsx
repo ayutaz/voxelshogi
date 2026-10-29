@@ -209,7 +209,12 @@ export function App() {
               <p data-testid="ai-phase" role="status">{phaseText}</p>
               {aiStatus.phase === 'thinking' && <button type="button" data-testid="cancel-search" onClick={pause}>思考を中断</button>}
               {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
-              {aiStatus.last && <p className="muted" data-testid="ai-analysis">
+              {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
+                直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
+                {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />
+                Value {aiStatus.last.result.value?.toFixed(3) ?? '未算出'}（直前のAIの視点）<br />
+                推論{Math.round(aiStatus.last.inferenceMs)}ms・往復{Math.round(aiStatus.last.roundTripMs)}ms
+              </p> : aiStatus.last && <p className="muted" data-testid="ai-analysis">
                 直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.difficulty === 'easy' ? 'Easy・ランダム着手（探索なし）' : `Normal・深さ${aiStatus.last.result.completedDepth}${aiStatus.last.result.completedDepth === 0 ? '・合法な代替手' : ''}`}<br />
                 {aiStatus.last.result.score === null ? '評価は未算出' : Math.abs(aiStatus.last.result.score) === 1_000_000 ? `終局評価：${aiStatus.last.result.score > 0 ? '勝ち' : '負け'}` : `駒得 ${aiStatus.last.result.score >= 0 ? '+' : ''}${aiStatus.last.result.score}（歩=100、直前のAIの視点）`}<br />
                 {aiStatus.last.result.nodes}ノード・往復{Math.round(aiStatus.last.roundTripMs)}ms・停止理由 {aiStatus.last.result.stopReason}
