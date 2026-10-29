@@ -31,7 +31,7 @@ export function parseInferenceRequest(value: unknown): InferenceRequest {
   return r as unknown as InferenceRequest;
 }
 
-function compare(reference: Float32Array, actual: Float32Array, count: number, precision: Precision): Comparison {
+export function compare(reference: Float32Array, actual: Float32Array, count: number, precision: Precision): Comparison {
   if (reference.length !== count || actual.length !== count) throw new Error('model output length mismatch');
   const [atol, rtol] = precision === 'fp16' ? [1e-3, 1e-2] : [1e-5, 1e-4];
   let maxAbs = 0, maxRelative = 0, exceeded = 0;
