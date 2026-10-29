@@ -2,6 +2,7 @@
 
 import argparse
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -44,8 +45,11 @@ class Rental:
         self.sku = sku
         self.state.mkdir(parents=True, exist_ok=True)
 
+    def quote_seconds(self):
+        return QUOTES[self.sku]
+
     def reserve(self):
-        maximum_seconds = QUOTES[self.sku]
+        maximum_seconds = self.quote_seconds()
         cap = maximum_seconds / 3600
         with self.budget.open("r+") as stream:
             fcntl.flock(stream, fcntl.LOCK_EX)
@@ -81,9 +85,17 @@ class Rental:
     def rent(self, start_guard):
         if self.sku not in QUOTES:
             raise ValueError("SKU has no production quote")
-        maximum_seconds = QUOTES[self.sku]
+        maximum_seconds = self.quote_seconds()
         cap = maximum_seconds / 3600
-        if (self.state / "rent-request.json").exists():
+        if any(
+            (self.state / name).exists()
+            for name in (
+                "rent-request.json",
+                "terminal.json",
+                "deadline.json",
+                "guardian-ready.json",
+            )
+        ):
             raise ValueError(
                 "rental request exists; audit it instead of creating another"
             )
@@ -306,13 +318,64 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+def guard_command(state, budget, *, purpose, sku):
+    return [
+        sys.executable,
+        "-m",
+        "training.rental_control",
+        str(state),
+        "guard",
+        "--budget",
+        str(budget),
+        "--ready-file",
+        str(Path(state) / "guardian-ready.json"),
+        "--purpose",
+        purpose,
+        "--sku",
+        sku,
+    ]
+
+
+def wait_for_guard(
+    ready, child, *, tag, deadline_sha256, clock=time.monotonic, pause=time.sleep
+):
+    end = clock() + 10
+    while clock() < end:
+        if child.poll() is not None:
+            raise RuntimeError("deadline guardian exited before readiness")
+        if ready.exists():
+            if ready.is_symlink():
+                raise RuntimeError("deadline guardian readiness mismatch")
+            value = json.loads(ready.read_text())
+            if value != {
+                "pid": child.pid,
+                "tag": tag,
+                "deadline_sha256": deadline_sha256,
+            }:
+                raise RuntimeError("deadline guardian readiness mismatch")
+            return
+        pause(0.1)  # Local process startup only, never a provider/CI status poll.
+    raise RuntimeError("deadline guardian readiness timed out")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("state", type=Path)
     parser.add_argument("command", choices=("rent", "status", "terminate", "guard"))
     parser.add_argument("--budget", type=Path)
     parser.add_argument("--sku", choices=tuple(QUOTES), default=SKU)
+    parser.add_argument("--purpose", choices=("m4", "m6"), default="m4")
+    parser.add_argument("--approval", type=Path)
+    parser.add_argument("--phase", choices=("trial", "main"), default="trial")
+    parser.add_argument("--maximum-seconds", type=int, default=14400)
+    parser.add_argument("--ready-file", type=Path)
     args = parser.parse_args()
+    if args.purpose != "m6" and (
+        args.approval is not None
+        or args.phase != "trial"
+        or args.maximum_seconds != 14400
+    ):
+        parser.error("M6 settings require --purpose m6")
     root = Path(__file__).resolve().parents[1]
     state = args.state.resolve()
     if not state.is_relative_to(root / "runs") or not re.fullmatch(
@@ -322,7 +385,11 @@ def main():
     budget = (args.budget or root / "runs/m4/cost-budget.json").resolve()
     if not budget.is_relative_to(root / "runs"):
         parser.error("budget must remain in ignored runs/")
-    tag = "voxelshogi-m4-" + state.name
+    if args.approval is not None:
+        args.approval = args.approval.resolve()
+        if not args.approval.is_relative_to(root / "runs"):
+            parser.error("approval record must remain in ignored runs/")
+    tag = "voxelshogi-" + args.purpose + "-" + state.name
     key = ""
     for line in (root / ".env").read_text().splitlines():
         match = re.match(r"^\s*(?:export\s+)?CLOUDRIFT_API_KEY\s*=\s*(.*?)\s*$", line)
@@ -346,30 +413,79 @@ def main():
         except urllib.error.HTTPError as error:
             raise RuntimeError("CloudRift HTTP " + str(error.code)) from None
 
-    control = Rental(state, api, tag=tag, budget=budget, sku=args.sku)
+    if args.purpose == "m6":
+        from training.m6_rental_control import M6Rental
+
+        control = M6Rental(
+            state,
+            api,
+            tag=tag,
+            budget=budget,
+            sku=args.sku,
+            approval=args.approval,
+            phase=args.phase,
+            maximum_seconds=args.maximum_seconds,
+        )
+    else:
+        control = Rental(state, api, tag=tag, budget=budget, sku=args.sku)
 
     def start_guard():
+        ready = state / "guardian-ready.json"
+        ready.unlink(missing_ok=True)
         with (state / "guardian.log").open("a") as stream:
             child = subprocess.Popen(
-                [
-                    sys.executable,
-                    str(Path(__file__).resolve()),
-                    str(state),
-                    "guard",
-                    "--budget",
-                    str(budget),
-                ],
+                guard_command(
+                    state,
+                    budget,
+                    purpose=args.purpose,
+                    sku=args.sku,
+                ),
                 stdout=stream,
                 stderr=stream,
                 start_new_session=True,
+                cwd=root,
             )
-        if child.poll() is not None:
-            raise RuntimeError("deadline guardian failed to start")
+        try:
+            wait_for_guard(
+                ready,
+                child,
+                tag=tag,
+                deadline_sha256=hashlib.sha256(
+                    (state / "deadline.json").read_bytes()
+                ).hexdigest(),
+            )
+        except Exception:
+            if child.poll() is None:
+                child.terminate()
+                try:
+                    child.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait(timeout=5)
+            raise
         save(state / "guardian.json", {"pid": child.pid, "at": time.time()})
 
     if args.command == "rent":
         result = control.rent(start_guard)
     elif args.command == "guard":
+        if args.ready_file is not None:
+            if args.ready_file.resolve() != state / "guardian-ready.json":
+                parser.error("guardian readiness file must belong to the control state")
+            raw = (state / "deadline.json").read_bytes()
+            limits = json.loads(raw)
+            if not all(
+                type(limits.get(name)) in (int, float)
+                for name in ("stop_at", "maximum_end_at")
+            ):
+                raise ValueError("guardian deadline is incomplete")
+            save(
+                args.ready_file,
+                {
+                    "pid": os.getpid(),
+                    "tag": tag,
+                    "deadline_sha256": hashlib.sha256(raw).hexdigest(),
+                },
+            )
         control.guard()
         return
     else:

@@ -10,6 +10,8 @@ M6専用の提案総枠は**GPU24時間・US$24まで**。最初の試行は環�
 
 各レンタルの上限を累積ledgerへ予約し、外部guardianを起動してから課金操作をする。終了・退避の余裕を設けて計算を止め、実機終了とresources releasedを確認する。開発・CI待ちでGPUを保持しない。M4の過去の予約上限US$41と合算するとUS$65だが、M4承認をM6へ転用しない。実請求と予約上限は別に記録する。
 
+[M6専用の起動制御](M6_RENTAL_CONTROL.md)で、M4の24時間quoteを試行へ流用しないこと、用途別／全体の累積上限、mainの実測report hash、M6のtagを持つguardianのreadyを検査する。実行用の承認記録はまだ作成していない。
+
 ## 外部保存
 
 CloudRiftの永続volume種別は現在空のため、永続volumeは使わない。Macへcheckpointを落とさず、[JSON＋safetensorsの再開archive](M6_RESUME_ARCHIVE.md)を外部LinuxからHFへ直接保存する案とする。
