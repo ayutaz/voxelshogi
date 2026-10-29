@@ -54,4 +54,4 @@ stateとreceiptをfsyncしてから、latest／best両方の参照を一つのJS
 
 [PyTorchの再現性の説明](https://docs.pytorch.org/docs/2.14/notes/randomness.html)に従って決定的演算を有効にし、非対応の演算はエラーにする。[state_dictとweights_onlyの公式仕様](https://docs.pytorch.org/docs/2.14/notes/serialization.html#torch-load-with-weights-only-true)を使い、読み込み権限を広げるallowlistや`weights_only=False`で失敗を回避しない。
 
-実データ・CUDAでの実行、GPU終了後の外部保持先と復旧試験、本学習の設定・速度・精度は未確認。保存先は課金を始める前に具体的な対応・料金・保持期限まで確定する。
+実データ・CUDAでの実行、GPU終了後の外部保持先と復旧試験、本学習の設定・速度・精度は未確認。[JSONとsafetensorsによる再開archive](M6_RESUME_ARCHIVE.md)で、optimizer・乱数・latest/bestを外部Linux間で復元する実装を準備する。通常のモデル公開へは混ぜない。保存先は課金を始める前に具体的な対応・料金・保持期限まで確定する。

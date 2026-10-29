@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "resume-archive-publication-link",
+        "training/hub_release.py",
+        "if manifest_path.is_symlink():",
+        "if False:",
+        "test_resume_archive_policy.py",
+    ),
+    (
+        "resume-archive-tensor-value",
+        "training/resume_archive.py",
+        'return value\n        if kind in ("dict", "ordered_dict"):',
+        'return value * 0\n        if kind in ("dict", "ordered_dict"):',
+        "test_resume_archive.py",
+    ),
+    (
+        "resume-archive-hash",
+        "training/resume_archive.py",
+        'or file_hash(path) != entry["sha256"]',
+        "or False",
+        "test_resume_archive.py",
+    ),
+    (
+        "resume-archive-best-validation",
+        "training/resume_archive.py",
+        'if role == "best" and descriptor["progress"]["best_val_loss"] is None:',
+        "if False:",
+        "test_resume_archive_policy.py",
+    ),
+    (
+        "resume-archive-publication-purpose",
+        "training/hub_release.py",
+        'and manifest.get("schema") == "voxelshogi-resume-archive-v1"',
+        "and False",
+        "test_resume_archive_policy.py",
+    ),
+    (
         "trained-evaluated-bytes",
         "export/trained.py",
         'raise ValueError("evaluated artifact size/hash differs")',
