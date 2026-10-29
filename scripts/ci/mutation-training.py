@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "m6-shared-payload-ip",
+        "training/rental_control.py",
+        '"with_public_ip": public_ip,\n            "tags":',
+        '"with_public_ip": True,\n            "tags":',
+        "test_m6_shared_ip.py",
+    ),
+    (
+        "m6-shared-payload-region",
+        "training/rental_control.py",
+        '"instance_type": self.sku,\n                    "datacenters": [dc]',
+        '"instance_type": self.sku,\n                    "datacenters": [DC]',
+        "test_m6_shared_ip.py",
+    ),
+    (
+        "m6-shared-public-validation",
+        "training/rental_control.py",
+        'not public_ip\n                or offer["ip_availability_per_dc"]',
+        'True\n                or offer["ip_availability_per_dc"]',
+        "test_m6_shared_ip.py",
+    ),
+    (
         "vast-storage-price",
         "training/vast_rental_control.py",
         'offer["dph_total"], offer["dph_base"] + offer["storage_total_cost"]',

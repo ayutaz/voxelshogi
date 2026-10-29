@@ -61,3 +61,19 @@ Macではproviderを使わない25の制御テストに加え、古い制御状�
 ## Vast.aiの代替経路
 
 CloudRiftの既知構成に空きがない場合は、[Vast.ai用の料金・所有実機・終了制御](M6_VAST.md)を使う。共有M6承認と累積ledgerは同じだが、API・ディスク課金・一覧と削除の確認はproviderごとに分ける。Vast.aiの停止をCloudRiftのresources_released=trueへ読み替えない。
+
+## 韓国RTX5090の共有IP・SSH転送
+
+2026-10-29 14:54 UTCの認証付き在庫一覧で、`rtx59-7-23-800-ig.1`／`ap_northeast_kr_se_1`に1台、65 cents/時、専用公開IPなしを確認した。これは予約ではなく、起動直前にも在庫・単価を再確認する。M6に限りこの固定構成を追加し、米国SKUとM4の公開IP条件は維持する。
+
+共有IPのVMは`with_public_ip=false`、SSHの`ports=["22"]`を指定する。専用公開IPを割り当てないことを、SSHが不要という意味にしない。起動後は所有ID／tagが一致するAPIのhostと`[内部port, 外部port]`を読み、22番の転送先へ鍵認証する。接続先がまだ埋まっていないActive状態は、作業開始の証拠にしない。実SSH・CUDA・物理GPUブラウザは起動後に確認し、不成立なら同じ実機を調べて終了する。
+
+```bash
+uv run --locked python -m training.rental_control runs/m6/korea-control rent --purpose m6 --phase main --maximum-seconds 14400 --approval runs/m6/retry-approval.json --sku rtx59-7-23-800-ig.1
+```
+
+次の枠は従来どおり暫定3時間・最大4時間／US$4を保守的に予約する。表示単価が65 cents/時のままなら4時間の参考上限はUS$2.60だが、予約額や実請求と混同しない。M6基本枠US$24と共有ledger、独立guardian・上限15分前の終了、承認済みのRTX5090／CUDA環境、Macで計算しない方針を維持する。
+
+追加4テストは共有IPの料金・固定DC・SSH転送、M4への暗黙追加の拒否、既存public-IP条件、guardianへのSKU伝達を確認する。3変異でrequestのIP／DCと従来のpublic-IP検査の破壊を検出する。実在庫・SSHの実成功へ読み替えない。
+
+一次資料：[公式OpenAPI](https://api.cloudrift.ai/api-docs/openapi.json)のRentInstanceRequest／InstanceAndUsageInfo、[公式VMチュートリアルの共有IPとport mapping](https://www.cloudrift.ai/blog/comfyui-gpu-vm)、[公式SDKの接続先抽出](https://github.com/cloudrift-ai/emmy/blob/main/emmy/provisioning/cloudrift.py)。
