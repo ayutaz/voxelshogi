@@ -7,7 +7,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M6_PLAN.md` のM6-2起動前準備（M6-0〜1の実装とCPU CIは取り込み済み）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。教師契約／検査器はPR #47で取り込み済み。読み込み・損失・更新／評価はPR #48でLinux CI成功後に取り込み済み。学習CLI／checkpointもPR #49のCPU CI成功後に取り込み済み。CUDA依存・probe・試行コードもPR #50で取り込み済み。固定test／対局評価・評価した重みからの3形式変換・JSONとsafetensorsの保存復元もPR #51〜#53で取り込み済み。端末内モデル読込はPR #54、特徴量・同形式照合sessionもPR #55〜#56で取り込み済み。PR #56のLinux CIでWeb240テスト・80既知変異と、実WASMからPython入力hashへの4件照合が成功。Worker通信と観戦制御もPR #57〜#58の必須CI成功後に取り込み済み。モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2EはPR #59で全6件と必須CI成功後に取り込み、mainの公開検証も成功（`docs/M6_ARENA.md`）。推論用HFパッケージprofileもPR #60で取り込み済み。再開状態の公開profileはPR #61の必須CI成功後に取り込み済み。M6用途別の費用・終了制御もPR #62の必須CI成功後に取り込み済み。2026-10-29にM6基本枠US$24（既存総枠US$100内）、成果物のApache-2.0、別HF repoへの再開状態公開が承認済み。不足時の追加GPU予算US$100も承認済みで、実測見積もりにより不足を確認してから使う。詳細は `export/m6-approval.json` と `docs/M6_RUN_PROPOSAL.md`。実データのsplit別教師数は未集計で、外部GPU試行の冒頭に確定してから学習する。
+- 次の実行計画: `docs/M6_TRIAL.md` の本学習・評価・公開観戦。M4・M5は完了。M6の学習／再開、固定評価・変換、HF公開profile、Workerと観戦UI、費用・終了制御はPR #47〜#63の必須CI成功後に取り込み済み。M6-2の実RTX5090試行では教師train29,884／val3,421／test3,589を監査し、batch4約185局面/秒、CUDA再開とHFからの新run復旧・継続一致、Linuxブラウザの物理GPU利用を確認。試行実機は終了・資源解放済み。本学習・最終評価・学習済み推論公開・Arenaの実機検証は未実施。M6基本枠US$24、成果物Apache-2.0・別HF repo再開状態公開、不足時の追加GPU予算US$100・追加合成データ生成はPR #64に記録済み。追加枠はまだ未使用。詳細は `export/m6-approval.json`、`docs/M6_PLAN.md`。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -34,7 +34,7 @@
 | `crates/voxelshogi-python` | PyO3／maturinのPython境界と行動マスク付きGymnasium環境。ルールはRust coreを呼ぶ |
 | `training/` | Parquet本生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
 | `training/fit.py`、`training/checkpoint.py` | 合法手を対象とした教師あり学習、val選択、optimizer／乱数／batch位置を含む保存再開。CPU CIで一致確認済み |
-| `infrastructure/cuda/`、`training/cuda_preflight.py` | 外部Linux専用のPython3.14.9／CUDA依存lockと起動前検査。実GPUでは未実行 |
+| `infrastructure/cuda/`、`training/cuda_preflight.py` | 外部Linux専用のPython3.14.9／CUDA依存lockと起動前検査。RTX5090で少量学習・再開まで確認済み |
 
 ## 開発規約（必読）
 
@@ -108,5 +108,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、承認済みの最大4時間／US$4のCUDA試行を実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開の試行コードを準備中。実GPUでは未実行。M6の個別承認と実測見積もりを使い、追加GPU枠は不足時だけ有効化する。
+  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、承認済みの最大4時間／US$4のCUDA試行を実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開は実RTX5090で成功済み。M6の個別承認と実測見積もりを使い、追加GPU枠は不足時だけ有効化する。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

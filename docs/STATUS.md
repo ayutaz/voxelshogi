@@ -17,7 +17,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
 | M4・M5、次はM6 | M4は有効113,321局面・教師36,894件の全検証・全再生成・Card付きHF公開と全hash照合・資源終了まで完了。M5は固定3局145手が一致。次はM6の教師・学習・評価・モデル観戦。[各目的・ゴール](ROADMAP.md) |
 
-M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。現在はM4でGPUサービスのCPU利用実績があり、CUDA学習・R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
+M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。現在はM4のCPU利用に加えM6-2の少量CUDA学習・再開も確認済み。R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
@@ -25,13 +25,13 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 [小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
 
-現在着手しているのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、上記は文書更新時の固定基準。その後[M6教師契約・検査器](M6_TRAINING_CONTRACT.md)は[PR #47](https://github.com/ayutaz/voxelshogi/pull/47)の必須8チェック成功後、main `bbc51c6`へ取り込み済み。[M6-1の読み込み・損失・学習CLI・保存再開](M6_RUNTIME.md)もPR #48〜#49の必須CI成功後に取り込み済み。PR #49はLinuxの全255テストと85変異に成功し、main `6a285d6`へ統合した。[CUDA準備](M6_CUDA.md)・固定評価・評価した重みからの変換・再開archiveもPR #50〜#53で取り込み済み。[端末内モデル読込](M6_LOCAL_MODEL.md)と[特徴量・session](M6_SESSION.md)もPR #54〜#56で必須CI成功後に取り込み済み。PR #56のLinux CIはWeb240テスト・80既知変異、実WASMとPython入力hashの4件照合に成功。[Worker通信](M6_WORKER.md)と観戦制御もPR #57〜#58で取り込み済み。[モデル選択UI・AI条件付き棋譜保存・実ONNXの対局E2E](M6_ARENA.md)はPR #59の必須8チェックと全6実ブラウザE2E成功後に取り込み、mainの公開検証も成功。[固定記録](experiments/m6-arena-integration-2026-10-29.json)。[推論パッケージの公開profile](M6_INFERENCE_RELEASE.md)もPR #60で取り込み済み。[再開状態公開profile](M6_STATE_RELEASE.md)もPR #61の必須CI成功後に取り込み済み。[M6の用途別予算・終了制御](M6_RENTAL_CONTROL.md)もPR #62の必須CI成功後に取り込み済み。実データ監査・レンタル・GPU学習は未実施。[費用・保存・ライセンス方針](M6_RUN_PROPOSAL.md)は2026-10-29に個別承認済みで、次は最大4時間／US$4の実GPU試行。[承認記録](../export/m6-approval.json)。
+現在は[M6-2の実GPU試行](M6_TRIAL.md)を完了し、次は本学習・固定評価・学習済みモデルの公開観戦。固定教師はtrain29,884／val3,421／test3,589件。RTX5090・Python3.14.9・CUDA13.0でbatch4約185局面/秒、64連続／32＋32再開が完全一致した。HFへ公開したJSON＋safetensorsを固定revisionから新runへ復旧し、追加64更新も一致。Linuxブラウザの物理WebGPU／WebGLの基礎検査が成功し、試行実機は終了・資源解放済み。[固定記録](experiments/m6-cuda-trial-2026-10-29.json)。最初の操作スクリプト失敗・adapter取得失敗も保持する。学習・評価・変換・公開profile・観戦UI・費用制御の実装はPR #47〜#63で必須CI成功後に取り込み済み。実ONNXの対局E2E全6件とmain公開検証は[PR #59の固定記録](experiments/m6-arena-integration-2026-10-29.json)。[GPU・保存・ライセンスと不足時の追加GPU／データ生成](M6_RUN_PROPOSAL.md)はPR #64で記録済み。次の実機は最大8時間／US$8、M6累積予約US$12の計画で基本枠US$24内。本学習・固定test／対局評価・学習済み推論パッケージ公開・Arenaの実GPU同時検証は未実施。
 
 ## M4・M5の完了確認（2026-10-29 JST）
 
 [本生成の完了記録](M4_COMPLETION.md)。1,800局・116,921行から重複3,600行を除いた有効113,321局面・探索教師36,894件を全件検証。全再生成のバイト一致後、HF commit `6e7fb29d2469b56a895042fbb089d86e7b4d074f`へ`production-64`とDataset Cardを公開し、対象1,831ファイルの全hashが一致した。public/manual・Community OFF、CC-BY-4.0を確認。実機は終了・資源解放、稼働中VoxelShogi実機0・永続volume 0件。
 
-生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6基本枠US$24は既存US$100内に個別配分済み。不足時の追加GPU予算US$100も承認済み（M6最大US$124・全体最大US$200）だが、実測見積もりで不足を記録するまで有効化しない。M6学習は未実行。HF送信と同目的の所有実機の置き換えは継続承認済み。
+生成・検証・再生成は約4時間36分、RSS観測最大約589.84 MiB。準備から資源解放まで約5.04時間、時間×単価の参考額約US$5.04（実請求未回収）。過去の上限も保守的に残した予約上限累計US$41・未予約額US$59。M6基本枠US$24は既存US$100内に個別配分済み。不足時の追加GPU予算US$100も承認済み（M6最大US$124・全体最大US$200）だが、実測見積もりで不足を記録するまで有効化しない。初回M6試行の予約US$4を加えた累積予約はUS$45・未予約US$55。本学習は未実行。HF送信と同目的の所有実機の置き換えは継続承認済み。
 
 実装・公開準備はPR #43、開始記録と継続承認はPR #44を必須8チェック成功後に通常merge。統合後のmain CI・公開検証も成功した。M5は[PR #42・固定3局145手の全件一致](M5_PLAN.md)で、全棋譜の完全互換は主張しない。
 
@@ -64,7 +64,7 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 | 有効10万局面 | ✅ 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HF公開と全1,831対象ファイル照合・実機終了まで完了。[記録](M4_COMPLETION.md) | M6は固定revisionを使用。各splitの探索教師数は学習前に外部Linuxで集計・凍結する |
 | 承認・予算 | M4データv1のCC-BY-4.0・HF public/manual・合計US$100は承認済み。予約上限累計US$41・未予約US$59、実請求未回収 | M6のGPU試行・本学習・checkpoint保持費は別に見積もる。HF送信・公開の継続承認を毎回の確認へ戻さない |
 | M5 | ✅ 改定後の固定3局145手、各局面の盤／持ち駒と投了結果が一致。PR #42を必須CI成功後に通常merge。[結果・制約](M5_PLAN.md) | 全棋譜・全終局条件の完全互換は主張しない。原本を学習や公開へ含めない |
-| M6 | CUDA学習・棋力評価・学習済みモデル対局は未実行 | 同じGPUサービスで学習速度と配布条件を確認 |
+| M6 | 少量CUDA学習・HF復旧・物理GPUブラウザ基礎検査が成功。本学習・最終評価・モデル対局は未実行 | [実測と最大8時間／US$8の次の実行単位](M6_TRIAL.md) |
 
 Macは編集・読み取り・軽量確認のみ。探索・生成・計測・学習はVast.ai／CloudRift、重い回帰はLinux CIで行う。データと学習checkpointは外部LinuxからHFの`voxelshogi/`配下へ直接送り、Macへ中継しない。public/manualはダウンロード申請を人が承認する設定で、公開自体の再承認待ちではない。M3の既承認配布は維持し、学習済みモデルのライセンスと取得ゲートに沿うWeb配信はM6で別に確定する。
 
@@ -83,7 +83,7 @@ Macは編集・読み取り・軽量確認のみ。探索・生成・計測・�
 | M2完了時のテスト | Rust core153件＋WASM境界5件、Web115件、CI制御Node49件、Native/WASM12fixture、既知core/WASM33変異とWeb29変異、E2E21件。現在の確認元は上のM3表を参照 |
 | 実機の公開確認 | Mac M1・8 GiB・Chrome155・Metalで公開E2E21件が再試行／skipなしで成功。最終公開版は22.7秒で全21件が成功（[最終記録](experiments/m2-final-publication.json)）。途中版の [全レポート](experiments/m2-public-e2e.json) とCIでの再試行・修正経緯は [検証記録](M2_VALIDATION.md) に保持 |
 | 性能と配信 | Normalは深さ6・50,000ノード・約1秒。初期局面は3回とも深さ2。初回JS255,096 bytes、公開WASM361,183 bytes。[固定7入力・Native比較](experiments/m2-search-browser-public.json)・[同じCI成果物との12ファイル照合](experiments/m2-public-artifact-match.json) |
-| 未導入・保留 | M3の未学習モデル推論は公開済み。学習済みAI対局はM6の対象。R2・COOP/COEP・CUDA学習は未導入。M4でGPUサービスのCPUは利用済み、9王の正式採用は保留 |
+| 未導入・保留 | M3の未学習モデル推論は公開済み。学習済みAI対局はM6の対象。R2・COOP/COEPは未導入。M6-2の少量CUDA学習は成功済み。M4でGPUサービスのCPUは利用済み、9王の正式採用は保留 |
 | ローカル準備 | 空き容量は2026-10-27確認で約27.2 GiB。[取得記録](experiments/documentation-baseline-2026-10-27.json)。Pythonは3.14.9、依存導入直前に容量と互換性を再確認 |
 
 ## 過去の課題：C0で対応済み

@@ -1,6 +1,6 @@
 # 再開状態の公開profileとアップロード上限
 
-[再開archive](M6_RESUME_ARCHIVE.md)専用の`artifact_role="training-state"`を準備する。**2026-10-29にoptimizer・乱数状態の別HF repo公開と成果物のApache-2.0をユーザーが承認済み。実repo作成・転送・GPU起動は未実施。** [確定方針](M6_RUN_PROPOSAL.md)と[承認記録](../export/m6-approval.json)に基づき、実planを作る。
+[再開archive](M6_RESUME_ARCHIVE.md)専用の`artifact_role="training-state"`を準備する。**2026-10-29にoptimizer・乱数状態の別HF repo公開と成果物のApache-2.0をユーザーが承認済み。実GPU試行の再開状態は[固定revisionへの公開・新run復旧・追加更新一致まで確認済み](M6_TRIAL.md)。本学習状態は未作成。** [確定方針](M6_RUN_PROPOSAL.md)と[承認記録](../export/m6-approval.json)に基づき、実planを作る。
 
 ## 目的と送信範囲
 
@@ -55,4 +55,4 @@ uv run --locked python -m training.hub_release runs/m6/archive runs/m6/state-pla
 
 opaque metadataを使う対象4ファイル52テストで、別の公開承認・宛先・期待binding、余分なファイル・hash・best・symlink・Card、送信前予約・重複・上限・Mac拒否、API失敗時の予約保持を検証する。追加5変異と全回帰はCIへ含める。モデルやTensorはMacで実行しない。
 
-実データのCUDA試行、実際のarchiveの転送・固定revision照合と復旧、実レンタルの終了制御へのledger引継ぎは未実施。profileの単体テストだけで外部保存を完了と表示しない。
+実データのCUDA試行、archiveの転送・固定revision照合・新run復旧と追加64更新の一致、終了前のledger回収と資源解放も[M6-2の実測](M6_TRIAL.md)で確認済み。本学習状態の公開はこれから行う。profileの単体テストだけで外部保存を完了と表示しない。

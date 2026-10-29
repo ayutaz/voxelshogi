@@ -1,6 +1,8 @@
 # M6のCUDA起動前準備
 
-M6-2のための依存・検査コード。GPUを借りずに準備しており、**実GPUでの動作・学習速度・再開は未確認**。[全体の計画](M6_PLAN.md)と[学習CLI・再開基準](M6_RUNTIME.md)に従う。
+2026-10-29の[実RTX5090試行](M6_TRIAL.md)で、固定依存・演算・少量学習・再開と外部復旧を確認済み。以下はその環境と試行手順。本学習と学習済みモデルの実機検証はこれから行う。
+
+M6-2のための依存・検査コード。実装をLinux CPU CIで先に検証し、その後に上記の実GPU試行を行った。[全体の計画](M6_PLAN.md)と[学習CLI・再開基準](M6_RUNTIME.md)に従う。
 
 ## CPU CIとCUDAを別の環境に固定する
 
@@ -27,7 +29,7 @@ uv run --project infrastructure/cuda --locked python -m training.cuda_preflight 
 
 ## 実データでの試行コード
 
-入力を監査して作成したcacheに対して、外部Linuxで実行する形を用意した。まだ実行していない。
+入力を監査して作成したcacheに対して、外部Linuxで実行する。batch1とbatch4の64 stepは上記試行で成功済み。
 
 ```bash
 uv run --project infrastructure/cuda --locked python -m training.cuda_trial runs/m6/cache runs/m6/trial-b1 --batch-size 1 --steps 64 --max-seconds 600
