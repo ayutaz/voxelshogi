@@ -7,7 +7,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/M6_PLAN.md` のM6-0〜1（教師・評価条件と学習／再開の実装）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。教師契約／検査器はPR #47で取り込み済み。読み込み・損失・更新／評価はPR #48でLinux CI成功後に取り込み済み。後続ブランチで学習CLI／checkpointを実装中で、次はCUDA起動前準備。実データのsplit別教師数は未集計で、外部GPU試行の冒頭に確定してから学習する。
+- 次の実行計画: `docs/M6_PLAN.md` のM6-2起動前準備（M6-0〜1の実装とCPU CIは取り込み済み）。M4は1,800局・有効113,321局面と探索教師36,894件の全検証・全再生成・HF公開を完了し、実機も終了済み。`docs/M4_COMPLETION.md`。M5は固定3局145手の一致を確認済み。M6のGPU学習は未実行。教師契約／検査器はPR #47で取り込み済み。読み込み・損失・更新／評価はPR #48でLinux CI成功後に取り込み済み。学習CLI／checkpointもPR #49のCPU CI成功後に取り込み済み。現在はCUDA起動前準備。実データのsplit別教師数は未集計で、外部GPU試行の冒頭に確定してから学習する。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -33,7 +33,8 @@
 | `export/` | uv管理の特徴量・行動契約、未学習代表モデルとONNX変換・数値比較 |
 | `crates/voxelshogi-python` | PyO3／maturinのPython境界と行動マスク付きGymnasium環境。ルールはRust coreを呼ぶ |
 | `training/` | Parquet本生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
-| 予定 | 学習ループ、CUDA学習環境、`infrastructure/` |
+| `training/fit.py`、`training/checkpoint.py` | 合法手を対象とした教師あり学習、val選択、optimizer／乱数／batch位置を含む保存再開。CPU CIで一致確認済み |
+| `infrastructure/cuda/`、`training/cuda_preflight.py` | 外部Linux専用のPython3.14.9／CUDA依存lockと起動前検査。実GPUでは未実行 |
 
 ## 開発規約（必読）
 
@@ -106,5 +107,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、小規模CUDA試行を見積もり・承認後に実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。現状のLinux torchはCPU版で、CUDA学習は未実装・未実行。M4の費用承認を学習へ転用しない。
+  1. M6: [M6_PLAN](docs/M6_PLAN.md)のM6-0〜1で教師・評価条件と学習／再開を実装。その後、小規模CUDA試行を見積もり・承認後に実測し、本学習・評価・変換・HF公開・ブラウザ観戦へ進む。通常CIはCPU版torchを維持し、CUDA用の別lock・検査器・少量学習と再開の試行コードを準備中。実GPUでは未実行。M4の費用承認を学習へ転用しない。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
