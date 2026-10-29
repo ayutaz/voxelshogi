@@ -24,7 +24,7 @@ uv run --locked python -m training.resume_archive restore runs/m6/resume-archive
 
 ## 保存先と公開
 
-この形式の実装は、optimizer状態の公開許可ではない。通常のHFモデル公開ハーネスはresume archiveを拒否する。保存先・保持期限・最大料金・取得権限・Model Cardとライセンスを具体化してから、別の保存方針を確定する。[M6計画](M6_PLAN.md)の通り、エフェメラルディスクだけに唯一の再開状態を残して実機を終了しない。実行前の費用・保存先が未確定の間はGPUを起動しない。
+この形式の実装は、optimizer状態の公開許可ではない。通常のHFモデル公開ハーネスはresume archiveを拒否する。[別承認を要求するstate専用profileと累積アップロード上限](M6_STATE_RELEASE.md)を準備する。保存先・保持期限・最大料金・取得権限・Model Cardとライセンスを具体化してから、別の保存方針を確定する。[M6計画](M6_PLAN.md)の通り、エフェメラルディスクだけに唯一の再開状態を残して実機を終了しない。実行前の費用・保存先が未確定の間はGPUを起動しない。
 
 ## 検証
 
