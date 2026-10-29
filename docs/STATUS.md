@@ -25,7 +25,7 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 [小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
 
-次に着手するのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、今回の更新では実装・レンタル・学習を行っていない。
+現在着手しているのは[M6-0〜1の契約・読み込み／学習・保存再開、その後のCUDA起動前準備](M6_PLAN.md#直近に実装するpr)。実装と小規模学習テストはLinux CI、Macは編集・軽量確認のみ。GPU学習を始めるのはM6-2の見積もり後であり、上記は文書更新時の固定基準。その後[M6教師契約・検査器](M6_TRAINING_CONTRACT.md)を実装中で、実データ監査・レンタル・学習はまだ行っていない。
 
 ## M4・M5の完了確認（2026-10-29 JST）
 
