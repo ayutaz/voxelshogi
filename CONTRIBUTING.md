@@ -30,7 +30,7 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - この作業環境のエージェントはMacで探索・生成・計測・学習・重い回帰検証を行わない。Macは編集・読み取り・軽量な確認のみとし、フル検証はCI、実機計測と学習は承認済みVast.ai／CloudRiftで実行する。[現在の運用](docs/M4_REMOTE_PLAN.md)。CIの性能を外部GPU実機の性能と読み替えない。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
-文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次のM4の目的・作業・完了条件は [ROADMAP.md](docs/ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
+文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次のM6の目的・作業・完了条件は [M6_PLAN.md](docs/M6_PLAN.md) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
 
 変更に関連する検証を実行する。Rust、Node、pnpm、wasm-bindgenの版は固定値に合わせる（`rust-toolchain.toml`、`.node-version`、Webの `packageManager` / lockfile）。Pythonは `.python-version` を使う。ローカルE2Eは既存Chrome、CIは `PW_CHANNEL=''` でChromiumを使う。
 
@@ -65,7 +65,7 @@ PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレ�
 
 M3の `Browser model inference (real WASM)` もCI Gateへ必須の依存として含める。uvから3形式を生成してlocalhostで実際に読み込み、専用Worker・全出力照合・描画と中断・破損／未対応表示の6 E2Eを行う。GPUを持たないCIは実機GPUの証拠にはしない。モデルのライセンス確定までは、生成物をこのジョブ内だけに置き、モデルやtraceをartifactへ公開しない。
 
-モデル公開の設定は `export/publication.json`。ユーザーのライセンス回答を得るまで `approved=false`・`license=null` を維持する。承認の対象はこのIDの未学習モデルだけで、M6の学習済みモデルへ拡大しない。公開時はclean source・全3形式・ライセンスとModel Cardを検証し、実モデルE2Eを通った同じ配布物を公開する。公開後は `scripts/verify-model-distribution.mjs` がアプリのWorker・モデル・参照値・ORT全ファイルの実配信SHA、サイズ、MIME、cacheを確認する。アプリの実ファイル一覧はbuild時の `inference-build.json` に保存する。承認待ちの条件分岐がskipされたことを、公開経路の成功とは数えない。
+モデル公開の設定は `export/publication.json`。M3検証用IDは承認済みで`approved=true`・`license=Apache-2.0`。新しい未承認のモデルは承認が得られるまで`approved=false`・`license=null`を維持する。承認の対象はこのIDの未学習モデルだけで、M6の学習済みモデルへ拡大しない。公開時はclean source・全3形式・ライセンスとModel Cardを検証し、実モデルE2Eを通った同じ配布物を公開する。公開後は `scripts/verify-model-distribution.mjs` がアプリのWorker・モデル・参照値・ORT全ファイルの実配信SHA、サイズ、MIME、cacheを確認する。アプリの実ファイル一覧はbuild時の `inference-build.json` に保存する。承認待ちの条件分岐がskipされたことを、公開経路の成功とは数えない。
 
 実機検証の再現コマンド（事前にWASMビルド・依存導入を行う）：
 

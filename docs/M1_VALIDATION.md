@@ -1,6 +1,6 @@
 # M1：探索AIの検証記録
 
-2026-10-26（JST）。標準 `voxelshogi-standard-v1` を対象とする。M1の実装・独立検証・全体変異調査・Native計測を完了した。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10) は最終必須CI成功後、保護を迂回せず通常取り込み済み。以下はM1完了時点の記録で、以後の文書更新による公開SHAとは区別する。[現在の確認元](STATUS.md)、[完了したM2](M2_VALIDATION.md)・[M3検証](M3_VALIDATION.md)・[次のM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)。9王ルールの正式採用、Web Workerとライブ探索はこの完了条件に含めない。
+2026-10-26（JST）。標準 `voxelshogi-standard-v1` を対象とする。M1の実装・独立検証・全体変異調査・Native計測を完了した。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10) は最終必須CI成功後、保護を迂回せず通常取り込み済み。以下はM1完了時点の記録で、以後の文書更新による公開SHAとは区別する。[現在の確認元](STATUS.md)、[完了したM2](M2_VALIDATION.md)・[M3検証](M3_VALIDATION.md)・[完了したM4](M4_COMPLETION.md)・[次のM6](M6_PLAN.md)。9王ルールの正式採用、Web Workerとライブ探索はこの完了条件に含めない。
 
 ## 実装と独立した期待値
 

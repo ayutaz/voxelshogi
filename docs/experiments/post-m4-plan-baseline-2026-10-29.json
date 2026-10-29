@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "assembled_at_utc": "2026-10-29T00:22:01.747193+00:00",
+  "source_main_commit": "389ba94720dbe5f9b6d13d31f5db4a771d436fd1",
+  "main_ci": {
+    "run_id": 40746960925,
+    "conclusion": "success"
+  },
+  "main_security": {
+    "run_id": 40746962816,
+    "conclusion": "success"
+  },
+  "public_build_commit": "389ba94720dbe5f9b6d13d31f5db4a771d436fd1",
+  "hf_dataset": {
+    "id": "voxelshogi/voxelshogi-synthetic-v1",
+    "sha": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true
+  },
+  "resource_audit": {
+    "checked_at": 1793233119.349325,
+    "active_project_instances": 0,
+    "persistent_volumes": 0,
+    "provider": "cloudrift",
+    "scope": "Personal instances tagged voxelshogi-*; all persistent volumes"
+  },
+  "production_counts_source": "docs/experiments/m4-production-release-2026-10-29.json",
+  "implementation_sources": [
+    "pyproject.toml",
+    "export/model.py",
+    "docs/MODEL_CONTRACT.md",
+    "training/"
+  ],
+  "m6_status": {
+    "training_loop": "not implemented",
+    "linux_torch": "CPU index in pyproject.toml",
+    "cuda_training": "not run",
+    "teacher_counts_per_split": "not aggregated",
+    "gpu_training_quote": "not prepared"
+  },
+  "scope": "Read-only current-state verification and documentation; no GPU rental, training or data download.",
+  "budget": {
+    "approved_total_usd": 100,
+    "reserved_total_usd": 41.0,
+    "remaining_unreserved_usd": 59.0,
+    "note": "M4 caps, not invoices or provider balance; not an approval of M6 training."
+  }
+}

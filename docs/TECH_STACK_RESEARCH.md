@@ -11,7 +11,7 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO30.30.1／maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2、HF SDK2.3.0はM4で導入・Linux CIと実機で検証済み。CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。次は [ROADMAPのM4](ROADMAP.md#m4-python-バインディングとデータ生成phase-3-の本体)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO30.30.1／maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2、HF SDK2.3.0はM4で導入・Linux CIと実機で検証済み。CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。M4本生成とM5の固定3局照合は完了し、次は[M6の教師・学習実装](M6_PLAN.md)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
 2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・データ生成依存とHF公開ハーネスはM4で導入済み。LinuxのtorchはCPU版で、CUDA学習・COOP/COEP・R2は未導入。
 
