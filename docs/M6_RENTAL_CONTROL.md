@@ -1,6 +1,6 @@
 # M6のGPU起動・費用上限・終了制御
 
-[M6の具体案](M6_RUN_PROPOSAL.md)に合わせ、既存の総額US$100とM6専用の提案枠US$24を同時に守る起動制御を準備する。**費用配分・学習成果物ライセンス・再開状態公開の判断はまだ確認待ち。M6の実レンタルは行っていない。** この実装やテスト用の承認fixtureを、ユーザーの承認として扱わない。
+[M6の具体案](M6_RUN_PROPOSAL.md)に合わせ、既存の総額US$100とM6基本枠US$24を同時に守る起動制御を用意した。**2026-10-29に費用配分・Apache-2.0・別repoへの再開状態公開をユーザーが承認済み。M6の実レンタルは未実施。** [承認記録](../export/m6-approval.json)。不足時の追加GPU予算US$100も承認済みだが、まだ有効化しない。実測による不足を記録した後、ledgerと制御を検証付きで拡張して使う。条件付きの上限はM6 US$124、全体US$200で、有料保存追加は対象外。
 
 ## 目的と上限
 
@@ -17,17 +17,17 @@ CloudRiftの既知のRTX5090 SKUだけを対象とし、実際の単価が100 ce
 
 ## 用途の承認を混ぜない
 
-M6の承認記録は以下のschemaを使う。**未確定の現在はこのfalse／nullの状態であり、実行できる承認ファイルを自動生成しない。** 3点が実際に確定した後、制御側のignored `runs/`へ小さい記録を用意し、hashを起動記録に残す。
+M6の承認記録は以下のschemaを使う。明示承認に基づき、制御側のignored `runs/`へ以下の基本枠の記録を用意し、hashを起動記録に残す。追加枠の承認は別の実行承認記録に保持し、基本枠のファイルを書き換えただけで有効化しない。
 
 ```json
 {
   "schema": "voxelshogi-m6-rental-approval-v1",
-  "approved": false,
+  "approved": true,
   "maximum_usd": 24,
   "maximum_seconds": 86400,
   "maximum_hourly_usd": 1,
-  "license": null,
-  "state_publication_approved": false
+  "license": "Apache-2.0",
+  "state_publication_approved": true
 }
 ```
 
@@ -43,7 +43,7 @@ guardianは上限の15分前から終了を要求し、所有instanceだけの�
 
 ## 承認後の操作
 
-実際に見積もりと承認記録がそろった後、制御側で専用SSH鍵と新しい制御ディレクトリを用意する。以下はAPI操作を伴うため、未承認の現在は実行しない。providerキーは制御側だけに置き、GPUへコピーしない。Macでは制御と小さい記録の回収だけを行い、モデル・データ・学習計算を中継しない。
+実際に見積もりと承認記録がそろった後、制御側で専用SSH鍵と新しい制御ディレクトリを用意する。以下はAPI操作を伴う。承認済みの初回試行として、最新の空き・価格とguardianのreadyを確認してから実行する。providerキーは制御側だけに置き、GPUへコピーしない。Macでは制御と小さい記録の回収だけを行い、モデル・データ・学習計算を中継しない。
 
 ```bash
 uv run --locked python -m training.rental_control runs/m6/trial-control rent --purpose m6 --sku rtx59-3-24-750-xam.1 --phase trial --maximum-seconds 14400 --budget runs/m4/cost-budget.json --approval runs/m6/approval.json
@@ -55,4 +55,4 @@ mainの承認記録には`main_estimate`として`trial_sha256`・`estimated_sec
 
 ## 検証
 
-Macではproviderを使わない25の制御テストに加え、古い制御状態・用途の取り違えの拒否と、ネットワークを禁止した隔離checkoutでのguardian実プロセス起動を確認する。対象のM4／M6テストは合計30件。9変異を既知回帰へ追加し、全133 training変異と全回帰はLinux CIで確認する。承認の実記録作成、実起動・実測・終了の確認は未実施。
+Macではproviderを使わない25の制御テストに加え、古い制御状態・用途の取り違えの拒否と、ネットワークを禁止した隔離checkoutでのguardian実プロセス起動を確認する。対象のM4／M6テストは合計30件。9変異を既知回帰へ追加し、全133 training変異と全回帰はLinux CIで確認する。明示承認は実行承認記録へ反映済み。実起動・実測・終了の確認は未実施。
