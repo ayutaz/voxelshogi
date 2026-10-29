@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'benchmark-wait-measured-input', file: 'scripts/trained-benchmark.mjs', before: 'const measured = await Promise.race([completion.then(() => false), waitForMeasured().then(() => true)]);', after: 'const measured = true;', test: 'trained-benchmark' },
   {"name": "portable-evidence-compute", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.equal(validation.information.computePrecision, 'float32', 'FP16 weight-only requires FP32 compute');", "after": "", "test": "trained-browser-evidence"},
   { name: 'benchmark-root-side', file: 'scripts/trained-benchmark.mjs', before: 'if (game.sideToMove() !== fixture.side)', after: 'if (false)', test: 'trained-benchmark' },
   { name: 'benchmark-root-free', file: 'scripts/trained-benchmark.mjs', before: 'finally { game.free(); }', after: 'finally {}', test: 'trained-benchmark' },

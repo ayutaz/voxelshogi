@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { browserMemory } from './browser-memory.mjs';
-import { canonicalAction, fixedPositions, switchPrecisions, installPolicyBridge, runPolicyRequests } from './trained-benchmark.mjs';
+import { canonicalAction, fixedPositions, switchPrecisions, installPolicyBridge, runPolicyRequests, duringMeasuredRequests } from './trained-benchmark.mjs';
 import { trainedCases, validateTrainedEvidence, requireExternalLinux } from './trained-browser-evidence.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -94,11 +94,9 @@ export async function measureTrainedModels({browser,base,modelFolder,catalog,out
         const fixed=fixtures.find(f=>f.name===value.fixture);
         const measured=await sampleMemory(cdp,page,async()=>{
           const coldPacket=await page.evaluate(runPolicyRequests,{root:fixed.root});if(coldPacket.error)throw Object.assign(new Error(coldPacket.error.message),{stage:coldPacket.error.stage});const cold=coldPacket.samples[0];
-          let done=false;
           const repeating=page.evaluate(runPolicyRequests,{root:fixed.root,count:smoke?11:40,warmup:10});
-          repeating.then(()=>{done=true;},()=>{done=true;});
-          if(value.show3D) for(let attempt=0;attempt<20 && !done;attempt++) await drag(page);
-          const packet=await repeating;if(packet.error)throw Object.assign(new Error(packet.error.message),{stage:packet.error.stage});const repeated=packet.samples;
+          const packet=await (value.show3D ? duringMeasuredRequests(repeating,()=>page.waitForFunction(()=>window.trainedBenchmark.measuring && window.trainedBenchmark.pending),()=>drag(page)) : repeating);
+          if(packet.error)throw Object.assign(new Error(packet.error.message),{stage:packet.error.stage});const repeated=packet.samples;
           return {cold,repeated,interaction:await page.evaluate(()=>({draws:window.trainedObservation.draws,trustedCameraInputs:window.trainedObservation.trustedCameraInputs,maximumFrameGapMs:Math.max(0,...window.trainedObservation.gaps)}))};
         });
         const {cold,repeated,interaction}=measured.value;
