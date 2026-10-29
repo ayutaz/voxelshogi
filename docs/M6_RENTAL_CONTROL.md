@@ -56,3 +56,8 @@ mainの承認記録には`main_estimate`として`trial_sha256`・`estimated_sec
 ## 検証
 
 Macではproviderを使わない25の制御テストに加え、古い制御状態・用途の取り違えの拒否と、ネットワークを禁止した隔離checkoutでのguardian実プロセス起動を確認する。対象のM4／M6テストは合計30件。9変異を既知回帰へ追加し、全133 training変異と全回帰はLinux CIで確認する。明示承認は実行承認記録へ反映済み。実起動・実測・終了と資源解放も[M6-2の固定記録](M6_TRIAL.md)で確認済み。
+
+
+## Vast.aiの代替経路
+
+CloudRiftの既知構成に空きがない場合は、[Vast.ai用の料金・所有実機・終了制御](M6_VAST.md)を使う。共有M6承認と累積ledgerは同じだが、API・ディスク課金・一覧と削除の確認はproviderごとに分ける。Vast.aiの停止をCloudRiftのresources_released=trueへ読み替えない。

@@ -69,6 +69,8 @@ GPUによる**学習計算を始めるのはM6-2**。その冒頭のデータ監
 
 ## GPUサービス・依存・費用
 
+CloudRiftの既知RTX5090構成に空きがない場合の[Vast.ai制御](M6_VAST.md)を追加する。実認証・在庫・料金・CUDAと物理GPUブラウザは別途確認し、基本枠US$24・次の最大4時間／US$4を維持する。
+
 CloudRiftを第一候補、Vast.aiを代替とする。M4で使ったRTX5090構成はCPU生成の実績であり、CUDA学習の動作・速度・VRAM余裕の実績ではない。小規模試行前に空き・価格・GPUアーキテクチャ対応・CUDA版PyTorchとdriverの互換性を確認する。空きがなくてもMacで学習へ切り替えない。
 
 Python3.14を基本とし、CUDAの必須依存が未対応の場合だけ3.13を使い、対象・理由・解消条件を記録する。依存は`uv add`とlockで管理する。現在のLinux CI用CPU版torchを維持し、[外部CUDA用のPython3.14.9／torch2.14.1+cu130の別lockと検査器](M6_CUDA.md)を実装・CI検証し、実GPUでも確認済み。依存の固定で実GPUの動作確認を代用しない。

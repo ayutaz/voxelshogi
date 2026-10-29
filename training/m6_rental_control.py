@@ -10,6 +10,70 @@ from pathlib import Path
 from training.rental_control import QUOTES, Rental, save
 
 
+def validate_m6_approval(approval_path, tag, phase, maximum_seconds):
+    if (
+        approval_path is None
+        or approval_path.is_symlink()
+        or not approval_path.is_file()
+        or approval_path.stat().st_size > 65536
+    ):
+        raise ValueError("M6 purpose approval is required before rental")
+    approval = json.loads(approval_path.read_text())
+    if (
+        approval.get("schema") != "voxelshogi-m6-rental-approval-v1"
+        or approval.get("approved") is not True
+        or approval.get("maximum_usd") != 24
+        or approval.get("maximum_seconds") != 86400
+        or approval.get("maximum_hourly_usd") != 1
+        or approval.get("license") != "Apache-2.0"
+        or approval.get("state_publication_approved") is not True
+    ):
+        raise ValueError("M6 purpose, license and state publication must be approved")
+    limit = {"trial": 14400, "main": 72000}.get(phase)
+    if (
+        limit is None
+        or type(maximum_seconds) is not int
+        or not 1800 <= maximum_seconds <= limit
+    ):
+        raise ValueError("M6 phase time differs from the proposed quote")
+    if not tag.startswith("voxelshogi-m6-"):
+        raise ValueError("M6 requires its own ownership tag")
+    if phase == "main":
+        estimate = approval.get("main_estimate", {})
+        trial = approval_path.parent / "trial.json"
+        if (
+            estimate.get("maximum_seconds") != maximum_seconds
+            or type(estimate.get("estimated_seconds")) is not int
+            or not 0 < estimate["estimated_seconds"] <= maximum_seconds - 900
+            or trial.is_symlink()
+            or not trial.is_file()
+            or trial.stat().st_size > 4 * 1024 * 1024
+            or hashlib.sha256(trial.read_bytes()).hexdigest()
+            != estimate.get("trial_sha256")
+        ):
+            raise ValueError(
+                "M6 main requires a hash-pinned trial and fitting estimate"
+            )
+        report = json.loads(trial.read_text())
+        speed = report.get("full_examples_per_second_including_logging_save")
+        if (
+            report.get("schema") != "voxelshogi-cuda-trial-v1"
+            or report.get("verified") is not True
+            or report.get("same_example_order") is not True
+            or report.get("test_used") is not False
+            or report.get("config", {}).get("device") != "cuda"
+            or type(report.get("steps")) is not int
+            or report["steps"] < 64
+            or type(speed) not in (int, float)
+            or not math.isfinite(speed)
+            or speed <= 0
+            or type(report.get("peak_allocated_bytes")) is not int
+            or report["peak_allocated_bytes"] <= 0
+        ):
+            raise ValueError("M6 main estimate does not bind a verified CUDA trial")
+    return maximum_seconds
+
+
 class M6Rental(Rental):
     def __init__(
         self, *args, approval=None, phase="trial", maximum_seconds=14400, **kwargs
@@ -19,70 +83,11 @@ class M6Rental(Rental):
         self.phase, self.maximum_seconds = phase, maximum_seconds
 
     def quote_seconds(self):
-        if (
-            self.approval is None
-            or self.approval.is_symlink()
-            or not self.approval.is_file()
-            or self.approval.stat().st_size > 65536
-        ):
-            raise ValueError("M6 purpose approval is required before rental")
-        approval = json.loads(self.approval.read_text())
-        if (
-            approval.get("schema") != "voxelshogi-m6-rental-approval-v1"
-            or approval.get("approved") is not True
-            or approval.get("maximum_usd") != 24
-            or approval.get("maximum_seconds") != 86400
-            or approval.get("maximum_hourly_usd") != 1
-            or approval.get("license") != "Apache-2.0"
-            or approval.get("state_publication_approved") is not True
-        ):
-            raise ValueError(
-                "M6 purpose, license and state publication must be approved"
-            )
-        limit = {"trial": 14400, "main": 72000}.get(self.phase)
-        if (
-            self.sku not in QUOTES
-            or limit is None
-            or type(self.maximum_seconds) is not int
-            or not 1800 <= self.maximum_seconds <= limit
-        ):
-            raise ValueError("M6 phase time differs from the proposed quote")
-        if not self.tag.startswith("voxelshogi-m6-"):
-            raise ValueError("M6 requires its own ownership tag")
-        if self.phase == "main":
-            estimate = approval.get("main_estimate", {})
-            trial = self.approval.parent / "trial.json"
-            if (
-                estimate.get("maximum_seconds") != self.maximum_seconds
-                or type(estimate.get("estimated_seconds")) is not int
-                or not 0 < estimate["estimated_seconds"] <= self.maximum_seconds - 900
-                or trial.is_symlink()
-                or not trial.is_file()
-                or trial.stat().st_size > 4 * 1024 * 1024
-                or hashlib.sha256(trial.read_bytes()).hexdigest()
-                != estimate.get("trial_sha256")
-            ):
-                raise ValueError(
-                    "M6 main requires a hash-pinned trial and fitting estimate"
-                )
-            report = json.loads(trial.read_text())
-            speed = report.get("full_examples_per_second_including_logging_save")
-            if (
-                report.get("schema") != "voxelshogi-cuda-trial-v1"
-                or report.get("verified") is not True
-                or report.get("same_example_order") is not True
-                or report.get("test_used") is not False
-                or report.get("config", {}).get("device") != "cuda"
-                or type(report.get("steps")) is not int
-                or report["steps"] < 64
-                or type(speed) not in (int, float)
-                or not math.isfinite(speed)
-                or speed <= 0
-                or type(report.get("peak_allocated_bytes")) is not int
-                or report["peak_allocated_bytes"] <= 0
-            ):
-                raise ValueError("M6 main estimate does not bind a verified CUDA trial")
-        return self.maximum_seconds
+        if self.sku not in QUOTES:
+            raise ValueError("M6 SKU differs from the proposed quote")
+        return validate_m6_approval(
+            self.approval, self.tag, self.phase, self.maximum_seconds
+        )
 
     def rent(self, start_guard):
         self.quote_seconds()  # Approval/estimate failures precede even read-only API calls.
