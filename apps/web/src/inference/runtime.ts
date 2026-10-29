@@ -2,9 +2,10 @@ import { assetUrl, fetchVerified, joinVerifiedParts } from './assets';
 import { parseDeployment, parseModel, type Deployment, type ModelManifest, type RuntimeManifest } from './manifest';
 
 export type Ort = typeof import('onnxruntime-web/webgpu');
-export interface ModelPackage { index: Deployment; model: ModelManifest; assetBase: string; modelBase: string; packageHash: string }
+export interface RuntimeIndex { index: Deployment; assetBase: string }
+export interface ModelPackage extends RuntimeIndex { model: ModelManifest; modelBase: string; packageHash: string }
 
-export async function loadPackage(indexUrl: string, signal?: AbortSignal): Promise<ModelPackage> {
+export async function loadRuntimeIndex(indexUrl: string, signal?: AbortSignal): Promise<RuntimeIndex> {
   const response = await fetch(indexUrl, { cache: 'no-store', signal });
   if (!response.ok) throw new Error(`model index download failed: ${response.status}`);
   const text = await response.text();
@@ -12,6 +13,11 @@ export async function loadPackage(indexUrl: string, signal?: AbortSignal): Promi
   const allowLocal = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(indexUrl).hostname);
   const index = parseDeployment(JSON.parse(text), allowLocal);
   const assetBase = new URL('.', indexUrl).href;
+  return { index, assetBase };
+}
+
+export async function loadPackage(indexUrl: string, signal?: AbortSignal): Promise<ModelPackage> {
+  const { index, assetBase } = await loadRuntimeIndex(indexUrl, signal);
   const modelUrl = assetUrl(assetBase, index.model.path);
   const bytes = await fetchVerified(modelUrl, index.model, signal);
   const model = parseModel(JSON.parse(new TextDecoder().decode(bytes)), index.publication);

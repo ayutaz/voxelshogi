@@ -13,6 +13,9 @@
 /models/m3/index.json
   Cache-Control: no-store
 
+/models/m6/catalog.json
+  Cache-Control: no-store
+
 /models/m3/models/*
   Cache-Control: public, max-age=31536000, immutable
 

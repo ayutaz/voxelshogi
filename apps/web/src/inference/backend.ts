@@ -1,4 +1,4 @@
-import { loadRuntime, type ModelPackage } from './runtime';
+import { loadRuntime, type RuntimeIndex } from './runtime';
 import { type Backend, type Precision, POLICY_ELEMENTS } from './manifest';
 import { profileNode } from './profile';
 import { inferenceOptions } from './options';
@@ -16,7 +16,7 @@ export interface BackendPort {
   info: RuntimeInfo; buffers?: () => { created: number; liveBytes: number; peakBytes: number } | null;
 }
 
-export async function openBackend(pkg: ModelPackage, backend: Backend, precision: Precision): Promise<BackendPort> {
+export async function openBackend(pkg: RuntimeIndex, backend: Backend, precision: Precision): Promise<BackendPort> {
   let device: GPUDevice | undefined;
   let adapterInfo: RuntimeInfo['adapter'] = null;
   const features: GPUFeatureName[] = [];

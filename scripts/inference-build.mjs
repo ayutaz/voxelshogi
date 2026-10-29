@@ -13,7 +13,13 @@ export function inferenceBuild(directory) {
     return { path, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
   }).sort((a, b) => a.path.localeCompare(b.path));
   assert.ok(files.some(f => /^assets\/inference\.worker-.*\.js$/.test(f.path)), 'inference Worker is missing from build');
-  const manifest = { schema: 1, commit: build.commit, files };
+  assert.deepEqual(readdirSync(resolve(root, 'models/m6')).sort(), ['catalog.json'], 'M6 public assets may contain only catalog metadata');
+  const catalogBytes = readFileSync(resolve(root, 'models/m6/catalog.json'));
+  assert.ok(catalogBytes.length > 0 && catalogBytes.length <= 1024 * 1024, 'catalog exceeds metadata limit');
+  const value = JSON.parse(catalogBytes);
+  assert.ok(value.schema === 1 && Array.isArray(value.releases), 'invalid trained catalog');
+  const catalog = { path: 'models/m6/catalog.json', bytes: catalogBytes.length, sha256: createHash('sha256').update(catalogBytes).digest('hex') };
+  const manifest = { schema: 1, commit: build.commit, files, catalog };
   writeFileSync(resolve(root, 'inference-build.json'), JSON.stringify(manifest, null, 2) + '\n');
   return manifest;
 }

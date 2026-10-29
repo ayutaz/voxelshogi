@@ -7,13 +7,13 @@ import { encodePosition, selectPolicyMove, type PolicyChoice } from './policy-co
 
 export interface PolicySelection { modelId: string; packageHash: string; precision: Precision; backend: Backend }
 export interface PolicyRoot { revision: number; cursor: number; side: Color; hash: string; ruleset: string }
-interface Position extends PolicyRoot { recordJson: string }
+export interface PolicyPosition extends PolicyRoot { recordJson: string }
 export interface PolicyGame {
   goto: (cursor: number) => void; ply: () => number; hash: () => string; sideToMove: () => string;
   isFinished: () => boolean; board: () => Uint8Array; hands: () => Uint8Array;
   legalMoves: () => string[]; free: () => void;
 }
-interface Dependencies {
+export interface PolicyDependencies {
   source: LocalModel;
   open: (backend: Backend, precision: Precision) => Promise<BackendPort>;
   game: (recordJson: string) => PolicyGame;
@@ -33,17 +33,17 @@ function record(value: unknown): Record<string, unknown> {
 function integer(value: unknown, max = Number.MAX_SAFE_INTEGER): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= max;
 }
-function parseSelection(value: unknown): PolicySelection {
+export function parsePolicySelection(value: unknown): PolicySelection {
   const selected = record(value);
   if (Object.keys(selected).length !== 4 || typeof selected.modelId !== 'string' || !/^[A-Za-z0-9._-]{1,128}$/.test(selected.modelId) || typeof selected.packageHash !== 'string' || !/^[0-9a-f]{64}$/.test(selected.packageHash) ||
     !['fp32', 'fp16', 'int8'].includes(String(selected.precision)) || !['wasm', 'webgpu'].includes(String(selected.backend))) throw new Error('invalid policy model selection');
   return { ...selected } as unknown as PolicySelection;
 }
-function parsePosition(value: unknown): Position {
+export function parsePolicyPosition(value: unknown): PolicyPosition {
   const position = record(value);
   if (Object.keys(position).length !== 6 || !integer(position.revision) || !integer(position.cursor, 20000) || (position.side !== 'b' && position.side !== 'w') || typeof position.hash !== 'string' || !/^[0-9a-f]{16}$/.test(position.hash) ||
     position.ruleset !== 'voxelshogi-standard-v1' || typeof position.recordJson !== 'string' || position.recordJson.length < 1 || position.recordJson.length > 4 * 1024 * 1024 || new TextEncoder().encode(position.recordJson).length > 4 * 1024 * 1024) throw new Error('invalid policy position metadata');
-  return { ...position } as unknown as Position;
+  return { ...position } as unknown as PolicyPosition;
 }
 function floats(bytes: Uint8Array<ArrayBuffer>): Float32Array {
   if (bytes.byteOffset % 4 || bytes.byteLength % 4) throw new Error('unaligned reference tensor');
@@ -58,7 +58,7 @@ export class PolicySession {
   private ready = false;
   private busy = false;
   private disposed = false;
-  constructor(private readonly deps: Dependencies) {}
+  constructor(private readonly deps: PolicyDependencies) {}
 
   private live() { if (this.disposed) throw new DOMException('policy session cancelled', 'AbortError'); }
   private placement(): Profile {
@@ -76,7 +76,7 @@ export class PolicySession {
   async initialize(value: unknown): Promise<PolicyValidation> {
     this.live();
     if (this.busy || this.selection) throw new Error('policy session already initialized or busy; create a new Worker');
-    const selection = parseSelection(value), source = this.deps.source;
+    const selection = parsePolicySelection(value), source = this.deps.source;
     if (source.model.trained !== true || source.model.id !== selection.modelId || source.packageHash !== selection.packageHash) throw new Error('trained model identity differs from selection');
     const model = structuredClone(source.model), variant = model.variants.find(item => item.id === selection.precision);
     if (!variant) throw new Error('selected model precision is not available');
@@ -121,7 +121,7 @@ export class PolicySession {
     this.live();
     if (this.busy) throw new Error('policy session busy');
     if (!this.ready || !this.selection || !this.session) throw new Error('policy session is not ready');
-    const position = parsePosition(value), { recordJson, ...root } = position;
+    const position = parsePolicyPosition(value), { recordJson, ...root } = position;
     this.busy = true;
     try {
       const game = this.deps.game(recordJson);
