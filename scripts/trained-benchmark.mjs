@@ -17,6 +17,15 @@ export function switchPrecisions(available) {
   return Array.from({ length: 20 }, (_, i) => formats[(i + 1) % formats.length]);
 }
 
+/** Warmup is not an interaction measurement. Race completion to avoid hanging on failed requests. */
+export async function duringMeasuredRequests(repeating, waitForMeasured, interact) {
+  let done = false;
+  const completion = repeating.finally(() => { done = true; });
+  const measured = await Promise.race([completion.then(() => false), waitForMeasured().then(() => true)]);
+  if (measured) for (let attempt = 0; attempt < 20 && !done; attempt++) await interact();
+  return completion;
+}
+
 /** Serialized directly into the real page by Playwright, also tested with opaque fake Worker ports. */
 export function installPolicyBridge({ workerUrl, timeoutMs = 120000 }, scope = globalThis) {
   let worker = null, selected = null, sentFiles = false, next = 0, active = null;

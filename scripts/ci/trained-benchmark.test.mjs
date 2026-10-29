@@ -1,6 +1,30 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { fixedPositions, switchPrecisions, installPolicyBridge } from '../trained-benchmark.mjs';
+import { fixedPositions, switchPrecisions, installPolicyBridge, duringMeasuredRequests } from '../trained-benchmark.mjs';
+
+test('camera interactions start after warmup, while real measured requests remain pending', async () => {
+  let ready, finish, phase = 'warmup';
+  const gate = new Promise(resolve => { ready = resolve; });
+  const requests = new Promise(resolve => { finish = resolve; });
+  const events = [];
+  const work = duringMeasuredRequests(requests, () => gate, async () => {
+    events.push(phase); assert.equal(phase, 'measuring');
+    if (events.length === 2) finish({ samples: 30 });
+  });
+  work.catch(() => {});
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(events, []);
+  phase = 'measuring'; ready();
+  assert.deepEqual(await work, { samples: 30 });
+  assert.deepEqual(events, ['measuring', 'measuring']);
+});
+test('completed or failed requests do not hang waiting for measurement readiness', async () => {
+  let interactions = 0;
+  const never = () => new Promise(() => {});
+  assert.equal(await duringMeasuredRequests(Promise.resolve('complete'), never, async () => { interactions++; }), 'complete');
+  await assert.rejects(duringMeasuredRequests(Promise.reject(new Error('request failed')), never, async () => { interactions++; }), /request failed/);
+  assert.equal(interactions, 0);
+});
 
 test('fixed roots use replayed Rust metadata and preserve all history for each fixture', () => {
   let freed = 0;

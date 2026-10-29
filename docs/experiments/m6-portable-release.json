@@ -1,0 +1,1149 @@
+{
+  "schema": "voxelshogi-m6-portable-release-v1",
+  "recorded_at_utc": "2026-10-29T18:45:33.007269+00:00",
+  "complete_fixed_evaluations": true,
+  "complete_m6": false,
+  "training_source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da",
+  "export_source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+  "cache_sha256": "a5964be6625d6dd8fe69abffab83f33a25dda3d029a57fdbda00b3007419361e",
+  "checkpoint": {
+    "path": "model.safetensors",
+    "bytes": 20092056,
+    "sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85"
+  },
+  "protocol": {
+    "cutoff_is_draw": false,
+    "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+    "max_plies": 256,
+    "opening_plies": 8,
+    "opening_seeds": {
+      "random": [
+        7000,
+        7001,
+        7002,
+        7003,
+        7004,
+        7005,
+        7006,
+        7007,
+        7008,
+        7009,
+        7010,
+        7011,
+        7012,
+        7013,
+        7014,
+        7015,
+        7016,
+        7017,
+        7018,
+        7019
+      ],
+      "search": [
+        8000,
+        8001,
+        8002,
+        8003,
+        8004,
+        8005,
+        8006,
+        8007,
+        8008,
+        8009
+      ]
+    },
+    "opponent_seed": "100000 + opening seed",
+    "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+    "primary_win_rate": "wins / games_started",
+    "schema": "voxelshogi-evaluation-v1",
+    "search_limits": {
+      "max_depth": 2,
+      "max_nodes": 10000,
+      "table_capacity": 4096
+    },
+    "swap_model_colors": true
+  },
+  "models": {
+    "eval-baseline": {
+      "source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da",
+      "model": {
+        "artifact_sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c",
+        "backend": "torch-cuda",
+        "model_id": "voxelshogi-transformer-s-m6-initial-314159-v1",
+        "precision": "fp32",
+        "trained": false
+      },
+      "test": {
+        "examples": 3589,
+        "loss": 6.255215074531744,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 6.024297219925054,
+        "policy_top1": 0.019504040122596825,
+        "policy_top5": 0.0994706046252438,
+        "raw_legal_rate": 0.0,
+        "value_mae": 0.38006504016621395,
+        "value_mse": 0.23091785406177173
+      },
+      "matches": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 2,
+          "draws": 18,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "evaluation_sha256": "912dc93cd379b86725509a009789e13428709e87f49afcea917b22f0ff7fd092",
+      "test_sha256": "e7b67d416a8f661597a48d1e3924a360c668f675210548711e225f0572004e84"
+    },
+    "eval-torch": {
+      "source_commit": "874aed9ac28c9e50e178c2dda706941b2d3294da",
+      "model": {
+        "artifact_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+        "backend": "torch-cuda",
+        "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+        "precision": "fp32",
+        "trained": true
+      },
+      "test": {
+        "examples": 3589,
+        "loss": 0.896500653334016,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 0.8627605704138608,
+        "policy_top1": 0.7559208693229312,
+        "policy_top5": 0.9657286152131513,
+        "raw_legal_rate": 0.0016717748676511562,
+        "value_mae": 0.11377290785976957,
+        "value_mse": 0.033740082436961825
+      },
+      "matches": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 8,
+          "draws": 9,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 3,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "evaluation_sha256": "03ac2a96b06d36d31cf1c2fab38d28c2b71ad0cd60f24ac5c23f89ed968eee26",
+      "test_sha256": "f34ed1cf8ed39e440b663a2ac083965e67cae1e3c83dff044230bc1a351d2498"
+    },
+    "eval-fp32": {
+      "source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "model": {
+        "artifact_sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63",
+        "backend": "ort-cpu",
+        "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+        "precision": "fp32",
+        "trained": true
+      },
+      "test": {
+        "examples": 3589,
+        "loss": 0.8965007923772206,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 0.8627606980576618,
+        "policy_top1": 0.7559208693229312,
+        "policy_top5": 0.9657286152131513,
+        "raw_legal_rate": 0.0016717748676511562,
+        "value_mae": 0.11377295276392888,
+        "value_mse": 0.03374009548864276
+      },
+      "matches": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 8,
+          "draws": 9,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 3,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "evaluation_sha256": "fc5d307e758200c90981bf4a85240757f099e838e3c90e9db1fede29ba641ebb",
+      "test_sha256": "0368c805f068bd05463ee1ebe523635d704c43e77cf30619fdf7da175a14877f"
+    },
+    "eval-fp16": {
+      "source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "model": {
+        "artifact_sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a",
+        "backend": "ort-cpu",
+        "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+        "precision": "fp16",
+        "trained": true
+      },
+      "test": {
+        "examples": 3589,
+        "loss": 0.8964727693882655,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 0.862734472579144,
+        "policy_top1": 0.7559208693229312,
+        "policy_top5": 0.9657286152131513,
+        "raw_legal_rate": 0.0016717748676511562,
+        "value_mae": 0.11376916386373519,
+        "value_mse": 0.03373829648097337
+      },
+      "matches": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 8,
+          "draws": 9,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 3,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "evaluation_sha256": "c4544dd54a057188e5e2130be3de3c1e8feb6abcc5605bf6b5b872ac6222adc6",
+      "test_sha256": "da3760dceb7f53e46a1d01cf35902152d68ef4c730a215e70277651001eed51f"
+    },
+    "eval-int8": {
+      "source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "model": {
+        "artifact_sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9",
+        "backend": "ort-cpu",
+        "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+        "precision": "int8",
+        "trained": true
+      },
+      "test": {
+        "examples": 3589,
+        "loss": 0.8969180844450747,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 0.8632431787706326,
+        "policy_top1": 0.7553636110337141,
+        "policy_top5": 0.9657286152131513,
+        "raw_legal_rate": 0.0016717748676511562,
+        "value_mae": 0.11312834212969108,
+        "value_mse": 0.033674906470090735
+      },
+      "matches": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 7,
+          "draws": 9,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 4,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "evaluation_sha256": "02ff9dcfee6e6f5e45ce0becab2f97bcc68ff3343b0b212132c9a7c30fd290b8",
+      "test_sha256": "0dcd526fd49264239b3757c578988581755d016b6f0fd8b1d7073b20365ab7c9"
+    }
+  },
+  "variants": [
+    {
+      "id": "fp32",
+      "precision": "fp32",
+      "model": {
+        "path": "fp32.onnx",
+        "bytes": 20461391,
+        "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Concat",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/fp32/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "fe736dbe41faa1eef3feb734006934a92241d912fe2a277a4be467cac9e55194"
+          },
+          "value": {
+            "path": "reference/fp32/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "8f3629ebea8482801feef9c5815154679a36107f08cdfde744678e35e7c8cb65"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/fp32/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "28caffd0d11e425a372e531f5123d83c75b94241914167ffa93ed30f6e876602"
+          },
+          "value": {
+            "path": "reference/fp32/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "46ee13466df9db06797d1674aed680769c3c1362c1283bf10aeb7173659b95bd"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/fp32/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "66b4d3ad2546085fdfbc2ebcf1105d4e2827fed9781b889ba4298e68e625e9d2"
+          },
+          "value": {
+            "path": "reference/fp32/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "7ea33f0467017e2827347feff079e7ddcc4b916685a3b8d10794c08fd1edce43"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/fp32/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "bb3a640ddb48f7178af7fe407443ade0c76e774a38a63adb70079c0b1f7d16df"
+          },
+          "value": {
+            "path": "reference/fp32/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "646725b620a9c116f662612a021873cc88354ce79b4e1f30be2cc2e478b93c27"
+          }
+        }
+      },
+      "torchComparison": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 4.1961669921875e-05,
+            "max_relative": 0.08833909968702983,
+            "exceeded": 0,
+            "atol": 0.0001,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 3.427267074584961e-07,
+            "max_relative": 2.60133794727744e-06,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 3.4332275390625e-05,
+            "max_relative": 1.0888796545770716,
+            "exceeded": 0,
+            "atol": 0.0001,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 2.682209014892578e-07,
+            "max_relative": 1.8668076313851432e-06,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 2.6702880859375e-05,
+            "max_relative": 31.64371470564033,
+            "exceeded": 0,
+            "atol": 0.0001,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 5.960464477539063e-08,
+            "max_relative": 6.558389836594439e-08,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "max_abs": 1.9073486328125e-05,
+            "max_relative": 9.922207872109194,
+            "exceeded": 0,
+            "atol": 0.0001,
+            "rtol": 0.0001
+          },
+          "value": {
+            "elements": 1,
+            "max_abs": 1.4603137969970703e-06,
+            "max_relative": 3.760885364606707e-06,
+            "exceeded": 0,
+            "atol": 1e-05,
+            "rtol": 0.0001
+          }
+        }
+      }
+    },
+    {
+      "id": "fp16",
+      "precision": "fp16",
+      "model": {
+        "path": "fp16.onnx",
+        "bytes": 10463104,
+        "sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Cast",
+        "Concat",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "conversion": {
+        "method": "fp16-weight-only",
+        "activations": "float32",
+        "compute": "float32",
+        "convertedTensors": 31,
+        "convertedElements": 5000000
+      },
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/fp16/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "d85348a611e4355bbda12ed365e158cb66d3b080fd5bd0e4f40a0e52da39757f"
+          },
+          "value": {
+            "path": "reference/fp16/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "f27d18c30bd0d75312062780811dc758912b9cde179f11296c7bb9a63f323c61"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/fp16/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "c3ea0e287d5b19a0b4691b7486a33e504425fd7b4429d215e492fe1899806bc7"
+          },
+          "value": {
+            "path": "reference/fp16/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "7f126866de8a52ec4cab684fcfac43a68577c61f9fea9b909de0d0df0a8ef3c9"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/fp16/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "9ef1323e114631cecbf4438bf37267b9837d8e739cefc36208b1ae52c6d623f7"
+          },
+          "value": {
+            "path": "reference/fp16/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "fdf2c5a655f2217eb9e8eb97b5cc2e18e0d29c73372bc8487ae5802277e17163"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/fp16/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "0cd4f21751ef3194c27fcd932271ad0a00cf056048a19dc568d14e880964dfae"
+          },
+          "value": {
+            "path": "reference/fp16/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "c5b0cfab4723aa49b569fe3fadd76939e63d60041f3e9df1a8c351287870d537"
+          }
+        }
+      },
+      "fp32Difference": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.0050144195556640625,
+            "mae": 0.00041620711511033845,
+            "rmse": 0.0005792447774598409,
+            "maxRelative": 9.802194886981006,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 1.8104910850524902e-05,
+            "mae": 1.8104910850524902e-05,
+            "rmse": 1.8104910850524902e-05,
+            "maxRelative": 0.0001374188620790784,
+            "argmaxEqual": true
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.0039958953857421875,
+            "mae": 0.0003539439134372576,
+            "rmse": 0.000481888600154714,
+            "maxRelative": 495.36622601616926,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 4.932284355163574e-05,
+            "mae": 4.932284355163574e-05,
+            "rmse": 4.932284355163574e-05,
+            "maxRelative": 0.00034328454025851296,
+            "argmaxEqual": true
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.004436492919921875,
+            "mae": 0.0003277766443644888,
+            "rmse": 0.0004388700252202738,
+            "maxRelative": 357.4135033734473,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 7.748603820800781e-06,
+            "mae": 7.748603820800781e-06,
+            "rmse": 7.748603820800781e-06,
+            "maxRelative": 8.52590734673501e-06,
+            "argmaxEqual": true
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.0029544830322265625,
+            "mae": 0.00024265161947725788,
+            "rmse": 0.0003398641568506228,
+            "maxRelative": 86.35764182159467,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 9.894371032714844e-05,
+            "mae": 9.894371032714844e-05,
+            "rmse": 9.894371032714844e-05,
+            "maxRelative": 0.0002548182133006511,
+            "argmaxEqual": true
+          }
+        }
+      },
+      "referenceEngine": {
+        "name": "onnxruntime",
+        "version": "1.31.1",
+        "provider": "CPUExecutionProvider",
+        "graphOptimization": "all"
+      }
+    },
+    {
+      "id": "int8",
+      "precision": "int8",
+      "model": {
+        "path": "int8.onnx",
+        "bytes": 5467835,
+        "sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9"
+      },
+      "opset": 18,
+      "operators": [
+        "Add",
+        "Concat",
+        "DequantizeLinear",
+        "Div",
+        "Gemm",
+        "LayerNormalization",
+        "MatMul",
+        "Mul",
+        "Pow",
+        "ReduceMean",
+        "Reshape",
+        "Slice",
+        "Softmax",
+        "Squeeze",
+        "Tanh",
+        "Transpose"
+      ],
+      "conversion": {
+        "method": "symmetric-per-tensor-weight-only-int8",
+        "range": [
+          -127,
+          127
+        ],
+        "zeroPoint": 0,
+        "rounding": "ties-to-even",
+        "minimumScale": 1.1754943508222875e-38,
+        "activations": "float32",
+        "compute": "float32",
+        "quantizedTensors": 31,
+        "quantizedElements": 5000000
+      },
+      "references": {
+        "initial-b": {
+          "policy": {
+            "path": "reference/int8/initial-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "599d0c56bd643adefa9b6d7c6ec3686c7c39cd30a0d6c70ea423338b41b641a3"
+          },
+          "value": {
+            "path": "reference/int8/initial-b-value.f32",
+            "bytes": 4,
+            "sha256": "d7a05c28350c3547acb90de51e7d5ace373aefa830ca05599ef63ee225e80cd3"
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "path": "reference/int8/after-one-w-policy.f32",
+            "bytes": 4271940,
+            "sha256": "c68e4351d8f79dd5c7eefeaaf43d7250ccf412765c8b1543118ef45d585dcb4f"
+          },
+          "value": {
+            "path": "reference/int8/after-one-w-value.f32",
+            "bytes": 4,
+            "sha256": "5710db294a716bb4d3203c1e73a60e1c938931b96f1f8225db8ed52d110fb8c4"
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "path": "reference/int8/mate-in-one-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "e3af88c73b11b9b57718e7f30771b6fbd1aeeaff34bb87e54c7451861dff21a4"
+          },
+          "value": {
+            "path": "reference/int8/mate-in-one-b-value.f32",
+            "bytes": 4,
+            "sha256": "5ec98029ac45a12e952661fc2060d37916f6239a5be63a0497ea916bf30758be"
+          }
+        },
+        "material-b": {
+          "policy": {
+            "path": "reference/int8/material-b-policy.f32",
+            "bytes": 4271940,
+            "sha256": "dd9470ad150f886409894ca5a93371a2d897cea729e47e44516101d61937ba02"
+          },
+          "value": {
+            "path": "reference/int8/material-b-value.f32",
+            "bytes": 4,
+            "sha256": "cfa9cd54596c63cf383c158c3e5e5bf6aa3788d858f032aa978e0e228fb56ead"
+          }
+        }
+      },
+      "fp32Difference": {
+        "initial-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.4690055847167969,
+            "mae": 0.05054021479457203,
+            "rmse": 0.06324180804501736,
+            "maxRelative": 1377.6613069974271,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.0005332082509994507,
+            "mae": 0.0005332082509994507,
+            "rmse": 0.0005332082509994507,
+            "maxRelative": 0.004047126865658981,
+            "argmaxEqual": true
+          }
+        },
+        "after-one-w": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.5627584457397461,
+            "mae": 0.03298607447205663,
+            "rmse": 0.046471538491608316,
+            "maxRelative": 158410.540483675,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.0017578154802322388,
+            "mae": 0.0017578154802322388,
+            "rmse": 0.0017578154802322388,
+            "maxRelative": 0.012234308396252412,
+            "argmaxEqual": true
+          }
+        },
+        "mate-in-one-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.25942325592041016,
+            "mae": 0.028773167138998267,
+            "rmse": 0.03467177536702465,
+            "maxRelative": 68228.42978257788,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.0020709633827209473,
+            "mae": 0.0020709633827209473,
+            "rmse": 0.0020709633827209473,
+            "maxRelative": 0.0022787126981715995,
+            "argmaxEqual": true
+          }
+        },
+        "material-b": {
+          "policy": {
+            "elements": 1067985,
+            "maxAbs": 0.15360790491104126,
+            "mae": 0.016777186898586382,
+            "rmse": 0.020696436041959844,
+            "maxRelative": 22821.36766908628,
+            "argmaxEqual": true
+          },
+          "value": {
+            "elements": 1,
+            "maxAbs": 0.019259274005889893,
+            "mae": 0.019259274005889893,
+            "rmse": 0.019259274005889893,
+            "maxRelative": 0.049600058209076196,
+            "argmaxEqual": true
+          }
+        }
+      },
+      "referenceEngine": {
+        "name": "onnxruntime",
+        "version": "1.31.1",
+        "provider": "CPUExecutionProvider",
+        "graphOptimization": "basic"
+      }
+    }
+  ],
+  "publication": {
+    "plan": {
+      "schema": 1,
+      "repo_id": "voxelshogi/voxelshogi-transformer-s",
+      "repo_type": "model",
+      "private": false,
+      "gated": "manual",
+      "license": "apache-2.0",
+      "license_approved": true,
+      "source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "artifact_role": "inference-package",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "README.md",
+          "bytes": 14208,
+          "sha256": "4e83b3fc66f0611ec7d5ef090fc897232933444edcf3e2ff86343fc3c6c4b1ec"
+        },
+        {
+          "path": "evaluation.json",
+          "bytes": 16727,
+          "sha256": "03ac2a96b06d36d31cf1c2fab38d28c2b71ad0cd60f24ac5c23f89ed968eee26"
+        },
+        {
+          "path": "fp16.onnx",
+          "bytes": 10463104,
+          "sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a"
+        },
+        {
+          "path": "fp32.onnx",
+          "bytes": 20461391,
+          "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63"
+        },
+        {
+          "path": "inputs/after-one-w.f32",
+          "bytes": 125388,
+          "sha256": "fea43477b26cf5b66d8da7c9123309a2bb4a20821952e0ab47c845347135d1b6"
+        },
+        {
+          "path": "inputs/initial-b.f32",
+          "bytes": 125388,
+          "sha256": "e45e6524437c01d7ad4d61db1faded24a2b1d0aaaf814fbbbcb42aa198f0642a"
+        },
+        {
+          "path": "inputs/mate-in-one-b.f32",
+          "bytes": 125388,
+          "sha256": "c817286c328d398fe4026bc5ac9c888c6aab963fd19314d527e473e82d80c3b6"
+        },
+        {
+          "path": "inputs/material-b.f32",
+          "bytes": 125388,
+          "sha256": "9f98fdc7ba475e87e9128faeded6254a3b809ab0c96d1d7e50d80be5b8dfc5ca"
+        },
+        {
+          "path": "int8.onnx",
+          "bytes": 5467835,
+          "sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9"
+        },
+        {
+          "path": "manifest.json",
+          "bytes": 28477,
+          "sha256": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae"
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 20092056,
+          "sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85"
+        },
+        {
+          "path": "reference/fp16/after-one-w-policy.f32",
+          "bytes": 4271940,
+          "sha256": "c3ea0e287d5b19a0b4691b7486a33e504425fd7b4429d215e492fe1899806bc7"
+        },
+        {
+          "path": "reference/fp16/after-one-w-value.f32",
+          "bytes": 4,
+          "sha256": "7f126866de8a52ec4cab684fcfac43a68577c61f9fea9b909de0d0df0a8ef3c9"
+        },
+        {
+          "path": "reference/fp16/initial-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "d85348a611e4355bbda12ed365e158cb66d3b080fd5bd0e4f40a0e52da39757f"
+        },
+        {
+          "path": "reference/fp16/initial-b-value.f32",
+          "bytes": 4,
+          "sha256": "f27d18c30bd0d75312062780811dc758912b9cde179f11296c7bb9a63f323c61"
+        },
+        {
+          "path": "reference/fp16/mate-in-one-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "9ef1323e114631cecbf4438bf37267b9837d8e739cefc36208b1ae52c6d623f7"
+        },
+        {
+          "path": "reference/fp16/mate-in-one-b-value.f32",
+          "bytes": 4,
+          "sha256": "fdf2c5a655f2217eb9e8eb97b5cc2e18e0d29c73372bc8487ae5802277e17163"
+        },
+        {
+          "path": "reference/fp16/material-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "0cd4f21751ef3194c27fcd932271ad0a00cf056048a19dc568d14e880964dfae"
+        },
+        {
+          "path": "reference/fp16/material-b-value.f32",
+          "bytes": 4,
+          "sha256": "c5b0cfab4723aa49b569fe3fadd76939e63d60041f3e9df1a8c351287870d537"
+        },
+        {
+          "path": "reference/fp32/after-one-w-policy.f32",
+          "bytes": 4271940,
+          "sha256": "28caffd0d11e425a372e531f5123d83c75b94241914167ffa93ed30f6e876602"
+        },
+        {
+          "path": "reference/fp32/after-one-w-value.f32",
+          "bytes": 4,
+          "sha256": "46ee13466df9db06797d1674aed680769c3c1362c1283bf10aeb7173659b95bd"
+        },
+        {
+          "path": "reference/fp32/initial-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "fe736dbe41faa1eef3feb734006934a92241d912fe2a277a4be467cac9e55194"
+        },
+        {
+          "path": "reference/fp32/initial-b-value.f32",
+          "bytes": 4,
+          "sha256": "8f3629ebea8482801feef9c5815154679a36107f08cdfde744678e35e7c8cb65"
+        },
+        {
+          "path": "reference/fp32/mate-in-one-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "66b4d3ad2546085fdfbc2ebcf1105d4e2827fed9781b889ba4298e68e625e9d2"
+        },
+        {
+          "path": "reference/fp32/mate-in-one-b-value.f32",
+          "bytes": 4,
+          "sha256": "7ea33f0467017e2827347feff079e7ddcc4b916685a3b8d10794c08fd1edce43"
+        },
+        {
+          "path": "reference/fp32/material-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "bb3a640ddb48f7178af7fe407443ade0c76e774a38a63adb70079c0b1f7d16df"
+        },
+        {
+          "path": "reference/fp32/material-b-value.f32",
+          "bytes": 4,
+          "sha256": "646725b620a9c116f662612a021873cc88354ce79b4e1f30be2cc2e478b93c27"
+        },
+        {
+          "path": "reference/int8/after-one-w-policy.f32",
+          "bytes": 4271940,
+          "sha256": "c68e4351d8f79dd5c7eefeaaf43d7250ccf412765c8b1543118ef45d585dcb4f"
+        },
+        {
+          "path": "reference/int8/after-one-w-value.f32",
+          "bytes": 4,
+          "sha256": "5710db294a716bb4d3203c1e73a60e1c938931b96f1f8225db8ed52d110fb8c4"
+        },
+        {
+          "path": "reference/int8/initial-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "599d0c56bd643adefa9b6d7c6ec3686c7c39cd30a0d6c70ea423338b41b641a3"
+        },
+        {
+          "path": "reference/int8/initial-b-value.f32",
+          "bytes": 4,
+          "sha256": "d7a05c28350c3547acb90de51e7d5ace373aefa830ca05599ef63ee225e80cd3"
+        },
+        {
+          "path": "reference/int8/mate-in-one-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "e3af88c73b11b9b57718e7f30771b6fbd1aeeaff34bb87e54c7451861dff21a4"
+        },
+        {
+          "path": "reference/int8/mate-in-one-b-value.f32",
+          "bytes": 4,
+          "sha256": "5ec98029ac45a12e952661fc2060d37916f6239a5be63a0497ea916bf30758be"
+        },
+        {
+          "path": "reference/int8/material-b-policy.f32",
+          "bytes": 4271940,
+          "sha256": "dd9470ad150f886409894ca5a93371a2d897cea729e47e44516101d61937ba02"
+        },
+        {
+          "path": "reference/int8/material-b-value.f32",
+          "bytes": 4,
+          "sha256": "cfa9cd54596c63cf383c158c3e5e5bf6aa3788d858f032aa978e0e228fb56ead"
+        },
+        {
+          "path": "test.json",
+          "bytes": 379,
+          "sha256": "f34ed1cf8ed39e440b663a2ac083965e67cae1e3c83dff044230bc1a351d2498"
+        }
+      ]
+    },
+    "receipt": {
+      "dry_run": false,
+      "release_sha256": "4b3c4a136eaa96dc57d52aca31cf1cfb36fac09cdd958b73e8e45e089834b187",
+      "verified": true,
+      "hub_commit": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+      "repo_id": "voxelshogi/voxelshogi-transformer-s",
+      "repo_type": "model",
+      "community_disabled": true
+    },
+    "catalog": {
+      "schema": 1,
+      "releases": [
+        {
+          "approved": true,
+          "id": "voxelshogi-transformer-s-m6-314159-v1",
+          "license": "Apache-2.0",
+          "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+          "repo": "voxelshogi/voxelshogi-transformer-s",
+          "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+          "manifest": {
+            "path": "manifest.json",
+            "bytes": 28477,
+            "sha256": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae"
+          },
+          "notices": [
+            {
+              "path": "README.md",
+              "bytes": 14208,
+              "sha256": "4e83b3fc66f0611ec7d5ef090fc897232933444edcf3e2ff86343fc3c6c4b1ec"
+            },
+            {
+              "path": "LICENSE",
+              "bytes": 11358,
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "measurement_helper": {
+    "provenance": {
+      "helper_commit": "f279649cc95ab76ae88ab86371a5f53c3552b991",
+      "export_source": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "application_source": "47d27b32dbf5bf21a3ea5eb99d59529e7b5955c1",
+      "ci_at_start": "pending; external integration validation, not accepted until CI success",
+      "files": {
+        "scripts/measure-trained-models.mjs": "6408811491c436eb188fcd1d119e70024a597f3625cdc9b5bb4b474b1e6ceb31",
+        "scripts/trained-benchmark.mjs": "809893f5168a0948c5fa3eb7021b969a8d2d4a61c504a434d9096eb02634c586",
+        "scripts/trained-browser-evidence.mjs": "e8d61e5ae6508d021afa4c31fd7cffb7f048ef49d2164a26ac53c375da2d20ce",
+        "apps/web/src/wasm/pkg/voxelshogi_wasm_bg.wasm": "3f624733ccd8764a8137e87fb006b82e68d44d4d425038f4726d589d8a3f8475"
+      }
+    },
+    "ci": {
+      "head": "f279649cc95ab76ae88ab86371a5f53c3552b991",
+      "all_required_and_related_success": true,
+      "checked_at_utc": "2026-10-29T18:44:27Z",
+      "runs": {
+        "CI": 40931543795,
+        "Quality measurements": 40931543435,
+        "Security": 40931543707
+      },
+      "required_count": 8
+    }
+  },
+  "candidate_browser": {
+    "sha256": "7199ff1d6a699dca26e6a8ffc4c8a550d07ce4bc50fd132ccb21100f069d2a2d",
+    "application_commit": "47d27b32dbf5bf21a3ea5eb99d59529e7b5955c1",
+    "model": {
+      "id": "voxelshogi-transformer-s-m6-314159-v1",
+      "trained": true,
+      "numericContract": "voxelshogi-trained-numeric-v1",
+      "packageHash": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae",
+      "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+      "revision": "066b9ad6819ada11f6f399a2df3e85d9c7c5506d",
+      "variants": [
+        {
+          "precision": "fp32",
+          "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63",
+          "bytes": 20461391
+        },
+        {
+          "precision": "fp16",
+          "sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a",
+          "bytes": 10463104,
+          "fp16WeightOnly": true
+        },
+        {
+          "precision": "int8",
+          "sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9",
+          "bytes": 5467835
+        }
+      ]
+    },
+    "summary": {
+      "successfulCases": 48,
+      "unsupportedCases": 0,
+      "actualSwitches": 40
+    },
+    "final_public_catalog_proof": false
+  },
+  "historical_failures": [
+    "m6-initial-main-results.json",
+    "m6-fp16-portability-diagnosis.json"
+  ],
+  "pending": [
+    "CI and publication of catalog",
+    "noncandidate physical48-condition/40-switch validation",
+    "three actual GPU Arena formats and7 WASM Arena/driver tests",
+    "resource teardown and final documentation CI"
+  ],
+  "candidate_arena": {
+    "complete": true,
+    "candidate": true,
+    "catalog_interception": true,
+    "application_commit": "47d27b32dbf5bf21a3ea5eb99d59529e7b5955c1",
+    "fixture_revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+    "stats": {
+      "startTime": "2026-10-29T18:46:05.954Z",
+      "duration": 58606.636999999995,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "raw_report_sha256": "d2fc81cd18592b67cbda2a4dcb2a6f0e0fa32a6b8c20f42c811ea7329008b3be"
+  }
+}
