@@ -12,11 +12,11 @@ const fixture = resolve('../../runs/m6/browser-fixture');
 const catalog = JSON.parse(readFileSync(resolve(fixture, 'catalog.json'), 'utf8')) as { releases: { id: string; manifest: { sha256: string } }[] };
 loadWasm();
 test.afterEach(async ({ page }, info) => {
-  if (info.status !== info.expectedStatus) console.info('Arena model failure:', JSON.stringify({
-    status: await page.getByTestId('status').textContent().catch(() => null),
-    phase: await page.getByTestId('ai-phase').textContent().catch(() => null),
-    error: await page.getByTestId('ai-error').textContent().catch(() => null),
-  }));
+  if (info.status !== info.expectedStatus) console.info('Arena model failure:', JSON.stringify(await page.evaluate(() => ({
+    status: document.querySelector('[data-testid="status"]')?.textContent ?? null,
+    phase: document.querySelector('[data-testid="ai-phase"]')?.textContent ?? null,
+    error: document.querySelector('[data-testid="ai-error"]')?.textContent ?? null,
+  })).catch(() => ({ pageClosed: true }))));
 });
 async function prepare(page: Page, context: BrowserContext, folder = 'model') {
   await context.route('**/models/m6/catalog.json', route => route.fulfill({ json: catalog }));
@@ -75,7 +75,8 @@ for (const [black, white] of [['fp32', 'fp16'], ['fp16', 'int8'], ['int8', 'fp32
     if (black === 'fp32') {
       await page.getByTestId('move-delay').fill('50');
       await page.getByTestId('toggle-run').click();
-      await expect.poll(() => page.getByTestId('move-list').locator('li').count(), { timeout: 60_000 }).toBeGreaterThanOrEqual(4);
+      // The list also includes one row for the initial position.
+      await expect.poll(() => page.getByTestId('move-list').locator('li').count(), { timeout: 60_000 }).toBeGreaterThanOrEqual(5);
       await page.getByTestId('toggle-run').click();
       await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
       const automatic = await saved(page);
