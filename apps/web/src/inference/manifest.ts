@@ -7,7 +7,7 @@ export interface ModelFixture { name: string; side: 'b' | 'w'; record: Record<st
 export interface Difference { elements: number; maxAbs: number; mae: number; rmse: number; maxRelative: number; argmaxEqual: boolean }
 export interface Variant { id: Precision; precision: Precision; model: FileRef; references: Record<string, { policy: FileRef; value: FileRef }>; fp32Difference?: Record<string, { policy: Difference; value: Difference }> }
 export interface ModelManifest {
-  schema: 1; id: string; trained: false; license: string | null; inputSchema: string; ruleset: string;
+  schema: 1; id: string; trained: boolean; license: string | null; inputSchema: string; ruleset: string;
   seed: number; parameters: number; fixtures: ModelFixture[]; variants: Variant[];
 }
 export interface RuntimeManifest { version: string; bundle: FileRef; bootstrap: FileRef; wasm: FileRef & { parts: FileRef[] }; notices: FileRef[] }
@@ -33,9 +33,13 @@ function shape(value: unknown, expected: number[]) {
 }
 
 export function parseModel(value: unknown, publication = true): ModelManifest {
+  return parseModelData(value, false, publication ? 'Apache-2.0' : null);
+}
+
+function parseModelData(value: unknown, trained: boolean, approvedLicense: string | null): ModelManifest {
   const m = record(value);
-  if (m.schema !== 1 || m.inputSchema !== 'voxelshogi-standard-features-v1' || m.ruleset !== 'voxelshogi-standard-v1' || m.trained !== false || typeof m.id !== 'string' || !/^[a-zA-Z0-9._-]{1,128}$/.test(m.id)) throw new Error('unsupported model manifest');
-  if (publication && m.license !== 'Apache-2.0') throw new Error('model publication license is not approved');
+  if (m.schema !== 1 || m.inputSchema !== 'voxelshogi-standard-features-v1' || m.ruleset !== 'voxelshogi-standard-v1' || m.trained !== trained || typeof m.id !== 'string' || !/^[a-zA-Z0-9._-]{1,128}$/.test(m.id)) throw new Error('unsupported model manifest');
+  if (approvedLicense !== null && m.license !== approvedLicense) throw new Error('model publication license is not approved');
   if (typeof m.parameters !== 'number' || !Number.isSafeInteger(m.parameters) || m.parameters < 5_000_000 || m.parameters > 10_000_000 || typeof m.seed !== 'number' || !Number.isSafeInteger(m.seed)) throw new Error('invalid model size/seed');
   shape(record(m.inputs).features, [1, 729, 43]);
   shape(record(m.outputs).policy, [1, POLICY_ELEMENTS]); shape(record(m.outputs).value, [1, 1]);
@@ -68,6 +72,22 @@ export function parseModel(value: unknown, publication = true): ModelManifest {
   });
   if (new Set(variants.map((v) => v.id)).size !== variants.length) throw new Error('duplicate model variant');
   return { ...m, fixtures, variants } as unknown as ModelManifest;
+}
+
+export interface TrainedIdentity { id: string; license: string; sourceCommit: string }
+
+/** The catalog pins the full manifest; Python validates the full training contract before publication. */
+export function parseTrainedModel(value: unknown, identity: TrainedIdentity): ModelManifest {
+  if (!identity.license || !/^[0-9a-f]{40}$/.test(identity.sourceCommit)) throw new Error('invalid trained identity');
+  const parsed = parseModelData(value, true, identity.license), m = record(value);
+  if (parsed.id !== identity.id || m.sourceCommit !== identity.sourceCommit || m.sourceDirty !== false || parsed.seed !== 314159 || parsed.parameters !== 5_021_064) throw new Error('trained model identity differs from the reviewed release');
+  const training = record(m.training), binding = record(training.binding), receipt = record(training.receipt), progress = record(receipt.progress);
+  const checkpoint = file(m.checkpoint), counts = record(training.teacher_splits);
+  if (binding.source_commit !== identity.sourceCommit || receipt.verified !== true || training.evaluated_weights_sha256 !== checkpoint.sha256 || training.evaluation_game_count !== 60 ||
+    ['evaluation_report_sha256', 'test_report_sha256'].some(key => typeof training[key] !== 'string' || !/^[0-9a-f]{64}$/.test(training[key])) ||
+    Object.keys(counts).length !== 3 || ['train', 'val', 'test'].some(key => typeof counts[key] !== 'number' || !Number.isSafeInteger(counts[key]) || counts[key] <= 0) || Object.values(counts).reduce<number>((sum, n) => sum + Number(n), 0) !== 36894 ||
+    typeof progress.epoch !== 'number' || !Number.isSafeInteger(progress.epoch) || progress.epoch < 1 || progress.next_batch !== 0 || typeof progress.best_val_loss !== 'number' || !Number.isFinite(progress.best_val_loss) || progress.best_val_loss < 0) throw new Error('incomplete trained evaluation provenance');
+  return parsed;
 }
 
 export function parseDeployment(value: unknown, allowLocal = false): Deployment {

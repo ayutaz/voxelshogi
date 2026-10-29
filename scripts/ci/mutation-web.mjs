@@ -15,6 +15,15 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'local-model-approval', file: 'inference/local-model.ts', before: 'if (release.approved !== true)', after: 'if (false)', test: 'local-model' },
+  { name: 'local-model-descriptor-snapshot', file: 'inference/local-model.ts', before: 'known.set(file.path, { ...file });', after: 'known.set(file.path, file);', test: 'local-model' },
+  { name: 'local-model-unlisted-file', file: 'inference/local-model.ts', before: 'const expected = known.get(file.path);', after: 'const expected = file;', test: 'local-model' },
+  { name: 'local-model-notice-hash', file: 'inference/local-model.ts', before: 'await Promise.all(release.notices.map(file => folder.read(file, signal)));', after: '', test: 'local-model' },
+  { name: 'local-model-directory-limit', file: 'inference/local-model.ts', before: 'if (total > MAX_FOLDER)', after: 'if (false)', test: 'local-model' },
+  { name: 'local-model-abort-before-read', file: 'inference/local-model.ts', before: 'signal?.throwIfAborted();\n    has(file);', after: 'has(file);', test: 'local-model' },
+  { name: 'trained-model-cohort', file: 'inference/manifest.ts', before: 'training.evaluation_game_count !== 60', after: 'false', test: 'trained-manifest' },
+  { name: 'trained-model-selected-epoch', file: 'inference/manifest.ts', before: 'progress.epoch < 1', after: 'false', test: 'trained-manifest' },
+  { name: 'trained-model-m3-scope', file: 'inference/manifest.ts', before: 'm.trained !== trained', after: 'false', test: 'trained-manifest' },
   { name: 'worker-port-origin', file: 'ai/search.worker.ts', before: "if (event.origin !== '') return;", after: '', test: 'search-worker' },
   { name: 'worker-terminate', file: 'ai/search-client.ts', before: 'w.terminate();', after: '', test: 'search-client' },
   { name: 'worker-stale-callback', file: 'ai/search-client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'search-client' },
@@ -110,7 +119,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 50);
+    assert.equal(results.length, 59);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

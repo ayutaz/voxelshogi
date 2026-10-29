@@ -14,7 +14,7 @@ function checkRef(file: FileRef) {
   }
 }
 
-async function verify(data: Uint8Array<ArrayBuffer>, file: FileRef) {
+export async function verifyBytes(data: Uint8Array<ArrayBuffer>, file: FileRef) {
   checkRef(file);
   if (data.byteLength !== file.bytes) throw new Error('asset byte length mismatch');
   const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', data))].map((n) => n.toString(16).padStart(2, '0')).join('');
@@ -45,7 +45,7 @@ export async function fetchVerified(url: string, file: FileRef, signal?: AbortSi
   const bytes = new Uint8Array(size);
   let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
-  return verify(bytes, file);
+  return verifyBytes(bytes, file);
 }
 
 export async function joinVerifiedParts(parts: readonly Uint8Array[], file: FileRef): Promise<Uint8Array<ArrayBuffer>> {
@@ -54,5 +54,5 @@ export async function joinVerifiedParts(parts: readonly Uint8Array[], file: File
   const bytes = new Uint8Array(file.bytes);
   let offset = 0;
   for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
-  return verify(bytes, file);
+  return verifyBytes(bytes, file);
 }
