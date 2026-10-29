@@ -12,6 +12,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "cuda-resume-floating-drift",
+        "training/cuda_trial.py",
+        'raise ValueError(f"resume floating tensors differ: {path}")',
+        "pass",
+        "test_cuda_trial.py",
+    ),
+    (
+        "cuda-resume-counter",
+        "training/cuda_trial.py",
+        'or (path and path[-1] == "step")',
+        "or False",
+        "test_cuda_trial.py",
+    ),
+    (
+        "cuda-compiled-architecture",
+        "training/cuda_preflight.py",
+        'or "sm_120" not in facts["compiled_arches"]',
+        "or False",
+        "test_cuda_preflight.py",
+    ),
+    (
+        "cuda-driver-minimum",
+        "training/cuda_preflight.py",
+        'or int(facts["driver"].split(".")[0]) < 580',
+        "or False",
+        "test_cuda_preflight.py",
+    ),
+    (
+        "cuda-available",
+        "training/cuda_preflight.py",
+        'or facts["cuda_available"] is not True',
+        "or False",
+        "test_cuda_preflight.py",
+    ),
+    (
+        "cuda-lock-source",
+        "training/cuda_preflight.py",
+        'raise ValueError(\n            "CUDA lock/source differs from pinned CPU-compatible environment"\n        )',
+        "pass",
+        "test_cuda_lock.py",
+    ),
+    (
+        "cuda-kernel-gradient",
+        "training/cuda_preflight.py",
+        "product.sum().backward()",
+        "(2 * product.sum()).backward()",
+        "test_cuda_kernel.py",
+    ),
+    (
         "checkpoint-optimizer",
         "training/checkpoint.py",
         'optimizer.load_state_dict(state["optimizer"])',
@@ -648,11 +697,11 @@ def main():
         work = Path(tmp)
         for name in ("pyproject.toml", "uv.lock", ".python-version", ".gitignore"):
             shutil.copy2(ROOT / name, work / name)
-        for name in ("training", "export", "crates"):
+        for name in ("training", "export", "crates", "infrastructure"):
             shutil.copytree(
                 ROOT / name,
                 work / name,
-                ignore=shutil.ignore_patterns("target", "pkg", "__pycache__"),
+                ignore=shutil.ignore_patterns("target", "pkg", "__pycache__", ".venv"),
             )
         (work / "scripts/ci").mkdir(parents=True)
         shutil.copy2(Path(__file__), work / "scripts/ci/mutation-training.py")

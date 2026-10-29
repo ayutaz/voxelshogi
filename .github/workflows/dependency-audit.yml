@@ -34,3 +34,5 @@ jobs:
           version: '0.11.23'
           enable-cache: false
       - run: uv audit --locked
+      - name: Audit external CUDA dependencies without installing them
+        run: uv audit --project infrastructure/cuda --locked

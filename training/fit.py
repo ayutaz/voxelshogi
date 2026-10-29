@@ -90,6 +90,9 @@ def runtime_environment(config):
     if config.device == "cuda":
         if not torch.cuda.is_available():
             raise ValueError("CUDA requested but unavailable; do not fall back to CPU")
+        environment["cuda_lock_sha256"] = file_hash(
+            ROOT / "infrastructure/cuda/uv.lock"
+        )
         environment.update(
             cuda=torch.version.cuda,
             cudnn=torch.backends.cudnn.version(),

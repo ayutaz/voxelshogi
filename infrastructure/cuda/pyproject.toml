@@ -1,0 +1,41 @@
+[project]
+name = "voxelshogi-cuda"
+version = "0.1.0"
+description = "External Linux CUDA environment for VoxelShogi M6"
+requires-python = ">=3.14,<3.15"
+license = "Apache-2.0"
+dependencies = [
+    "huggingface-hub==2.3.0",
+    "numpy==2.5.4",
+    "onnx==1.23.2",
+    "onnxconverter-common==1.16.0",
+    "onnxruntime==1.31.1",
+    "onnxscript==0.7.2",
+    "psutil==7.2.2",
+    "pyarrow==26.0.0",
+    "safetensors==0.8.0",
+    "torch==2.14.1",
+    "voxelshogi",
+]
+
+[tool.uv]
+package = false
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.workspace]
+members = []
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+voxelshogi = { path = "../../crates/voxelshogi-python", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.17.3",
+]

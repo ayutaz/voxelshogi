@@ -119,6 +119,8 @@ jobs:
           version: '0.11.23'
           enable-cache: true
       - run: uv sync --locked
+      - name: Validate external CUDA lock without installing GPU packages
+        run: uv lock --project infrastructure/cuda --check
       - run: uv run --locked ruff check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
       - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py
       - run: uv run --locked pytest -q
