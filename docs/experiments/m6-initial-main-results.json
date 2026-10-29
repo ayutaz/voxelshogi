@@ -1,0 +1,488 @@
+{
+  "schema": "voxelshogi-m6-initial-main-evidence-v1",
+  "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+  "initial": {
+    "cache_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+    "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+    "test_used": false,
+    "train_probe": {
+      "examples": 2048,
+      "loss": 6.289685341529548,
+      "ordered_ids_sha256": "eadba8d6d93b6edaa4579e6ae9f1f36afef93cf4dfc72bb4605f919bb231810a",
+      "policy_loss": 6.042254260741174,
+      "split": "train",
+      "value_mse": 0.24743106867026654
+    },
+    "val": {
+      "examples": 3421,
+      "loss": 6.199511940316895,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 6.000658970135619,
+      "policy_top1": 0.013446360713241743,
+      "policy_top5": 0.08798596901490792,
+      "raw_legal_rate": 0.0,
+      "value_mae": 0.3540873688342661,
+      "value_mse": 0.19885296361219792
+    },
+    "weights": {
+      "bytes": 20092056,
+      "path": "student.safetensors",
+      "sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c"
+    }
+  },
+  "selected": {
+    "best_checkpoint": {
+      "binding": {
+        "cache_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+        "config": {
+          "batch_size": 4,
+          "device": "cuda",
+          "epochs": 3,
+          "learning_rate": 0.0003,
+          "optimizer": {
+            "betas": [
+              0.9,
+              0.999
+            ],
+            "eps": 1e-08,
+            "foreach": false,
+            "fused": false,
+            "name": "AdamW"
+          },
+          "precision": "float32",
+          "save_every": 100,
+          "seed": 314159,
+          "selection_split": "val",
+          "threads": 3,
+          "weight_decay": 0.01
+        },
+        "contract": {
+          "config": "production-64",
+          "evaluation": {
+            "cutoff_is_draw": false,
+            "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+            "max_plies": 256,
+            "opening_plies": 8,
+            "opening_seeds": {
+              "random": [
+                7000,
+                7001,
+                7002,
+                7003,
+                7004,
+                7005,
+                7006,
+                7007,
+                7008,
+                7009,
+                7010,
+                7011,
+                7012,
+                7013,
+                7014,
+                7015,
+                7016,
+                7017,
+                7018,
+                7019
+              ],
+              "search": [
+                8000,
+                8001,
+                8002,
+                8003,
+                8004,
+                8005,
+                8006,
+                8007,
+                8008,
+                8009
+              ]
+            },
+            "opponent_seed": "100000 + opening seed",
+            "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+            "primary_win_rate": "wins / games_started",
+            "schema": "voxelshogi-evaluation-v1",
+            "search_limits": {
+              "max_depth": 2,
+              "max_nodes": 10000,
+              "table_capacity": 4096
+            },
+            "swap_model_colors": true
+          },
+          "features": "voxelshogi-standard-features-v1",
+          "loss_policy": "mean cross entropy over engine-supplied legal actions",
+          "loss_value": "mean squared error",
+          "loss_value_weight": 1,
+          "mate_score": 1000000,
+          "policy_actions": 1067985,
+          "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+          "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+          "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+          "ruleset_id": "voxelshogi-standard-v1",
+          "schema": "voxelshogi-supervision-v1",
+          "selection_split": "val",
+          "test_role": "final selected checkpoint and predeclared conversion comparison only",
+          "training_seed": 314159,
+          "value_scale": 1000,
+          "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+        },
+        "environment": {
+          "capability": [
+            12,
+            0
+          ],
+          "cuda": "13.0",
+          "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+          "cudnn": 92400,
+          "deterministic": true,
+          "device": "cuda",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+          "machine": "x86_64",
+          "python": "3.14.9",
+          "tf32": false,
+          "torch": "2.14.1+cu130"
+        },
+        "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb"
+      },
+      "bytes": 60371971,
+      "progress": {
+        "best_val_loss": 0.8743949341787136,
+        "epoch": 3,
+        "examples": 89652,
+        "next_batch": 0,
+        "step": 22413
+      },
+      "schema": "voxelshogi-checkpoint-v1",
+      "sha256": "edda9b77e99584f22d51e8ed0794a5b26e99ece528816cad12f459116edf002a",
+      "step": 22413,
+      "verified": true
+    },
+    "cache_sha256": "b0fcf5a114dcf54410c7d40f360ed28cad33ad22dd6328d8ae016b8ab373c6df",
+    "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+    "test_used": false,
+    "train_probe": {
+      "examples": 2048,
+      "loss": 0.789803011252161,
+      "ordered_ids_sha256": "eadba8d6d93b6edaa4579e6ae9f1f36afef93cf4dfc72bb4605f919bb231810a",
+      "policy_loss": 0.7545845371174096,
+      "split": "train",
+      "value_mse": 0.03521847129047728
+    },
+    "val": {
+      "examples": 3421,
+      "loss": 0.8743949341787136,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 0.8477765907151756,
+      "policy_top1": 0.7760888629055832,
+      "policy_top5": 0.9634609763227127,
+      "raw_legal_rate": 0.0,
+      "value_mae": 0.10713934788174952,
+      "value_mse": 0.026618343994825332
+    }
+  },
+  "partial": {
+    "elapsed_seconds": 20.763812400000006,
+    "new_steps": 1000,
+    "progress": {
+      "best_val_loss": null,
+      "epoch": 0,
+      "examples": 4000,
+      "next_batch": 1000,
+      "step": 1000
+    },
+    "reason": "max_steps"
+  },
+  "resumed": {
+    "elapsed_seconds": 440.09417633699996,
+    "new_steps": 21413,
+    "progress": {
+      "best_val_loss": 0.8743949341787136,
+      "epoch": 3,
+      "examples": 89652,
+      "next_batch": 0,
+      "step": 22413
+    },
+    "reason": "complete"
+  },
+  "baseline": {
+    "model": {
+      "artifact_sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c",
+      "backend": "torch-cuda",
+      "model_id": "voxelshogi-transformer-s-m6-initial-314159-v1",
+      "precision": "fp32",
+      "trained": false
+    },
+    "test": {
+      "input_sha256": "e80e8513ded4d665569cadb529a5f8a8f56387dd323711d05c357ca603787361",
+      "metrics": {
+        "examples": 3589,
+        "loss": 6.255215074531744,
+        "masked_legal_rate": 1.0,
+        "policy_loss": 6.024297219925054,
+        "policy_top1": 0.019504040122596825,
+        "policy_top5": 0.0994706046252438,
+        "raw_legal_rate": 0.0,
+        "value_mae": 0.38006504016621395,
+        "value_mse": 0.23091785406177173
+      },
+      "split": "test"
+    },
+    "matches": {
+      "cohorts": {
+        "random": {
+          "cutoffs": 40,
+          "draws": 0,
+          "games_started": 40,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 20,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "search": {
+          "cutoffs": 2,
+          "draws": 18,
+          "games_started": 20,
+          "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+          "losses": 0,
+          "paired_bootstrap95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 10,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "complete": true,
+      "model": {
+        "artifact_sha256": "88a2174b0b355303b2146c5a57ec1a11d41ce0b673ec3837c38d815d737ea98c",
+        "backend": "torch-cuda",
+        "model_id": "voxelshogi-transformer-s-m6-initial-314159-v1",
+        "precision": "fp32",
+        "trained": false
+      },
+      "production_profile": true,
+      "protocol": {
+        "cutoff_is_draw": false,
+        "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+        "max_plies": 256,
+        "opening_plies": 8,
+        "opening_seeds": {
+          "random": [
+            7000,
+            7001,
+            7002,
+            7003,
+            7004,
+            7005,
+            7006,
+            7007,
+            7008,
+            7009,
+            7010,
+            7011,
+            7012,
+            7013,
+            7014,
+            7015,
+            7016,
+            7017,
+            7018,
+            7019
+          ],
+          "search": [
+            8000,
+            8001,
+            8002,
+            8003,
+            8004,
+            8005,
+            8006,
+            8007,
+            8008,
+            8009
+          ]
+        },
+        "opponent_seed": "100000 + opening seed",
+        "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+        "primary_win_rate": "wins / games_started",
+        "schema": "voxelshogi-evaluation-v1",
+        "search_limits": {
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "table_capacity": 4096
+        },
+        "swap_model_colors": true
+      },
+      "schema": "voxelshogi-match-run-v1",
+      "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb"
+    }
+  },
+  "trained": {
+    "cohorts": {
+      "random": {
+        "cutoffs": 40,
+        "draws": 0,
+        "games_started": 40,
+        "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+        "losses": 0,
+        "paired_bootstrap95": [
+          0.0,
+          0.0
+        ],
+        "pairs": 20,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "search": {
+        "cutoffs": 8,
+        "draws": 9,
+        "games_started": 20,
+        "interval_method": "opening-pair bootstrap; 10000 resamples; seed314159; order statistics 250/9750",
+        "losses": 3,
+        "paired_bootstrap95": [
+          0.0,
+          0.0
+        ],
+        "pairs": 10,
+        "win_rate": 0.0,
+        "wins": 0
+      }
+    },
+    "complete": true,
+    "evaluation_sha256": "4c5112c374811920939da2aecb1cfef071b810acab5d6d5d2a17172846aa3b41",
+    "model": {
+      "artifact_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+      "backend": "torch-cuda",
+      "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+      "precision": "fp32",
+      "trained": true
+    },
+    "source_commit": "d98cc4923625910bba68b28f1071742bbb06a2eb",
+    "test": {
+      "examples": 3589,
+      "loss": 0.896500653334016,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 0.8627605704138608,
+      "policy_top1": 0.7559208693229312,
+      "policy_top5": 0.9657286152131513,
+      "raw_legal_rate": 0.0016717748676511562,
+      "value_mae": 0.11377290785976957,
+      "value_mse": 0.033740082436961825
+    }
+  },
+  "state_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "bd8b39ecf8fcc476a389f49d25c8eb1ad120deec",
+    "release_sha256": "0fbfb70b29479668d9b640306c3673870a866ec3d3277f43a4fa005ebc7ab808",
+    "repo_id": "voxelshogi/voxelshogi-transformer-s-training-state",
+    "repo_type": "model",
+    "verified": true
+  },
+  "state_restore": {
+    "all_file_hashes_verified": true,
+    "comparisons": {
+      "best": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      },
+      "latest": {
+        "model": {
+          "floating_values": 5021064,
+          "maximum_absolute_error": 0.0
+        },
+        "optimizer": {
+          "floating_values": 10042128,
+          "maximum_absolute_error": 0.0
+        },
+        "rng": {
+          "floating_values": 0,
+          "maximum_absolute_error": 0.0
+        }
+      }
+    },
+    "completed_training": true,
+    "hub_commit": "bd8b39ecf8fcc476a389f49d25c8eb1ad120deec",
+    "new_run_restore": true,
+    "test_used": false,
+    "verified": true
+  },
+  "original_report_sha256": {
+    "learning-summary.json": "33b92b8215563b929a51a81ccb151773f4556909c5405f58b53593804cae3bbb",
+    "eval-baseline/evaluation.json": "6a449726d99468190f511e6148f50765fe92db6a9bc4efa1986df74c4d80eb3e",
+    "eval-torch/evaluation.json": "1bf179b374a7b97bcf677fe005b51de0c211ea19ae217780e08f0ad0dcb6725c",
+    "numeric-probe.json": "ac70770e126c70d66668c1d3a9eece2abbce1decb827f9d0eda277a95403f051"
+  },
+  "conversion_complete": false,
+  "inference_published": false,
+  "browser_measured": false,
+  "resources_released": true,
+  "epoch_validation": [
+    {
+      "attempt": "7156d487b00445bcba2f74762055bac3",
+      "elapsed_seconds": 133.12149669900003,
+      "epoch": 0,
+      "event": "validation",
+      "examples": 3421,
+      "loss": 1.4424537953138525,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 1.3489172425021976,
+      "policy_top1": 0.6816720257234726,
+      "policy_top5": 0.9096755334697457,
+      "raw_legal_rate": 0.0,
+      "step": 7471,
+      "value_mae": 0.17046576667031466,
+      "value_mse": 0.09353655591820613
+    },
+    {
+      "attempt": "7156d487b00445bcba2f74762055bac3",
+      "elapsed_seconds": 288.763795849,
+      "epoch": 1,
+      "event": "validation",
+      "examples": 3421,
+      "loss": 1.0729943992339595,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 1.0263884510219123,
+      "policy_top1": 0.7392575270388775,
+      "policy_top5": 0.9497223034200526,
+      "raw_legal_rate": 0.0,
+      "step": 14942,
+      "value_mae": 0.10557679978009554,
+      "value_mse": 0.04660595074362083
+    },
+    {
+      "attempt": "7156d487b00445bcba2f74762055bac3",
+      "elapsed_seconds": 439.939537883,
+      "epoch": 2,
+      "event": "validation",
+      "examples": 3421,
+      "loss": 0.8743949341787136,
+      "masked_legal_rate": 1.0,
+      "policy_loss": 0.8477765907151756,
+      "policy_top1": 0.7760888629055832,
+      "policy_top5": 0.9634609763227127,
+      "raw_legal_rate": 0.0,
+      "step": 22413,
+      "value_mae": 0.10713934788174952,
+      "value_mse": 0.026618343994825332
+    }
+  ]
+}

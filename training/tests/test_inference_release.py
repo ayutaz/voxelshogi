@@ -35,6 +35,7 @@ def package(folder):
     manifest = {
         "schema": 1,
         "trained": True,
+        "numericContract": "voxelshogi-trained-numeric-v1",
         "id": review["model_id"],
         "license": "Apache-2.0",
         "seed": 314159,

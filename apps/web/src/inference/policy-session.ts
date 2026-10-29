@@ -4,6 +4,7 @@ import { compare, type Comparison } from './engine';
 import type { LocalModel } from './local-model';
 import { POLICY_ELEMENTS, type Backend, type Precision } from './manifest';
 import { encodePosition, selectPolicyMove, type PolicyChoice } from './policy-contract';
+import { TRAINED_NUMERIC_CONTRACT } from './numeric';
 
 export interface PolicySelection { modelId: string; packageHash: string; precision: Precision; backend: Backend }
 export interface PolicyRoot { revision: number; cursor: number; side: Color; hash: string; ruleset: string }
@@ -78,6 +79,7 @@ export class PolicySession {
     if (this.busy || this.selection) throw new Error('policy session already initialized or busy; create a new Worker');
     const selection = parsePolicySelection(value), source = this.deps.source;
     if (source.model.trained !== true || source.model.id !== selection.modelId || source.packageHash !== selection.packageHash) throw new Error('trained model identity differs from selection');
+    if (source.model.numericContract !== TRAINED_NUMERIC_CONTRACT) throw new Error('unsupported trained numeric contract');
     const model = structuredClone(source.model), variant = model.variants.find(item => item.id === selection.precision);
     if (!variant) throw new Error('selected model precision is not available');
     this.selection = selection; this.busy = true;
@@ -104,7 +106,7 @@ export class PolicySession {
         const outputs = await this.session.run(features);
         try {
           this.live();
-          const comparison = { policy: compare(floats(policy), outputs.policy, POLICY_ELEMENTS, selection.precision), value: compare(floats(expectedValue), outputs.value, 1, selection.precision) };
+          const comparison = { policy: compare(floats(policy), outputs.policy, POLICY_ELEMENTS, selection.precision, model.numericContract, 'policy'), value: compare(floats(expectedValue), outputs.value, 1, selection.precision, model.numericContract, 'value') };
           if (Math.abs(outputs.value[0]!) > 1) throw new Error('Value exceeds tanh range');
           fixtures.push({ name: fixture.name, comparison });
         } finally { outputs.dispose(); }

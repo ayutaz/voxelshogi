@@ -220,6 +220,7 @@ def test_trained_manifest_cannot_lose_selected_provenance_or_change_weight_ident
     )
     manifest = {
         "trained": True,
+        "numericContract": "voxelshogi-trained-numeric-v1",
         "seed": 314159,
         "sourceDirty": False,
         "sourceCommit": "a" * 40,
@@ -228,7 +229,14 @@ def test_trained_manifest_cannot_lose_selected_provenance_or_change_weight_ident
         "training": result["training"],
     }
     validate_training_manifest(manifest)
-    for field in ("missing", "weights", "games", "source"):
+    for field in (
+        "missing",
+        "weights",
+        "games",
+        "source",
+        "numeric-missing",
+        "numeric-other",
+    ):
         bad = copy.deepcopy(manifest)
         if field == "missing":
             del bad["training"]
@@ -236,6 +244,10 @@ def test_trained_manifest_cannot_lose_selected_provenance_or_change_weight_ident
             bad["checkpoint"]["sha256"] = "d" * 64
         elif field == "games":
             bad["training"]["evaluation_game_count"] = 4
+        elif field == "numeric-missing":
+            del bad["numericContract"]
+        elif field == "numeric-other":
+            bad["numericContract"] = "other"
         else:
             bad["sourceCommit"] = "d" * 40
         with pytest.raises(ValueError):

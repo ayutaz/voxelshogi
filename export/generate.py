@@ -24,6 +24,7 @@ from export.contract import (
     encode_position,
 )
 from export.model import CONFIG, SEED, make_model
+from export.numeric import TRAINED_NUMERIC_CONTRACT
 from export.variants import make_fp16, make_int8
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -215,12 +216,18 @@ def generate(output, *, seed=SEED, license=None, selected_evaluation=None):
         for name, ref, observed in zip(
             ["policy", "value"], expected, actual, strict=True
         ):
-            comparison[fixture["name"]][name] = compare_outputs(ref.numpy(), observed)
+            comparison[fixture["name"]][name] = compare_outputs(
+                ref.numpy(),
+                observed,
+                output=name,
+                numeric_contract=TRAINED_NUMERIC_CONTRACT if review else None,
+            )
             references[fixture["name"]][name] = write_floats(
                 output, f"reference/fp32/{fixture['name']}-{name}.f32", observed
             )
     sources = [
         "export/contract.py",
+        "export/numeric.py",
         "export/model.py",
         "export/generate.py",
         "export/variants.py",
@@ -234,6 +241,7 @@ def generate(output, *, seed=SEED, license=None, selected_evaluation=None):
         if review
         else f"voxelshogi-transformer-s-untrained-{seed}-v1",
         "trained": review is not None,
+        **({"numericContract": TRAINED_NUMERIC_CONTRACT} if review else {}),
         "license": license,
         "inputSchema": INPUT_SCHEMA,
         "seed": seed,
@@ -315,7 +323,7 @@ def validate_package(root):
         from export.trained import validate_training_manifest
 
         validate_training_manifest(manifest)
-    elif "training" in manifest:
+    elif "training" in manifest or "numericContract" in manifest:
         raise ValueError("untrained manifest must not contain trained provenance")
     if not manifest.get("fixtures") or not manifest.get("variants"):
         raise ValueError("manifest must contain fixtures and variants")

@@ -21,6 +21,11 @@ function placement(validation, backend, precision) {
   else assert.equal(validation.information.adapter, null, 'CPU adapter must be explicit');
   assert.deepEqual(validation.fixtures.map(f => f.name), TRAINED_FIXTURES, 'all same-format references required');
   for (const fixture of validation.fixtures) for (const name of ['policy', 'value']) {
+    const stats = fixture.comparison[name];
+    const [atol, rtol] = precision === 'fp16' ? [.001, .01] : [name === 'policy' ? .0001 : .00001, .0001];
+    assert.equal(stats.atol, atol, 'numeric absolute bound differs');
+    assert.equal(stats.rtol, rtol, 'numeric relative bound differs');
+    assert.ok([stats.maxAbs, stats.maxRelative].every(n => Number.isFinite(n) && n >= 0), 'invalid numeric difference');
     assert.equal(fixture.comparison[name].elements, name === 'policy' ? 1067985 : 1, 'reference output count differs');
     assert.equal(fixture.comparison[name].exceeded, 0, 'numeric reference comparison failed');
   }
@@ -39,6 +44,7 @@ export function validateTrainedEvidence(report, { allowCandidate = false } = {})
   assert.doesNotMatch(report.renderer, /swiftshader|llvmpipe/i, 'software renderer is not physical proof');
   const model = report.model;
   assert.equal(model.trained, true, 'trained model required');
+  assert.equal(model.numericContract, 'voxelshogi-trained-numeric-v1', 'trained numeric contract differs');
   assert.ok(hash(model.packageHash, 64) && hash(model.sourceCommit, 40) && hash(model.revision, 40), 'model provenance required');
   assert.deepEqual(model.variants.map(v => v.precision), TRAINED_PRECISIONS, 'all formats required');
   assert.ok(model.variants.every(v => hash(v.sha256, 64) && positive(v.bytes)), 'model artifact hashes required');

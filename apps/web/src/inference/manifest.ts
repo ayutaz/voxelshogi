@@ -1,4 +1,5 @@
 import { assetUrl, type FileRef } from './assets';
+import { TRAINED_NUMERIC_CONTRACT } from './numeric';
 
 export const POLICY_ELEMENTS = 1_067_985;
 export type Precision = 'fp32' | 'fp16' | 'int8';
@@ -9,6 +10,7 @@ export interface Variant { id: Precision; precision: Precision; model: FileRef; 
 export interface ModelManifest {
   schema: 1; id: string; trained: boolean; license: string | null; inputSchema: string; ruleset: string;
   seed: number; parameters: number; fixtures: ModelFixture[]; variants: Variant[];
+  numericContract?: string;
 }
 export interface RuntimeManifest { version: string; bundle: FileRef; bootstrap: FileRef; wasm: FileRef & { parts: FileRef[] }; notices: FileRef[] }
 export interface Deployment { schema: 1; publication: boolean; model: FileRef; modelNotices: FileRef[]; runtime: RuntimeManifest }
@@ -38,6 +40,7 @@ export function parseModel(value: unknown, publication = true): ModelManifest {
 
 function parseModelData(value: unknown, trained: boolean, approvedLicense: string | null): ModelManifest {
   const m = record(value);
+  if (trained ? m.numericContract !== TRAINED_NUMERIC_CONTRACT : Object.hasOwn(m, 'numericContract')) throw new Error('unsupported numeric contract');
   if (m.schema !== 1 || m.inputSchema !== 'voxelshogi-standard-features-v1' || m.ruleset !== 'voxelshogi-standard-v1' || m.trained !== trained || typeof m.id !== 'string' || !/^[a-zA-Z0-9._-]{1,128}$/.test(m.id)) throw new Error('unsupported model manifest');
   if (approvedLicense !== null && m.license !== approvedLicense) throw new Error('model publication license is not approved');
   if (typeof m.parameters !== 'number' || !Number.isSafeInteger(m.parameters) || m.parameters < 5_000_000 || m.parameters > 10_000_000 || typeof m.seed !== 'number' || !Number.isSafeInteger(m.seed)) throw new Error('invalid model size/seed');

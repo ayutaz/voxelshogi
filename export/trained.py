@@ -175,11 +175,14 @@ def load_evaluated_weights(folder, *, context, seed):
 
 
 def validate_training_manifest(manifest):
+    from export.numeric import TRAINED_NUMERIC_CONTRACT
+
     try:
         training = manifest["training"]
         binding, receipt = training["binding"], training["receipt"]
         if (
             manifest["trained"] is not True
+            or manifest.get("numericContract") != TRAINED_NUMERIC_CONTRACT
             or manifest["seed"] != 314159
             or manifest["sourceDirty"] is not False
             or manifest["id"] != "voxelshogi-transformer-s-m6-314159-v1"

@@ -9,7 +9,7 @@ export function policyRequest(withFiles = true): PolicyRequest {
 export function policyResult(request = policyRequest()) {
   const { recordJson: _record, ...root } = request.root;
   void _record;
-  const comparison = (elements: number) => ({ elements, maxAbs: 0, maxRelative: 0, exceeded: 0, atol: request.selection.precision === 'fp16' ? 1e-3 : 1e-5, rtol: request.selection.precision === 'fp16' ? 1e-2 : 1e-4 });
+  const comparison = (elements: number) => ({ elements, maxAbs: 0, maxRelative: 0, exceeded: 0, atol: request.selection.precision === 'fp16' ? 1e-3 : elements === 1 ? 1e-5 : 1e-4, rtol: request.selection.precision === 'fp16' ? 1e-2 : 1e-4 });
   return { schema: 1, kind: 'result', requestId: request.requestId,
     result: { root, selection: { ...request.selection }, finished: false, inferenceMs: 1,
       choice: { move: '111211', action: 2, rawAction: 0, rawLegal: false, value: .25 } },

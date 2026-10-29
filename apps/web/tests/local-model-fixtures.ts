@@ -4,7 +4,7 @@ import { modelFixture } from './inference-fixtures';
 export const digest = (bytes: Uint8Array | string) => createHash('sha256').update(bytes).digest('hex');
 export const ref = (path: string, text: string) => ({ path, bytes: new TextEncoder().encode(text).length, sha256: digest(text) });
 export function trainedFixture() {
-  return { ...modelFixture(), id: 'voxelshogi-transformer-s-m6-314159-v1', trained: true,
+  return { ...modelFixture(), id: 'voxelshogi-transformer-s-m6-314159-v1', trained: true, numericContract: 'voxelshogi-trained-numeric-v1',
     sourceCommit: 'c'.repeat(40), sourceDirty: false, checkpoint: { path: 'model.safetensors', bytes: 3, sha256: digest('abc') },
     training: { binding: { source_commit: 'c'.repeat(40) }, receipt: { verified: true, progress: { epoch: 1, next_batch: 0, best_val_loss: 0.5 } },
       evaluated_weights_sha256: digest('abc'), evaluation_report_sha256: 'd'.repeat(64), test_report_sha256: 'e'.repeat(64),
