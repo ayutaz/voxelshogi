@@ -15,6 +15,13 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  {"name": "portable-export-role", "file": "inference/manifest.ts", "before": "p.export_source_commit !== identity.sourceCommit", "after": "false", "test": "portable-fp16"},
+  {"name": "portable-protocol-expected-mode", "file": "inference/policy-protocol.ts", "before": "(result.fp16WeightOnly ?? false) !== expectedWeightOnly", "after": "false", "test": "portable-fp16"},
+  {"name": "portable-protocol-compute", "file": "inference/policy-protocol.ts", "before": "info.computePrecision !== 'float32'", "after": "false", "test": "portable-fp16"},
+  {"name": "portable-session-route", "file": "inference/policy-session.ts", "before": "weightOnly ? 'fp32' : selection.precision", "after": "selection.precision", "test": "policy-session"},
+  {"name": "portable-seat-mode", "file": "ai/model-library.ts", "before": "fp16WeightOnly(entry.model.variants.find(v => v.precision === choice.precision)!)", "after": "false", "test": "model-library"},
+  {"name": "portable-client-mode", "file": "inference/policy-client.ts", "before": "this.source.fp16WeightOnly", "after": "false", "test": "policy-client"},
+  {"name": "portable-metadata-compute", "file": "inference/manifest.ts", "before": "c.compute !== 'float32'", "after": "false", "test": "portable-fp16"},
   { name: 'trained-numeric-policy-bound', file: 'inference/numeric.ts', before: 'return [1e-4, 1e-4]', after: 'return [1e-3, 1e-4]', test: 'trained-numeric' },
   { name: 'trained-numeric-value-isolation', file: 'inference/numeric.ts', before: "output === 'policy'", after: 'true', test: 'trained-numeric' },
   { name: 'trained-numeric-default-isolation', file: 'inference/numeric.ts', before: 'contract === TRAINED_NUMERIC_CONTRACT', after: 'true', test: 'trained-numeric' },
@@ -195,7 +202,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 135);
+    assert.equal(results.length, 142);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

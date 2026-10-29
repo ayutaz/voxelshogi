@@ -30,3 +30,18 @@ WebはHFから取得したモデルフォルダーを選び、実ONNXと同形�
 Macは小さいopaque metadataの正例・拒否条件と静的検査だけ。fixtureの30,000／3,000／3,894件は検査用の架空の分割で、実データのsplit別件数として報告しない。
 
 Linux CIではValue headの最終行列を0・biasを0.5にしたfixture重みを変換し、全3形式でValueが手計算の`tanh(0.5)`になることを確認する。これは重みの読み込み・変換の試験であり、学習の成果ではない。safetensorsの完全一致、同形式参照の全出力比較、来歴の改変検出、別schemaの小さいRust棋譜の再生・集計も確認する。実データでの学習済みモデルの成績・実機対応は、後続の実測がそろうまで未確認として残す。
+
+## FP16重み版と学習・変換sourceの分離
+
+実学習済みの混合FP16版はLinux実機のWASMで同形式参照の数値基準を超え、NVIDIA VulkanのF16を検証用フラグで有効にしても基準未達だった。旧版・初回HF revision・失敗した48条件の記録は[固定した診断結果](experiments/m6-fp16-portability-diagnosis.json)に保持する。誤差基準を変更せず、`--fp16-weights-only`でrank>=2の重みをFP16へ丸め、明示的なCastでFP32へ戻して演算する版を追加する。bias・活性・演算・公開I/OはFP32。無限大・NaN・65504超の重みはclipせず拒否する。これは混合FP16演算と別の変換方式であり、配布時は「FP16（重み）」と表示し、新しい実ファイルを同じ固定test・対局で評価する。
+
+学習し直して既存の結果を別commitへ付け替える代わりに、変換だけを改善できるようsourceの役割を明示する。`--training-source-commit`を独立した期待値として指定した場合に限り、`training.export_provenance`の`voxelshogi-export-lineage-v1`へtraining／export両commitを記録する。元の学習binding・checkpoint receipt・test・60局とそのhashは変更しない。指定なしの旧契約ではsource不一致を引き続き拒否する。変換済み評価とブラウザも同じ両sourceを検証する。
+
+```bash
+# 外部Linuxで実行。2つのsourceはそれぞれ実際の固定commitを指定する。
+uv run --project infrastructure/cuda --locked python -m export.generate runs/m6/portable-export --selected-evaluation runs/m6/eval-torch --training-source-commit "$training_commit" --fp16-weights-only --license Apache-2.0
+```
+
+専用Workerは検証済みmanifestからFP32演算モードを導き、main側も同じmanifestから期待値を導く。FP16重み版と宣言された場合だけ`shader-f16`を不要とし、FP32演算の証拠、全固定入力・全出力の同形式照合、実providerを要求する。混合FP16のfeature確認、数値基準、M3未学習モデルの形式は維持する。
+
+私的な実機試作では同一4入力のPolicy全1,067,985要素とValueがWASM／通常設定WebGPUで基準内だった。これは実行経路を選ぶ診断であり、正式な変換版の固定評価・HF公開・全48条件計測・公開catalogの完了とは区別する。正式な実行はsourceを固定して再検証する。

@@ -25,7 +25,7 @@ from export.contract import (
 )
 from export.model import CONFIG, SEED, make_model
 from export.numeric import TRAINED_NUMERIC_CONTRACT
-from export.variants import make_fp16, make_int8
+from export.variants import make_fp16, make_fp16_weights, make_int8
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -148,19 +148,42 @@ def source_context():
         return {"sourceCommit": None, "sourceDirty": True}
 
 
-def generate(output, *, seed=SEED, license=None, selected_evaluation=None):
+def generate(
+    output,
+    *,
+    seed=SEED,
+    license=None,
+    selected_evaluation=None,
+    training_source_commit=None,
+    fp16_weights_only=False,
+):
     output = Path(output)
     if selected_evaluation is not None and output.exists():
         raise FileExistsError("trained conversion requires a new output directory")
     torch.set_num_threads(1)
     torch.use_deterministic_algorithms(True)
     context = source_context()
+    if selected_evaluation is None and (
+        training_source_commit is not None or fp16_weights_only
+    ):
+        raise ValueError(
+            "portable FP16/explicit lineage requires a selected trained evaluation"
+        )
     review = None
     if selected_evaluation is not None:
         from export.trained import load_evaluated_weights
 
         state, review = load_evaluated_weights(
-            selected_evaluation, context=context, seed=seed
+            selected_evaluation,
+            context={
+                **context,
+                **(
+                    {"trainingSourceCommit": training_source_commit}
+                    if training_source_commit is not None
+                    else {}
+                ),
+            },
+            seed=seed,
         )
     model = make_model(seed)
     if review is not None:
@@ -296,7 +319,12 @@ def generate(output, *, seed=SEED, license=None, selected_evaluation=None):
     manifest["variants"].extend(
         [
             low_precision_variant(
-                output, graph, fixtures, references, "fp16", make_fp16
+                output,
+                graph,
+                fixtures,
+                references,
+                "fp16",
+                make_fp16_weights if fp16_weights_only else make_fp16,
             ),
             low_precision_variant(
                 output, graph, fixtures, references, "int8", make_int8
@@ -414,12 +442,16 @@ def main():
     parser.add_argument("--seed", type=int, default=SEED)
     parser.add_argument("--license", choices=["Apache-2.0"])
     parser.add_argument("--selected-evaluation", type=Path)
+    parser.add_argument("--training-source-commit")
+    parser.add_argument("--fp16-weights-only", action="store_true")
     args = parser.parse_args()
     manifest = generate(
         args.output,
         seed=args.seed,
         license=args.license,
         selected_evaluation=args.selected_evaluation,
+        training_source_commit=args.training_source_commit,
+        fp16_weights_only=args.fp16_weights_only,
     )
     print(
         json.dumps(

@@ -21,6 +21,27 @@ MUTATIONS = [
     for name, before, after in CONTRACT_MUTATIONS
 ] + [
     (
+        "fp16-storage-dtype",
+        "variants.py",
+        "values.astype(np.float16)",
+        "values.astype(np.float32)",
+        "test_fp16_weights.py",
+    ),
+    (
+        "fp16-storage-cast",
+        "variants.py",
+        "to=TensorProto.FLOAT",
+        "to=TensorProto.FLOAT16",
+        "test_fp16_weights.py",
+    ),
+    (
+        "fp16-storage-overflow",
+        "variants.py",
+        "np.any(np.abs(values) > 65504)",
+        "False",
+        "test_fp16_weights.py",
+    ),
+    (
         "trained-policy-bound",
         "numeric.py",
         "return 1e-4, 1e-4",
@@ -101,8 +122,8 @@ MUTATIONS = [
     (
         "quant-missing-dequant",
         "variants.py",
-        "[weight.name],",
-        '[prefix + "__unused"],',
+        '[weight.name],\n                name=prefix + "__dequantize",',
+        '[prefix + "__unused"],\n                name=prefix + "__dequantize",',
         "test_variants.py",
     ),
     (

@@ -1,6 +1,7 @@
 import type { Color } from '../game/model';
 import type { TrainedRelease } from '../inference/local-model';
 import type { ModelManifest, Precision } from '../inference/manifest';
+import { fp16WeightOnly } from '../inference/manifest';
 import type { ModelFile } from '../inference/policy-protocol';
 import type { PolicySelection } from '../inference/policy-session';
 import { modelSeatKey, type ModelSeat } from './arena-model';
@@ -38,7 +39,7 @@ export function modelSeat(state: ModelLibrary, side: Color): ModelSeat | undefin
   const { repo, revision, sourceCommit, license } = entry.release;
   const seat: ModelSeat = { sourceId: entry.sourceId, repo, revision, sourceCommit, license, files: entry.files,
     selection: { modelId: entry.release.id, packageHash: entry.release.manifest.sha256, precision: choice.precision, backend: choice.backend },
-    fixtures: entry.model.fixtures.map(fixture => fixture.name) };
+    fixtures: entry.model.fixtures.map(fixture => fixture.name), ...(fp16WeightOnly(entry.model.variants.find(v => v.precision === choice.precision)!) ? { fp16WeightOnly: true } : {}) };
   modelSeatKey(seat);
   return seat;
 }

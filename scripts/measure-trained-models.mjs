@@ -57,7 +57,7 @@ export async function measureTrainedModels({browser,base,modelFolder,catalog,out
   const fixtures=await positions(manifest);
   const report={schema:1,kind:'m6-trained-browser-measurement',platform:process.platform,mode:smoke?'smoke':'full',candidate,complete:false,base,startedAt:new Date().toISOString(),chrome:browser.version(),gpu:gpu.gpu,
     applicationCommit:null,renderer:null,model:{id:manifest.id,trained:true,numericContract:manifest.numericContract,packageHash:release.manifest.sha256,sourceCommit:manifest.sourceCommit,revision:release.revision,
-      variants:manifest.variants.map(v=>({precision:v.id,sha256:v.model.sha256,bytes:v.model.bytes}))},fixtures,rows:[],switches:[],
+      variants:manifest.variants.map(v=>({precision:v.id,sha256:v.model.sha256,bytes:v.model.bytes,...(v.id==='fp16' && v.conversion?.method==='fp16-weight-only'?{fp16WeightOnly:true}:{} )}))},fixtures,rows:[],switches:[],
     method:{warmup:10,measured:30,cold:'new browser context and Worker; OS/driver caches uncontrolled',reuse:'same validated Worker session for all repeated root requests',timing:'inference includes CPU output readback; round trip additionally includes Worker messaging',memory:'dedicated Chromium process RSS and main-page heap sampled once per second; observed values, not guaranteed peaks',rendering:'trusted camera input and real instanced draws observed during pending inference; no delayed replies',batch:1}};
   const save=()=>{mkdirSync(dirname(output),{recursive:true});writeFileSync(output,JSON.stringify(report,null,2)+'\n');};save();
   let workerUrl=null, firstBuild=null;

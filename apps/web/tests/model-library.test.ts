@@ -43,3 +43,11 @@ it('bounds retained file handles to four releases', () => {
   const extra = packet('local-5'); extra.release.id += 'extra';
   expect(() => addModel(state, extra)).toThrow(/4/);
 });
+
+it('derives the independently expected FP16 storage mode from the selected package', () => {
+  const entry = packet(); entry.model.variants[1]!.conversion = { method: 'fp16-weight-only', compute: 'float32', activations: 'float32', convertedTensors: 1, convertedElements: 6 };
+  const state = chooseModel(addModel(empty(), entry), 'b', { sourceId: 'local-1', precision: 'fp16', backend: 'webgpu' });
+  expect(modelSeat(state, 'b')!.fp16WeightOnly).toBe(true);
+  const other = chooseModel(state, 'b', { sourceId: 'local-1', precision: 'fp32', backend: 'wasm' });
+  expect(modelSeat(other, 'b')!.fp16WeightOnly).toBeUndefined();
+});

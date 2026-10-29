@@ -1,7 +1,12 @@
 """Linux-only conversion of altered fixture weights, not evidence of learning."""
 
+import pytest
 
-def test_evaluated_weight_bytes_survive_all_three_conversions(tmp_path, monkeypatch):
+
+@pytest.mark.parametrize("weight_only", [False, True])
+def test_evaluated_weight_bytes_survive_all_three_conversions(
+    tmp_path, monkeypatch, weight_only
+):
     import copy
     import json
     import math
@@ -31,11 +36,11 @@ def test_evaluated_weight_bytes_survive_all_three_conversions(tmp_path, monkeypa
 
     # Synthetic source metadata isolates weight loading from Git cleanliness.
     # Dirty-source rejection is separately checked by the pure metadata tests.
-    source = {"sourceCommit": "a" * 40, "sourceDirty": False}
+    source = {"sourceCommit": ("d" if weight_only else "a") * 40, "sourceDirty": False}
     monkeypatch.setattr(generator, "source_context", lambda: source)
     evaluated = fixture(
         tmp_path / "evaluated",
-        source_commit=source["sourceCommit"],
+        source_commit="a" * 40,
         weights_writer=weights_writer,
     )
     replays = []
@@ -43,7 +48,19 @@ def test_evaluated_weight_bytes_survive_all_three_conversions(tmp_path, monkeypa
         trained, "verify_evaluation_games", lambda path: replays.append(path)
     )
     output = tmp_path / "converted"
-    manifest = export_evaluated(evaluated, output)
+    manifest = export_evaluated(
+        evaluated,
+        output,
+        training_source_commit="a" * 40 if weight_only else None,
+        fp16_weights_only=weight_only,
+    )
+    if weight_only:
+        assert (
+            manifest["training"]["export_provenance"]["training_source_commit"]
+            == "a" * 40
+        )
+        assert manifest["sourceCommit"] == "d" * 40
+        assert manifest["variants"][1]["conversion"]["compute"] == "float32"
     assert replays == [evaluated]
     assert manifest["trained"] is True and manifest["license"] is None
     assert manifest["numericContract"] == "voxelshogi-trained-numeric-v1"

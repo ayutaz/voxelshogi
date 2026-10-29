@@ -95,3 +95,15 @@ it('closes the Worker after decode, execution or postMessage failures', async ()
     await expect(pending).rejects.toThrow(); expect(worker.terminate).toHaveBeenCalledTimes(1);
   }
 });
+
+it('carries the expected storage-only mode into independent response validation', async () => {
+  const worker = port(), input = source(); input.selection.precision = 'fp16'; input.selection.backend = 'webgpu';
+  const client = new PolicyClient({ ...input, fp16WeightOnly: true }, () => worker);
+  const pending = client.bestMove(policyRequest().root), result = policyResult(requestAt(worker));
+  Reflect.set(result.validation, 'fp16WeightOnly', true);
+  Reflect.set(result.validation.information, 'computePrecision', 'float32');
+  Reflect.set(result.validation.information, 'adapter', { vendor: 'fake', architecture: '', device: '', description: '' });
+  Reflect.set(result.validation.profile, 'providers', { WebGpuExecutionProvider: 1 });
+  message(worker, result); await expect(pending).resolves.toMatchObject({ validation: { fp16WeightOnly: true } });
+  client.dispose();
+});

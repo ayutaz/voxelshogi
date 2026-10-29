@@ -6,7 +6,8 @@ export type Precision = 'fp32' | 'fp16' | 'int8';
 export type Backend = 'wasm' | 'webgpu';
 export interface ModelFixture { name: string; side: 'b' | 'w'; record: Record<string, unknown>; input: FileRef }
 export interface Difference { elements: number; maxAbs: number; mae: number; rmse: number; maxRelative: number; argmaxEqual: boolean }
-export interface Variant { id: Precision; precision: Precision; model: FileRef; references: Record<string, { policy: FileRef; value: FileRef }>; fp32Difference?: Record<string, { policy: Difference; value: Difference }> }
+export interface Variant { id: Precision; precision: Precision; model: FileRef; references: Record<string, { policy: FileRef; value: FileRef }>; fp32Difference?: Record<string, { policy: Difference; value: Difference }>; conversion?: { method: string; compute?: string; activations?: string; convertedTensors?: number; convertedElements?: number } }
+export function fp16WeightOnly(variant: Variant): boolean { return variant.precision === 'fp16' && variant.conversion?.method === 'fp16-weight-only'; }
 export interface ModelManifest {
   schema: 1; id: string; trained: boolean; license: string | null; inputSchema: string; ruleset: string;
   seed: number; parameters: number; fixtures: ModelFixture[]; variants: Variant[];
@@ -56,6 +57,10 @@ function parseModelData(value: unknown, trained: boolean, approvedLicense: strin
   const variants = array(m.variants).map((item) => {
     const v = record(item);
     if (!['fp32', 'fp16', 'int8'].includes(String(v.id)) || v.precision !== v.id) throw new Error('unsupported model precision');
+    if (v.conversion && record(v.conversion).method === 'fp16-weight-only') {
+      const c = record(v.conversion);
+      if (!trained || v.precision !== 'fp16' || c.compute !== 'float32' || c.activations !== 'float32' || !Number.isSafeInteger(c.convertedTensors) || Number(c.convertedTensors) < 1 || !Number.isSafeInteger(c.convertedElements) || Number(c.convertedElements) < 1 || Number(c.convertedElements) > Number(m.parameters)) throw new Error('invalid FP16 weight-only conversion');
+    }
     file(v.model);
     const references = record(v.references);
     if (Object.keys(references).length !== names.length || !names.every((name) => Object.hasOwn(references, name))) throw new Error('incomplete model references');
@@ -86,7 +91,13 @@ export function parseTrainedModel(value: unknown, identity: TrainedIdentity): Mo
   if (parsed.id !== identity.id || m.sourceCommit !== identity.sourceCommit || m.sourceDirty !== false || parsed.seed !== 314159 || parsed.parameters !== 5_021_064) throw new Error('trained model identity differs from the reviewed release');
   const training = record(m.training), binding = record(training.binding), receipt = record(training.receipt), progress = record(receipt.progress);
   const checkpoint = file(m.checkpoint), counts = record(training.teacher_splits);
-  if (binding.source_commit !== identity.sourceCommit || receipt.verified !== true || training.evaluated_weights_sha256 !== checkpoint.sha256 || training.evaluation_game_count !== 60 ||
+  let trainingSource = identity.sourceCommit;
+  if (Object.hasOwn(training, 'export_provenance')) {
+    const p = record(training.export_provenance);
+    if (Object.keys(p).length !== 3 || p.schema !== 'voxelshogi-export-lineage-v1' || p.export_source_commit !== identity.sourceCommit || typeof p.training_source_commit !== 'string' || !/^[0-9a-f]{40}$/.test(p.training_source_commit)) throw new Error('invalid explicit export/training lineage');
+    trainingSource = p.training_source_commit;
+  }
+  if (binding.source_commit !== trainingSource || receipt.verified !== true || training.evaluated_weights_sha256 !== checkpoint.sha256 || training.evaluation_game_count !== 60 ||
     ['evaluation_report_sha256', 'test_report_sha256'].some(key => typeof training[key] !== 'string' || !/^[0-9a-f]{64}$/.test(training[key])) ||
     Object.keys(counts).length !== 3 || ['train', 'val', 'test'].some(key => typeof counts[key] !== 'number' || !Number.isSafeInteger(counts[key]) || counts[key] <= 0) || Object.values(counts).reduce<number>((sum, n) => sum + Number(n), 0) !== 36894 ||
     typeof progress.epoch !== 'number' || !Number.isSafeInteger(progress.epoch) || progress.epoch < 1 || progress.next_batch !== 0 || typeof progress.best_val_loss !== 'number' || !Number.isFinite(progress.best_val_loss) || progress.best_val_loss < 0) throw new Error('incomplete trained evaluation provenance');

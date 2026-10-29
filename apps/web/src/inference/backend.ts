@@ -7,6 +7,7 @@ export interface OutputData { policy: Float32Array; value: Float32Array; dispose
 export interface SessionPort { run: (features: Float32Array) => Promise<OutputData>; finishProfiling?: () => Promise<void>; release: () => Promise<void> }
 export interface Profile { providers: Record<string, number>; operators: Record<string, number> }
 export interface RuntimeInfo {
+  computePrecision?: 'float32' | 'float16';
   backend: string; adapter: { vendor: string; architecture: string; device: string; description: string } | null;
   features: string[]; runtimeBytes: number;
 }
@@ -54,7 +55,7 @@ export async function openBackend(pkg: RuntimeIndex, backend: Backend, precision
     const { ort } = loaded;
     if (device) ort.env.webgpu.device = device;
     return {
-      info: { backend, adapter: adapterInfo, features, runtimeBytes: loaded.runtimeBytes },
+      info: { backend, adapter: adapterInfo, features, runtimeBytes: loaded.runtimeBytes, computePrecision: precision === 'fp16' ? 'float16' : 'float32' },
       buffers: () => backend === 'webgpu' && buffers.created === 0 ? null : { ...buffers }, profile: () => structuredClone(evidence), resetProfile: () => { evidence = { providers: {}, operators: {} }; },
       dispose: async () => { loaded.dispose(); device?.destroy(); console.log = originalLog; },
       createSession: async (model, sessionPrecision) => {

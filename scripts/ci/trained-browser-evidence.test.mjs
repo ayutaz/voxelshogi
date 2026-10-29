@@ -52,3 +52,11 @@ test('numeric evidence pins the trained contract and exact per-output limits on 
     const value = evidence(); change(value); assert.throws(() => validateTrainedEvidence(value));
   }
 });
+
+test('FP16 weight storage is pinned to FP32 compute on rows and switches without pretending native f16', () => {
+  const value=evidence();value.model.variants[1].fp16WeightOnly=true;
+  for(const row of value.rows) if(row.precision==='fp16') {row.validation.fp16WeightOnly=true;row.validation.information.computePrecision='float32';row.validation.information.features=[];}
+  assert.equal(validateTrainedEvidence(value).successfulCases,48);
+  const bad=structuredClone(value);delete bad.model.variants[1].fp16WeightOnly;assert.throws(()=>validateTrainedEvidence(bad));
+  value.rows.find(r=>r.precision==='fp16').validation.information.computePrecision='float16';assert.throws(()=>validateTrainedEvidence(value));
+});

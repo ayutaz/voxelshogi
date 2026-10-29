@@ -53,7 +53,7 @@ function identity(value: unknown, request: PolicyRequest) {
   const object = record(value), root = record(object.root), selected = parsePolicySelection(object.selection);
   if (Object.keys(root).length !== 5 || rootKeys.some(key => root[key] !== request.root[key]) || !samePolicySelection(selected, request.selection)) throw new Error('policy reply root/model mismatch');
 }
-function validation(value: unknown, request: PolicyRequest, expectedFixtures: readonly string[]) {
+function validation(value: unknown, request: PolicyRequest, expectedFixtures: readonly string[], expectedWeightOnly: boolean) {
   const result = record(value), selected = parsePolicySelection(result.selection);
   if (!samePolicySelection(selected, request.selection) || !Array.isArray(result.fixtures) || result.fixtures.length !== expectedFixtures.length || result.fixtures.length < 1 || result.fixtures.length > 32) throw new Error('policy validation fixture/model mismatch');
   const names = new Set<string>();
@@ -68,6 +68,7 @@ function validation(value: unknown, request: PolicyRequest, expectedFixtures: re
     }
   }
   const info = record(result.information), profile = record(result.profile), providers = Object.entries(record(profile.providers));
+  if ((result.fp16WeightOnly ?? false) !== expectedWeightOnly || (expectedWeightOnly && (selected.precision !== 'fp16' || info.computePrecision !== 'float32'))) throw new Error('unexpected policy compute precision');
   const expected = selected.backend === 'webgpu' ? 'WebGpuExecutionProvider' : 'CPUExecutionProvider';
   if (info.backend !== selected.backend || !integer(info.runtimeBytes) || info.runtimeBytes === 0 || !Array.isArray(info.features) || info.features.length > 64 || info.features.some(feature => typeof feature !== 'string' || feature.length > 64) ||
     providers.length !== 1 || providers.some(([name, count]) => name !== expected || !integer(count) || count < 1)) throw new Error('unverified policy backend placement');
@@ -75,11 +76,11 @@ function validation(value: unknown, request: PolicyRequest, expectedFixtures: re
   if (operators.length === 0 || operators.some(([name, count]) => !name || !integer(count) || count < 1)) throw new Error('missing policy operator evidence');
   if (selected.backend === 'webgpu') {
     const adapter = record(info.adapter);
-    if (['vendor', 'architecture', 'device', 'description'].some(key => typeof adapter[key] !== 'string' || adapter[key].length > 1024) || (selected.precision === 'fp16' && !info.features.includes('shader-f16'))) throw new Error('invalid policy adapter information');
+    if (['vendor', 'architecture', 'device', 'description'].some(key => typeof adapter[key] !== 'string' || adapter[key].length > 1024) || (selected.precision === 'fp16' && !expectedWeightOnly && !info.features.includes('shader-f16'))) throw new Error('invalid policy adapter information');
   } else if (info.adapter !== null) throw new Error('unexpected adapter for WASM backend');
 }
 
-export function parsePolicyResponse(value: unknown, request: PolicyRequest, expectedFixtures: readonly string[]): PolicyResponse {
+export function parsePolicyResponse(value: unknown, request: PolicyRequest, expectedFixtures: readonly string[], expectedWeightOnly = false): PolicyResponse {
   const message = record(value);
   if (message.schema !== 1 || message.requestId !== request.requestId) throw new Error('policy response ID/schema mismatch');
   identity(message.kind === 'result' ? message.result : message, request);
@@ -88,7 +89,7 @@ export function parsePolicyResponse(value: unknown, request: PolicyRequest, expe
   } else if (message.kind === 'error') {
     if (!['input', 'busy', 'initialization', 'inference'].includes(String(message.code)) || typeof message.message !== 'string' || message.message.length < 1 || message.message.length > 500) throw new Error('invalid policy error');
   } else if (message.kind === 'result') {
-    validation(message.validation, request, expectedFixtures);
+    validation(message.validation, request, expectedFixtures, expectedWeightOnly);
     const result = record(message.result);
     if (typeof result.finished !== 'boolean' || !finite(result.inferenceMs) || (result.finished && (result.choice !== null || result.inferenceMs !== 0))) throw new Error('invalid policy terminal/timing result');
     if (!result.finished) {

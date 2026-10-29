@@ -10,13 +10,15 @@ export function trainedCases() {
   return cases;
 }
 const key = value => JSON.stringify([value.show3D, value.backend, value.precision, value.fixture]);
-function placement(validation, backend, precision) {
+function placement(validation, backend, precision, weightOnly = false) {
   assert.equal(validation.information.backend, backend, 'measured backend differs');
   const provider = backend === 'webgpu' ? 'WebGpuExecutionProvider' : 'CPUExecutionProvider';
   assert.deepEqual(Object.keys(validation.profile.providers), [provider], 'unexpected policy provider');
   assert.ok(Number.isSafeInteger(validation.profile.providers[provider]) && validation.profile.providers[provider] > 0, 'missing operator placement');
   assert.ok(Object.keys(validation.profile.operators).length > 0 && Object.values(validation.profile.operators).every(n => Number.isSafeInteger(n) && n > 0), 'operator evidence required');
-  if (backend === 'webgpu' && precision === 'fp16') assert.ok(validation.information.features.includes('shader-f16'), 'native FP16 feature required');
+  assert.equal(validation.fp16WeightOnly ?? false, weightOnly, 'FP16 storage declaration differs from measured package');
+  if (weightOnly) { assert.equal(precision, 'fp16');assert.equal(validation.information.computePrecision, 'float32', 'FP16 weight-only requires FP32 compute'); }
+  if (backend === 'webgpu' && precision === 'fp16' && !weightOnly) assert.ok(validation.information.features.includes('shader-f16'), 'native FP16 feature required');
   if (backend === 'webgpu') assert.match(validation.information.adapter.vendor, /nvidia/i, 'physical GPU vendor differs');
   else assert.equal(validation.information.adapter, null, 'CPU adapter must be explicit');
   assert.deepEqual(validation.fixtures.map(f => f.name), TRAINED_FIXTURES, 'all same-format references required');
@@ -62,7 +64,7 @@ export function validateTrainedEvidence(report, { allowCandidate = false } = {})
       unsupportedCases++; continue;
     }
     assert.equal(row.status, 'done', 'failed measurement');
-    placement(row.validation, row.backend, row.precision);
+    placement(row.validation, row.backend, row.precision, model.variants.find(v => v.precision === row.precision).fp16WeightOnly ?? false);
     assert.equal(row.warmupCount, 10, 'ten warmups required');
     assert.equal(row.samples.length, 30, 'thirty measured repetitions required');
     assert.ok([row.cold, ...row.samples].every(s => positive(s.inferenceMs) && positive(s.roundTripMs)), 'invalid measured duration');
@@ -89,7 +91,7 @@ export function validateTrainedEvidence(report, { allowCandidate = false } = {})
       assert.notEqual(step.precision, previous, 'initial load or repeated model is not a switch');
       assert.equal(step.packageHash, model.packageHash, 'switch model hash differs');
       assert.ok(report.rows.filter(row => row.backend === group.backend && row.precision === step.precision).every(row => row.status === 'done'), 'unsupported format cannot be a successful switch');
-      placement(step.validation, group.backend, step.precision); previous = step.precision; actualSwitches++;
+      placement(step.validation, group.backend, step.precision, model.variants.find(v => v.precision === step.precision).fp16WeightOnly ?? false); previous = step.precision; actualSwitches++;
     }
     memory(group.memory);
   }

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  {"name": "portable-evidence-compute", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.equal(validation.information.computePrecision, 'float32', 'FP16 weight-only requires FP32 compute');", "after": "", "test": "trained-browser-evidence"},
   { name: 'benchmark-root-side', file: 'scripts/trained-benchmark.mjs', before: 'if (game.sideToMove() !== fixture.side)', after: 'if (false)', test: 'trained-benchmark' },
   { name: 'benchmark-root-free', file: 'scripts/trained-benchmark.mjs', before: 'finally { game.free(); }', after: 'finally {}', test: 'trained-benchmark' },
   { name: 'benchmark-root-history', file: 'scripts/trained-benchmark.mjs', before: "ruleset: 'voxelshogi-standard-v1', recordJson }", after: "ruleset: 'voxelshogi-standard-v1', recordJson: '{}' }", test: 'trained-benchmark' },
