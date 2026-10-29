@@ -1,5 +1,7 @@
 # M6の変換モデル比較と初回HF公開
 
+新しいFP16重み版・全3形式の再評価と最終HF配布は[M6_PORTABLE](M6_PORTABLE.md)を参照。本記録は初回の混合精度FP16を含む歴史的な結果として保持する。
+
 2026-10-29 UTC。[再学習・HF再開状態の復旧](M6_RETRY.md)後、初期／学習済みTorchとFP32／FP16／INT8重み版の固定評価を完了した。全モデルでtest3,589件・Random40局・M1探索20局、合計300局。**実モデルのブラウザ計測と公開catalogへの登録は未完了で、M6全体の完了記録ではない。** [固定集計・モデルdescriptor・元report hash](experiments/m6-converted-models.json)。
 
 ## 同条件の精度・対局

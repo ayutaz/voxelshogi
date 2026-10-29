@@ -8,7 +8,7 @@ HFのmanual取得ゲートを守りながら、取得済みの実ONNXと同形�
 
 ## 実装した境界
 
-`apps/web/src/inference/local-model.ts`の`parseTrainedCatalog`は、承認済みのmodel ID・ライセンス・コードcommit、`voxelshogi/`配下のrepo・固定Hub revision、manifestとCard／LICENSEのbytes・SHA-256を読む。空catalogを許可し、未承認の成果物を自動登録しない。実際の学習済みモデルはまだ登録・配布していない。
+`apps/web/src/inference/local-model.ts`の`parseTrainedCatalog`は、承認済みのmodel ID・ライセンス・コードcommit、`voxelshogi/`配下のrepo・固定Hub revision、manifestとCard／LICENSEのbytes・SHA-256を読む。空catalogを許可し、未承認の成果物を自動登録しない。初期実装では学習済みモデルを登録しなかった。現在の配布・catalog登録と検証状態は[M6_PORTABLE](M6_PORTABLE.md)を参照する。
 
 `indexLocalFolder`はdirectory pickerから来るFileのパス・サイズだけで一覧を作る。同じrootからの安全な相対パスに限定し、重複・不正なパス・過大な件数／サイズを拒否する。最大512ファイル、1ファイル64 MiB、合計512 MiB。モデルの本体はWorkerが必要になった時だけ読み、読み込み前のサイズと実bytes・SHA-256を検査する。中断済みなら読み込み前、進行中の中断なら読み込み・hash照合後に停止する。
 
