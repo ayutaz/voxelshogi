@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'catalog-artifact-hash', file: 'scripts/inference-build.mjs', before: "createHash('sha256').update(catalogBytes).digest('hex')", after: "'0'.repeat(64)", test: 'model-distribution' },
+  { name: 'catalog-metadata-only', file: 'scripts/inference-build.mjs', before: "assert.deepEqual(readdirSync(resolve(root, 'models/m6')).sort(), ['catalog.json'], 'M6 public assets may contain only catalog metadata');", after: '', test: 'model-distribution' },
+  { name: 'catalog-served-bytes', file: 'scripts/verify-model-distribution.mjs', before: "const catalog = await read(new URL(path(application.catalog.path), origin + '/').href, application.catalog, true, null, true);", after: 'const catalog = { schema: 1, releases: [] };', test: 'model-distribution' },
   { name: 'required-real-model-ci', file: 'scripts/ci/gate.mjs', before: ", 'models'", after: '', test: 'gate' },
   { name: 'resident-set-unit', file: 'scripts/browser-memory.mjs', before: 'rssBytes: kib * 1024', after: 'rssBytes: kib * 1000', test: 'browser-memory' },
   { name: 'model-publication-license', file: 'scripts/prepare-inference.mjs', before: "assert.equal(manifest.license, 'Apache-2.0', 'model license must be approved before publication');", after: '', test: 'inference-package' },

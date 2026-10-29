@@ -15,6 +15,22 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'policy-client-terminate', file: 'inference/policy-client.ts', before: 'worker.terminate();', after: '', test: 'policy-client' },
+  { name: 'policy-client-stale-callback', file: 'inference/policy-client.ts', before: 'this.worker !== worker || !this.pending', after: '!this.pending', test: 'policy-client' },
+  { name: 'policy-client-stale-error', file: 'inference/policy-client.ts', before: 'if (this.worker === worker) this.fail(new Error(event.message', after: 'if (true) this.fail(new Error(event.message', test: 'policy-client' },
+  { name: 'policy-client-duplicate-id', file: 'inference/policy-client.ts', before: 'data.requestId !== pending.request.requestId', after: 'false', test: 'policy-client' },
+  { name: 'policy-client-source-snapshot', file: 'inference/policy-client.ts', before: 'source.files.map(entry => ({ ...entry }))', after: 'source.files', test: 'policy-client' },
+  { name: 'policy-protocol-root-revision', file: 'inference/policy-protocol.ts', before: 'rootKeys.some(key => root[key] !== request.root[key])', after: "rootKeys.some(key => key !== 'revision' && root[key] !== request.root[key])", test: 'policy-protocol' },
+  { name: 'policy-protocol-precision', file: 'inference/policy-protocol.ts', before: 'selectionKeys.every(key => first[key] === second[key])', after: "selectionKeys.every(key => key === 'precision' || first[key] === second[key])", test: 'policy-protocol' },
+  { name: 'policy-protocol-complete-fixtures', file: 'inference/policy-protocol.ts', before: 'result.fixtures.length !== expectedFixtures.length', after: 'false', test: 'policy-protocol' },
+  { name: 'policy-protocol-numeric-failure', file: 'inference/policy-protocol.ts', before: 'stats.exceeded !== 0', after: 'false', test: 'policy-protocol' },
+  { name: 'policy-factory-catalog-hash', file: 'inference/policy-factory.ts', before: 'item.manifest.sha256 === selection.packageHash', after: 'true', test: 'policy-factory' },
+  { name: 'policy-host-busy', file: 'inference/policy-host.ts', before: 'if (this.busy)', after: 'if (false)', test: 'policy-host' },
+  { name: 'policy-host-reuse', file: 'inference/policy-host.ts', before: 'if (!this.active) {', after: 'if (true) {', test: 'policy-host' },
+  { name: 'policy-worker-origin', file: 'inference/policy.worker.ts', before: "if (event.origin !== '') return;", after: '', test: 'policy-worker' },
+  { name: 'policy-host-late-initialization', file: 'inference/policy-host.ts', before: "if (this.closed) { await prepared.session.dispose(); throw new DOMException('policy initialization cancelled', 'AbortError'); }", after: '', test: 'policy-host' },
+  { name: 'policy-protocol-action-identity', file: 'inference/policy-protocol.ts', before: 'choice.action !== policyAction(choice.move, request.root.side)', after: 'false', test: 'policy-protocol' },
+  { name: 'policy-protocol-main-file-read', file: 'inference/policy-protocol.ts', before: 'indexLocalFolder(files.map(localFile));', after: 'files.forEach(entry => { void entry.file.arrayBuffer(); }); indexLocalFolder(files.map(localFile));', test: 'policy-protocol' },
   { name: 'policy-session-input-reference', file: 'inference/policy-session.ts', before: 'input.some((byte, index) => byte !== encoded[index])', after: 'false', test: 'policy-session' },
   { name: 'policy-session-all-fixtures', file: 'inference/policy-session.ts', before: 'for (const fixture of model.fixtures)', after: 'for (const fixture of model.fixtures.slice(0, 1))', test: 'policy-session' },
   { name: 'policy-session-precision', file: 'inference/policy-session.ts', before: 'this.port.createSession(bytes, selection.precision)', after: "this.port.createSession(bytes, 'fp32')", test: 'policy-session' },
@@ -140,7 +156,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 80);
+    assert.equal(results.length, 96);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

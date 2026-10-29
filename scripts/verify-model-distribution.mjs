@@ -11,7 +11,7 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch, 
     assert.ok(typeof name === 'string' && /^[a-zA-Z0-9_./-]+$/.test(name) && !name.startsWith('/') && !name.split('/').some(p => !p || p === '.' || p === '..'), 'unsafe distribution path');
     return name;
   };
-  const read = async (url, file = null, capture = false, onChunk = null) => {
+  const read = async (url, file = null, capture = false, onChunk = null, mutable = false) => {
     if (file) { path(file.path); assert.ok(Number.isSafeInteger(file.bytes) && file.bytes > 0 && file.bytes <= 25 * 1024 * 1024, 'invalid file size'); assert.match(file.sha256, /^[0-9a-f]{64}$/); }
     const response = await fetcher(url, { cache: 'no-store', redirect: 'error' });
     assert.equal(response.status, 200, `download failed: ${url}`);
@@ -26,7 +26,7 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch, 
     const mime = headers.get('content-type') ?? '', cache = headers.get('cache-control') ?? '';
     assert.ok(!mime.includes('text/html'), 'HTML fallback is not an artifact');
     if (url.endsWith('.mjs') || url.endsWith('.js')) assert.match(mime, /(?:javascript|ecmascript)/i, 'JavaScript MIME required');
-    if (file) assert.match(cache, /immutable/, 'content-addressed files must be immutable');
+    if (file) assert.match(cache, mutable ? /no-store/ : /immutable/, 'artifact cache policy mismatch');
     records.push({ url, bytes, sha256, mime, cache, contentEncoding: headers.get('content-encoding'), cors: headers.get('access-control-allow-origin') });
     return capture ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : null;
   };
@@ -38,6 +38,10 @@ export async function verifyDistribution(base, expectedCommit, fetcher = fetch, 
   if (expectedArtifact) assert.deepEqual(application, expectedArtifact.application, 'served files differ from tested application artifact');
   assert.ok(application.files.some(f => /^assets\/inference\.worker-.*\.js$/.test(f.path)), 'application Worker manifest missing');
   for (const file of application.files) await read(new URL(path(file.path), origin + '/').href, file);
+  assert.equal(application.catalog?.path, 'models/m6/catalog.json', 'trained catalog missing from tested artifact');
+  assert.ok(application.catalog.bytes <= 1024 * 1024, 'oversized trained catalog');
+  const catalog = await read(new URL(path(application.catalog.path), origin + '/').href, application.catalog, true, null, true);
+  assert.ok(catalog.schema === 1 && Array.isArray(catalog.releases), 'invalid served trained catalog');
   const indexUrl = modelBase + 'index.json', index = await read(indexUrl, null, true);
   if (expectedArtifact) assert.deepEqual(index, expectedArtifact.deployment, 'served files differ from tested model artifact');
   assert.match(records.at(-1).cache, /no-store/, 'model index must bypass cache');
