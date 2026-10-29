@@ -6,7 +6,7 @@ M6-2のための依存・検査コード。GPUを借りずに準備しており�
 
 通常の`pyproject.toml`／`uv.lock`はLinux CPU版torchのまま維持する。外部Linux x86_64の環境は`infrastructure/cuda/`に置き、Python3.14.9、公式`cu130` indexの`torch==2.14.1+cu130`と、その依存を別lockで固定した。学習・監査・変換の直接依存はCPU環境と同じ版にする。MacへCUDAのwheelやデータをインストールしない。
 
-初回CIではCUDA側に解決されたsetuptools78.1.0の既知脆弱性を依存監査とdependency reviewが検出し、mergeを停止した。公式wheelの条件`setuptools>=77.0.3`を満たす修正版84.1.0をCUDA側だけへ明示固定し、古い版への逆戻りもメタデータ検査で拒否する。[修正版の公式advisory](https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w)。監査のignoreや保護の解除は使わない。
+初回CIではCUDA側に解決されたsetuptools78.1.0の既知脆弱性を依存監査とdependency reviewが検出し、mergeを停止した。公式wheelの条件`setuptools>=77.0.3`を満たす修正版84.1.0をCUDA側だけへ明示固定し、古い版への逆戻りもメタデータ検査で拒否する。[修正版の公式advisory](https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w)。修正後はPR #50の必須CI・dependency review・CPU/GPU両lockの脆弱性監査が成功し、main `0e9875d`へ取り込み済み。Pythonの281テストと92既知変異も成功した。監査のignoreや保護の解除は使わない。
 
 外部Linuxでrepoのルートから実行する。
 

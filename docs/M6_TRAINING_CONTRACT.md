@@ -44,4 +44,4 @@ Valueは探索の尺度を圧縮した蒸留値で、勝率ではない。最初
 
 M6モデルはHFのpublic/manual・Community OFFで公開し、承認済み利用者が取得した実ONNXをWebのファイル選択で読み込む方式を採る。公開catalogのmodel ID・形式・hashに照合してWorkerへ渡す。重みを別の公開URLへ複製して取得ゲートを迂回しない。既存M3の承認済み配布は維持する。
 
-現時点で実装したのは教師抽出とデータ監査。学習・損失、保存再開、対局評価、変換後の測定、Webの読込・観戦は[M6計画](M6_PLAN.md)の後続作業である。Macで確認するのは小さい手書きmetadata fixtureの純粋テストだけで、Rust／Parquetの接続と全回帰はLinux CI、実データ監査と学習は外部Linuxで行う。
+教師抽出・データ監査、学習・損失と保存再開はPR #47〜#49で実装とCPU CIを確認済み。[固定testと対局評価](M6_EVALUATION.md)を実装中で、実データの学習・評価、変換後の測定、Webの読込・観戦は[M6計画](M6_PLAN.md)の後続作業である。Macで確認するのは小さい手書きmetadata fixtureの純粋テストだけで、Rust／Parquetの接続と全回帰はLinux CI、実データ監査と学習は外部Linuxで行う。
