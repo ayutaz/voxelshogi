@@ -113,5 +113,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
   - M6 / Phase4: 3 epoch／22,413更新、固定test・各60局、3形式のHF公開、公開実GPU48条件／40切替・3形式着手・7 E2E、資源解放まで完了（[記録](docs/M6_COMPLETION.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. [M6後の実行計画](docs/POST_M6_PLAN.md)のP5-0で評価契約v2と独立テストを作る。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。Phase6までの実行指示に基づき、評価runner・外部試行・自己対局・構造比較へ進む。metadata契約境界はPR #77で取り込み済み。現在は`docs/P5_EVALUATION.md`のLinux専用runnerとRust全手再生の接続を実装中。
+  1. [M6後の実行計画](docs/POST_M6_PLAN.md)のP5-0で評価契約v2と独立テストを作る。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。Phase6までの実行指示に基づき、評価runner・外部試行・自己対局・構造比較へ進む。metadata契約境界はPR #77で取り込み済み。Linux専用runner・Rust全手再生はPR #78で取り込み済み。現在は`docs/P5_EXECUTION.md`の用途別費用制御を検証中で、実局面集合・全件漏洩監査・外部試行が後続。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
