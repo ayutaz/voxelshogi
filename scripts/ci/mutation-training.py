@@ -12,6 +12,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-loss-integer-visit-total",
+        "training/research_learning.py",
+        'or type(policy["total_visits"]) is not int',
+        "or False",
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-boolean-probability",
+        "training/research_learning.py",
+        'or any(type(p) not in (int, float) for p in policy["probabilities"])',
+        "or False",
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-all-legal-denominator",
+        "training/research_learning.py",
+        "F.log_softmax(logits[i, legal], dim=0)",
+        'F.log_softmax(logits[i, torch.tensor(policies[i]["actions"], device=logits.device)], dim=0)',
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-visit-weights",
+        "training/research_learning.py",
+        "weights * log_probabilities[selected]",
+        "log_probabilities[selected] / len(selected)",
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-value-weight",
+        "training/research_learning.py",
+        '"total": policy + value_weight * value',
+        '"total": policy + value',
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-value-origin",
+        "training/research_learning.py",
+        'or label.get("kind") != value_kind',
+        "or False",
+        "test_research_learning.py",
+    ),
+    (
+        "research-loss-batch-mean",
+        "training/research_learning.py",
+        "policy = torch.stack(terms).mean()",
+        "policy = torch.stack(terms).sum()",
+        "test_research_learning.py",
+    ),
+    (
         "python-fork-independent-session",
         f"{PACKAGE}/__init__.py",
         "game._engine = self._engine.fork()",
