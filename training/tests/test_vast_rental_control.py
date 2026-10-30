@@ -266,7 +266,7 @@ def test_official_client_keeps_key_in_header_and_suppresses_error_body():
     class Opener:
         def open(self, request, timeout):
             assert (
-                request.full_url == "https://console.vast.ai/api/v1/instances?limit=25"
+                request.full_url == "https://console.vast.ai/api/v1/instances/?limit=25"
             )
             assert request.get_header("Authorization") == "Bearer opaque-key"
             assert timeout == 40
@@ -385,3 +385,49 @@ def test_unknown_nonfinite_hardware_facts_do_not_form_a_quote(field):
     item[field] = float("nan")
     with pytest.raises(ValueError):
         quote_offer(item)
+
+
+@pytest.mark.parametrize(
+    "method,path,expected",
+    [
+        ("GET", "/api/v0/users/current", "/api/v0/users/current/"),
+        ("GET", "/api/v1/instances/", "/api/v1/instances/"),
+        ("POST", "/api/v0/bundles", "/api/v0/bundles/"),
+        ("PUT", "/api/v0/asks/123", "/api/v0/asks/123/"),
+        ("DELETE", "/api/v0/instances/456", "/api/v0/instances/456/"),
+    ],
+)
+def test_client_targets_canonical_routes_without_following_a_redirect(
+    method, path, expected
+):
+    import io
+
+    from training.vast_rental_control import VastClient
+
+    class Opener:
+        def open(self, request, timeout):
+            assert request.full_url == "https://console.vast.ai" + expected
+            assert request.get_method() == method
+            assert request.get_header("Authorization") == "Bearer opaque-key"
+            return io.BytesIO(b'{"success":true}')
+
+    assert VastClient("opaque-key", Opener())(method, path) == {"success": True}
+
+
+def test_redirect_response_stays_an_error_with_no_body_or_credentials_in_output():
+    import urllib.error
+
+    from training.vast_rental_control import VastClient
+
+    class Redirect:
+        def open(self, request, timeout):
+            raise urllib.error.HTTPError(
+                request.full_url,
+                301,
+                "opaque-key",
+                {"Location": "https://other.invalid"},
+                None,
+            )
+
+    with pytest.raises(RuntimeError, match="^Vast.ai HTTP 301$"):
+        VastClient("opaque-key", Redirect())("GET", "/api/v0/users/current")
