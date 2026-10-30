@@ -1,5 +1,7 @@
 # Phase5自己対局：探索とActorの契約
 
+完成episodeの独立した再生・ラベル検証と保存は[Replay Buffer](P5_REPLAY.md)を参照。
+
 2026-10-30。[P5-2](POST_M6_PLAN.md#phase5)に向け、最初の探索方式を
 PUCTに固定する。[探索核](../training/selfplay_search.py)は手書きの木で
 数式と停止を検証する部分で、実モデルの自己対局を完了した記録ではない。

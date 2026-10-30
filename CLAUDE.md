@@ -11,7 +11,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/POST_M6_PLAN.md`のP5-1（`docs/P5_DATA_PLAN.md`）→1GPU自己対局→世代比較→複数GPU→構造比較の順。P5-0は完了（`docs/P5_PILOT.md`）。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、P5試行US$4を加えプロジェクトUS$65／基本枠100、追加US$100は未使用。実請求は未回収。使用GPUは資源解放済み。
+- 次の実行計画: `docs/POST_M6_PLAN.md`のP5-1（`docs/P5_DATA_PLAN.md`）→1GPU自己対局→世代比較→複数GPU→構造比較の順。P5-0は完了（`docs/P5_PILOT.md`）。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、P5評価US$4とデータ試行US$4を加えプロジェクトUS$69／基本枠100、追加US$100は未使用。実請求は未回収。P5-1の外部試行を開始（`docs/experiments/p5-data-launch-2026-10-30.json`、06:02 UTC時点で入力取得中）。結果と資源終了は確認待ち。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`

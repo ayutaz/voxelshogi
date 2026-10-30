@@ -1,0 +1,55 @@
+{
+  "schema": "voxelshogi-p5-data-launch-proof-v1",
+  "received_at_utc": "2026-10-30T06:02:12Z",
+  "purpose": "phase5-data",
+  "pipeline_complete": false,
+  "source_commit": "668ea5dae772e28af422e2a544125e1b9cbc2940",
+  "validated_pr": "https://github.com/ayutaz/voxelshogi/pull/89",
+  "protocol_sha256": "c3823dc0dfe754cdc5975b8101fcd75ad5d0a37eae1af24baee68cb441dbf573",
+  "workload_sha256": "f2abe7a7f4ac424d4ce34652d84e15ab745e769fded7dd95c1f0bf0840d2f883",
+  "instance_id": "e6de287a-d425-11f1-af00-3b87432bf57c",
+  "lease": {
+    "requested_at": 1793339466.376899,
+    "stop_at": 1793352966.376899,
+    "maximum_end_at": 1793353866.376899,
+    "hourly_usd": 0.65,
+    "consumption_cap_usd": 4.0
+  },
+  "project_reserved_usd": 69,
+  "project_base_cap_usd": 100,
+  "phase5_reserved_usd": 8,
+  "phase5_initial_cap_usd": 20,
+  "conditional_extra_usd_activated": false,
+  "actual_invoice_collected": false,
+  "worker_launch": {
+    "pid": 3026,
+    "create_time": 1793340111.46,
+    "at": 1793340112.172973,
+    "source_commit": "668ea5dae772e28af422e2a544125e1b9cbc2940",
+    "workload_sha256": "f2abe7a7f4ac424d4ce34652d84e15ab745e769fded7dd95c1f0bf0840d2f883"
+  },
+  "verified_observation": {
+    "pid": 3026,
+    "running": true,
+    "stage": "download-frozen-corpus"
+  },
+  "bootstrap": {
+    "complete": true,
+    "source_commit": "668ea5dae772e28af422e2a544125e1b9cbc2940",
+    "python": "3.14.9",
+    "torch": "2.14.1+cu130",
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "completed_at": 1793339586.7936618
+  },
+  "publication": {
+    "repo_id": "voxelshogi/voxelshogi-search-v1",
+    "repo_type": "dataset",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true,
+    "license": "cc-by-4.0",
+    "license_basis": "same self-generated synthetic data family and standing additional-data/publication authorization"
+  },
+  "scope": "launch observation only; generation, validation, reproduction, HF data publication and resource release not yet confirmed"
+}
