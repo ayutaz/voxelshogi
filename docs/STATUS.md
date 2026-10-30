@@ -1,16 +1,18 @@
 # 現在の状態と文書の案内
 
-**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5の[P5-0評価契約](P5_EVALUATION.md)に着手。Phase6〜7は未着手。
+**M6／Phase4完了（2026-10-29 UTC）、Phase5進行中**：[M6完了記録](M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認した。2026-10-30 UTCに[P5-0の開発用評価32局](P5_PILOT.md)と全手再生・凍結コーパス照合を完了し、使用GPUも資源解放済み。棋力改善は未確認。Phase6〜7は未着手。
 
 **初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
 
-確認: **2026-10-30（JST）**。M4／Phase3、固定3局のM5、M6-5／Phase4まで完了。[M6完了証拠](M6_COMPLETION.md)。次はPhase5〜7の計画。過去の性能・公開記録は日時と対象SHAを保持し、現在の公開SHAは`build-info.json`と対応する成功CIから確認する。
+確認: **2026-10-30（JST）**。M4／Phase3、固定3局のM5、M6-5／Phase4、P5-0の開発用試行まで完了。次は[P5-1の教師・長期対局分布の比較](P5_DATA_PLAN.md)。過去の性能・公開記録は日時と対象SHAを保持し、現在の公開SHAは`build-info.json`と対応する成功CIから確認する。
 
 M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903d96fbc2`（[最終公開記録](experiments/m2-final-publication.json)）。性能計測の対象 `3a500cd` と最終版の実行ファイルは同一であり、計測JSONの元SHAは保持する。これは固定した検証対象であり、後続の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。M1時点の `2405e86` の記録は後半に保持する。
 
 ## 次の実装と文書更新時の照合
 
-次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase6までの実行指示を受け、P5-0のmetadata契約・集計・独立テストは[PR #77](https://github.com/ayutaz/voxelshogi/pull/77)で必須・関連CI成功後に取り込み済み。Linux用runner・全手再生も[PR #78](https://github.com/ayutaz/voxelshogi/pull/78)で必須・関連CI成功後に取り込み済み。用途別費用制御も[PR #80](https://github.com/ayutaz/voxelshogi/pull/80)で取り込み済み。実局面と全継続局面の漏洩監査をCI検証中。外部試行、追加生成、GPU学習、Phase6の構造比較は未実施。
+次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-1：教師と分布の比較**。[開発用評価32局](P5_PILOT.md)はM1対M1が5勝5敗4引分2打切り、M6対M1が2勝6敗4引分4打切りで、全手再生・凍結コーパス全行との物理局面照合まで完了した。少数の露出済み局面による診断で、棋力改善の証明ではない。PR #82〜#87では学習ラベル・PUCT・履歴複製・疎損失・Actor・検証付きPolicy/Valueを取り込み済み。次は教師／長期対局試料とReplay Buffer・世代更新を接続する。追加生成、複数世代自己対局学習、別実機再開、複数GPU、Phase6の構造比較は未実施。
+
+P5-0使用実機は05:13 UTCに`Inactive`・`resources_released=true`を確認した。保守的予約上限は全体US$65／基本枠100、Phase5 US$4／初期枠20。追加US$100は未使用、実請求は未回収。[費用・実行制御](P5_EXECUTION.md)を参照。
 
 文書更新開始時点のmain／公開版は`16b2b2733b74f176ce65a2e0f334edb710db4a71`。[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40943910648)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40943910611)は成功、公開catalogは最終HF revisionに一致した（[固定した読取記録](experiments/post-m6-plan-baseline-2026-10-30.json)）。物理計測対象は`564715a`のまま保持し、後続の文書公開へ実測値を付け替えない。最新の配信SHAは公開`build-info.json`を確認する。
 
@@ -26,6 +28,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
 | M4〜M6完了 | M4の全生成・検証・HF公開、M5固定3局145手の一致、M6の学習・復旧・全3形式・公開実機・資源終了まで完了。[目的とゴール](ROADMAP.md)・[M6証拠](M6_COMPLETION.md) |
+| Phase5進行中 | [P5-0の32局試行](P5_PILOT.md)を完了。Actor・Policy/Value等の基盤は実装済み。次は[P5-1](P5_DATA_PLAN.md)。複数世代、別実機再開、1／4GPU学習は後続 |
 
 M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重みと、WASMの全3形式が数値基準を満たした。FP16×WebGPUは基準未達として拒否。3DありFP32 WebGPU中央値55.00〜56.95ms、Chrome RSS合計の観測最大約1.36 GiB。未学習モデルの技術デモで、通常の探索対局とは別。HTTP 500を1回観測した失敗・回復も保存、M3では有料GPU・R2を使わなかった。その後のM6学習・公開実GPU検証は[完了記録](M6_COMPLETION.md)を参照。R2は未実施。[全JSON・限界](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst)
 
@@ -130,7 +133,7 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 
 | 文書 | 用途・今回の扱い |
 |---|---|
-| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M6／Phase4完了、次のP5-0と段階別の費用・検証条件、固定ツール・コマンドへそろえる |
+| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M6／Phase4・P5-0完了、次のP5-1と段階別の費用・検証条件、固定ツール・コマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5は固定した改定後3局の全件一致を確認。完全互換は未検証 |

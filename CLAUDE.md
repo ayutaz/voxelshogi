@@ -1,6 +1,6 @@
 # CLAUDE.md — VoxelShogi
 
-**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](docs/M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5のP5-0評価契約に着手。Phase6〜7は未着手。
+**M6／Phase4完了（2026-10-29 UTC）、Phase5進行中**：[M6完了記録](docs/M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認した。2026-10-30 UTCに[P5-0の開発用評価32局](docs/P5_PILOT.md)と全手再生・凍結コーパス照合を完了し、使用GPUも資源解放済み。棋力改善は未確認。次はP5-1の教師・長期対局分布の比較。Phase6〜7は未着手。
 
 **初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](docs/M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
 
@@ -11,7 +11,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: M6-5まで完了（`docs/M6_COMPLETION.md`）。次は`docs/POST_M6_PLAN.md`のP5-0（評価v2の契約・独立テスト）から進む。評価→教師／長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較の順。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、プロジェクトUS$61／基本枠100、追加US$100は未使用。GPUはすべて資源解放済み。
+- 次の実行計画: `docs/POST_M6_PLAN.md`のP5-1（`docs/P5_DATA_PLAN.md`）→1GPU自己対局→世代比較→複数GPU→構造比較の順。P5-0は完了（`docs/P5_PILOT.md`）。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、P5試行US$4を加えプロジェクトUS$65／基本枠100、追加US$100は未使用。実請求は未回収。使用GPUは資源解放済み。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -113,5 +113,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
   - M6 / Phase4: 3 epoch／22,413更新、固定test・各60局、3形式のHF公開、公開実GPU48条件／40切替・3形式着手・7 E2E、資源解放まで完了（[記録](docs/M6_COMPLETION.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. [M6後の実行計画](docs/POST_M6_PLAN.md)のP5-0で評価契約v2と独立テストを作る。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。Phase6までの実行指示に基づき、評価runner・外部試行・自己対局・構造比較へ進む。metadata契約境界はPR #77で取り込み済み。Linux専用runner・Rust全手再生はPR #78で取り込み済み。用途別費用制御はPR #80で取り込み済み。現在は`docs/P5_EVALUATION.md`の実局面・全継続局面監査をCI検証中。外部試行は未実施。
+  1. [P5-1の教師と分布の比較](docs/P5_DATA_PLAN.md)を具体化する。[P5-0の開発用評価](docs/P5_PILOT.md)は32局・全手再生・凍結コーパスの物理局面照合まで完了。M6対M1は2勝6敗4引分4打切りで、棋力改善の証明ではない。PR #82〜#87で学習ラベル・PUCT・履歴複製・疎損失・Actor・検証付きPolicy/Valueを取り込み済み。次は教師／長期対局試料とReplay Buffer・世代更新の接続。実際の複数世代自己対局、別実機再開、複数GPU、Phase6の構造比較は未実施で、[段階別計画](docs/POST_M6_PLAN.md)の完了条件を維持する。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。

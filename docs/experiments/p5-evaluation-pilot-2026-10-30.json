@@ -1,0 +1,817 @@
+{
+  "schema": "voxelshogi-p5-evaluation-pilot-proof-v1",
+  "purpose": "development diagnostics; not unseen strength holdout",
+  "report": {
+    "complete": true,
+    "dataset_revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+    "elapsed_seconds": 6036.140080771,
+    "model_revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+    "model_weight_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+    "new_hf_publication": false,
+    "results": {
+      "control": {
+        "leakage": {
+          "cases_with_overlap": [],
+          "corpus_contract": {
+            "config": "production-64",
+            "evaluation": {
+              "cutoff_is_draw": false,
+              "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+              "max_plies": 256,
+              "opening_plies": 8,
+              "opening_seeds": {
+                "random": [
+                  7000,
+                  7001,
+                  7002,
+                  7003,
+                  7004,
+                  7005,
+                  7006,
+                  7007,
+                  7008,
+                  7009,
+                  7010,
+                  7011,
+                  7012,
+                  7013,
+                  7014,
+                  7015,
+                  7016,
+                  7017,
+                  7018,
+                  7019
+                ],
+                "search": [
+                  8000,
+                  8001,
+                  8002,
+                  8003,
+                  8004,
+                  8005,
+                  8006,
+                  8007,
+                  8008,
+                  8009
+                ]
+              },
+              "opponent_seed": "100000 + opening seed",
+              "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+              "primary_win_rate": "wins / games_started",
+              "schema": "voxelshogi-evaluation-v1",
+              "search_limits": {
+                "max_depth": 2,
+                "max_nodes": 10000,
+                "table_capacity": 4096
+              },
+              "swap_model_colors": true
+            },
+            "features": "voxelshogi-standard-features-v1",
+            "loss_policy": "mean cross entropy over engine-supplied legal actions",
+            "loss_value": "mean squared error",
+            "loss_value_weight": 1,
+            "mate_score": 1000000,
+            "policy_actions": 1067985,
+            "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+            "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+            "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+            "ruleset_id": "voxelshogi-standard-v1",
+            "schema": "voxelshogi-supervision-v1",
+            "selection_split": "val",
+            "test_role": "final selected checkpoint and predeclared conversion comparison only",
+            "training_seed": 314159,
+            "value_scale": 1000,
+            "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+          },
+          "corpus_inventory_sha256": "6dbcea9e7f1a52c52c869623fec849443fe13885dc39f1bf19191292e7aeef98",
+          "corpus_positions": 113321,
+          "corpus_rows": 116921,
+          "evaluation_positions": 371,
+          "overlaps_by_split": {
+            "test": 0,
+            "train": 0,
+            "val": 0
+          },
+          "passed": true,
+          "protocol_sha256": "92e4c923f866692e4e72d35f15b4c23edbb2e4cbb7ad2d74f80829c74ca57b00",
+          "scope": "all supplied scored continuation and terminal positions; shared book prefix excluded",
+          "scope_note": "All published M6 corpus rows, including duplicates and all splits, are excluded; this is not an audit of later new datasets."
+        },
+        "summary": {
+          "by_side": {
+            "b": {
+              "additional_plies": {
+                "max": 220,
+                "mean": 57.0,
+                "min": 1
+              },
+              "completed_score_rate": 0.42857142857142855,
+              "cutoffs": 1,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 61.34399637887498,
+                "total": 490.7519710309998
+              },
+              "games": 8,
+              "losses": 3,
+              "score_bounds": [
+                0.375,
+                0.5
+              ],
+              "termination_rate": 0.875,
+              "win_rate": 0.25,
+              "wins": 2
+            },
+            "w": {
+              "additional_plies": {
+                "max": 220,
+                "mean": 57.0,
+                "min": 1
+              },
+              "completed_score_rate": 0.5714285714285714,
+              "cutoffs": 1,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 61.36426942537514,
+                "total": 490.91415540300113
+              },
+              "games": 8,
+              "losses": 2,
+              "score_bounds": [
+                0.5,
+                0.625
+              ],
+              "termination_rate": 0.875,
+              "win_rate": 0.375,
+              "wins": 3
+            }
+          },
+          "by_stratum": {
+            "endgame": {
+              "additional_plies": {
+                "max": 128,
+                "mean": 64.5,
+                "min": 1
+              },
+              "completed_score_rate": 0.5,
+              "cutoffs": 2,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 9.997805444000164,
+                "total": 39.99122177600066
+              },
+              "games": 4,
+              "losses": 0,
+              "score_bounds": [
+                0.25,
+                0.75
+              ],
+              "termination_rate": 0.5,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "middlegame": {
+              "additional_plies": {
+                "max": 220,
+                "mean": 220.0,
+                "min": 220
+              },
+              "completed_score_rate": 0.5,
+              "cutoffs": 0,
+              "draws": 0,
+              "elapsed_seconds": {
+                "mean": 400.3703173195004,
+                "total": 800.7406346390007
+              },
+              "games": 2,
+              "losses": 1,
+              "score_bounds": [
+                0.5,
+                0.5
+              ],
+              "termination_rate": 1.0,
+              "win_rate": 0.5,
+              "wins": 1
+            },
+            "opening": {
+              "additional_plies": {
+                "max": 103,
+                "mean": 103.0,
+                "min": 103
+              },
+              "completed_score_rate": 0.5,
+              "cutoffs": 0,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 70.33498222799972,
+                "total": 140.66996445599943
+              },
+              "games": 2,
+              "losses": 0,
+              "score_bounds": [
+                0.5,
+                0.5
+              ],
+              "termination_rate": 1.0,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "tactical": {
+              "additional_plies": {
+                "max": 1,
+                "mean": 1.0,
+                "min": 1
+              },
+              "completed_score_rate": 0.5,
+              "cutoffs": 0,
+              "draws": 0,
+              "elapsed_seconds": {
+                "mean": 0.0330381953750134,
+                "total": 0.2643055630001072
+              },
+              "games": 8,
+              "losses": 4,
+              "score_bounds": [
+                0.5,
+                0.5
+              ],
+              "termination_rate": 1.0,
+              "win_rate": 0.5,
+              "wins": 4
+            }
+          },
+          "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+          "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+          "model_sha256": "8f4ae0e23ec66c136563b39d905f105460b38cec6d5f7459b22aa43bc4342cf1",
+          "opponent_sha256": "8f4ae0e23ec66c136563b39d905f105460b38cec6d5f7459b22aa43bc4342cf1",
+          "overall": {
+            "additional_plies": {
+              "max": 220,
+              "mean": 57.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 2,
+            "draws": 4,
+            "elapsed_seconds": {
+              "mean": 61.35413290212506,
+              "total": 981.666126434001
+            },
+            "games": 16,
+            "losses": 5,
+            "paired_win_rate95": [
+              0.125,
+              0.4375
+            ],
+            "pairs": 8,
+            "score_bounds": [
+              0.4375,
+              0.5625
+            ],
+            "termination_rate": 0.875,
+            "win_rate": 0.3125,
+            "wins": 5
+          },
+          "protocol_sha256": "92e4c923f866692e4e72d35f15b4c23edbb2e4cbb7ad2d74f80829c74ca57b00",
+          "schema": "voxelshogi-evaluation-v2",
+          "sensitivity": {
+            "criteria": {
+              "minimum_pairs": 8,
+              "minimum_termination_rate": 0.25
+            },
+            "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+            "sufficient": true
+          },
+          "verification_scope": "all match records Rust replayed; full-corpus leakage audit is separate"
+        }
+      },
+      "m6": {
+        "leakage": {
+          "cases_with_overlap": [],
+          "corpus_contract": {
+            "config": "production-64",
+            "evaluation": {
+              "cutoff_is_draw": false,
+              "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+              "max_plies": 256,
+              "opening_plies": 8,
+              "opening_seeds": {
+                "random": [
+                  7000,
+                  7001,
+                  7002,
+                  7003,
+                  7004,
+                  7005,
+                  7006,
+                  7007,
+                  7008,
+                  7009,
+                  7010,
+                  7011,
+                  7012,
+                  7013,
+                  7014,
+                  7015,
+                  7016,
+                  7017,
+                  7018,
+                  7019
+                ],
+                "search": [
+                  8000,
+                  8001,
+                  8002,
+                  8003,
+                  8004,
+                  8005,
+                  8006,
+                  8007,
+                  8008,
+                  8009
+                ]
+              },
+              "opponent_seed": "100000 + opening seed",
+              "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+              "primary_win_rate": "wins / games_started",
+              "schema": "voxelshogi-evaluation-v1",
+              "search_limits": {
+                "max_depth": 2,
+                "max_nodes": 10000,
+                "table_capacity": 4096
+              },
+              "swap_model_colors": true
+            },
+            "features": "voxelshogi-standard-features-v1",
+            "loss_policy": "mean cross entropy over engine-supplied legal actions",
+            "loss_value": "mean squared error",
+            "loss_value_weight": 1,
+            "mate_score": 1000000,
+            "policy_actions": 1067985,
+            "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+            "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+            "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+            "ruleset_id": "voxelshogi-standard-v1",
+            "schema": "voxelshogi-supervision-v1",
+            "selection_split": "val",
+            "test_role": "final selected checkpoint and predeclared conversion comparison only",
+            "training_seed": 314159,
+            "value_scale": 1000,
+            "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+          },
+          "corpus_inventory_sha256": "6dbcea9e7f1a52c52c869623fec849443fe13885dc39f1bf19191292e7aeef98",
+          "corpus_positions": 113321,
+          "corpus_rows": 116921,
+          "evaluation_positions": 1347,
+          "overlaps_by_split": {
+            "test": 0,
+            "train": 0,
+            "val": 0
+          },
+          "passed": true,
+          "protocol_sha256": "16fda6c90806b44286b1ee14537e61677dcaca3ce478ab53779629af4a1f8026",
+          "scope": "all supplied scored continuation and terminal positions; shared book prefix excluded",
+          "scope_note": "All published M6 corpus rows, including duplicates and all splits, are excluded; this is not an audit of later new datasets."
+        },
+        "summary": {
+          "by_side": {
+            "b": {
+              "additional_plies": {
+                "max": 512,
+                "mean": 127.75,
+                "min": 1
+              },
+              "completed_score_rate": 0.3333333333333333,
+              "cutoffs": 2,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 117.20444280200013,
+                "total": 937.635542416001
+              },
+              "games": 8,
+              "losses": 3,
+              "score_bounds": [
+                0.25,
+                0.5
+              ],
+              "termination_rate": 0.75,
+              "win_rate": 0.125,
+              "wins": 1
+            },
+            "w": {
+              "additional_plies": {
+                "max": 343,
+                "mean": 72.375,
+                "min": 1
+              },
+              "completed_score_rate": 0.3333333333333333,
+              "cutoffs": 2,
+              "draws": 2,
+              "elapsed_seconds": {
+                "mean": 58.31653279999989,
+                "total": 466.5322623999991
+              },
+              "games": 8,
+              "losses": 3,
+              "score_bounds": [
+                0.25,
+                0.5
+              ],
+              "termination_rate": 0.75,
+              "win_rate": 0.125,
+              "wins": 1
+            }
+          },
+          "by_stratum": {
+            "endgame": {
+              "additional_plies": {
+                "max": 128,
+                "mean": 36.25,
+                "min": 1
+              },
+              "completed_score_rate": 0.5,
+              "cutoffs": 1,
+              "draws": 3,
+              "elapsed_seconds": {
+                "mean": 1.6436372084997402,
+                "total": 6.574548833998961
+              },
+              "games": 4,
+              "losses": 0,
+              "score_bounds": [
+                0.375,
+                0.625
+              ],
+              "termination_rate": 0.75,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "middlegame": {
+              "additional_plies": {
+                "max": 512,
+                "mean": 427.5,
+                "min": 343
+              },
+              "completed_score_rate": 0.0,
+              "cutoffs": 1,
+              "draws": 0,
+              "elapsed_seconds": {
+                "mean": 482.15863055850014,
+                "total": 964.3172611170003
+              },
+              "games": 2,
+              "losses": 1,
+              "score_bounds": [
+                0.0,
+                0.5
+              ],
+              "termination_rate": 0.5,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "opening": {
+              "additional_plies": {
+                "max": 490,
+                "mean": 296.5,
+                "min": 103
+              },
+              "completed_score_rate": 0.25,
+              "cutoffs": 0,
+              "draws": 1,
+              "elapsed_seconds": {
+                "mean": 216.46728909800004,
+                "total": 432.9345781960001
+              },
+              "games": 2,
+              "losses": 1,
+              "score_bounds": [
+                0.25,
+                0.25
+              ],
+              "termination_rate": 1.0,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "tactical": {
+              "additional_plies": {
+                "max": 1,
+                "mean": 1.0,
+                "min": 1
+              },
+              "completed_score_rate": 0.3333333333333333,
+              "cutoffs": 2,
+              "draws": 0,
+              "elapsed_seconds": {
+                "mean": 0.042677083625108025,
+                "total": 0.3414166690008642
+              },
+              "games": 8,
+              "losses": 4,
+              "score_bounds": [
+                0.25,
+                0.5
+              ],
+              "termination_rate": 0.75,
+              "win_rate": 0.25,
+              "wins": 2
+            }
+          },
+          "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+          "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+          "model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+          "opponent_sha256": "8f4ae0e23ec66c136563b39d905f105460b38cec6d5f7459b22aa43bc4342cf1",
+          "overall": {
+            "additional_plies": {
+              "max": 512,
+              "mean": 100.0625,
+              "min": 1
+            },
+            "completed_score_rate": 0.3333333333333333,
+            "cutoffs": 4,
+            "draws": 4,
+            "elapsed_seconds": {
+              "mean": 87.76048780100001,
+              "total": 1404.1678048160002
+            },
+            "games": 16,
+            "losses": 6,
+            "paired_win_rate95": [
+              0.0,
+              0.3125
+            ],
+            "pairs": 8,
+            "score_bounds": [
+              0.25,
+              0.5
+            ],
+            "termination_rate": 0.75,
+            "win_rate": 0.125,
+            "wins": 2
+          },
+          "protocol_sha256": "16fda6c90806b44286b1ee14537e61677dcaca3ce478ab53779629af4a1f8026",
+          "schema": "voxelshogi-evaluation-v2",
+          "sensitivity": {
+            "criteria": {
+              "minimum_pairs": 8,
+              "minimum_termination_rate": 0.25
+            },
+            "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+            "sufficient": true
+          },
+          "verification_scope": "all match records Rust replayed; full-corpus leakage audit is separate"
+        }
+      }
+    },
+    "schema": "voxelshogi-p5-evaluation-pilot-v1",
+    "source_commit": "bbc518dfa8f735aabeb55de289027b8ccccfce58",
+    "training_performed": false
+  },
+  "bootstrap": {
+    "complete": true,
+    "source_commit": "bbc518dfa8f735aabeb55de289027b8ccccfce58",
+    "python": "3.14.9",
+    "torch": "2.14.1+cu130",
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "at": 1793330545.6218386
+  },
+  "resources": {
+    "interval_seconds": 2,
+    "last_cpu_seconds": 2604.27,
+    "max_system_memory_percent": 12.6,
+    "mean_gpu_util_percent": 0.5059732958538299,
+    "peak_gpu_memory_used_mib": 739.0,
+    "peak_rss_bytes": 1732984832,
+    "samples": 1460
+  },
+  "resource_scope": "worker RSS/CPU plus device-wide GPU samples; small isolated-checkout tests shared this VM; not an exclusive benchmark",
+  "lease": {
+    "provider": "cloudrift",
+    "instance_id": "164841f2-d40f-11f1-9add-0351b764cb3c",
+    "status": "Inactive",
+    "resources_released": true,
+    "release_confirmed_at": 1793337230.502433,
+    "requested_at": 1793329667.389827,
+    "hourly_usd": 0.65,
+    "reservation_cap_usd": 4.0,
+    "project_reserved_usd": 65,
+    "project_base_cap_usd": 100,
+    "conditional_extra_usd_activated": false,
+    "actual_invoice_collected": false
+  },
+  "workload_sha256": "40b7649e20338d25174f3fef86024902a2590e66096ce752b3c0230d60908e45",
+  "input_verification": {
+    "model": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+      "release_sha256": "4b3c4a136eaa96dc57d52aca31cf1cfb36fac09cdd958b73e8e45e089834b187",
+      "repo_id": "voxelshogi/voxelshogi-transformer-s",
+      "repo_type": "model",
+      "verified": true
+    },
+    "dataset": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+      "release_sha256": "ec056cb1b8be69be035c4ff1e171148621cdc192519c5f4a428925c9d80baf0c",
+      "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+      "repo_type": "dataset",
+      "verified": true
+    }
+  },
+  "runs": {
+    "control": {
+      "complete": true,
+      "files": [
+        {
+          "bytes": 775,
+          "path": "mate-black-b.json",
+          "sha256": "e838cf87d22e279d5b44ab1d600cc1aac471d9e6f3163ad79f38304e234f9f9d"
+        },
+        {
+          "bytes": 777,
+          "path": "mate-black-w.json",
+          "sha256": "866bad902652881d3fa00f4b180f428b048fa33fa0c6bbdfa809909f864b6ca4"
+        },
+        {
+          "bytes": 777,
+          "path": "mate-white-b.json",
+          "sha256": "74a2ce293ab0e1a7357e34ffddc81a3f04edf0216cb30e52d17b72c54c79a763"
+        },
+        {
+          "bytes": 775,
+          "path": "mate-white-w.json",
+          "sha256": "49637241e30879f506d6cba94feeb2daec024f5d49d1a0e5d460563e7fea2f8a"
+        },
+        {
+          "bytes": 784,
+          "path": "mate-black-offset-b.json",
+          "sha256": "3452994754831158fa77f51cf85cfc3b942149318f7030993417673cb6d73b0d"
+        },
+        {
+          "bytes": 784,
+          "path": "mate-black-offset-w.json",
+          "sha256": "1fd85a8cbe556c3c7a5a7d925dea1af64a0544540067bb7a19121d539f619a7f"
+        },
+        {
+          "bytes": 784,
+          "path": "mate-white-offset-b.json",
+          "sha256": "a4de9ad46508c23f5a0392383486b97c8b42abeeabfea9ebc498cd520847a2b4"
+        },
+        {
+          "bytes": 783,
+          "path": "mate-white-offset-w.json",
+          "sha256": "9a607a03fbf6853b0ca8213a85a63170977b197c1c0a6faab1499edacb6f4065"
+        },
+        {
+          "bytes": 866,
+          "path": "repetition-near-end-b.json",
+          "sha256": "94b66db04ca6b34cb31295b446077d87f3530301a54e795ccaedd53791a52306"
+        },
+        {
+          "bytes": 866,
+          "path": "repetition-near-end-w.json",
+          "sha256": "d0d79266d9b0f24ed5fa1b535b6f3cd18b8d1c6db21dc955e8213da63bb33701"
+        },
+        {
+          "bytes": 1916,
+          "path": "material-ending-b.json",
+          "sha256": "a9ccd2136590a8367104d28277d1ce1834b7eb74b28ed38826511d7e0e4ccb19"
+        },
+        {
+          "bytes": 1916,
+          "path": "material-ending-w.json",
+          "sha256": "c4d76844b8173a1c7ce3b6ecd4d04a3ec915fc240300e46f905f9c39c7c6ae05"
+        },
+        {
+          "bytes": 2180,
+          "path": "standard-opening-b.json",
+          "sha256": "aa7ea93e03ec830fb061465646a59c56172d675018a78eb8566cb21f84459b0e"
+        },
+        {
+          "bytes": 2180,
+          "path": "standard-opening-w.json",
+          "sha256": "02ac173d12a4c69147096590c0e0060ebeaadbed33eaf57e4b1d11ea939dbc6d"
+        },
+        {
+          "bytes": 3963,
+          "path": "standard-middle-b.json",
+          "sha256": "077015d90065f783f1db93bcd78d7d3e1e32521e90ae9655b21525912d309fdc"
+        },
+        {
+          "bytes": 3963,
+          "path": "standard-middle-w.json",
+          "sha256": "043b6c349791580b88a36d011463bbf10c5f2c6d3216338807e57eb2eb59a798"
+        }
+      ],
+      "games": 16,
+      "protocol_sha256": "92e4c923f866692e4e72d35f15b4c23edbb2e4cbb7ad2d74f80829c74ca57b00",
+      "runtime": {
+        "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+        "python": "3.14.9",
+        "source_commit": "bbc518dfa8f735aabeb55de289027b8ccccfce58",
+        "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+      },
+      "summary_sha256": "3ae66702f270afd88b49b975265cc4dd71841fdc5fddb84b36408c9bf10c7cfc"
+    },
+    "m6": {
+      "complete": true,
+      "files": [
+        {
+          "bytes": 767,
+          "path": "mate-black-b.json",
+          "sha256": "2120a12389cedb6330f158b4571c4ec1e3245e560e360e98a2919a19b8388bf0"
+        },
+        {
+          "bytes": 777,
+          "path": "mate-black-w.json",
+          "sha256": "a7efcaf3df54b412e4279c2a49b510fbd397eefb75e4b86c8086be5f18baa5c6"
+        },
+        {
+          "bytes": 776,
+          "path": "mate-white-b.json",
+          "sha256": "93d8410f8498cebe942447c181b42145fe75f9d0f15ad3a6514ddc807e80f393"
+        },
+        {
+          "bytes": 768,
+          "path": "mate-white-w.json",
+          "sha256": "f4b08fea15459676716a5f602e2ef24160ab1b0103d076e3711c8ed05b3b0de6"
+        },
+        {
+          "bytes": 785,
+          "path": "mate-black-offset-b.json",
+          "sha256": "937eab5456ca9058e29ce45eb959d0cbb348e0afc681da2475273c9b4fde5cbd"
+        },
+        {
+          "bytes": 785,
+          "path": "mate-black-offset-w.json",
+          "sha256": "ef8757ceb8b5efaf4540fc90374049cd00db710c8bf4f847d1cc2529f023e066"
+        },
+        {
+          "bytes": 784,
+          "path": "mate-white-offset-b.json",
+          "sha256": "b77639551c2071bb72ce52e8f4166f5fcbc41c0230dcf554070ae0d940724352"
+        },
+        {
+          "bytes": 784,
+          "path": "mate-white-offset-w.json",
+          "sha256": "5738d15633f06a6dc1efb65fb31091e6c6b7603859292360a8c5066213a9730c"
+        },
+        {
+          "bytes": 866,
+          "path": "repetition-near-end-b.json",
+          "sha256": "2c8a329d9ae6359385ea44031583d067156596fac25ec7808b203ce06b1bfaa9"
+        },
+        {
+          "bytes": 866,
+          "path": "repetition-near-end-w.json",
+          "sha256": "e29a478ca982da5bd53b557edec8c56e59f717ce1c0be8733aa441ef701bf46a"
+        },
+        {
+          "bytes": 894,
+          "path": "material-ending-b.json",
+          "sha256": "5a3c4c7ba521597d65b5a92c5e475663084295e0d7fa1471808b6a9b17ce2163"
+        },
+        {
+          "bytes": 1915,
+          "path": "material-ending-w.json",
+          "sha256": "fdecb760978ddf47705a0df7626f033f23f7c2678583f9d694e833ff18d491ef"
+        },
+        {
+          "bytes": 5641,
+          "path": "standard-opening-b.json",
+          "sha256": "5aecbb0f9331d5c5e35ef79efa6e4e706792b8bb1f0d4d47509e1d33c582d886"
+        },
+        {
+          "bytes": 2180,
+          "path": "standard-opening-w.json",
+          "sha256": "c289be195afadc7d7a9eaefed48e73630bd4bf194e88807a7aa2b71aae627c57"
+        },
+        {
+          "bytes": 6564,
+          "path": "standard-middle-b.json",
+          "sha256": "ba44de23f9ae003872d2fed8938f94ac50c20c10d25586ec77023564a8adf7c2"
+        },
+        {
+          "bytes": 5085,
+          "path": "standard-middle-w.json",
+          "sha256": "6db7bbe17b080ca505cbd07019346c99abbee7d3d6b1013d790cacf9b0e0100f"
+        }
+      ],
+      "games": 16,
+      "protocol_sha256": "16fda6c90806b44286b1ee14537e61677dcaca3ce478ab53779629af4a1f8026",
+      "runtime": {
+        "cuda": "13.0",
+        "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+        "gpu": "NVIDIA GeForce RTX 5090",
+        "platform": "Linux-6.8.0-134-generic-x86_64-with-glibc2.39",
+        "python": "3.14.9",
+        "source_commit": "bbc518dfa8f735aabeb55de289027b8ccccfce58",
+        "torch": "2.14.1+cu130",
+        "uv_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b"
+      },
+      "summary_sha256": "3b5b55be595d69349ca1533c5804fc6112840e37a856ae3409ef97353db75d2e"
+    }
+  }
+}
