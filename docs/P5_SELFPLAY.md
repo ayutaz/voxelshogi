@@ -13,7 +13,7 @@ Pythonへ再実装しない。VSFENだけから複製して履歴を落とす方
 独立して複製する。`Game.from_record`の全手再生やVSFENからの作り直しは行わない。
 外部Linuxで、11手の反復履歴を複製して12手目の千日手を検証し、
 元の局面・別の着手分岐との独立性、MaxPlies／Abandonedの保持を確認する。
-実モデル接続の検証は後続で行う。
+実モデルの読み込みと確率・Valueの境界は、下のevaluatorで確認する。
 
 evaluatorは全合法actionだけの事前確率と、現在の手番視点の有限なValue
 `[-1,1]`を返す。確率は非負、合計1（絶対誤差1e-6以内）。
@@ -93,6 +93,37 @@ episode内の任意の手からの再開は、このActorでは実装しない�
 
 ## 独立検証と実装の残り
 
+### 実モデルのevaluator
+
+[Policy／Value evaluator](../training/policy_value.py)は既存Studentと
+特徴量・出力の検査を共有し、全合法手だけでsoftmaxした確率と、
+現在の手番視点のValueを返す。Valueを反転・clampしない。
+推論はeval／inference modeで行い、推論モデルの勾配を無効にする。
+現在のファイルloaderはFP32のTransformer-Sだけを扱う。
+
+`load_policy_value`には期待するSHA-256とCPU／CUDAを明示する。
+通常ファイル・safetensors形式・512MiB以下を要求し、読み込み前後のhash、
+全重みのFP32／finite、全state keyとshapeの一致を検査する。
+検証した重みから別の推論モデルを作り、artifact hash・構造・backend・
+compute dtypeをbindingに保存する。rawモデルのconstructorはbindingを持たない。
+CPUへの自動切替は行わず、要求したCUDAが使えなければエラーにする。
+
+生成時と呼び出し時に決定的演算を有効にし、TF32を無効、
+float32 matmulをhighestに設定する。CUDAは実行前の
+`CUBLAS_WORKSPACE_CONFIG=:4096:8`を要求する。
+M6のValueは探索スコア由来の尺度であり、勝率を表さない。
+実行driverは引き続きclean sourceとepisodeのsource／model hashを照合する。
+
+[外部Linuxの機能確認](experiments/p5-policy-value-functional.json)では、
+固定したM6実重みをCPU／RTX5090 CUDAの先後2局面ずつへ読み込み、
+合法確率・Value範囲・既存argmaxとの一致を確認した。
+この2局面では既存モデルと同様に詰み手を選ばなかった。
+同じVMで評価と機能確認を併走しており、専有性能の測定には使わない。
+14件の新しい単体・既存Studentの2件と、新規12・既存2変異も検証する。
+重みやデータ本体をMacへ中継しない。
+
+### 探索とActorの独立検証
+
 2手の終局木を手計算し、simulation4回・`c_puct=4`で訪問数3対1、
 root平均0.5になることを先後両視点で検査する。
 2階層の木で平均−0.625、深さ1では−0.25となることも手計算で検査する。
@@ -106,7 +137,7 @@ Actorは手書きportで温度のCDF、rootノイズ、自然終局／bootstrap�
 先後の1手詰め、11手の履歴からの千日手、MaxPlies棋譜の再生も確認する。
 ここでのモデルは手書きの既知policy／valueで、学習済みモデルの性能評価ではない。
 
-この後、実モデルevaluatorと、完成episodeの検証・保存・読み込み、
+この後、evaluatorとActorを完成episodeの検証・保存・読み込み、
 [全合法手を分母にする疎な損失](P5_TARGETS.md)と、Replay Buffer・世代更新・保存再開を接続する。
 外部Linuxで複数世代を実行し、別実機での復旧・固定評価まで通してP5-2〜3を判定する。
 この小さい参照木のテストを、実3D将棋の自己対局実績と読み替えない。

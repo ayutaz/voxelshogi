@@ -13,7 +13,7 @@ class TorchStudent:
             raise ValueError("ORT CPU reference cannot be labelled CUDA")
         self.model, self.device = model.to(device).eval(), device
 
-    def __call__(self, game):
+    def _outputs(self, game):
         import torch
 
         legal = sorted(game.legal_actions())
@@ -39,6 +39,13 @@ class TorchStudent:
                 or not torch.isfinite(value).all()
             ):
                 raise ValueError("student output shape/dtype/finite differs")
+            return legal, policy, value
+
+    def __call__(self, game):
+        import torch
+
+        legal, policy, _value = self._outputs(game)
+        with torch.inference_mode():
             # Sorted canonical IDs make argmax's first occurrence the fixed tie rule.
             return legal[policy[0, legal].argmax().item()]
 
