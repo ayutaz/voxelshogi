@@ -55,6 +55,7 @@ class ResearchRental(Rental):
         phase="phase5",
         other_provider_idle=None,
         source_check=_source_check,
+        remote_guard=None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -64,6 +65,8 @@ class ResearchRental(Rental):
         self.other_provider_idle = other_provider_idle
         self.source_check = source_check
         self._plan_sha256 = None
+        self.remote_guard = remote_guard
+        self._remote_deadline = None
 
     def read_plan(self):
         if (
@@ -138,7 +141,12 @@ class ResearchRental(Rental):
         return plan
 
     def quote_seconds(self):
-        return self.read_plan()["maximum_seconds"]
+        seconds = self.read_plan()["maximum_seconds"]
+        if self._remote_deadline is not None:
+            seconds = min(seconds, int(self._remote_deadline - self.clock()) - 60)
+        if seconds < 900:
+            raise ValueError("independent deadline has expired")
+        return seconds
 
     def configuration(self):
         plan = self.read_plan()
@@ -151,6 +159,20 @@ class ResearchRental(Rental):
     def rent(self, start_guard):
         plan = self.read_plan()
         self.source_check(plan["source_commit"])
+        if self.remote_guard is None:
+            raise ValueError("a live independent deadline guard is required")
+        spec = self.remote_guard(
+            tag=self.tag,
+            now=self.clock(),
+            minimum_seconds=plan["estimated_seconds"] + 960,
+        )
+        spec.validate(now=self.clock())
+        if (
+            spec.tag != self.tag
+            or spec.maximum_end_at - self.clock() < plan["estimated_seconds"] + 960
+        ):
+            raise ValueError("independent deadline identity or remaining time differs")
+        self._remote_deadline = spec.maximum_end_at
         if self.other_provider_idle is None:
             raise ValueError("cross-provider ownership check is required")
         self.other_provider_idle()
@@ -252,6 +274,7 @@ def main():
     parser.add_argument("--plan", type=Path)
     parser.add_argument("--workload", type=Path)
     parser.add_argument("--ready-file", type=Path)
+    parser.add_argument("--guard-run", type=int)
     args = parser.parse_args()
     state, budget = args.state.resolve(), args.budget.resolve()
     if (
@@ -267,6 +290,8 @@ def main():
             path.is_symlink() or not path.resolve().is_relative_to(ROOT / "runs")
         ):
             parser.error("research plan/workload must be regular files under runs/")
+    if args.command == "rent" and args.guard_run is None:
+        parser.error("rent requires --guard-run from the independent main workflow")
     key = project_key(ROOT, "CLOUDRIFT_API_KEY")
     opener = urllib.request.build_opener(NoRedirect)
 
@@ -291,6 +316,8 @@ def main():
             raise ValueError("existing Vast.ai VoxelShogi rental requires audit")
 
     tag = "voxelshogi-" + args.phase + "-" + state.name
+    from training.remote_deadline import live_guard
+
     control = ResearchRental(
         state,
         api,
@@ -300,6 +327,7 @@ def main():
         plan=args.plan,
         workload=args.workload,
         other_provider_idle=other_provider_idle,
+        remote_guard=lambda **kwargs: live_guard(args.guard_run, **kwargs),
     )
 
     def start_guard():

@@ -9,6 +9,7 @@ from training.tests.test_rental_control import Provider
 
 
 def setup(tmp_path):
+    from training.remote_deadline import Deadline
     from training.research_rental_control import ResearchRental
 
     state = tmp_path / "eval-pilot"
@@ -61,6 +62,7 @@ def setup(tmp_path):
         other_provider_idle=lambda: None,
         workload=workload,
         source_check=lambda commit: None,
+        remote_guard=lambda **kw: Deadline(kw["tag"], 15400),
     )
     return control, api, budget, plan
 
@@ -90,7 +92,7 @@ def test_existing_project_and_new_purpose_caps_preserve_all_m6_reservations(tmp_
         == hashlib.sha256((tmp_path / "workload.json").read_bytes()).hexdigest()
     )
     deadline = json.loads((control.state / "deadline.json").read_text())
-    assert deadline["maximum_end_at"] == 15400 and deadline["stop_at"] == 14500
+    assert deadline["maximum_end_at"] == 15340 and deadline["stop_at"] == 14440
     with pytest.raises(ValueError):
         control.rent(guard)
 
@@ -333,3 +335,36 @@ def test_real_source_check_compares_commit_and_dirty_status(monkeypatch):
         )
         with pytest.raises(ValueError, match="clean source"):
             _source_check("a" * 40)
+
+
+def test_missing_independent_guard_refuses_rent_before_api_or_budget(tmp_path):
+    control, api, budget, _ = setup(tmp_path)
+    before = budget.read_bytes()
+    control.remote_guard = None
+    with pytest.raises(ValueError, match="independent"):
+        control.rent(lambda: None)
+    assert not api.calls and budget.read_bytes() == before
+
+
+def test_remote_guard_shortens_local_deadline_and_rejects_expiry(tmp_path):
+    from training.remote_deadline import Deadline
+
+    control, api, _, _ = setup(tmp_path)
+    control.remote_guard = lambda **kw: Deadline(control.tag, 10000)
+    control.rent(lambda: None)
+    deadline = json.loads((control.state / "deadline.json").read_text())
+    assert deadline["maximum_end_at"] == 9940
+    assert deadline["stop_at"] == 9040
+
+
+def test_unconfirmed_remote_guard_stops_before_provider(tmp_path):
+    control, api, budget, _ = setup(tmp_path)
+    before = budget.read_bytes()
+
+    def missing(**kwargs):
+        raise ValueError("independent guard not running")
+
+    control.remote_guard = missing
+    with pytest.raises(ValueError, match="independent"):
+        control.rent(lambda: None)
+    assert not api.calls and budget.read_bytes() == before

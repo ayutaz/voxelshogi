@@ -1,5 +1,7 @@
 # Phase5〜6の外部実行と初期費用制御
 
+**終了遅延後の更新**：[インシデントと独立監視](P5_DEADLINE_INCIDENT.md)。実機は資源解放済み。全体予約US$73／100、Phase5 US$12／20に修正。以下の過去試行の上限は達成証拠ではない。新しい有料実行は独立監視の検証後に行う。
+
 2026-10-30。Phase6まで進める指示と既存のプロジェクト費用枠に基づく。[段階別計画](POST_M6_PLAN.md)に従い、[P5-0の外部32局試行と資源解放](P5_PILOT.md)まで完了した。追加生成・自己対局学習は未実施。制御の実装は[training/research_rental_control.py](../training/research_rental_control.py)で、単体テストと実機の実行証拠を区別する。
 
 ## 目的と完了条件
@@ -38,8 +40,12 @@ Workloadは`source_commit`を持つJSONで、評価の場合は評価protocolそ
 
 ```bash
 # 検証済みplan・workload・専用の公開SSH鍵を用意し、CI成功後に制御側で実行する形。
+# 独立監視のmain workflowを起動し、Arm成功と監視step実行中を確認したrun ID。
+# 過去試行のtagは再使用しない。新しいcontrol directory・plan・workloadを用意する。
+guard_run_id='REPLACE_WITH_RUNNING_GUARD_RUN_ID'
 uv run --locked python -m training.research_rental_control runs/p5/evaluation-control rent \
-  --phase phase5 --plan runs/p5/evaluation-plan.json --workload runs/p5/protocol.json
+  --phase phase5 --plan runs/p5/evaluation-plan.json --workload runs/p5/protocol.json \
+  --guard-run "$guard_run_id"
 uv run --locked python -m training.research_rental_control runs/p5/evaluation-control status --phase phase5
 uv run --locked python -m training.research_rental_control runs/p5/evaluation-control terminate --phase phase5
 ```
