@@ -46,6 +46,6 @@ provider APIキーはMacの制御側だけで使い、外部GPUへ渡さない�
 
 ## 検証と未実施の範囲
 
-Macでは小さいprovider／ledger fixtureでRED→GREEN、予算・用途・時間・改変・稼働競合・終了監視とcleanupを検証する。新規10変異はすべて実行済みassertionで検出し、通常CIへ追加する。実APIの読み取りと、モックによるrent／terminateは別の証拠として扱う。
+Macでは小さいprovider／ledger fixtureでRED→GREEN、予算・用途・時間・改変・稼働競合・終了監視とcleanupを検証する。新規10変異はすべて実行済みassertionで検出し、通常CIへ追加した。[PR #80](https://github.com/ayutaz/voxelshogi/pull/80)は必須8チェックと関連CI成功後に取り込み済み。実APIの読み取りと、モックによるrent／terminateは別の証拠として扱う。
 
 実機での起動・期限終了・新しいworkloadの実行・複数GPUは未実施。初回試行前に評価runnerとこの制御の必須CIを確認する。成果物の公開は[HF公開ハーネス](HF_PUBLICATION.md)を使い、public/manual・Community OFF・Card・licenseの承認対象・固定revision全hash照合を守る。公開許可を新しい未確定のlicenseへ自動拡大しない。

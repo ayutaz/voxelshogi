@@ -10,7 +10,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 
 ## 次の実装と文書更新時の照合
 
-次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase6までの実行指示を受け、P5-0のmetadata契約・集計・独立テストは[PR #77](https://github.com/ayutaz/voxelshogi/pull/77)で必須・関連CI成功後に取り込み済み。Linux用runner・全手再生も[PR #78](https://github.com/ayutaz/voxelshogi/pull/78)で必須・関連CI成功後に取り込み済み。用途別費用制御を検証中。外部試行、追加生成、GPU学習、Phase6の構造比較は未実施。
+次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase6までの実行指示を受け、P5-0のmetadata契約・集計・独立テストは[PR #77](https://github.com/ayutaz/voxelshogi/pull/77)で必須・関連CI成功後に取り込み済み。Linux用runner・全手再生も[PR #78](https://github.com/ayutaz/voxelshogi/pull/78)で必須・関連CI成功後に取り込み済み。用途別費用制御も[PR #80](https://github.com/ayutaz/voxelshogi/pull/80)で取り込み済み。実局面と全継続局面の漏洩監査をCI検証中。外部試行、追加生成、GPU学習、Phase6の構造比較は未実施。
 
 文書更新開始時点のmain／公開版は`16b2b2733b74f176ce65a2e0f334edb710db4a71`。[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40943910648)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40943910611)は成功、公開catalogは最終HF revisionに一致した（[固定した読取記録](experiments/post-m6-plan-baseline-2026-10-30.json)）。物理計測対象は`564715a`のまま保持し、後続の文書公開へ実測値を付け替えない。最新の配信SHAは公開`build-info.json`を確認する。
 
