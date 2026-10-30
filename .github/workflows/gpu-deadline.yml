@@ -1,0 +1,49 @@
+name: GPU deadline
+run-name: 'GPU deadline: ${{ inputs.tag }} @ ${{ inputs.maximum_end_at }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Fresh exact voxelshogi-phase5/6 rental tag
+        required: true
+        type: string
+      maximum_end_at:
+        description: Absolute UTC Unix seconds, between 30 minutes and 4 hours ahead
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# A new dispatch must never cancel or serialize an already armed deadline.
+concurrency:
+  group: gpu-deadline-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  deadline:
+    name: Independent CloudRift deadline
+    if: github.repository == 'ayutaz/voxelshogi' && github.ref == 'refs/heads/main'
+    environment: gpu-control
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      RENTAL_TAG: ${{ inputs.tag }}
+      MAXIMUM_END_AT: ${{ inputs.maximum_end_at }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - name: Arm deadline
+        env:
+          CLOUDRIFT_API_KEY: ${{ secrets.CLOUDRIFT_API_KEY }}
+        run: python -m training.remote_deadline arm --state "$RUNNER_TEMP/deadline.json"
+      - name: Guard CloudRift deadline
+        env:
+          CLOUDRIFT_API_KEY: ${{ secrets.CLOUDRIFT_API_KEY }}
+        run: python -u -m training.remote_deadline watch --state "$RUNNER_TEMP/deadline.json"
