@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "python-fork-independent-session",
+        f"{PACKAGE}/__init__.py",
+        "game._engine = self._engine.fork()",
+        "game._engine = self._engine",
+        "test_history_fork.py",
+    ),
+    (
+        "python-fork-full-history",
+        f"{PACKAGE}/__init__.py",
+        "game._engine = self._engine.fork()",
+        'game._engine = Engine(self.snapshot()["vsfen"])',
+        "test_history_fork.py",
+    ),
+    (
         "selfplay-search-child-viewpoint",
         "training/selfplay_search.py",
         "(1 if node.side == child.side else -1)",

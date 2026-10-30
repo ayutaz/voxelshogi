@@ -53,6 +53,7 @@ const mutations = [
   { name: 'python-fallback-score', crate: 'voxelshogi-python', file: 'lib.rs', before: '"score":r.score,', after: '"score":r.score.or(Some(0)),', args: ['--lib'] },
   { name: 'python-record-termination', crate: 'voxelshogi-python', file: 'lib.rs', before: 'self.session.state().result().is_none() && self.session.termination().is_some()', after: 'false', args: ['--lib'] },
   { name: 'python-finished-mask', crate: 'voxelshogi-python', file: 'lib.rs', before: 'if self.session.is_finished() {', after: 'if false {', args: ['--lib'] },
+  { name: 'python-fork-repetition-history', crate: 'voxelshogi-python', file: 'lib.rs', before: 'session: self.session.clone(),', after: 'session: Session::from_vsfen(&to_vsfen(self.session.state())).unwrap(),', args: ['--lib', 'fork_retains_history_without_mutating_the_parent'] },
 ];
 
 function main() {
@@ -90,7 +91,7 @@ function main() {
         writeFileSync(path, original);
       }
     }
-    assert.equal(results.length, 38);
+    assert.equal(results.length, 39);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
