@@ -12,6 +12,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "evaluation-v2-runner-terminal-priority",
+        "training/evaluation_v2_runner.py",
+        'if snapshot["finished"]:',
+        'if snapshot["finished"] and len(game.record()["moves"]) - prefix_length < case["max_additional_plies"]:',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-additional-limit",
+        "training/evaluation_v2_runner.py",
+        'len(game.record()["moves"]) - prefix_length >= case["max_additional_plies"]',
+        'len(game.record()["moves"]) >= case["max_additional_plies"]',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-color-route",
+        "training/evaluation_v2_runner.py",
+        'choose_model if snapshot["side"] == model_side else choose_opponent',
+        'choose_opponent if snapshot["side"] == model_side else choose_model',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-interruption",
+        "training/evaluation_v2_runner.py",
+        "if stop_requested():",
+        "if False:",
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-position-ply",
+        "training/evaluation_v2_runner.py",
+        '"position": " ".join(parts[:3])',
+        '"position": " ".join(parts)',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-position-hands",
+        "training/evaluation_v2_runner.py",
+        '"position": " ".join(parts[:3])',
+        '"position": " ".join(parts[:2])',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
+        "evaluation-v2-runner-search-binding",
+        "training/evaluation_v2_runner.py",
+        '"search_limits": limits,',
+        '"search_limits": {},',
+        "test_evaluation_v2_runner.py",
+    ),
+    (
         "evaluation-v2-cutoff-score",
         "training/evaluation_v2.py",
         'points = counts["win"] + 0.5 * counts["draw"]',
