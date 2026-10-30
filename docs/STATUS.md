@@ -12,7 +12,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 
 次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-1：教師と分布の比較**。[開発用評価32局](P5_PILOT.md)はM1対M1が5勝5敗4引分2打切り、M6対M1が2勝6敗4引分4打切りで、全手再生・凍結コーパス全行との物理局面照合まで完了した。少数の露出済み局面による診断で、棋力改善の証明ではない。PR #82〜#87では学習ラベル・PUCT・履歴複製・疎損失・Actor・検証付きPolicy/Valueを取り込み済み。次は教師／長期対局試料とReplay Buffer・世代更新を接続する。追加生成、複数世代自己対局学習、別実機再開、複数GPU、Phase6の構造比較は未実施。
 
-P5-0使用実機は05:13 UTCに`Inactive`・`resources_released=true`を確認した。保守的予約上限は全体US$65／基本枠100、Phase5 US$4／初期枠20。追加US$100は未使用、実請求は未回収。[費用・実行制御](P5_EXECUTION.md)を参照。
+P5-0使用実機は05:13 UTCに`Inactive`・`resources_released=true`を確認した。その後、P5-1の[外部試行を開始](experiments/p5-data-launch-2026-10-30.json)し、06:02 UTC時点で入力取得中の実PIDを確認した。生成・検証・公開・資源終了は確認待ち。保守的予約上限は全体US$69／基本枠100、Phase5 US$8／初期枠20。追加US$100は未使用、実請求は未回収。[費用・実行制御](P5_EXECUTION.md)を参照。
 
 文書更新開始時点のmain／公開版は`16b2b2733b74f176ce65a2e0f334edb710db4a71`。[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40943910648)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40943910611)は成功、公開catalogは最終HF revisionに一致した（[固定した読取記録](experiments/post-m6-plan-baseline-2026-10-30.json)）。物理計測対象は`564715a`のまま保持し、後続の文書公開へ実測値を付け替えない。最新の配信SHAは公開`build-info.json`を確認する。
 
