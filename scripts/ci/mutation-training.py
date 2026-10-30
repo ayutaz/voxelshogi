@@ -12,6 +12,113 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "selfplay-soft-visits",
+        "training/selfplay_training.py",
+        '[r["policy"] for r in rows]',
+        '[{"kind": "visits-v1", "actions": r["policy"]["actions"][:1], "probabilities": '
+        '[1.0], "visits": [r["policy"]["total_visits"]], "total_visits": '
+        'r["policy"]["total_visits"]} for r in rows]',
+        "test_selfplay_training_native.py",
+    ),
+    (
+        "selfplay-sampler-resume",
+        "training/selfplay_training.py",
+        "return batches[start_batch:]",
+        "return batches",
+        "test_selfplay_training.py",
+    ),
+    (
+        "selfplay-fixed-epoch-selection",
+        "training/selfplay_training.py",
+        '"selection": "fixed epochs; no holdout selection"',
+        '"selection": "test selection"',
+        "test_selfplay_training.py",
+    ),
+    (
+        "selfplay-protection-bytes",
+        "training/selfplay_generations.py",
+        'or file_hash(path) != p["protection_sha256"]',
+        "or False",
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-protection-unique",
+        "training/selfplay_generations.py",
+        'or value["ids"] != sorted(set(value["ids"]))',
+        "or False",
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-protection-provenance",
+        "training/selfplay_generations.py",
+        'or value["provenance"] != p["protection_provenance"]',
+        "or False",
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-generation-seeds",
+        "training/selfplay_generations.py",
+        '"generation": generation, "episode": index',
+        '"generation": 0, "episode": index',
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-family-split",
+        "training/selfplay_generations.py",
+        'or family["split"] != "train"',
+        "or False",
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-verified-publication",
+        "training/selfplay_generations.py",
+        'or receipt.get("verified") is not True',
+        "or False",
+        "test_selfplay_generations.py",
+    ),
+    (
+        "selfplay-learn-feature-bytes",
+        "training/selfplay_training.py",
+        'digest.update(feature.tobytes(order="C"))',
+        "pass",
+        "test_selfplay_training_native.py",
+    ),
+    (
+        "selfplay-optimizer-update",
+        "training/selfplay_training.py",
+        "    optimizer.step()",
+        "    pass",
+        "test_selfplay_training_native.py",
+    ),
+    (
+        "selfplay-value-origin-batch",
+        "training/selfplay_training.py",
+        "if len(kinds) != 1:",
+        "if False:",
+        "test_selfplay_training_native.py",
+    ),
+    (
+        "selfplay-resume-cursor",
+        "training/selfplay_training.py",
+        "    _cursor(progress, data.kinds, config)",
+        '    progress["next_batch"] = 0\n    _cursor(progress, data.kinds, config)',
+        "test_selfplay_training_native.py",
+    ),
+    (
+        "selfplay-generation-parent",
+        "training/selfplay_generations.py",
+        'or record["parent_model_sha256"] != parent_sha',
+        "or False",
+        "test_selfplay_generations_native.py",
+    ),
+    (
+        "selfplay-generation-weights",
+        "training/selfplay_generations.py",
+        'or file_hash(file) != record["model_sha256"]',
+        "or False",
+        "test_selfplay_generations_native.py",
+    ),
+    (
         "replay-raw-bootstrap",
         "training/selfplay_actor.py",
         'bootstrap = {"value": float(value), "side": snapshot["side"], "ply": ply}',
@@ -1952,7 +2059,7 @@ def main():
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=180 if not tests else 60,
                 check=False,
             )
             (output / f"{name}.log").write_text(result.stdout + result.stderr)
