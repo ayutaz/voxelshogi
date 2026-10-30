@@ -10,7 +10,7 @@ M6で教師模倣精度が上がっても対局の改善が確認できなかっ
 2. Rustによる全手再生と、train／開発用評価／最終holdoutの全局面についての漏洩照合。
 3. 戦術・中終盤・標準序盤の固定した開発用少量試行。終局率・対局長・先後差・時間を測定し、本比較へ進む条件を決める。
 
-**1の契約・集計境界は[PR #77](https://github.com/ayutaz/voxelshogi/pull/77)で必須8チェックと関連CI成功後に取り込み済み**。Linux用runnerとRust全手再生は[PR #78](https://github.com/ayutaz/voxelshogi/pull/78)で必須・関連CI成功後に取り込み済み。2の全件漏洩監査は後続。metadataテストを実対局・独立したルール検証・外部GPU試行の代わりにしない。実局面集合・全件漏洩監査・外部試行は未完了。
+**契約・集計境界は[PR #77](https://github.com/ayutaz/voxelshogi/pull/77)、Linux用runnerとRust全手再生は[PR #78](https://github.com/ayutaz/voxelshogi/pull/78)、実局面と継続局面の監査は[PR #81](https://github.com/ayutaz/voxelshogi/pull/81)で必須8チェックと関連CI成功後に取り込み済み**。[外部32局試行](P5_PILOT.md)は保存前後の全手再生・凍結コーパス全行の物理局面照合・感度screen・GPU資源解放まで完了した。正規化後のモデル入力同値性、新しいデータ、未知の最終holdoutまで監査済みとはしない。
 
 ## 固定する契約
 
@@ -42,7 +42,7 @@ M6で教師模倣精度が上がっても対局の改善が確認できなかっ
 
 Macでは小さいmetadataだけで10テストを先に実行してREDを確認後、GREENを確認。勝敗・引分・打切りの手計算、先後pairの区間、条件改変、履歴・上限・結果の改変、漏洩と感度判定を検証した。新規9変異も実行済みassertionで検出し、[継続ハーネス](../scripts/ci/mutation-training.py)へ追加した。ルール・探索・モデルはMacで実行しない。既存v1を含む全回帰はLinux CIで確認する。
 
-Linux専用runnerと全手再生の接続はPR #78で取り込み済み（次節）。続いて実局面集合・全件漏洩監査・少量試行を進める。外部試行は[Phase5の用途別制御](P5_EXECUTION.md)・見積もり・停止／資源解放をそろえてから開始する。Phase5〜6は依頼済みの範囲として進め、実測で予算不足が見込まれるときは既存の条件付き追加枠と照合する。
+Linux専用runner・全手再生・実局面と監査の接続、および少量試行は完了した（[結果と限界](P5_PILOT.md)）。次は[P5-1の教師と分布の比較](P5_DATA_PLAN.md)へ進む。外部試行は[Phase5の用途別制御](P5_EXECUTION.md)・見積もり・停止／資源解放をそろえてから開始する。Phase5〜6は依頼済みの範囲として進め、実測で予算不足が見込まれるときは既存の条件付き追加枠と照合する。
 
 
 ## Linux用runner
@@ -80,4 +80,6 @@ uv run --locked python -m training.evaluation_cases prepare runs/p5/participants
 uv run --locked python -m training.evaluation_cases audit runs/p5/evaluation /mnt/dataset/production-64 runs/p5/leakage.json
 ```
 
-Macでは静的metadata・全splitの行数・継続局面の集合について5テストをRED→GREENで確認し、純粋部分の4変異を検出した。手書きの詰み／千日手、共通prefixの除外と後続局面、固定16／96手生成の再現性の3統合テスト、およびrootだけを照合する変異の検出はLinux CIで確認する。実コーパスの監査と実モデル対局は未実施で、P5-0全体の完了とはしない。
+Macでは静的metadata・全splitの行数・継続局面の集合について5テストをRED→GREENで確認し、純粋部分の4変異を検出した。手書きの詰み／千日手、共通prefixの除外と後続局面、固定16／96手生成の再現性の3統合テスト、およびrootだけを照合する変異の検出はPR #81のLinux CIで成功した。
+
+外部試行はM1対M1とM6対M1の各16局で完了し、全32局を再生・再集計した。凍結コーパス全116,921行に対し、対照371・M6比較1,347の一意な継続物理局面で重なり0だった。両方が事前の感度screenを満たしたため、P5-0の開発用診断を完了とする。これは棋力改善の証明や、後続データ・正規化入力の全監査を意味しない。[固定条件・集計・時間・監査範囲](P5_PILOT.md)を参照。
