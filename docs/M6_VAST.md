@@ -1,5 +1,7 @@
 # M6のVast.aiへの切替
 
+M6は[完了済み](M6_COMPLETION.md)。本書のレンタル制御は引き続きM6専用で、Phase5〜6の用途や予算へ自動流用しない。後続は[実行計画](POST_M6_PLAN.md)に従う。
+
 目的は、CloudRiftの既知RTX5090構成に空きがないときも、承認済みのVast.aiでM6の変換・評価・実機検証を続けること。**この制御の単体テストは料金・metadataの検査であり、Vast.aiの実機を借りた証拠ではない。** 実機の認証・残高・在庫・CUDA・ブラウザはレンタル時に別途確認する。Macで計算へ切り替えない。
 
 ## 構成と上限
@@ -17,6 +19,8 @@
 ## ローカル制御と外部Linuxの役割
 
 ユーザーがプロジェクトの`.env`へ`VAST_API_KEY`を保存する。キーはMacの制御プロセスが公式`console.vast.ai`のAuthorization headerでだけ使用し、URL・引数・ログへ入れない。redirectは拒否する。CloudRiftキーは同社APIの稼働確認にだけ使う。どちらのproviderキーもGPUへ渡さない。
+
+2026-10-30の読み取り確認で、末尾スラッシュなしのURLが301を返したため、クライアントは公式originのAPIパスを末尾`/`付きで直接要求する。既に末尾`/`があれば重複させず、queryはその後へ付ける。redirectの追跡は許可しない。修正後に認証とページ付き全インスタンス一覧の取得が成功し、レンタル・入金・実機変更は行っていない。公式の[開発者向けAPI例](https://vast.ai/developers/api)も末尾`/`付きのパスを示す。単体テストはGET／POST／PUT／DELETEのURL、header認証、エラー本文の非表示とredirect拒否を確認し、URLを元へ戻す変異を検出する。
 
 ```bash
 # 料金・metadataの読み取りだけ。受理できるofferのIDと単価を保存する。

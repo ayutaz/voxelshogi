@@ -353,7 +353,7 @@ class VastClient:
             r"/api/v[01]/[a-z0-9/_-]+", path
         ):
             raise ValueError("invalid official Vast.ai API path")
-        url = "https://console.vast.ai" + path
+        url = "https://console.vast.ai" + path.rstrip("/") + "/"
         if params:
             url += "?" + urllib.parse.urlencode(params)
         request = urllib.request.Request(

@@ -111,6 +111,13 @@ MUTATIONS = [
         "test_m6_shared_ip.py",
     ),
     (
+        "vast-canonical-api-route",
+        "training/vast_rental_control.py",
+        'url = "https://console.vast.ai" + path.rstrip("/") + "/"',
+        'url = "https://console.vast.ai" + path',
+        "test_vast_rental_control.py",
+    ),
+    (
         "vast-storage-price",
         "training/vast_rental_control.py",
         'offer["dph_total"], offer["dph_base"] + offer["storage_total_cost"]',
