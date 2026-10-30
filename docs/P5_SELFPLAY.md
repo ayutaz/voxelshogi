@@ -9,7 +9,11 @@ PUCTに固定する。[探索核](../training/selfplay_search.py)は手書きの
 局面adapterは`fork()`、`snapshot()`、`legal_actions()`、`play()`を提供する。
 実対局のadapterはRustの履歴付きGameを使い、王手・終局・合法手・千日手を
 Pythonへ再実装しない。VSFENだけから複製して履歴を落とす方法は使わない。
-Rust境界の履歴保持と実モデル接続の検証は後続で行う。
+`Game.fork()`はRustの`Session::clone`を呼び、反復履歴・記録・外部停止状態を
+独立して複製する。`Game.from_record`の全手再生やVSFENからの作り直しは行わない。
+外部Linuxで、11手の反復履歴を複製して12手目の千日手を検証し、
+元の局面・別の着手分岐との独立性、MaxPlies／Abandonedの保持を確認する。
+実モデル接続の検証は後続で行う。
 
 evaluatorは全合法actionだけの事前確率と、現在の手番視点の有限なValue
 `[-1,1]`を返す。確率は非負、合計1（絶対誤差1e-6以内）。

@@ -37,6 +37,13 @@ impl Engine {
         self.session.to_record_json()
     }
 
+    /// Keep repetition/perpetual-check history and external termination intact.
+    fn fork(&self) -> Self {
+        Self {
+            session: self.session.clone(),
+        }
+    }
+
     fn play(&mut self, text: &str) -> PyResult<()> {
         self.session.play(text).map_err(PyValueError::new_err)
     }
@@ -125,6 +132,30 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fork_retains_history_without_mutating_the_parent() {
+        let mut layers = vec!["9/9/9/9/9/9/9/9/9"; 9];
+        layers[0] = "8k/9/9/9/9/9/9/9/9";
+        layers[8] = "9/9/9/9/9/9/9/9/K8";
+        let initial = format!("{} b - 1", layers.join("|"));
+        let mut game = Engine::new(Some(&initial)).unwrap();
+        let cycle = ["999899", "111211", "899999", "211111"];
+        for text in cycle.iter().cycle().take(11) {
+            game.play(text).unwrap();
+        }
+        let original = game.record();
+        let mut fork = game.fork();
+        assert_eq!(fork.record(), original);
+        fork.play("211111").unwrap();
+        let snapshot: serde_json::Value = serde_json::from_str(&fork.snapshot()).unwrap();
+        assert_eq!(snapshot["result"], json!({"Draw":{"reason":"Repetition"}}));
+        assert_eq!(game.record(), original);
+        assert!(!game.session.is_finished());
+        game.play("211311").unwrap();
+        assert!(!game.session.is_finished());
+        assert!(fork.session.is_finished());
+    }
 
     #[test]
     fn snapshot_play_and_search_boundary() {

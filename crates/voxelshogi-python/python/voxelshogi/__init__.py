@@ -25,6 +25,12 @@ class Game:
     def record(self):
         return json.loads(self._engine.record())
 
+    def fork(self):
+        """Independent copy of the Rust session, including repetition history."""
+        game = self.__class__.__new__(self.__class__)
+        game._engine = self._engine.fork()
+        return game
+
     def snapshot(self):
         return json.loads(self._engine.snapshot())
 
