@@ -8,6 +8,12 @@
 
 M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903d96fbc2`（[最終公開記録](experiments/m2-final-publication.json)）。性能計測の対象 `3a500cd` と最終版の実行ファイルは同一であり、計測JSONの元SHAは保持する。これは固定した検証対象であり、後続の文書PRによる配信SHAとは区別する。現在配信される版は公開 `build-info.json` と対応するmain CIを確認する。M1時点の `2405e86` の記録は後半に保持する。
 
+## 次の実装と文書更新時の照合
+
+次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase5〜7の実装は未着手。今回の文書更新でGPU・追加生成・学習・HF公開を開始しない。
+
+文書更新開始時点のmain／公開版は`16b2b2733b74f176ce65a2e0f334edb710db4a71`。[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40943910648)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40943910611)は成功、公開catalogは最終HF revisionに一致した（[固定した読取記録](experiments/post-m6-plan-baseline-2026-10-30.json)）。物理計測対象は`564715a`のまま保持し、後続の文書公開へ実測値を付け替えない。最新の配信SHAは公開`build-info.json`を確認する。
+
 ## 完了したものと次の作業
 
 | 対象 | 状態・根拠 |
@@ -15,7 +21,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 | Phase 0〜2、M0 | 調査・標準ルール・Web Alpha・CI/CDを完了。[M0記録](M0_VALIDATION.md) |
 | R0 | 9王3ルール＋標準対照など1,052局を比較し、400／800手の代表6棋譜を公開。正式な9王採用と観戦者の好みの評価は保留。[結果](NINE_KINGS_EXPERIMENT.md) |
 | M1 | 標準1王の全幅αβ、評価、反復深化・手の並べ替え・履歴を区別する置換表、深さ／ノード／時間上限を完了。[PR #10](https://github.com/ayutaz/voxelshogi/pull/10)・[#11](https://github.com/ayutaz/voxelshogi/pull/11)、[検証・計測](M1_VALIDATION.md) |
-| 現在の公開画面 | 通常画面はEasy/Normalの探索観戦と人間対AI、推論ラボは未学習モデル3形式の実行。9王比較室の公開画面・導線は撤去し、研究記録を保持。学習済みモデルによる対局はM6の対象 |
+| 現在の公開画面 | 通常画面はEasy/Normalと取得済み学習モデル3形式の観戦・人間対AI。推論ラボはM3の未学習モデル。9王比較室と旧URLの画面は撤去し、研究記録を保持 |
 | M2 | 完了。[計画・契約](M2_PLAN.md)・[G1〜G7の照合と実測](M2_VALIDATION.md) |
 | C0 | 観測競合の再現、入力イベント時点の判定への修正、変異2件の検出、実機・SwiftShaderの各3回と公開21件を検証。[原因・対策・最終公開の判定条件](C0_VALIDATION.md) |
 | M3 | 完了。承認済み3形式を公開、実配信55ファイルとCI成果物を照合。公開E2E・実機48組・WASM／WebGPUで各20実切替を確認。[固定記録と失敗・制約](M3_VALIDATION.md#m3-5公開版の最終検証2026-10-28-jst) |
@@ -25,7 +31,7 @@ M3の実機はApple M1・8 GiB・Chrome156。公開版のWebGPU FP32・INT8重�
 
 主用途はAI同士を見て眺める観戦と、そのためのモデル研究。人間対AIは補助機能、人間同士の対局・マルチプレイは対象外。Pythonは3.14系を基本、依存が未対応の場合だけ3.13系とする。モデルをFP16化・量子化した場合も、公開する実行可能版を選択して試せることと、評価した配布ファイルとのSHA-256一致をM3・M6で検証する。
 
-## 今回の更新で再確認した基準（2026-10-29 JST）
+## 履歴：PR #45の文書更新時の基準（2026-10-29 JST）
 
 [小さい確認記録](experiments/post-m4-plan-baseline-2026-10-29.json)。PR #45統合のmain `389ba94720dbe5f9b6d13d31f5db4a771d436fd1`で[CI・自動公開](https://github.com/ayutaz/voxelshogi/actions/runs/40746960925)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40746962816)が成功し、公開`build-info.json`も同じSHAだった。HFの現在のcommitは本生成公開時と同じで、public/manual・Community OFFを再確認。CloudRiftの稼働中VoxelShogi実機0・永続volume 0件を読み取り確認した。これは後続の文書PRで変わる前の固定した基準である。
 
@@ -57,7 +63,7 @@ M6-5まで完了。固定教師train29,884／val3,421／test3,589、RTX5090で3 
 | 同一性 | 55応答と最終CI artifactの実バイト列を照合。ONNX3形式・checkpoint・入力・ORT・アプリ実行ファイルは性能計測版と同じhash。参照値の一部は再生成で微小に変わったため、最終参照値と再照合した |
 | 固定環境・検証 | Rust1.97.1／MSRV1.85、Node24.22.1、pnpm10.32.1、Python3.14.9／uv。Rust core153＋WASM5、Web172、Python48、Node67。既知変異はcore／WASM33・Web50・Python16・CI制御14件 |
 
-## M4の現在地と次の作業
+## 履歴：M4各段階の達成証拠
 
 | 対象 | 現在の状態・証拠 | 次へ進む条件 |
 |---|---|---|
@@ -120,9 +126,11 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 
 ## 文書の役割と更新範囲
 
+現状は本書、仕様・フェーズ目標はROADMAP、直近の実行順は[POST_M6_PLAN](POST_M6_PLAN.md)。M6の契約は[M6_PLAN](M6_PLAN.md)、実績は[M6_COMPLETION](M6_COMPLETION.md)に分ける。以下の履歴リンクの件数・価格・日時は当時の記録として読む。
+
 | 文書 | 用途・今回の扱い |
 |---|---|
-| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M4・M5完了、次のM6-0〜1とCUDA試行の判断条件、固定ツールとコマンドへそろえる |
+| [README](../README.md)、[CLAUDE](../CLAUDE.md) | 入口・開発時の現在地。M6／Phase4完了、次のP5-0と段階別の費用・検証条件、固定ツール・コマンドへそろえる |
 | [PROJECT_SPEC](PROJECT_SPEC.md)、[ROADMAP](ROADMAP.md) | プロジェクト要件、各Phase／Mの目的・ゴール・依存関係・ユーザー準備の正 |
 | [M1_PLAN](M1_PLAN.md)、[M1_VALIDATION](M1_VALIDATION.md) | 完了したM1の実装契約と固定した検証記録。M2の契約と結果は [M2_PLAN](M2_PLAN.md)・[M2_VALIDATION](M2_VALIDATION.md)、M3の完了時の契約は [M3_PLAN](M3_PLAN.md) |
 | [GAME_ENGINE](GAME_ENGINE.md)、[RULESET](RULESET.md) | 実装済みAPIとルールの正。予定のAPIを現行APIとして記載しない。MaxPlies／Abandonedと検証済み投了結果の保存・履歴移動を明記。M5は固定した改定後3局の全件一致を確認。完全互換は未検証 |
@@ -130,11 +138,11 @@ M1のNative単独計測はApple M1・8 GiB、初期局面の深さ2が約0.33秒
 | [ARCHITECTURE_DECISIONS](ARCHITECTURE_DECISIONS.md) | ADR-001〜018は当時の判断。M2のWorker・観戦はADR-018、M3の形式・backend・配信はADR-019、M4のPython境界・外部生成・HF公開はADR-020。後続ADR・現在の仕様を優先し、過去の経緯を現在の未実装事項と混同しない |
 | [M0_VALIDATION](M0_VALIDATION.md)、[NINE_KINGS_EXPERIMENT](NINE_KINGS_EXPERIMENT.md) | M0／R0完了時の歴史的記録。旧テスト数・生成コミット・実測値を保持し、現在地への案内を更新 |
 | [RULE_VARIANTS_RESEARCH](RULE_VARIANTS_RESEARCH.md) | ルールの先行調査と未実施の継続評価。標準のM1完了と9王への未適用を区別 |
-| [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。M3の未学習Transformerと、未実施のGumbel・構造比較・DDP学習を区別する |
+| [RESEARCH](RESEARCH.md)、[RELATED_WORK](RELATED_WORK.md) | 外部資料の調査記録と将来の研究候補。M3未学習とM6学習済みの実績、未実施の自己対局・構造比較・DDPを区別する |
 | [TECH_STACK_RESEARCH](TECH_STACK_RESEARCH.md)、[COST_ESTIMATE](COST_ESTIMATE.md) | 固定済み構成と公開実測を更新。初回の外部版・GPU相場・為替・ドメイン価格は取得日付き参考値で、採用／課金時に再取得する |
 | [AGENTS](../AGENTS.md)、[CONTRIBUTING](../CONTRIBUTING.md)、[SECURITY](../SECURITY.md)、[PRテンプレート](../.github/pull_request_template.md)、[ci-checks](../.agents/skills/ci-checks/SKILL.md) | ブランチ・TDD・PR・秘密情報・最短10分間隔のCI確認という現行方針と整合を確認。追加の承認フローや人間同士の対局は導入しない |
 
-外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M4・M5は完了し、M6-0〜1の実装準備にユーザー側の追加作業はない。M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6基本枠US$24と不足時の追加GPU予算US$100、対象モデル・再開状態のApache-2.0、別repoへのpublic/manual・Community OFF公開は2026-10-29に個別承認済み。追加枠は不足の実測見積もりを記録後に有効化する。
+外部資料は記載の取得日に対する記録であり、全リンク先の最新版や将来の採用版を保証しない。現在の実装・固定版と、M4／M6以降で評価する候補を分けて読む。GPU費の初期予算例は支出の承認ではない。M6-5まで完了し、P5-0の仕様・独立テストと今回の文書更新にユーザー側の追加作業はない。M4データのCC-BY-4.0・費用総枠US$100は承認済み。M6基本枠US$24と不足時の追加GPU予算US$100、対象モデル・再開状態のApache-2.0、別repoへのpublic/manual・Community OFF公開は2026-10-29に個別承認済み。追加枠は不足の実測見積もりを記録後に有効化する。
 
 文書の更新時はコード・設定・実行結果を照合し、ローカルリンク／アンカー、掲載API例とコマンド、数値の出典を確認する。現在はPython CodeQLを含む通常PRの必須8チェック成功後に取り込み、mainの自動公開を確認する。
 

@@ -1,6 +1,6 @@
 # 再開状態の公開profileとアップロード上限
 
-[再開archive](M6_RESUME_ARCHIVE.md)専用の`artifact_role="training-state"`を準備する。**2026-10-29にoptimizer・乱数状態の別HF repo公開と成果物のApache-2.0をユーザーが承認済み。実GPU試行の再開状態は[固定revisionへの公開・新run復旧・追加更新一致まで確認済み](M6_TRIAL.md)。本学習状態は未作成。** [確定方針](M6_RUN_PROPOSAL.md)と[承認記録](../export/m6-approval.json)に基づき、実planを作る。
+`artifact_role="training-state"`による再開状態の公開は完了。承認済みのApache-2.0・public/manual・Community OFFを維持し、本学習のlatest／bestを固定HF revisionから新runへ復旧してmodel・optimizer・RNGの最大絶対差0を確認した（[完了記録](M6_COMPLETION.md)）。以下は公開範囲・送信上限の仕様と初期実装時の検証記録。
 
 ## 目的と送信範囲
 

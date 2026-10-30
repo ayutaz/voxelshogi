@@ -1,6 +1,6 @@
 # M6の読み込みと学習処理
 
-M6-1の実装記録。教師・損失・評価の条件は[M6教師契約](M6_TRAINING_CONTRACT.md)、全体の完了条件は[M6計画](M6_PLAN.md)を参照する。実データの監査・GPU学習・学習済みモデルの公開はまだ行っていない。
+M6の学習・保存再開は実装済み。固定データの監査、3 epochの実GPU学習と中断再開、HFからの復旧・モデル公開まで完了した（[M6完了記録](M6_COMPLETION.md)）。教師・損失は[M6契約](M6_TRAINING_CONTRACT.md)を維持する。以下の初期値・CIテスト数は初期実装時のもの。
 
 ## データを読む
 
@@ -54,4 +54,4 @@ stateとreceiptをfsyncしてから、latest／best両方の参照を一つのJS
 
 [PyTorchの再現性の説明](https://docs.pytorch.org/docs/2.14/notes/randomness.html)に従って決定的演算を有効にし、非対応の演算はエラーにする。[state_dictとweights_onlyの公式仕様](https://docs.pytorch.org/docs/2.14/notes/serialization.html#torch-load-with-weights-only-true)を使い、読み込み権限を広げるallowlistや`weights_only=False`で失敗を回避しない。
 
-実データ・CUDAでの実行、GPU終了後の外部保持先と復旧試験、本学習の設定・速度・精度は未確認。[JSONとsafetensorsによる再開archive](M6_RESUME_ARCHIVE.md)で、optimizer・乱数・latest/bestを外部Linux間で復元する実装を準備する。通常のモデル公開へは混ぜない。保存先は課金を始める前に具体的な対応・料金・保持期限まで確定する。
+実データ・CUDA本学習と外部保持先からの復旧は[M6完了記録](M6_COMPLETION.md)で確認済み。[JSONとsafetensorsによる再開archive](M6_RESUME_ARCHIVE.md)で、optimizer・乱数・latest/bestを外部Linux間で復元する。通常のモデル公開へは混ぜない。M6の保存先は同記録のHF固定revision。新しい用途では課金前に対応・料金・保持条件を確認する。

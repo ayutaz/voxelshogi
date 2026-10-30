@@ -11,7 +11,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: M6-5まで完了（`docs/M6_COMPLETION.md`）。次は`docs/ROADMAP.md`のPhase5〜7を、実学習約185〜194局面/秒・固定棋力評価と実機性能から具体化する。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、プロジェクトUS$61／基本枠100、追加US$100は未使用。GPUはすべて資源解放済み。
+- 次の実行計画: M6-5まで完了（`docs/M6_COMPLETION.md`）。次は`docs/POST_M6_PLAN.md`のP5-0（評価v2の契約・独立テスト）から進む。評価→教師／長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較の順。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、プロジェクトUS$61／基本枠100、追加US$100は未使用。GPUはすべて資源解放済み。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -38,7 +38,7 @@
 | `crates/voxelshogi-python` | PyO3／maturinのPython境界と行動マスク付きGymnasium環境。ルールはRust coreを呼ぶ |
 | `training/` | Parquet本生成・履歴再生と教師の全件検証・資源監視・対局単位の停止再開。[契約](docs/M4_DATA_CONTRACT.md) |
 | `training/fit.py`、`training/checkpoint.py` | 合法手を対象とした教師あり学習、val選択、optimizer／乱数／batch位置を含む保存再開。CPU CIで一致確認済み |
-| `infrastructure/cuda/`、`training/cuda_preflight.py` | 外部Linux専用のPython3.14.9／CUDA依存lockと起動前検査。RTX5090で少量学習・再開まで確認済み |
+| `infrastructure/cuda/`、`training/cuda_preflight.py` | 外部Linux専用のPython3.14.9／CUDA依存lockと起動前検査。RTX5090で本学習・再開・HF復旧まで確認済み |
 
 ## 開発規約（必読）
 
@@ -113,5 +113,5 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
   - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
   - M6 / Phase4: 3 epoch／22,413更新、固定test・各60局、3形式のHF公開、公開実GPU48条件／40切替・3形式着手・7 E2E、資源解放まで完了（[記録](docs/M6_COMPLETION.md)）。
 - **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. Phase5〜7の実行単位・比較条件・費用をM6実測から計画する。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。後続GPUの起動・学習はまだ行わない。
+  1. [M6後の実行計画](docs/POST_M6_PLAN.md)のP5-0で評価契約v2と独立テストを作る。今回のデータは64手までで、教師模倣精度の向上が棋力改善につながっていない制約を先に扱う。後続GPUの起動・学習はまだ行わない。
 - ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
