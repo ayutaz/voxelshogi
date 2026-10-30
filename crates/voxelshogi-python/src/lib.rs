@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn fork_retains_history_without_mutating_the_parent() {
-        let mut layers = vec!["9/9/9/9/9/9/9/9/9"; 9];
+        let mut layers = ["9/9/9/9/9/9/9/9/9"; 9];
         layers[0] = "8k/9/9/9/9/9/9/9/9";
         layers[8] = "9/9/9/9/9/9/9/9/K8";
         let initial = format!("{} b - 1", layers.join("|"));
