@@ -1,6 +1,6 @@
 # 現在の状態と文書の案内
 
-**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5〜7は未着手。
+**M6／Phase4完了（2026-10-29 UTC）**：[完了記録](M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認し、全所有GPUの資源解放を確認した。教師模倣精度は向上したが、探索AIに対する棋力向上は未確認。Phase5の[P5-0評価契約](P5_EVALUATION.md)に着手。Phase6〜7は未着手。
 
 **初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
 
@@ -10,7 +10,7 @@ M2完了時に照合したmain／公開版は `e212ec739aeb23b3dedac83f60b861903
 
 ## 次の実装と文書更新時の照合
 
-次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase5〜7の実装は未着手。今回の文書更新でGPU・追加生成・学習・HF公開を開始しない。
+次は[POST_M6_PLAN](POST_M6_PLAN.md)の**P5-0：評価契約v2と独立テスト**。評価の感度→教師・長期対局データ→1GPU自己対局→世代比較→複数GPU→構造比較→正式公開の順に、目的・成果物・完了条件を定めた。Phase6までの実行指示を受け、P5-0のmetadata契約・集計・独立テストに着手した。実対局、追加生成、GPU学習、Phase6の構造比較は未実施。
 
 文書更新開始時点のmain／公開版は`16b2b2733b74f176ce65a2e0f334edb710db4a71`。[CI](https://github.com/ayutaz/voxelshogi/actions/runs/40943910648)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/40943910611)は成功、公開catalogは最終HF revisionに一致した（[固定した読取記録](experiments/post-m6-plan-baseline-2026-10-30.json)）。物理計測対象は`564715a`のまま保持し、後続の文書公開へ実測値を付け替えない。最新の配信SHAは公開`build-info.json`を確認する。
 
