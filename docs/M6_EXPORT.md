@@ -1,19 +1,22 @@
 # M6の学習済み重みからの変換
 
-M6-4の変換処理。[初回本学習とTorch評価](M6_MAIN.md)は完了したが、最初のFP32変換が数値基準で停止し、**3形式の推論パッケージとHF公開は未完了。** 再試行前に[学習済み専用の数値契約](M6_MAIN.md#fp32変換の失敗と次の基準)を固定する。 基準は[学習・評価契約](M6_TRAINING_CONTRACT.md)と[固定評価ハーネス](M6_EVALUATION.md)。HFへの全参照値を含む送信と固定revisionのcatalog生成は[専用の推論公開profile](M6_INFERENCE_RELEASE.md)で準備する。M3の未学習モデルの変換・公開許可は、そのまま学習済み重みの公開許可にしない。
+val選択・固定評価済みの重みからの3形式変換とHF公開は完了（[M6完了記録](M6_COMPLETION.md)）。公開版はFP32・FP16重み／FP32計算・INT8重み／FP32計算。初回FP32変換と混合精度FP16の失敗は[履歴](M6_PORTABLE.md)に保持する。以下は現行の変換・来歴契約と初期実装時の検証記録。M3未学習モデルの承認とは別に、M6対象のApache-2.0を確認済み。
 
 ## 評価した重みを使う
 
 ```bash
 # 外部Linux。固定評価が完了したフォルダーと、新しい出力先を指定する形。
-uv run --project infrastructure/cuda --locked python -m export.generate runs/m6/export --selected-evaluation runs/m6/eval-trained
+uv run --project infrastructure/cuda --locked python -m export.generate runs/m6/export \
+  --selected-evaluation runs/m6/eval-trained \
+  --training-source-commit 874aed9ac28c9e50e178c2dda706941b2d3294da \
+  --fp16-weights-only --license Apache-2.0
 ```
 
-入力はval最良epochの重みを固定し、test全件・Random40局・M1探索20局の評価を完了したフォルダー。コードcommit・seed・教師契約・入力cache・split件数・選択元のreceiptと、評価したsafetensorsのサイズ／SHA-256を照合する。未完了の対局、重複したゲーム一覧、testや元ファイルの変更、途中epoch、別コードや別seedを拒否する。
+入力はval最良epochの重みを固定し、test全件・Random40局・M1探索20局の評価を完了したフォルダー。学習元と変換元を明示したコードcommit・seed・教師契約・入力cache・split件数・選択元のreceiptと、評価したsafetensorsのサイズ／SHA-256を照合する。未完了の対局、重複したゲーム一覧、testや元ファイルの変更、途中epoch、宣言と異なるコードや別seedを拒否する。明示的な学習元・変換元の分離は後述の`export_provenance`で結び付け、旧reportのsourceを書き換えない。
 
 変換の直前にも60局の全手と終局をRustで再生し、同じ序盤・先後・上限・生カウント・paired区間に一致することを確認する。対局を再探索する処理ではない。評価したFP32 safetensorsをモデルへstrictに読み込み、保存し直した重みのSHA-256も元と完全一致させる。初期seedの重みへの置換を、学習済みというラベルで通さない。
 
-その一つのcheckpointからFP32・FP16・INT8重み版を作る。学習アーキテクチャや入力43ch／出力1,067,985行動を無記録で小さくしない。INT8はM3と同じ重みのみの対称per-tensor変換で、演算とactivationはFP32、ORTの参照はbasic最適化。FP16は入出力FP32を維持する。testを校正・変換方法の調整には使わない。
+その一つのcheckpointからFP32・FP16・INT8重み版を作る。学習アーキテクチャや入力43ch／出力1,067,985行動を無記録で小さくしない。INT8はM3と同じ重みのみの対称per-tensor変換で、演算とactivationはFP32、ORTの参照はbasic最適化。公開FP16重み版は重みをFP16で保存し、活性・演算と入出力はFP32を保つ。旧混合FP16は別の失敗履歴として区別する。testを校正・変換方法の調整には使わない。
 
 4つの固定入力で、FP32はTorchと照合し、各低精度版は同形式のORT CPU参照とFP32との差を別々に残す。変換により下がった精度や異なるpolicyを隠さず、各実ファイルを[固定testと対局](M6_EVALUATION.md)にも渡す。サイズ・数値差・教師精度・棋力と、ブラウザ実機の性能を混同しない。
 

@@ -30,7 +30,7 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 - この作業環境のエージェントはMacで探索・生成・計測・学習・重い回帰検証を行わない。Macは編集・読み取り・軽量な確認のみとし、フル検証はCI、実機計測と学習は承認済みVast.ai／CloudRiftで実行する。[現在の運用](docs/M4_REMOTE_PLAN.md)。CIの性能を外部GPU実機の性能と読み替えない。
 - 秘密情報を commit・ログ・会話・artifact に含めない。Cloudflare のローカル操作は `scripts/cf.sh` を使う。費用の発生する操作は見積もりと事前承認が必要。
 
-文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、次のM6の目的・作業・完了条件は [M6_PLAN.md](docs/M6_PLAN.md) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
+文書のみの変更は、実装・設定との照合、リンク、記載したコマンドやAPI例、実測値の出典を検証する。過去の検証記録は日時と対象コミットを残し、現況と区別する。文章の変更のためだけに製品コードへ変異を入れたり、文章を写しただけのテストを追加したりしない。現在地と文書の役割は [STATUS.md](docs/STATUS.md)、M6の実績は [M6_COMPLETION.md](docs/M6_COMPLETION.md)、次の目的・作業・完了条件は [POST_M6_PLAN.md](docs/POST_M6_PLAN.md) を参照する。[M3_PLAN.md](docs/M3_PLAN.md) は完了した技術検証の契約として保持する。
 
 変更に関連する検証を実行する。Rust、Node、pnpm、wasm-bindgenの版は固定値に合わせる（`rust-toolchain.toml`、`.node-version`、Webの `packageManager` / lockfile）。Pythonは `.python-version` を使う。ローカルE2Eは既存Chrome、CIは `PW_CHANNEL=''` でChromiumを使う。
 

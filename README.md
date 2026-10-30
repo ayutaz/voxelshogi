@@ -35,7 +35,7 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 ### 開発状況
 
-ルールエンジン、ブラウザでの探索AI観戦、未学習モデルのブラウザ推論を公開済みです。
+標準ルールのエンジン、探索AIと学習済み3形式の観戦、未学習モデルの推論ラボを公開済みです。
 
 CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。
 
@@ -44,6 +44,10 @@ CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging Fac
 観戦画面には[取得済みモデルの読み込み・両AIの形式選択・AI条件付き棋譜保存](docs/M6_ARENA.md)があります。ブラウザ向けの全3形式をHFで公開し、固定revisionとファイルhashをモデル一覧に登録しました。Linux実GPUで公開後の全48条件・40回の形式切替、各形式の実着手・7件の実モデルE2Eを確認し、GPUの資源解放まで完了しました（[M6完了記録](docs/M6_COMPLETION.md)）。初回の混合精度FP16と計測手順の失敗も[記録](docs/M6_PORTABLE.md)へ残しています。
 
 詳しい進捗は [現在の状態](docs/STATUS.md)、各段階の目的・完了条件は [ロードマップ](docs/ROADMAP.md) を参照してください。M4と、固定3局145手を照合したM5は完了しています。M6／Phase4は[学習・再開・評価・3形式公開と実機観戦](docs/M6_COMPLETION.md)まで完了しました。計算とモデルの転送は外部Linuxで行い、Macでは編集と軽量な確認を行います。
+
+### 次に進めること
+
+次は評価が棋力差を捉えられるかを点検し、教師・長期対局データを比較してから、1GPUの自己対局ループへ進みます。複数GPUと構造比較は、その有効性・費用を測ってから行います。[段階ごとの目的・ゴールと最初のPR](docs/POST_M6_PLAN.md)をまとめています。
 
 ### ルールについて
 
@@ -96,7 +100,7 @@ node scripts/prepare-inference.mjs runs/m3/local apps/web/public/models/m3 --loc
 | 知りたいこと | 読むもの |
 |---|---|
 | 目的・開発範囲 | [プロジェクト仕様](docs/PROJECT_SPEC.md) |
-| 今できること・今後の予定 | [現在の状態](docs/STATUS.md) / [ロードマップ](docs/ROADMAP.md) |
+| 今できること・今後の予定 | [現在の状態](docs/STATUS.md) / [ロードマップ](docs/ROADMAP.md) / [M6後の実行計画](docs/POST_M6_PLAN.md) |
 | エンジンのAPI・設計 | [ゲームエンジン](docs/GAME_ENGINE.md) / [設計判断](docs/ARCHITECTURE_DECISIONS.md) |
 | データ生成・公開 | [M4実行計画](docs/M4_PLAN.md) / [HF公開・保存ルール](docs/HF_PUBLICATION.md) |
 | モデルの入出力・検証結果 | [モデル契約](docs/MODEL_CONTRACT.md) / [検証記録](docs/M3_VALIDATION.md) |

@@ -1,7 +1,7 @@
 # VoxelShogi 技術スタック調査（デューデリジェンス）
 
-- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-28**（公式料金の最終照合は2026-10-26）
-- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch DDP学習（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
+- 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-30**（公式料金の最終照合は2026-10-26）
+- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch単GPU学習と将来のDDP（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。
 - 凡例: **[確認済]** = 各節の取得日に一次情報で確認 / **[記憶ベース]** = 取得日に一次情報で未検証 / **[未確認]** = 確認できなかった・実測が必要
 
@@ -11,9 +11,9 @@
 
 以下のバージョン表・ローカル環境・候補比較は初回調査時点の記録。M0 以後の実装は Rust 1.97.1、Node 24.22.1、pnpm 10.32.1、Python 3.14.9 に固定した。WASM は wasm-pack ではなく `scripts/build-wasm.sh` と wasm-bindgen-cli 0.2.129 を使う（ADR-007）。Wrangler 4.152.0 は Web の lockfile で管理する。WASM ターゲットと CLI の導入は完了し、本番公開まで検証済み。
 
-Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO30.30.1／maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2、HF SDK2.3.0はM4で導入・Linux CIと実機で検証済み。CUDA／学習依存はM6で確認し、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。M4本生成とM5の固定3局照合は完了し、次は[M6の教師・学習実装](M6_PLAN.md)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
+Python は3.14系を基本、依存が未対応の場合のみ3.13系とする。Python／ONNX依存はM3で導入・検証済み。PyO30.30.1／maturin1.15.0、Gymnasium1.4.0、PyArrow26.0.0、psutil7.2.2、HF SDK2.3.0はM4で導入・Linux CIと実機で検証済み。CUDA／学習依存はM6で実測・検証済みであり、下記の古い最小バージョン例をそのまま採用しない。2026-10-27のディスク再確認は約27.2 GiB（[取得記録](experiments/documentation-baseline-2026-10-27.json)）。初回の約9GBや前回の約32GiBと区別し、依存導入直前に再確認する。M4本生成・M5固定3局照合と[M6学習・復旧・3形式公開・実機観戦](M6_COMPLETION.md)は完了し、次は[評価・自己対局・構造比較の計画](POST_M6_PLAN.md)、全体の順序は [ROADMAP.md](ROADMAP.md)、CI/CD は [CI_CD_PLAN.md](CI_CD_PLAN.md) を優先する。
 
-2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・データ生成依存とHF公開ハーネスはM4で導入済み。LinuxのtorchはCPU版で、CUDA学習・COOP/COEP・R2は未導入。
+2026-10-27にM2最終main／公開版 `e212ec7` と照合した（[現在地](STATUS.md)・[最終公開記録](experiments/m2-final-publication.json)）。標準1王の探索は専用module Workerで動き、両AIのEasy/Normal設定・中断／再試行・3D遅延ロードを公開済み。以下の公開バイト数は `3a500cd` の計測値で、最終版と実行ファイルのSHA一致を確認している。この段落と下表のM2サイズは歴史的な固定記録で、現在のNN配布サイズではない。M3ではORT Web1.31.1・PyTorch・ONNX等を導入済み。PyO3・maturin・データ生成依存とHF公開ハーネスはM4で導入済み。このM4時点のLinux用torchはCPU版で、当時はCUDA学習・COOP/COEP・R2を未導入。現在のCUDA構成は次節に記載する。
 
 | 採用構成／固定記録 | 固定値・実績 | 正となる設定・証拠 |
 |---|---|---|
@@ -32,6 +32,10 @@ M2の固定コミット `63a4716` では、実Chromeの2D初回JSは255,096 byte
 WASMサイズはビルド環境でも差が出るため、配信バイト数とローカル生成物の値を混ぜない。以下の外部版・公開日・サイズは、特記がなければ2026-10-25の調査記録。将来の推論・学習の採用版や性能を確定したものではない。
 
 M3は未学習モデル3形式を [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で実行できる。採用版はORT Web／Python ORT 1.31.1、opset18、専用Worker、WASM 1 thread。Asyncify WASM 28,747,738 bytesを16 MiB単位に分割する同一originのStatic Assetsを採用し、R2は追加していない。FP32／INT8重みのM1 WebGPUと全3形式のWASMが数値基準内、FP16×M1 WebGPUは不合格を表示する。3DありFP32 WebGPU中央値55.00〜56.95msは基準公開版`dd3762c`の固定測定であり、一般端末の保証値ではない。[最終公開・測定の区別](M3_VALIDATION.md)・[ADR-019](ARCHITECTURE_DECISIONS.md#adr-019-m3の精度形式backend配信方式2026-10-27)
+
+## M6で確認した現在の構成
+
+M6はPython3.14.9／torch2.14.1+cu130／CUDA13.0／RTX5090の単GPU・FP32学習を実測した。推論配布はFP32・FP16重み／FP32計算・INT8重み／FP32計算で、ORT Web1.31.1のWASM／WebGPUと公開3D観戦を検証済み。モデルはHFのmanual gateから取得した端末内ファイルを使い、Cloudflareはcatalog・アプリ・ORTを配信する。DDP・別構造・未測定端末は対応済みにしない。詳細は[M6完了記録](M6_COMPLETION.md)。以下の外部バージョン候補・価格・記憶ベースの項目は取得日当時の調査であり、今回すべてを再調査したものではない。
 
 ## 0. 結論サマリ
 

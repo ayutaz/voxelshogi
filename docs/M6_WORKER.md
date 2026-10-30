@@ -1,6 +1,6 @@
 # M6のモデル用Worker通信
 
-M6-5の[端末内読込](M6_LOCAL_MODEL.md)と[数値検証付きsession](M6_SESSION.md)を専用Workerへ接続する。Workerと観戦制御はPR #57〜#58で取り込み済み。[観戦UIと実ONNXの全6 E2E](M6_ARENA.md)もPR #59でLinux CI成功後に取り込み済み。**学習済みモデル公開・実GPUでの実行は未完了。** 公開catalogは空で、未承認のモデルを登録したり、実学習が済んだように表示したりしない。
+学習済みモデルの端末内読込と数値検証付きsessionを専用Workerへ接続し、公開catalog・観戦UI・実GPUまで検証済み（[M6完了記録](M6_COMPLETION.md)）。catalogは最終HF revisionを固定しており、空ではない。以下は通信・中断・配信の仕様と初期実装時の検証記録。
 
 ## ファイルと実行先
 
@@ -20,8 +20,8 @@ Worker内部の通常失敗はsessionをdisposeしてエラーとして返す。
 
 `apps/web/public/models/m6/catalog.json`だけをCloudflareへ配信する。ビルドはM6用ディレクトリへ重み等が混ざっていないことを確認し、catalogのbytes・SHA-256を`inference-build.json`へ記録する。catalogは`no-store`、hash付きJS／WASMは従来のimmutable配信とする。公開照合でもCIでテストしたmanifestとcatalogの実bytes・SHA・cache方針を確認する。HFのpublic/manualを別の重みURLで迂回しない。
 
-## 検証と次の作業
+## 初期実装時の検証と、その後の完了
 
 MacではFileの小さい文字列fixtureとfake portsで、通信・中断・再利用、型／局面／形式／数値証拠の改変、固定catalog URL、初期化失敗・cleanup失敗、配信hashを検証する。関連する純粋テスト157件と配信用Nodeテスト4件、新規Web16変異・配信制御3変異を確認した。Macでモデル・Tensor runtime・探索は実行していない。全96 Web変異と実WASM／既存E2EはLinux CIで検証する。
 
-次はarenaの両AI選択へ接続し、停止・1手送り・速度・人間対AI・モデル切替と棋譜／実行条件の保存を検証する。フォルダーの再選択は同じmodel hashでも新しい入力として扱い、古いWorkerを流用して新しいFileの検査を省略しない。モデル用Workerの実ブラウザ実行と数値検証はその接続時に行い、実学習済みモデルと物理GPUの結果で[M6-5](M6_PLAN.md)を判定する。
+その後arenaの両AI選択へ接続し、停止・1手送り・速度・人間対AI・モデル切替と棋譜／実行条件の保存を検証した。フォルダーの再選択は同じmodel hashでも新しい入力として扱い、古いWorkerを流用して新しいFileの検査を省略しない。実ブラウザ・数値検証・実学習済みモデルと物理GPUの結果は[M6完了記録](M6_COMPLETION.md)に固定した。

@@ -1,6 +1,6 @@
 # 学習済み推論パッケージのHF公開
 
-[HF公開ハーネス](HF_PUBLICATION.md)に`artifact_role="inference-package"`を追加する。対象はM6のval選択・固定評価済みの重みから作った3形式と同形式の照合データ。通常のmodel／datasetの許可範囲は広げず、任意の`.f32`やoptimizerを追加可能にはしない。**実データ監査と少量CUDA試行は[M6-2で確認済み](M6_TRIAL.md)。本学習・最終評価・学習済み推論パッケージ公開は未実施。** [費用・ライセンス・再開状態公開の方針](M6_RUN_PROPOSAL.md)は2026-10-29に個別承認済み。
+`artifact_role="inference-package"`で評価済みの実3形式・参照値・Model Cardを公開し、最終HF revisionの全37ファイルとpublic/manual・Community OFFを照合済み（[M6完了記録](M6_COMPLETION.md)）。以下は公開profileの検査仕様。実行・評価の証拠は同記録を参照し、opaque metadataの単体テストと区別する。
 
 ## 目的と範囲
 

@@ -21,15 +21,20 @@
 
 詳細は [RELATED_WORK.md](RELATED_WORK.md) を参照。これは目指す研究上の貢献であり、学習・アーキテクチャ比較を実施済みという意味ではない。
 
-## 実装済みの範囲（2026-10-28）
+## 実装済みの範囲（2026-10-30）
 
-実装・配信・品質の照合元は [STATUS](STATUS.md)。M3の完了証拠は [M3検証](M3_VALIDATION.md)、完了したM4は[固定記録](M4_COMPLETION.md)、次のM6の目的・作業・完了条件は [実行計画](M6_PLAN.md) を参照。
+現在の実装・公開・品質は[STATUS](STATUS.md)、各段階の目的とゴールは[ROADMAP](ROADMAP.md)を正とする。M0・R0・M1〜M6／Phase0〜4は完了。次は[M6後の実行計画](POST_M6_PLAN.md)に従い、評価の感度、教師・対局分布、自己対局、分散学習、構造比較、正式公開へ進む。
 
-標準1王ルールのRustエンジン・WASM・通常画面のEasy／NormalによるAI対局・Worker探索観戦、M0のCI/CD、R0の9王3ルール・CPU探索試作・生成棋譜のA/B再生を公開済み。R0は計1,052局を比較し、代表6棋譜を配信する。9王ルールの正式採用と観戦者の理解度評価は保留している。[試作結果](NINE_KINGS_EXPERIMENT.md)
+| 対象 | 実装・検証済みの範囲 |
+|---|---|
+| エンジン・探索・観戦 | 標準1王のRustエンジンをWASM／Pythonから共用。Easy／Normal、停止・1手送り・速度変更・中断、人間先手／後手を提供。人間同士の対局は対象外 |
+| R0 | 9王3候補と標準対照など1,052局を比較。正式採用・観戦者評価は保留。比較室と旧URLの画面は撤去し、研究記録・固定棋譜を保持 |
+| M3 | 未学習の約502万パラメータを3形式で実行する[推論ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1)。M1／ChromeでのFP16 WebGPU基準未達は記録し、M6のFP16重み版と区別 |
+| M4・M5 | 有効113,321局面・探索教師36,894件を全検証・全再生成し、Dataset Card付きでHF公開、固定revisionの1,831ファイルを照合。改定後の実棋譜は固定3局145手が一致し、全棋譜の完全互換は未検証 |
+| M6／Phase4 | 3 epoch・22,413更新、val選択、test3,589件・各60局の比較、HFからのmodel／optimizer／RNG復旧。FP32・FP16重み・INT8重みをHF public/manual・Community OFFで公開し、37ファイルを照合 |
+| 学習済みモデルの公開観戦 | 利用者が取得した実ファイルを両AIに選び、ブラウザ内Workerで実行。公開catalog差し替えなしのLinux RTX5090実機48条件・40実切替、3形式のGPU着手、7実モデルE2Eと資源解放まで確認 |
 
-標準1王のM1全幅探索とM2のブラウザ内ライブ探索は実装・検証・公開済み（[M1記録](M1_VALIDATION.md)・[M2記録](M2_VALIDATION.md)）。M2では両AIのEasy/Normal設定、停止・1手送り・速度変更・中断／再試行、人間先手／後手の補助モードを利用できる。
-
-M3も完了し、約502万パラメータの未学習TransformerをFP32・FP16・INT8重み版へ変換して [公開ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1) で選択・実行できる。実機M1／Chromeでは全3形式のWASM、FP32／INT8重みのWebGPUが数値基準を満たした。FP16×M1 WebGPUの基準未達も表示し、別形式・backendへ自動置換しない。未学習の技術デモであり、通常対局の探索AIやM6の学習済みAI対局とは別の機能。M4のPython境界・少量Parquet生成・全件検証・再生成・資源監視と本生成CLIを実装済み。CloudRiftのCPUで初回・64手の並列試行も完了し、有効769局面・探索教師252件を確認した。試料2 configはDataset Card付きでHFに公開し、public/manual・Community OFFと固定Hub commitの全28ファイルhash一致を確認済み。M5は固定した改定後3局145手の全件一致を確認済みで、全棋譜の完全互換は主張しない。本生成は有効113,321局面・探索教師36,894件の全検証・全再生成・Card付きHF公開と全1,831対象ファイル照合・資源終了まで完了。M6の学習・棋力評価・モデル対局は未完了。[M4の証拠と制約](M4_VALIDATION.md)、[本生成の完了](M4_COMPLETION.md)、[M6の実行計画](M6_PLAN.md)。
+[M6完了記録](M6_COMPLETION.md)・[M4完了記録](M4_COMPLETION.md)・[M5の対象と制約](M5_PLAN.md)。M6の教師手再現率は約75.6%だが、探索AIに対する棋力向上は未確認。自己対局学習・DDP・複数構造の同条件研究比較・対象モバイルへの正式対応はこれから行う。
 
 ## スコープ
 

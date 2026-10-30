@@ -1,6 +1,6 @@
 # M6の再開状態を外部へ退避する形式
 
-M6-2の[実GPU試行・HFへの転送・新run復旧と追加更新の一致](M6_TRIAL.md)を確認済み。本学習状態の作成はこれから行う。[学習処理](M6_RUNTIME.md)の非公開checkpointを、実行可能なPythonオブジェクトを含まない形式へ変換する。Macへデータやcheckpointを中継しない。
+本学習のmodel・optimizer・RNG・latest／bestをJSON＋safetensorsでHFへ退避し、固定revisionからの新run復旧・全hashと最大絶対差0を確認済み（[M6完了記録](M6_COMPLETION.md)）。以下は再開archiveの仕様と初期実装時の検証。実行用のpickle checkpointを公開モデルへ混ぜず、Macへ中継しない。
 
 ## 目的と完了条件
 
