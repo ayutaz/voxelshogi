@@ -89,7 +89,8 @@ def validate_protocol(protocol):
             or (
                 participant["backend"] not in ("torch-cpu", "torch-cuda", "ort-cpu")
                 if participant["policy"] == "legal-argmax-v1"
-                else participant["backend"] != "rust"
+                else participant["backend"]
+                != ("rust" if participant["policy"] == "alphabeta-v1" else "python-rng")
             )
         ):
             raise ValueError("invalid evaluation participant policy/backend")
