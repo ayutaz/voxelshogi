@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "evaluation-case-oracle-color",
+        "training/evaluation_cases.py",
+        '"winner": winner',
+        '"winner": "Black"',
+        "test_evaluation_cases.py",
+    ),
+    (
+        "evaluation-case-overlap",
+        "training/evaluation_cases.py",
+        "overlaps = {name: len(evaluated & group) for name, group in corpus.items()}",
+        "overlaps = {name: 0 for name in corpus}",
+        "test_evaluation_cases.py",
+    ),
+    (
+        "evaluation-case-all-roots",
+        "training/evaluation_cases.py",
+        "evaluated = set().union(*cases.values())",
+        "evaluated = set(next(iter(cases.values())))",
+        "test_evaluation_cases.py",
+    ),
+    (
+        "evaluation-case-all-corpus-rows",
+        "training/evaluation_cases.py",
+        "or count != expected_rows",
+        "or False",
+        "test_evaluation_cases.py",
+    ),
+    (
+        "evaluation-case-full-continuation",
+        "training/evaluation_cases.py",
+        'for move in record["moves"][len(opening["moves"]) :]:',
+        "for move in []:",
+        "test_evaluation_cases_native.py",
+    ),
+    (
         "evaluation-v2-runner-terminal-priority",
         "training/evaluation_v2_runner.py",
         'if snapshot["finished"]:',

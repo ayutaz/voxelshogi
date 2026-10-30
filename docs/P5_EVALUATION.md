@@ -60,3 +60,24 @@ uv run --project infrastructure/cuda --locked python -m training.evaluation_v2_r
 各対局は保存前にRustで全手・宣言結果を再生する。出力はprotocol、各棋譜、集計、実行環境・全棋譜のbytes／hashと集計hashを結ぶrun receipt。既存の出力先は上書きせず、中断・失敗時は`complete=false`を残す。`verify_run`は保存後にファイルのhash、全棋譜のRust再生、全件再集計をやり直す。これだけで入力コーパス全件の漏洩検査が済んだとはしない。
 
 Macではfake portsの操作・局面IDに関する7テストと、新規7変異の検出を確認。既存v1・v2を含む軽量集計は計22テストが成功した。実Rustの詰み／打切り・決定的な棋譜・中断・改変拒否・全receiptの統合テスト4件はLinux CIで確認する。Macでエンジン・探索・実モデルを実行しない。
+
+## 開発用の実局面と全継続局面の漏洩照合
+
+[training/evaluation_cases.py](../training/evaluation_cases.py)は開発用の8組16局を事前固定する。手書きの詰み4件（先後反転と遠方の自王位置変更）、千日手直前1件、少数駒と持ち駒の局面1件に、seed9200の16手・seed9201の96手の合法な標準序盤履歴を加える。16／96手の生成は外部Linuxで行う。`middlegame`は96手時点という操作上の層別名で、実際の駒数・状況を確認せず真の中盤だと断定しない。
+
+詰みの手計算oracleは先手`232222`・後手`878888`による詰み、千日手は11手の履歴から`211111`を指した自然引分。これらをRustへ渡して検証する。遠方の自王位置の変更は同じ戦術の変形であり、独立した4種類の戦術とは扱わない。M6の数値fixtureも含む露出済みの診断局面で、未知の棋力テストではない。
+
+戦術の追加手数上限は1手、千日手局面は16手、少数駒は128手、標準履歴からは512手。探索は深さ3／20,000ノード／TT4,096。pilotの感度screenは8組・終局率25%以上と事前固定する。満たしても棋力改善の証明にはせず、戦術成功・自然終局・先後差・打切り・時間を層別に確認して、本比較と最終holdoutを別に設計する。
+
+漏洩監査は固定したM6データrevisionの全ファイル・schema・行数・既存監査を照合してから、全116,921行をtrain／val／test別に列挙する。重複行も除かず、複数splitに現れる同一局面も保持する。現在の対象はこの凍結コーパスであり、後続の新データまで監査済みとはしない。
+
+評価側は保存済みrunのhash・全手再生・再集計を確認した後、評価開始局面とその後の全局面（終端を含む）をRustで再生して照合する。共通のbook prefixを未学習と主張せず、評価開始前の履歴だけを照合対象から除く。開始後に一度でも既存コーパスと重なれば`passed=false`を保存し、audit CLIは終了コード2を返す。結果を見て都合の良い対局だけ残さない。
+
+```bash
+# 外部Linux。participantsには事前固定した両者のhash・backend・policyを指定。
+uv run --locked python -m training.evaluation_cases prepare runs/p5/participants.json runs/p5/protocol.json
+# 評価runner完走後。データは外部LinuxからHFの固定revisionで取得・照合する。
+uv run --locked python -m training.evaluation_cases audit runs/p5/evaluation /mnt/dataset/production-64 runs/p5/leakage.json
+```
+
+Macでは静的metadata・全splitの行数・継続局面の集合について5テストをRED→GREENで確認し、純粋部分の4変異を検出した。手書きの詰み／千日手、共通prefixの除外と後続局面、固定16／96手生成の再現性の3統合テスト、およびrootだけを照合する変異の検出はLinux CIで確認する。実コーパスの監査と実モデル対局は未実施で、P5-0全体の完了とはしない。
