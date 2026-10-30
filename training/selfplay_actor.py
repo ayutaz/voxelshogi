@@ -153,6 +153,7 @@ def play_episode(
     if initial["finished"]:
         raise ValueError("episode opening must be unfinished")
     opening, game, samples = root.record(), root.fork(), []
+    bootstrap = None
     bootstrap_evaluations = 0
     prefix = len(opening["moves"])
     if opening["ruleset_id"] != RULESET:
@@ -190,6 +191,7 @@ def play_episode(
                     model_sha256=model_sha256,
                     discount=config.bootstrap_discount,
                 )
+            bootstrap = {"value": float(value), "side": snapshot["side"], "ply": ply}
             record, kind = game.record(), "cutoff"
             record.update(
                 termination="MaxPlies", result={"Draw": {"reason": "MaxPlies"}}
@@ -247,10 +249,11 @@ def play_episode(
         "model_sha256": model_sha256,
     }
     return {
-        "schema": "voxelshogi-selfplay-episode-v1",
+        "schema": "voxelshogi-selfplay-episode-v2",
         "episode_id": _digest(conditions),
         **conditions,
         "complete": True,
+        "bootstrap": bootstrap,
         "bootstrap_evaluations": bootstrap_evaluations,
         "model_evaluations": sum(s["search"]["model_evaluations"] for s in samples)
         + bootstrap_evaluations,
