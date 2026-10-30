@@ -1,0 +1,153 @@
+{
+  "scope": "functional checks only; not a strength or performance benchmark",
+  "base_git_commit": "bbc518dfa8f735aabeb55de289027b8ccccfce58",
+  "isolated_checkout_file_overlays": {
+    "training/policy_value.py": "85eb12fb8cbc0f922f462a4dddc77e931a61adc94f84876c43a080e3e558d81b",
+    "training/students.py": "b970b88f163aad9d081e3b2036ba7bdf5e0d69c96722e257cd77110d46f82935",
+    "training/tests/test_policy_value.py": "a44737e63269e635200fbc7279409e5c0d765e076e90ebdb08bfc3ffed069d6f"
+  },
+  "environment": {
+    "python": "3.14.9",
+    "torch": "2.14.1+cu130",
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090"
+  },
+  "unit_tests": {
+    "new": 14,
+    "existing_student": 2
+  },
+  "mutations": [
+    {
+      "name": "policy-value-initial-runtime",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-call-runtime",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-cuda-workspace",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-legal-normalization",
+      "outcome": "caught",
+      "assertion_failures": 2
+    },
+    {
+      "name": "policy-value-viewpoint",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-range",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-initial-artifact-hash",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-postload-artifact-hash",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-strict-weights",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-fp32-weights",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-inference-snapshot",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "policy-value-binding-copy",
+      "outcome": "caught",
+      "assertion_failures": 1
+    },
+    {
+      "name": "student-legal-argmax",
+      "outcome": "caught",
+      "assertion_failures": 2
+    },
+    {
+      "name": "student-canonical-tie",
+      "outcome": "caught",
+      "assertion_failures": 2
+    }
+  ],
+  "actual_m6_weights": {
+    "functional_only": true,
+    "benchmark": false,
+    "backends": {
+      "cpu": {
+        "binding": {
+          "artifact_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+          "architecture": "transformer-s-full-v1",
+          "backend": "torch-cpu",
+          "compute_dtype": "float32"
+        },
+        "cases": [
+          {
+            "case": "mate-black",
+            "legal_actions": 199,
+            "probability_sum": 0.9999999817046046,
+            "value": 0.908830463886261,
+            "argmax_move": "232341",
+            "old_student_argmax_matches": true
+          },
+          {
+            "case": "mate-white",
+            "legal_actions": 199,
+            "probability_sum": 0.9999999817046046,
+            "value": 0.908830463886261,
+            "argmax_move": "878769",
+            "old_student_argmax_matches": true
+          }
+        ],
+        "successful_model_evaluations": 2
+      },
+      "cuda": {
+        "binding": {
+          "artifact_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+          "architecture": "transformer-s-full-v1",
+          "backend": "torch-cuda",
+          "compute_dtype": "float32"
+        },
+        "cases": [
+          {
+            "case": "mate-black",
+            "legal_actions": 199,
+            "probability_sum": 0.9999999970800673,
+            "value": 0.9088303446769714,
+            "argmax_move": "232341",
+            "old_student_argmax_matches": true
+          },
+          {
+            "case": "mate-white",
+            "legal_actions": 199,
+            "probability_sum": 0.9999999970800673,
+            "value": 0.9088303446769714,
+            "argmax_move": "878769",
+            "old_student_argmax_matches": true
+          }
+        ],
+        "successful_model_evaluations": 2
+      }
+    },
+    "same_vm_as_evaluation": true,
+    "gpu": "NVIDIA GeForce RTX 5090"
+  }
+}
