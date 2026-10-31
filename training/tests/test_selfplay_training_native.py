@@ -217,3 +217,59 @@ def test_soft_policy_gradient_uses_all_visit_mass_and_masks_illegal_logits():
         rtol=0,
         atol=0,
     )
+
+
+def test_selfplay_safe_archive_restores_optimizer_rng_and_exact_training(tmp_path):
+    import json
+    import shutil
+
+    from training.resume_archive import pack_run, restore_run, verify_archive
+    from training.selfplay_training import TrainConfig, fit_samples
+    from training.tests.test_checkpoint import assert_state_equal
+
+    cfg = TrainConfig(
+        device="cpu",
+        epochs=2,
+        batch_size=2,
+        learning_rate=0.01,
+        weight_decay=0,
+        save_every=1,
+        threads=1,
+    )
+    a, ao = model_optimizer(cfg)
+    full = fit_samples(
+        a, ao, samples(), tmp_path / "full", config=cfg, input_binding=binding()
+    )
+    b, bo = model_optimizer(cfg)
+    source = tmp_path / "partial"
+    partial = fit_samples(
+        b, bo, samples(), source, config=cfg, input_binding=binding(), max_new_steps=1
+    )
+    expected = json.loads((source / "run.json").read_text())["binding"]
+    archive = tmp_path / "archive"
+    manifest = pack_run(source, archive, profile="selfplay")
+    assert manifest["schema"] == "voxelshogi-selfplay-resume-archive-v1"
+    assert set(manifest["roles"]) == {"latest"}
+    assert (
+        manifest["roles"]["latest"]["progress"]["step"]
+        == partial["progress"]["step"]
+        == 1
+    )
+    assert not list(archive.rglob("*.pt"))
+    assert {p.suffix for p in archive.rglob("*") if p.is_file()} == {
+        ".json",
+        ".safetensors",
+    }
+    verify_archive(archive, expected_binding=expected, profile="selfplay")
+    with pytest.raises(ValueError):
+        verify_archive(archive, expected_binding=expected)
+    shutil.rmtree(source)  # Disposable fixture; restore cannot use private .pt.
+    restored = tmp_path / "restored"
+    restore_run(archive, restored, expected_binding=expected, profile="selfplay")
+    c, co = model_optimizer(cfg)
+    resumed = fit_samples(
+        c, co, samples(), restored, config=cfg, input_binding=binding(), resume=True
+    )
+    assert full["progress"] == resumed["progress"]
+    assert_state_equal(a.state_dict(), c.state_dict())
+    assert_state_equal(ao.state_dict(), co.state_dict())

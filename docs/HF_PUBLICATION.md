@@ -76,3 +76,7 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 ## 本生成公開の完了（2026-10-29 JST）
 
 [本生成のDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1/blob/6e7fb29d2469b56a895042fbb089d86e7b4d074f/README.md)は実数・来歴・制約を記載済み。`production-64`を追加し、旧試料を保持した。固定Hub commitの全1,831対象ファイルとCardのhash、public/manual・Community OFF、実機終了・資源解放を[完了記録](M4_COMPLETION.md)へ残した。
+
+## 自己対局の再開状態
+
+[P5-2の専用archive・公開profile](P5_SELFPLAY_STATE.md)を使う。`profile="selfplay"`と`artifact_role="selfplay-training-state"`を明示し、旧M6の契約・repoへ混ぜない。public/manual・Community OFF・カード・固定revision全hash・共通upload ledgerは同じ境界を維持する。実自己対局の公開・別VM復旧は未実施であり、コードとfake Hubの成功をその証拠にしない。前述のM6公開前の記述は過去の計画で、M6の実公開・復旧は[M6完了記録](M6_COMPLETION.md)を確認する。

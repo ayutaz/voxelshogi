@@ -73,7 +73,13 @@ def state_inventory(folder, plan, card):
         )
         if section is None or not section.group(1).strip():
             raise ValueError(f"State Card requires a populated section: {title}")
-    manifest = verify_archive(folder, expected_binding=plan["expected_binding"])
+    manifest = verify_archive(
+        folder,
+        expected_binding=plan["expected_binding"],
+        profile="selfplay"
+        if plan["artifact_role"] == "selfplay-training-state"
+        else "m6",
+    )
     expected = {name: None for name in ("manifest.json", "README.md", "LICENSE")}
     if (folder / "NOTICE").exists():
         expected["NOTICE"] = None
