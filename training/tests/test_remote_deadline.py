@@ -62,7 +62,7 @@ def test_arm_requires_successful_empty_owned_inventory():
     assert api.calls[-1][1]["selector"] == {"ByTags": {"all": [TAG], "any": []}}
 
 
-def test_remote_clock_terminates_at_stop_time_without_local_process():
+def test_remote_clock_terminates_at_stop_time_without_local_process(capsys):
     from training.remote_deadline import watch
 
     api = Provider([active()])
@@ -80,6 +80,13 @@ def test_remote_clock_terminates_at_stop_time_without_local_process():
     assert [d for p, d in api.calls if p.endswith("/terminate")] == [
         {"selector": {"ById": ["owned"]}}
     ]
+    import json
+
+    assert json.loads(capsys.readouterr().out) == {
+        "event": "termination_requested",
+        "at": 4100,
+        "instance_ids": ["owned"],
+    }
 
 
 def test_empty_inventory_is_not_early_success_and_errors_retry():

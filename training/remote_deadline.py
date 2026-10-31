@@ -86,6 +86,16 @@ def watch(spec, api, *, clock=time.time, pause=time.sleep, stopping=lambda: Fals
                 active = [row["id"] for row in rows if row["status"] not in TERMINAL]
                 if active:
                     api("/api/v1/instances/terminate", {"selector": {"ById": active}})
+                    print(
+                        json.dumps(
+                            {
+                                "event": "termination_requested",
+                                "at": clock(),
+                                "instance_ids": active,
+                            }
+                        ),
+                        flush=True,
+                    )
                     # The successful response alone is not release confirmation.
                 if not seen and (now >= spec.maximum_end_at or stopping()):
                     return {

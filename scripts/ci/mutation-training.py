@@ -10,7 +10,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
-MUTATIONS = (
+MUTATIONS = [
+    (
+        "deadline-termination-evidence",
+        "training/remote_deadline.py",
+        '"event": "termination_requested"',
+        '"event": "observation_only"',
+        "test_remote_deadline.py",
+    )
+] + (
     [
         (
             "deadline-authoritative-id",

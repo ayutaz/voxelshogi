@@ -56,3 +56,11 @@ gh workflow run gpu-deadline.yml --ref main -f tag="$rental_tag" -f maximum_end_
 ## この修正の検証
 
 新規7件とレンタル連携3件の失敗を実装前に確認し、その後は関連77テストが成功した。GitHub実run／job取得とHTTP秘匿の追加回帰も含む。独立監視15変異は実際のテスト失敗で検出し、通常CIの既知変異へ追加した。Ruff・actionlint・差分の空白確認も成功。これはfake providerと制御metadataの検証であり、独立runnerによる実API接続・有料実機の終了試験はまだ未実施。
+
+## 2026-10-31 UTCの追記
+
+[所有12実機の再確認](experiments/p5-resource-recheck-2026-10-31.json)ではすべてInactive・resources_released=true。計上済み利用秒数と取得単価の計算合計は約US$21.03で、請求書の確定額ではない。今回以外の既知レンタルに元の予約上限を超える計算額はなく、保守的予約US$73を維持する。
+
+ユーザーがGitHubへのCloudRift APIキー保存を明示承認した。[専用environmentの設定記録](experiments/p5-gpu-control-environment-2026-10-31.json)のとおり、custom branch policyをmainのbranch 1件に限定してから環境Secretを保存した。キー値は記録しない。main統合後の無料接続試験と有料実機の独立終了試験は未実施。
+
+PR #91の最初のLinux CIでは全713テストは成功したが、research-time-cap変異が生存した。独立ガードの残り時間検査が既存の計画上限検査の欠落を隠していたため、計画の4時間制約をread_planで直接検査するように直し、当該変異の検出を確認した。終了APIを呼んだ時刻と所有IDを、資格情報を含まないJSONとして監視ログへ残す検査も追加した。最新mainとの統合後、既知変異は全297件。
