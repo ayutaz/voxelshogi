@@ -1,0 +1,24 @@
+{
+  "base_source": "fe4f98dd6da18fdcbfc3ef747bd87341aa2dc062",
+  "overlay_sha256": {
+    "training/selfplay_training.py": "38e3a1cf38feead72bb7124e79c71de5504b0eba66a3fca4c914a703beaff95a",
+    "training/tests/test_selfplay_training.py": "5d136037df5482da71ff749e4e92404986f695b8f9347c972e491f30dd1cb7d9",
+    "training/tests/test_selfplay_training_native.py": "0b8acab6a24bd9b3a49f75943233e81cc9edf96d395082682ca4a75ca9740448"
+  },
+  "backend": "torch-cpu, CUDA hidden",
+  "red": {
+    "exit": 1,
+    "cases": 5,
+    "failures": 5,
+    "errors": 0,
+    "tail": "============= FAILURES ===================================\n_____ test_soft_visit_learning_updates_parameters_and_resumes_bit_exactly ______\ntraining/tests/test_selfplay_training_native.py:76: in test_soft_visit_learning_updates_parameters_and_resumes_bit_exactly\n    from training.selfplay_training import TrainConfig, fit_samples\nE   ModuleNotFoundError: No module named 'training.selfplay_training'\n__ test_initial_loss_matches_independent_uniform_ce_and_squared_value_oracle ___\ntraining/tests/test_selfplay_training_native.py:125: in test_initial_loss_matches_independent_uniform_ce_and_squared_value_oracle\n    from training.selfplay_training import TrainConfig, update_step\nE   ModuleNotFoundError: No module named 'training.selfplay_training'\n__ test_replay_samples_encode_full_real_histories_and_filter_protected_inputs __\ntraining/tests/test_selfplay_training_native.py:147: in test_replay_samples_encode_full_real_histories_and_filter_protected_inputs\n    from training.selfplay_training import replay_samples\nE   ModuleNotFoundError: No module named 'training.selfplay_training'\n_________ test_changed_feature_bytes_cannot_resume_under_same_metadata _________\ntraining/tests/test_selfplay_training_native.py:175: in test_changed_feature_bytes_cannot_resume_under_same_metadata\n    from training.selfplay_training import TrainConfig, fit_samples\nE   ModuleNotFoundError: No module named 'training.selfplay_training'\n____ test_soft_policy_gradient_uses_all_visit_mass_and_masks_illegal_logits ____\ntraining/tests/test_selfplay_training_native.py:206: in test_soft_policy_gradient_uses_all_visit_mass_and_masks_illegal_logits\n    from training.selfplay_training import TrainConfig, update_step\nE   ModuleNotFoundError: No module named 'training.selfplay_training'\n=========================== short test summary info ============================\nFAILED training/tests/test_selfplay_training_native.py::test_soft_visit_learning_updates_parameters_and_resumes_bit_exactly\nFAILED training/tests/test_selfplay_training_native.py::test_initial_loss_matches_independent_uniform_ce_and_squared_value_oracle\nFAILED training/tests/test_selfplay_training_native.py::test_replay_samples_encode_full_real_histories_and_filter_protected_inputs\nFAILED training/tests/test_selfplay_training_native.py::test_changed_feature_bytes_cannot_resume_under_same_metadata\nFAILED training/tests/test_selfplay_training_native.py::test_soft_policy_gradient_uses_all_visit_mass_and_masks_illegal_logits\n5 failed in 0.68s\n"
+  },
+  "green": {
+    "exit": 0,
+    "cases": 5,
+    "failures": 0,
+    "errors": 0,
+    "tail": ".....                                                                    [100%]\n5 passed in 2.77s\n"
+  },
+  "at": 1793341736.3379395
+}
