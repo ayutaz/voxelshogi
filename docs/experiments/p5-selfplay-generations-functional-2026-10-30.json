@@ -1,0 +1,19 @@
+{
+  "source_commit": "9d0213601267244ba323e4bbe23731a9f1f79a26",
+  "overlay_sha256": {
+    "training/selfplay_training.py": "38e3a1cf38feead72bb7124e79c71de5504b0eba66a3fca4c914a703beaff95a",
+    "training/tests/test_selfplay_training.py": "5d136037df5482da71ff749e4e92404986f695b8f9347c972e491f30dd1cb7d9",
+    "training/tests/test_selfplay_training_native.py": "0b8acab6a24bd9b3a49f75943233e81cc9edf96d395082682ca4a75ca9740448",
+    "training/selfplay_generations.py": "1e8e71ba7dfc5efc2435a4a2802258feb762ec12fb74b40f77d9c9eae1b4ccf8",
+    "training/tests/test_selfplay_generations.py": "e18fea83cdffc3a4066aa5201c68e62b96b8e1fcee5070ce8a4f8368848ec152",
+    "training/tests/test_selfplay_generations_native.py": "4ad2d69c1b97a59b71d0698cf011d64a9a9a32ea97b1e11c0bc9096108fe1651"
+  },
+  "backend": "CPU with CUDA hidden",
+  "cases": 1,
+  "failures": 0,
+  "errors": 0,
+  "exit": 0,
+  "elapsed_seconds": 15.645529320999685,
+  "tail": ".                                                                        [100%]\n1 passed in 14.98s\n",
+  "at": 1793342284.6907127
+}
