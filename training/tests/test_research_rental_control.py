@@ -288,8 +288,10 @@ def test_consistent_but_overlong_quote_is_still_rejected(tmp_path):
     plan = json.loads(path.read_text())
     plan.update(maximum_seconds=18000, maximum_usd=5, estimated_seconds=14400)
     path.write_text(json.dumps(plan))
+    # Assert the plan contract directly: the independent guard must not mask
+    # a broken four-hour plan limit by rejecting its own remaining window.
     with pytest.raises(ValueError):
-        control.rent(lambda: None)
+        control.read_plan()
     assert api.calls == []
 
 
