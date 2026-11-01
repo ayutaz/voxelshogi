@@ -40,7 +40,7 @@ class Deadline:
 
     @property
     def stop_at(self):
-        return self.maximum_end_at - 900
+        return self.maximum_end_at - 1200
 
 
 def owned(spec, api):
