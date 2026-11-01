@@ -1,0 +1,258 @@
+{
+  "checked_at": 1793455206.685202,
+  "instances": [
+    {
+      "id": "f5b7463c-d2aa-11f1-aeba-f35b00fe6bee",
+      "tags": [
+        "voxelshogi-m4-hf-cli-20261028-0838"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T08:38:32.591212Z",
+      "usage_info": {
+        "usage": {
+          "secs": 533,
+          "nanos": 757893000
+        },
+        "accounted_usage": {
+          "secs": 533,
+          "nanos": 757893000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.1482660813888889
+    },
+    {
+      "id": "af60e56c-d2a5-11f1-961d-9b042e455883",
+      "tags": [
+        "voxelshogi-m4-hf-pilot-20261028-0756"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T08:00:47.078263Z",
+      "usage_info": {
+        "usage": {
+          "secs": 800,
+          "nanos": 800343000
+        },
+        "accounted_usage": {
+          "secs": 800,
+          "nanos": 800343000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.22244453972222222
+    },
+    {
+      "id": "e837653a-d2b1-11f1-8d2e-fb230893d611",
+      "tags": [
+        "voxelshogi-m4-hf-publish-20261028-0925"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T09:28:16.447277Z",
+      "usage_info": {
+        "usage": {
+          "secs": 1168,
+          "nanos": 405826000
+        },
+        "accounted_usage": {
+          "secs": 1168,
+          "nanos": 405826000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.3245571738888889
+    },
+    {
+      "id": "05144cf4-d299-11f1-90d9-1fbe1319f042",
+      "tags": [
+        "voxelshogi-m4-pilot-20261028-0412"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T06:30:07.464663Z",
+      "usage_info": {
+        "usage": {
+          "secs": 3300,
+          "nanos": 896875000
+        },
+        "accounted_usage": {
+          "secs": 3300,
+          "nanos": 896875000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.9169157986111112
+    },
+    {
+      "id": "2c61aa70-d2d2-11f1-add2-a75f8b0023c1",
+      "tags": [
+        "voxelshogi-m4-production-authorized-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T13:19:14.649487Z",
+      "usage_info": {
+        "usage": {
+          "secs": 18072,
+          "nanos": 905640000
+        },
+        "accounted_usage": {
+          "secs": 18072,
+          "nanos": 905640000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 5.0202515666666665
+    },
+    {
+      "id": "d6e17354-d2cd-11f1-8edf-3f08ff3bea13",
+      "tags": [
+        "voxelshogi-m4-production-final-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-28T12:48:13.202460Z",
+      "usage_info": {
+        "usage": {
+          "secs": 971,
+          "nanos": 555796000
+        },
+        "accounted_usage": {
+          "secs": 971,
+          "nanos": 555796000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.26987661
+    },
+    {
+      "id": "b7e48156-d3c9-11f1-af7f-7febb26930d6",
+      "tags": [
+        "voxelshogi-m6-browser-final-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-29T18:51:14.368678Z",
+      "usage_info": {
+        "usage": {
+          "secs": 2277,
+          "nanos": 928662000
+        },
+        "accounted_usage": {
+          "secs": 2277,
+          "nanos": 928662000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.6327579616666666
+    },
+    {
+      "id": "210e9e82-d38e-11f1-9fba-a33c9cea97e5",
+      "tags": [
+        "voxelshogi-m6-main-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-29T11:44:41.090024Z",
+      "usage_info": {
+        "usage": {
+          "secs": 3075,
+          "nanos": 509395000
+        },
+        "accounted_usage": {
+          "secs": 3075,
+          "nanos": 509395000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.8543081652777778
+    },
+    {
+      "id": "55607c82-d3ac-11f1-8a85-1383f5decdec",
+      "tags": [
+        "voxelshogi-m6-retry-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-29T15:20:53.660980Z",
+      "usage_info": {
+        "usage": {
+          "secs": 12522,
+          "nanos": 41419000
+        },
+        "accounted_usage": {
+          "secs": 12522,
+          "nanos": 41419000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 3.478344838611111
+    },
+    {
+      "id": "2c0714a8-d38a-11f1-bdf7-1f3e7fa42fae",
+      "tags": [
+        "voxelshogi-m6-trial-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-29T11:16:21.511126Z",
+      "usage_info": {
+        "usage": {
+          "secs": 1009,
+          "nanos": 642721000
+        },
+        "accounted_usage": {
+          "secs": 1009,
+          "nanos": 642721000
+        }
+      },
+      "cost_per_hour_cents": 100.0,
+      "usage_cost_estimate_usd": 0.2804563113888889
+    },
+    {
+      "id": "e6de287a-d425-11f1-af00-3b87432bf57c",
+      "tags": [
+        "voxelshogi-phase5-data-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-30T05:51:06.963508Z",
+      "usage_info": {
+        "usage": {
+          "secs": 41893,
+          "nanos": 426068000
+        },
+        "accounted_usage": {
+          "secs": 41893,
+          "nanos": 426068000
+        }
+      },
+      "cost_per_hour_cents": 65.0,
+      "usage_cost_estimate_usd": 7.564090817833334
+    },
+    {
+      "id": "164841f2-d40f-11f1-9add-0351b764cb3c",
+      "tags": [
+        "voxelshogi-phase5-evaluation-control"
+      ],
+      "status": "Inactive",
+      "resources_released": true,
+      "created_at": "2026-10-30T03:07:47.998777Z",
+      "usage_info": {
+        "usage": {
+          "secs": 7322,
+          "nanos": 253415000
+        },
+        "accounted_usage": {
+          "secs": 7322,
+          "nanos": 253415000
+        }
+      },
+      "cost_per_hour_cents": 65.0,
+      "usage_cost_estimate_usd": 1.3220735332638889
+    }
+  ],
+  "invoice_retrieved": false
+}

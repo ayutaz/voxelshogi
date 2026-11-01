@@ -1,0 +1,90 @@
+{
+  "schema": "voxelshogi-rental-deadline-incident-v1",
+  "instance_id": "e6de287a-d425-11f1-af00-3b87432bf57c",
+  "source_commit": "668ea5dae772e28af422e2a544125e1b9cbc2940",
+  "cause": "not established; local execution/connectivity cannot enforce an independent deadline",
+  "provider_observation": {
+    "checked_at": 1793381797.665774,
+    "instances": [
+      {
+        "id": "e6de287a-d425-11f1-af00-3b87432bf57c",
+        "created_at": "2026-10-30T05:51:06.963508Z",
+        "status": "Inactive",
+        "resources_released": true,
+        "resource_info": {
+          "provider_name": "IRONGREY",
+          "instance_type": "rtx59-7-23-800-ig.1",
+          "cost_per_hour": 65.0
+        },
+        "usage_info": {
+          "usage": {
+            "secs": 41893,
+            "nanos": 426068000
+          },
+          "accounted_usage": {
+            "secs": 41893,
+            "nanos": 426068000
+          }
+        }
+      }
+    ]
+  },
+  "timing": {
+    "deadline.json": {
+      "requested_at": 1793339466.376899,
+      "stop_at": 1793352966.376899,
+      "maximum_end_at": 1793353866.376899
+    },
+    "deadline-exceeded.json": {
+      "at": 1793357044.9647071,
+      "complete": false
+    },
+    "termination-request.json": {
+      "at": 1793381360.993335
+    },
+    "terminal.json": {
+      "checked_at": 1793381434.836624,
+      "complete": true
+    }
+  },
+  "budget": {
+    "original_reservation_usd": 4,
+    "adjusted_reservation_usd": 8,
+    "accounted_usage_cost_estimate_usd": 7.564090817833333,
+    "invoice_retrieved": false,
+    "project_reserved_total_usd": 73,
+    "project_unreserved_usd": 27,
+    "conditional_extra_100_activated": false
+  },
+  "hf_backup": {
+    "repo_id": "voxelshogi/voxelshogi-search-v1",
+    "revision": "1b86f7e83b70a69cdfa3cc0bd4e9b0886623c472",
+    "validation": {
+      "complete": false,
+      "games": 8,
+      "raw_teacher_targets": {
+        "deep": 3,
+        "shallow": 35
+      },
+      "regenerated_bytes_match": false,
+      "rows": 35,
+      "sample_splits": {
+        "test": 7,
+        "train": 18,
+        "val": 10
+      },
+      "verification_scope": "committed game hashes and full Rust replay only; teacher recomputation and input audit pending"
+    },
+    "eligible_for_training": false
+  },
+  "functional_checks": {
+    "selfplay-training-functional.json": {
+      "sha256": "885468d17ba1368b1dad5b560a34d0af2e9dde793bd8292198d2d40081cd7b22",
+      "scope": "small Linux functional check; not research training, separate-VM recovery, or Phase5 completion"
+    },
+    "selfplay-generations-functional.json": {
+      "sha256": "780019c6413cf402e5accb20dd3160e220c6a261c5d38f9b0fae80368a074b88",
+      "scope": "small Linux functional check; not research training, separate-VM recovery, or Phase5 completion"
+    }
+  }
+}

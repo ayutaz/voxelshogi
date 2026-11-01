@@ -1,0 +1,23 @@
+{
+  "checked_at": 1793455276.397808,
+  "approved_by": "user message: 承認します",
+  "scope": "main-only gpu-control environment and CloudRift API key environment Secret",
+  "environment": "gpu-control",
+  "deployment_branch_policy": {
+    "protected_branches": false,
+    "custom_branch_policies": true
+  },
+  "branch_policies": [
+    {
+      "name": "main",
+      "type": "branch"
+    }
+  ],
+  "provider_secret_uploaded": true,
+  "secret_metadata": [
+    {
+      "name": "CLOUDRIFT_API_KEY",
+      "updatedAt": "2026-10-31T14:01:15Z"
+    }
+  ]
+}
