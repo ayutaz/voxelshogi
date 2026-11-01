@@ -66,7 +66,7 @@ def test_remote_clock_terminates_at_stop_time_without_local_process(capsys):
     from training.remote_deadline import watch
 
     api = Provider([active()])
-    now = [4000]
+    now = [3700]
     pauses = []
 
     def pause(seconds):
@@ -76,7 +76,7 @@ def test_remote_clock_terminates_at_stop_time_without_local_process(capsys):
 
     result = watch(spec(), api, clock=lambda: now[0], pause=pause)
     assert result["complete"] and result["instance_ids"] == ["owned"]
-    assert now[0] == 4160 and pauses == [60, 40, 60]
+    assert now[0] == 3860 and pauses == [60, 40, 60]
     assert [d for p, d in api.calls if p.endswith("/terminate")] == [
         {"selector": {"ById": ["owned"]}}
     ]
@@ -84,7 +84,7 @@ def test_remote_clock_terminates_at_stop_time_without_local_process(capsys):
 
     assert json.loads(capsys.readouterr().out) == {
         "event": "termination_requested",
-        "at": 4100,
+        "at": 3800,
         "instance_ids": ["owned"],
     }
 

@@ -12,12 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "deadline-independent-budget-window",
+        "training/research_rental_control.py",
+        'if spec.maximum_end_at - self.clock() > plan["maximum_seconds"]:',
+        "if False:",
+        "test_research_rental_control.py",
+    ),
+    (
+        "deadline-primary-before-backstop",
+        "training/remote_deadline.py",
+        "return self.maximum_end_at - 1200",
+        "return self.maximum_end_at - 900",
+        "test_research_rental_control.py",
+    ),
+    (
+        "deadline-refresh-after-provider",
+        "training/rental_control.py",
+        "maximum_seconds = min(maximum_seconds, self.quote_seconds())",
+        "maximum_seconds = maximum_seconds",
+        "test_research_rental_control.py",
+    ),
+    (
+        "deadline-check-before-create",
+        "training/rental_control.py",
+        "        self.quote_seconds()\n"
+        '        result = self.api("/api/v1/instances/rent", payload)',
+        '        result = self.api("/api/v1/instances/rent", payload)',
+        "test_research_rental_control.py",
+    ),
+    (
         "deadline-termination-evidence",
         "training/remote_deadline.py",
         '"event": "termination_requested"',
         '"event": "observation_only"',
         "test_remote_deadline.py",
-    )
+    ),
 ] + (
     [
         (
@@ -44,7 +73,7 @@ MUTATIONS = [
         (
             "deadline-stop-margin",
             "training/remote_deadline.py",
-            "return self.maximum_end_at - 900",
+            "return self.maximum_end_at - 1200",
             "return self.maximum_end_at",
             "test_remote_deadline.py",
         ),

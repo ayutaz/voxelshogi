@@ -352,11 +352,11 @@ def test_remote_guard_shortens_local_deadline_and_rejects_expiry(tmp_path):
     from training.remote_deadline import Deadline
 
     control, api, _, _ = setup(tmp_path)
-    control.remote_guard = lambda **kw: Deadline(control.tag, 10000)
+    control.remote_guard = lambda **kw: Deadline(control.tag, 11000)
     control.rent(lambda: None)
     deadline = json.loads((control.state / "deadline.json").read_text())
-    assert deadline["maximum_end_at"] == 9940
-    assert deadline["stop_at"] == 9040
+    assert deadline["maximum_end_at"] == 10940
+    assert deadline["stop_at"] == 10040
 
 
 def test_unconfirmed_remote_guard_stops_before_provider(tmp_path):
@@ -368,5 +368,79 @@ def test_unconfirmed_remote_guard_stops_before_provider(tmp_path):
 
     control.remote_guard = missing
     with pytest.raises(ValueError, match="independent"):
+        control.rent(lambda: None)
+    assert not api.calls and budget.read_bytes() == before
+
+
+def test_independent_guard_triggers_before_local_fallback(tmp_path):
+    from training.remote_deadline import Deadline
+
+    control, _, _, _ = setup(tmp_path)
+    control.rent(lambda: None)
+    local = json.loads((control.state / "deadline.json").read_text())
+    assert Deadline(control.tag, 15400).stop_at < local["stop_at"]
+    assert local["maximum_end_at"] < 15400
+
+
+def test_catalog_wait_cannot_extend_absolute_remote_deadline(tmp_path):
+    control, api, _, _ = setup(tmp_path)
+    now = [1000]
+    control.clock = lambda: now[0]
+
+    def delayed(path, data):
+        if path.endswith("/instance-types/list"):
+            now[0] += 120
+        return api(path, data)
+
+    control.api = delayed
+    control.rent(lambda: None)
+    local = json.loads((control.state / "deadline.json").read_text())
+    assert local["maximum_end_at"] == 15340
+    assert local["stop_at"] == 14440
+
+
+def test_expiry_during_provider_preflight_never_reserves_or_rents(tmp_path):
+    control, api, budget, _ = setup(tmp_path)
+    now = [1000]
+    control.clock = lambda: now[0]
+    before = budget.read_bytes()
+
+    def delayed(path, data):
+        if path.endswith("/instance-types/list"):
+            now[0] += 14000
+        return api(path, data)
+
+    control.api = delayed
+    with pytest.raises(ValueError, match="expired|insufficient"):
+        control.rent(lambda: None)
+    assert budget.read_bytes() == before
+    assert not any(p.endswith("/instances/rent") for p, _ in api.calls)
+
+
+def test_expiry_while_starting_guard_never_creates_paid_resource(tmp_path):
+    control, api, budget, _ = setup(tmp_path)
+    now = [1000]
+    control.clock = lambda: now[0]
+
+    def suspended():
+        now[0] = 15000
+
+    with pytest.raises(ValueError, match="expired|insufficient"):
+        control.rent(suspended)
+    assert not any(p.endswith("/instances/rent") for p, _ in api.calls)
+    # Keep the conservative reservation for audit; never infer no rental from
+    # an unconfirmed provider response or silently retry this identity.
+    assert json.loads(budget.read_text())["reserved_total_usd"] == 65
+
+
+def test_remote_guard_cannot_outlive_the_reserved_job_budget(tmp_path):
+    control, api, budget, path = setup(tmp_path)
+    plan = json.loads(path.read_text())
+    plan.update(maximum_seconds=3600, maximum_usd=1, estimated_seconds=300)
+    path.write_text(json.dumps(plan))
+    before = budget.read_bytes()
+    # The live fixture has four hours left. A one-hour rental must reject it;
+    # a local one-hour fallback alone cannot enforce the independent budget.
+    with pytest.raises(ValueError, match="independent.*budget"):
         control.rent(lambda: None)
     assert not api.calls and budget.read_bytes() == before

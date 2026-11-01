@@ -93,7 +93,6 @@ class Rental:
         if self.sku not in configuration["skus"]:
             raise ValueError("SKU has no production quote")
         maximum_seconds = self.quote_seconds()
-        cap = maximum_seconds / 3600
         if any(
             (self.state / name).exists()
             for name in (
@@ -157,8 +156,11 @@ class Rental:
         public_key = (self.state / "id_ed25519.pub").read_text().strip()
         if not public_key.startswith("ssh-ed25519 "):
             raise ValueError("dedicated public SSH key is missing")
-        self.reserve()
+        # Refresh after provider I/O and anchor before the absolute quote.
         now = self.clock()
+        maximum_seconds = min(maximum_seconds, self.quote_seconds())
+        cap = maximum_seconds / 3600
+        self.reserve()
         save(
             self.state / "deadline.json",
             {
@@ -210,6 +212,8 @@ class Rental:
             "tags": [self.tag],
             "name": self.tag,
         }
+        # Reject a control host that resumes after the independent window.
+        self.quote_seconds()
         result = self.api("/api/v1/instances/rent", payload)
         save(self.state / "rent-response.json", result)
         if len(result.get("instance_ids", [])) != 1:
