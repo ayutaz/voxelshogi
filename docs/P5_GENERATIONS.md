@@ -1,5 +1,7 @@
 # P5-2：自己対局の学習と世代更新
 
+2026-10-31 UTC追記：学習・世代更新はPR #92で関連CI成功後にmainへ統合した。実HF公開・別VM復旧は未実施。
+
 2026-10-30 UTC。探索・Actor・検証付きPolicy/Value・Replay Bufferに、FP32学習と世代更新を接続する実装。Phase5全体の目的と完了条件は[段階別計画](POST_M6_PLAN.md#phase5)を維持する。
 
 ## 目的と完了条件
@@ -53,3 +55,5 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.selfp
 取得記録のsource／overlay hashを保持する。公開cursorを追加した現在版と、公開失敗→再試行・親lineage／重み改変の追加検査は通常Linux CIで検証する。Macのmetadata9件と8種類のmetadata変異は成功。新しい数値・世代変異はLinux CIで実行し、skipやtimeoutを検出成功として数えない。全テストbaselineの上限だけ180秒へ延ばし、個々の変異は既存の60秒を維持する。
 
 世代結合テストではsource SHA自体を実checkoutのHEADと照合するが、意図的な変異をlineage検査まで届けるため、clean判定だけをfixtureで分離する。本番コードのclean guardは変更せず、その比較・dirty拒否は既存のresearch rentalテストで検証する。dirty検出だけによる変異の検出成功を数えない。
+
+自己対局専用のJSON＋safetensors形式は[保存・復旧profile](P5_SELFPLAY_STATE.md)で拡張する。既定のM6用profileは保持し、公開計画・宛先・承認を区別する。
