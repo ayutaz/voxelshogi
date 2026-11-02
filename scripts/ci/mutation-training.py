@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-4090-quoted-hardware",
+        "training/research_rental_control.py",
+        '    "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),',
+        "",
+        "test_research_4090.py",
+    ),
+    (
+        "research-hardware-binding",
+        "training/research_rental_control.py",
+        'or (plan["datacenter"], plan["with_public_ip"]) != HARDWARE[plan["sku"]]',
+        "or False",
+        "test_research_4090.py",
+    ),
+    (
+        "research-4090-routed-region",
+        "training/research_rental_control.py",
+        '"datacenter": plan["datacenter"],',
+        '"datacenter": DC,',
+        "test_research_4090.py",
+    ),
+    (
         "deadline-independent-budget-window",
         "training/research_rental_control.py",
         'if spec.maximum_end_at - self.clock() > plan["maximum_seconds"]:',

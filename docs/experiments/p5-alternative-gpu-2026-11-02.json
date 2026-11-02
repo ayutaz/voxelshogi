@@ -1,0 +1,36 @@
+{
+  "schema": "voxelshogi-gpu-availability-observation-v1",
+  "observed_at_utc": "2026-11-02T09:37:46Z",
+  "source": "https://api.cloudrift.ai/api-docs/openapi.json",
+  "api": "/api/v1/instance-types/list",
+  "selector": {"ByServiceAndLocation": {"services": ["vm"], "datacenters": ["ustx1a_a01", "ap-east-tw-kn-2"]}},
+  "candidate": {
+    "sku": "rtx49-18-80-450-kn-packed.1",
+    "gpu": "RTX 4090",
+    "gpu_count": 1,
+    "cpu_count": 18,
+    "logical_cpu_count": 36,
+    "dram_bytes": 85899345920,
+    "vram_bytes": 25769803776,
+    "disk_bytes": 450971566080,
+    "hourly_usd": 0.39,
+    "datacenter": "ap-east-tw-kn-2",
+    "available_nodes": 2,
+    "public_ip_available": false,
+    "nvidia_kernel_module_support": "OpenOrProprietary"
+  },
+  "previous_candidates": {
+    "observed_at_utc": "2026-11-02T09:36:40Z",
+    "datacenter": "na_west_us_gr_1",
+    "available_nodes": {"rtx59-3-24-750-xam.1": 0, "rtx59-7-48-750-xam.1": 0}
+  },
+  "rental_created": false,
+  "reserved_total_usd": 73,
+  "phase5_reserved_usd": 12,
+  "conditional_extra_budget_activated": false,
+  "caveats": [
+    "This observation is not a reservation or a GPU execution result.",
+    "Recheck quote, live independent guard, ownership and budget before rental.",
+    "V100 VM offers were observed but not enabled for the CUDA 13 workload."
+  ]
+}
