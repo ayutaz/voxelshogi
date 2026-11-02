@@ -118,10 +118,8 @@ def instance_inventory(api):
     raise ValueError("Vast.ai inventory pagination exceeds limit")
 
 
-class VastRental(M6Rental):
-    def __init__(self, *args, other_provider_idle, **kwargs):
-        super().__init__(*args, sku="vast", **kwargs)
-        self.other_provider_idle = other_provider_idle
+class VastInstanceControl:
+    """Owned Vast instance operations, independent of any rental purpose."""
 
     def check_account(self, minimum_usd=0):
         account = self.api("GET", "/api/v0/users/current")
@@ -140,6 +138,102 @@ class VastRental(M6Rental):
             raise ValueError("Vast.ai balance does not cover the full quoted rental")
         if not path.exists():
             save(path, {"id": identity})
+
+    def owned(self):
+        self.check_account()
+        rows = instance_inventory(self.api)
+        response = self.state / "rent-response.json"
+        ids = (
+            json.loads(response.read_text())["instance_ids"]
+            if response.exists()
+            else []
+        )
+        selected = (
+            [row for row in rows if row["id"] in ids]
+            if ids
+            else [row for row in rows if row.get("label") == self.tag]
+        )
+        if any(row.get("label") != self.tag for row in selected):
+            raise ValueError("Vast.ai instance ownership differs")
+        return selected
+
+    def status(self):
+        rows = [
+            {
+                key: row.get(key)
+                for key in ("id", "label", "actual_status", "ssh_host", "ssh_port")
+            }
+            for row in self.owned()
+        ]
+        result = {"provider": "vast.ai", "checked_at": self.clock(), "instances": rows}
+        save(self.state / "status.json", result)
+        return result
+
+    def attach_key(self):
+        rows = self.owned()
+        if len(rows) != 1:
+            raise ValueError("one owned Vast.ai instance required for SSH")
+        key = (self.state / "id_ed25519.pub").read_text().strip()
+        if not key.startswith("ssh-ed25519 "):
+            raise ValueError("dedicated SSH public key is missing")
+        response = self.api(
+            "POST", f"/api/v0/instances/{rows[0]['id']}/ssh", {"ssh_key": key}
+        )
+        if response.get("success") is not True:
+            raise RuntimeError("Vast.ai SSH attachment not confirmed")
+        save(
+            self.state / "ssh-key-attached.json",
+            {"instance_id": rows[0]["id"], "success": True},
+        )
+        return {"success": True}
+
+    def terminate(self):
+        rows = self.owned()
+        response = self.state / "rent-response.json"
+        if rows and not response.exists():
+            save(
+                response,
+                {
+                    "instance_ids": [row["id"] for row in rows],
+                    "recovered_from_label": True,
+                    "provider": "vast.ai",
+                },
+            )
+        expected = (
+            json.loads(response.read_text())["instance_ids"]
+            if response.exists()
+            else []
+        )
+        for row in rows:
+            deleted = self.api("DELETE", f"/api/v0/instances/{row['id']}")
+            if deleted.get("success") is not True:
+                raise RuntimeError("Vast.ai destruction not acknowledged")
+        if rows:
+            save(
+                self.state / "termination-request.json",
+                {
+                    "at": self.clock(),
+                    "instance_ids": expected,
+                    "destruction_acknowledged": True,
+                },
+            )
+        result = self.status()
+        ack = self.state / "termination-request.json"
+        result["complete"] = (
+            bool(expected)
+            and not result["instances"]
+            and ack.exists()
+            and json.loads(ack.read_text()).get("instance_ids") == expected
+        )
+        if result["complete"]:
+            save(self.state / "terminal.json", result)
+        return result
+
+
+class VastRental(VastInstanceControl, M6Rental):
+    def __init__(self, *args, other_provider_idle, **kwargs):
+        super().__init__(*args, sku="vast", **kwargs)
+        self.other_provider_idle = other_provider_idle
 
     def quote_seconds(self):
         seconds = validate_m6_approval(
@@ -239,96 +333,6 @@ class VastRental(M6Rental):
             {"instance_ids": [identity], "provider": "vast.ai"},
         )
         return {"instance_ids": [identity], "stop_at": now + MAXIMUM_SECONDS - 900}
-
-    def owned(self):
-        self.check_account()
-        rows = instance_inventory(self.api)
-        response = self.state / "rent-response.json"
-        ids = (
-            json.loads(response.read_text())["instance_ids"]
-            if response.exists()
-            else []
-        )
-        selected = (
-            [row for row in rows if row["id"] in ids]
-            if ids
-            else [row for row in rows if row.get("label") == self.tag]
-        )
-        if any(row.get("label") != self.tag for row in selected):
-            raise ValueError("Vast.ai instance ownership differs")
-        return selected
-
-    def status(self):
-        rows = [
-            {
-                key: row.get(key)
-                for key in ("id", "label", "actual_status", "ssh_host", "ssh_port")
-            }
-            for row in self.owned()
-        ]
-        result = {"provider": "vast.ai", "checked_at": self.clock(), "instances": rows}
-        save(self.state / "status.json", result)
-        return result
-
-    def attach_key(self):
-        rows = self.owned()
-        if len(rows) != 1:
-            raise ValueError("one owned Vast.ai instance required for SSH")
-        key = (self.state / "id_ed25519.pub").read_text().strip()
-        if not key.startswith("ssh-ed25519 "):
-            raise ValueError("dedicated SSH public key is missing")
-        response = self.api(
-            "POST", f"/api/v0/instances/{rows[0]['id']}/ssh", {"ssh_key": key}
-        )
-        if response.get("success") is not True:
-            raise RuntimeError("Vast.ai SSH attachment not confirmed")
-        save(
-            self.state / "ssh-key-attached.json",
-            {"instance_id": rows[0]["id"], "success": True},
-        )
-        return {"success": True}
-
-    def terminate(self):
-        rows = self.owned()
-        response = self.state / "rent-response.json"
-        if rows and not response.exists():
-            save(
-                response,
-                {
-                    "instance_ids": [row["id"] for row in rows],
-                    "recovered_from_label": True,
-                    "provider": "vast.ai",
-                },
-            )
-        expected = (
-            json.loads(response.read_text())["instance_ids"]
-            if response.exists()
-            else []
-        )
-        for row in rows:
-            deleted = self.api("DELETE", f"/api/v0/instances/{row['id']}")
-            if deleted.get("success") is not True:
-                raise RuntimeError("Vast.ai destruction not acknowledged")
-        if rows:
-            save(
-                self.state / "termination-request.json",
-                {
-                    "at": self.clock(),
-                    "instance_ids": expected,
-                    "destruction_acknowledged": True,
-                },
-            )
-        result = self.status()
-        ack = self.state / "termination-request.json"
-        result["complete"] = (
-            bool(expected)
-            and not result["instances"]
-            and ack.exists()
-            and json.loads(ack.read_text()).get("instance_ids") == expected
-        )
-        if result["complete"]:
-            save(self.state / "terminal.json", result)
-        return result
 
 
 class VastClient:

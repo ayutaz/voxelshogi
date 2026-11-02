@@ -133,12 +133,22 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
         (root / name).write_text("")
     for name in ("training", "export", "crates", "infrastructure"):
         (root / name).mkdir()
+    workflow = (
+        Path(__file__).resolve().parents[2] / ".github/workflows/vast-deadline.yml"
+    ).read_text()
+    (root / ".github/workflows").mkdir(parents=True)
+    (root / ".github/workflows/vast-deadline.yml").write_text(workflow)
     (root / "training/tests").mkdir()
     (root / "training/value.py").write_text("VALUE = 1\n")
     # Unassigned files intentionally fail: they must not enter this shard's
     # isolated baseline. The ordinary CI unit job still runs all real tests.
     (root / "training/tests/test_a.py").write_text("assert False\n")
-    (root / "training/tests/test_b.py").write_text("assert VALUE == 1\n")
+    (root / "training/tests/test_b.py").write_text(
+        "from pathlib import Path\n"
+        "assert Path('.github/workflows/vast-deadline.yml').read_text() == "
+        f"{workflow!r}\n"
+        "assert VALUE == 1\n"
+    )
     (root / "training/tests/test_c.py").write_text("assert False\n")
     mutations = [
         ("m0", "training/value.py", "VALUE = 1", "VALUE = 2", "test_a.py"),

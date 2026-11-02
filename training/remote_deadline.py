@@ -20,6 +20,20 @@ from training.rental_control import TERMINAL, NoRedirect, save
 
 WORKFLOW = ".github/workflows/gpu-deadline.yml"
 REPOSITORY = "ayutaz/voxelshogi"
+PROVIDERS = {
+    "cloudrift": (
+        WORKFLOW,
+        "GPU deadline",
+        "Independent CloudRift deadline",
+        "Guard CloudRift deadline",
+    ),
+    "vast": (
+        ".github/workflows/vast-deadline.yml",
+        "Vast deadline",
+        "Independent Vast.ai deadline",
+        "Guard Vast.ai deadline",
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -113,14 +127,17 @@ def watch(spec, api, *, clock=time.time, pause=time.sleep, stopping=lambda: Fals
         pause(min(60, remaining) if remaining > 0 else 60)
 
 
-def verify_run(run, jobs, *, tag, now, minimum_seconds):
+def verify_run(run, jobs, *, tag, now, minimum_seconds, provider="cloudrift"):
+    if provider not in PROVIDERS:
+        raise ValueError("unknown independent deadline provider")
+    workflow, title, job_name, guard_step = PROVIDERS[provider]
     match = re.fullmatch(
-        r"GPU deadline: ([a-z0-9-]+) @ ([0-9]+)", run.get("display_title", "")
+        re.escape(title) + r": ([a-z0-9-]+) @ ([0-9]+)", run.get("display_title", "")
     )
     if (
         run.get("event") != "workflow_dispatch"
         or run.get("head_branch") != "main"
-        or run.get("path") != WORKFLOW
+        or run.get("path") != workflow
         or run.get("status") != "in_progress"
         or match is None
         or match[1] != tag
@@ -130,23 +147,19 @@ def verify_run(run, jobs, *, tag, now, minimum_seconds):
     spec.validate(now=now)
     if spec.maximum_end_at - now < minimum_seconds:
         raise ValueError("independent deadline leaves insufficient workload time")
-    candidates = [
-        job
-        for job in jobs.get("jobs", [])
-        if job.get("name") == "Independent CloudRift deadline"
-    ]
+    candidates = [job for job in jobs.get("jobs", []) if job.get("name") == job_name]
     if len(candidates) != 1 or candidates[0].get("status") != "in_progress":
         raise ValueError("independent deadline job is not running")
     steps = {step["name"]: step for step in candidates[0].get("steps", [])}
     if (
         steps.get("Arm deadline", {}).get("conclusion") != "success"
-        or steps.get("Guard CloudRift deadline", {}).get("status") != "in_progress"
+        or steps.get(guard_step, {}).get("status") != "in_progress"
     ):
         raise ValueError("independent deadline provider readiness is unconfirmed")
     return spec
 
 
-def live_guard(run_id, *, tag, now, minimum_seconds):
+def live_guard(run_id, *, tag, now, minimum_seconds, provider="cloudrift"):
     if type(run_id) is not int or run_id <= 0:
         raise ValueError("an actual Actions guard run ID is required")
     base = f"repos/{REPOSITORY}/actions/runs/{run_id}"
@@ -158,7 +171,9 @@ def live_guard(run_id, *, tag, now, minimum_seconds):
     if run.get("id") != run_id:
         raise ValueError("guard run identity differs")
     jobs = read(base + "/jobs?filter=latest&per_page=100")
-    return verify_run(run, jobs, tag=tag, now=now, minimum_seconds=minimum_seconds)
+    return verify_run(
+        run, jobs, tag=tag, now=now, minimum_seconds=minimum_seconds, provider=provider
+    )
 
 
 def client():
@@ -185,7 +200,7 @@ def client():
     return api
 
 
-def main():
+def main(*, provider="cloudrift"):
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("command", choices=("arm", "watch"))
     parser.add_argument("--state", type=Path, required=True)
@@ -198,7 +213,14 @@ def main():
     ):
         parser.error("remote deadline is restricted to protected main Actions")
     spec = Deadline(os.environ["RENTAL_TAG"], int(os.environ["MAXIMUM_END_AT"]))
-    api = client()
+    if provider == "cloudrift":
+        api = client()
+    elif provider == "vast":
+        from training.remote_vast_deadline import client as vast_client
+
+        api = vast_client(spec.tag)
+    else:
+        parser.error("unknown independent deadline provider")
     if args.command == "arm":
         if args.state.exists():
             raise ValueError("deadline already armed")
