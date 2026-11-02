@@ -59,13 +59,15 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の39変異（coreとWASM／Python境界）・Web142変異・Pythonモデル23変異・Python境界／データ／資源監視／pilot／HF公開／本生成／棋譜変換／本生成公開・終了制御／M6教師契約・読み込み／損失・保存再開・CUDA起動前・固定評価・学習済み変換・Vast.ai・共有IP制御／評価v2の契約・runner／Phase5〜6費用制御／評価局面・漏洩照合／研究ラベル・自己対局探索・履歴複製・疎損失・Actor・Policy/Value・paired教師・Replay・世代学習・独立終了監視・自己対局archive311変異・CI制御45変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PRでは変更範囲に応じた静的検査・単体テスト・buildを実行する。文書のみなら変更判定とGate契約を検証し、Rust／Web／Pythonのビルド・実モデル・E2E・依存監査・変異は省略する。CodeQLも文書だけと確認したPR／mainでは初期化・解析を省き、4つの必須jobでscopeの成功と型を検証する。scopeの失敗・欠損・不正値を成功にしない。コード・共通設定・未知の入力・比較不能では全4言語を解析し、週次・手動も全解析する。
+
+coverage・既知変異・MSRV・Python Native結合試験・ブラウザ推論・全E2E・カメラ反復は、影響するmain変更と定期・手動実行で行う。mainのQualityと通常CIの成功をGateへ結び付け、同じrunの検証済み成果物だけを公開する。文書のみのmain更新では再ビルド・再デプロイを省略する。省略された検査を実行成功とは報告しない。具体的な実行範囲と実測は[CI_PERFORMANCE](docs/CI_PERFORMANCE.md)を参照。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`
 - `Rust core coverage`、`Web unit coverage`、`Known mutation regressions`
 
-M3の `Browser model inference (real WASM)` もCI Gateへ必須の依存として含める。uvから3形式を生成してlocalhostで実際に読み込み、専用Worker・全出力照合・描画と中断・破損／未対応表示の6 E2Eを行う。GPUを持たないCIは実機GPUの証拠にはしない。モデルのライセンス確定までは、生成物をこのジョブ内だけに置き、モデルやtraceをartifactへ公開しない。
+main／定期のモデル影響時は、M3の `Browser model inference (real WASM)` もCI Gateへ必須の依存として含める。PR／文書のみではscope判定を検証する。uvから3形式を生成してlocalhostで実際に読み込み、専用Worker・全出力照合・描画と中断・破損／未対応表示の6 E2Eを行う。GPUを持たないCIは実機GPUの証拠にはしない。モデルのライセンス確定までは、生成物をこのジョブ内だけに置き、モデルやtraceをartifactへ公開しない。
 
 モデル公開の設定は `export/publication.json`。M3検証用IDは承認済みで`approved=true`・`license=Apache-2.0`。新しい未承認のモデルは承認が得られるまで`approved=false`・`license=null`を維持する。承認の対象はこのIDの未学習モデルだけで、M6の学習済みモデルへ拡大しない。公開時はclean source・全3形式・ライセンスとModel Cardを検証し、実モデルE2Eを通った同じ配布物を公開する。公開後は `scripts/verify-model-distribution.mjs` がアプリのWorker・モデル・参照値・ORT全ファイルの実配信SHA、サイズ、MIME、cacheを確認する。アプリの実ファイル一覧はbuild時の `inference-build.json` に保存する。承認待ちの条件分岐がskipされたことを、公開経路の成功とは数えない。
 
@@ -90,7 +92,7 @@ GitHub Actions が発行したチェックだけを受理し、CodeQL の error 
 
 PR・fork・Dependabot には production の Cloudflare Secrets を渡さず、本番 deploy は実行しない。main の push では統合後の通常 CI が成功した後、同じ run のビルド成果物を公開し、配信 SHA と公開 E2E を検証する。[デプロイと復旧手順](docs/DEPLOYMENT.md)
 
-C0のカメラ／探索回帰は通常Web CIと公開後に各3回・1 worker・retries=0で追加検証する。通常E2Eの再試行成功だけでこの反復検証の失敗を取り込まない。診断JSONは対象テストのattachmentとCIログに記録する（[原因・再現手順](docs/C0_VALIDATION.md)）。
+C0のカメラ／探索回帰はmain／定期の深いWeb CIと公開後に各3回・1 worker・retries=0で追加検証する。通常E2Eの再試行成功だけでこの反復検証の失敗を取り込まない。診断JSONは対象テストのattachmentとCIログに記録する（[原因・再現手順](docs/C0_VALIDATION.md)）。
 
 ## Hugging Face公開と保存場所
 
