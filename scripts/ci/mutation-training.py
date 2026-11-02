@@ -12,6 +12,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "vast-research-independent-admission",
+        "training/vast_research_control.py",
+        "plan = self.prepare()",
+        "plan = self.read_plan()",
+        "test_vast_research_control.py",
+    ),
+    (
+        "vast-research-purpose-reservation",
+        "training/vast_research_control.py",
+        "        self.reserve()",
+        "        pass",
+        "test_vast_research_control.py",
+    ),
+    (
+        "vast-research-final-window",
+        "training/vast_research_control.py",
+        "        self.quote_seconds()\n        result = self.api(",
+        "        result = self.api(",
+        "test_vast_research_control.py",
+    ),
+    (
+        "vast-research-balance-admission",
+        "training/vast_research_control.py",
+        'minimum_usd=quote["hourly_usd"] * plan["maximum_seconds"] / 3600',
+        "minimum_usd=0",
+        "test_vast_research_control.py",
+    ),
+    (
+        "vast-deadline-delete-ack",
+        "training/remote_vast_deadline.py",
+        'if response.get("success") is not True:',
+        "if False:",
+        "test_remote_vast_deadline.py",
+    ),
+    (
+        "vast-deadline-complete-inventory-absence",
+        "training/remote_vast_deadline.py",
+        "sorted(self.acknowledged - present)",
+        "sorted(self.acknowledged)",
+        "test_remote_vast_deadline.py",
+    ),
+    (
+        "vast-deadline-previously-owned",
+        "training/remote_vast_deadline.py",
+        "or i not in self.observed",
+        "or False",
+        "test_remote_vast_deadline.py",
+    ),
+    (
         "selfplay-dataset-protocol-binding",
         "training/selfplay_dataset.py",
         "or canonical(p) != canonical(expected_protocol)",
@@ -2359,7 +2408,7 @@ def main(argv=None):
         work = Path(tmp)
         for name in ("pyproject.toml", "uv.lock", ".python-version", ".gitignore"):
             shutil.copy2(ROOT / name, work / name)
-        for name in ("training", "export", "crates", "infrastructure"):
+        for name in ("training", "export", "crates", "infrastructure", ".github"):
             shutil.copytree(
                 ROOT / name,
                 work / name,
