@@ -48,15 +48,21 @@ def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+STATE_REPOS = {
+    "training-state": "voxelshogi/voxelshogi-transformer-s-training-state",
+    "selfplay-training-state": "voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1",
+}
+
+
 def _policy(plan):
     role = plan.get("artifact_role", "artifacts")
-    if role not in ("artifacts", "inference-package", "training-state") or (
-        role in ("inference-package", "training-state") and plan["repo_type"] != "model"
+    if role not in ("artifacts", "inference-package", *STATE_REPOS) or (
+        role in ("inference-package", *STATE_REPOS) and plan["repo_type"] != "model"
     ):
         raise ValueError("unsupported artifact publication role")
-    if role == "training-state" and (
+    if role in STATE_REPOS and (
         plan.get("state_publication_approved") is not True
-        or plan["repo_id"] != "voxelshogi/voxelshogi-transformer-s-training-state"
+        or plan["repo_id"] != STATE_REPOS[role]
         or not isinstance(plan.get("expected_binding"), dict)
         or plan["expected_binding"].get("source_commit") != plan["source_commit"]
     ):
@@ -185,7 +191,7 @@ def plan_release(
     }
     if artifact_role != "artifacts":
         plan["artifact_role"] = artifact_role
-    if artifact_role == "training-state":
+    if artifact_role in STATE_REPOS:
         plan.update(
             state_publication_approved=state_publication_approved,
             expected_binding=expected_binding,
@@ -198,7 +204,7 @@ def plan_release(
     manifest_path = Path(folder) / "manifest.json"
     if manifest_path.is_symlink():
         raise ValueError("publication manifest must not be a symlink")
-    if artifact_role in ("inference-package", "training-state") and (
+    if artifact_role in ("inference-package", *STATE_REPOS) and (
         not manifest_path.is_file() or manifest_path.stat().st_size > 1024 * 1024
     ):
         raise ValueError("invalid inference manifest size")
@@ -209,14 +215,15 @@ def plan_release(
             manifest = None
         if (
             isinstance(manifest, dict)
-            and manifest.get("schema") == "voxelshogi-resume-archive-v1"
-            and artifact_role != "training-state"
+            and manifest.get("schema")
+            in ("voxelshogi-resume-archive-v1", "voxelshogi-selfplay-resume-archive-v1")
+            and artifact_role not in STATE_REPOS
         ):
             raise ValueError(
                 "resume archives require a separately approved publication policy"
             )
     card_path = Path(folder) / "README.md"
-    if artifact_role in ("inference-package", "training-state") and (
+    if artifact_role in ("inference-package", *STATE_REPOS) and (
         card_path.is_symlink() or card_path.stat().st_size > 1024 * 1024
     ):
         raise ValueError("invalid inference Model Card")
@@ -242,7 +249,7 @@ def plan_release(
         from training.inference_release import inference_inventory
 
         expected = inference_inventory(folder, plan, card)
-    elif artifact_role == "training-state":
+    elif artifact_role in STATE_REPOS:
         from training.state_release import state_inventory
 
         expected = state_inventory(folder, plan, card)
@@ -274,7 +281,7 @@ def publish_release(
     }
     if not execute:
         return receipt
-    if plan.get("artifact_role") == "training-state":
+    if plan.get("artifact_role") in STATE_REPOS:
         if (system or platform.system().lower()) != "linux":
             raise ValueError("publish training state only from external Linux")
         from training.state_release import reserve_state_upload

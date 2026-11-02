@@ -1,0 +1,116 @@
+{
+  "schema": "voxelshogi-provider-switch-v1",
+  "cloudrift": {
+    "at": 1793615124.644078,
+    "instances": [
+      {
+        "id": "16144364-d6a5-11f1-b32d-1b98ee715d26",
+        "node_id": "cd679cc0-c276-11f1-8465-df8c48454322",
+        "status": "Failed",
+        "resources_released": true,
+        "failure": {
+          "id": "1d17d874-d6a5-11f1-814f-73a225a282a3",
+          "cause": "VmBootFailed",
+          "user_message": "VM failed to boot: error: internal error: Unknown PCI header type '127' for device '0000:31:00.0' [code=internalerror (1), domain=none (0)]",
+          "occurred_at": "2026-11-02T10:06:47.124597Z"
+        },
+        "hourly_cents": 39.0,
+        "usage": {
+          "secs": 0,
+          "nanos": 0
+        },
+        "accounted_usage": {
+          "secs": 0,
+          "nanos": 0
+        }
+      },
+      {
+        "id": "62defc82-d6a7-11f1-882c-ff344bf4002f",
+        "node_id": "cd679cc0-c276-11f1-8465-df8c48454322",
+        "status": "Failed",
+        "resources_released": true,
+        "failure": {
+          "id": "67ac85a4-d6a7-11f1-ab50-fbb6ac039d1a",
+          "cause": "VmBootFailed",
+          "user_message": "VM failed to boot: error: internal error: Unknown PCI header type '127' for device '0000:31:00.0' [code=internalerror (1), domain=none (0)]",
+          "occurred_at": "2026-11-02T10:23:11.243821Z"
+        },
+        "hourly_cents": 39.0,
+        "usage": {
+          "secs": 0,
+          "nanos": 0
+        },
+        "accounted_usage": {
+          "secs": 0,
+          "nanos": 0
+        }
+      }
+    ]
+  },
+  "vast": {
+    "at": 1793615125.1045382,
+    "balance_usd": 0,
+    "quotes": [
+      {
+        "offer_id": 58291028,
+        "gpu": "RTX 5090",
+        "disk_gb": 80,
+        "hourly_usd": 0.7555555555555556,
+        "maximum_seconds": 14400,
+        "maximum_usd": 4,
+        "bandwidth": "unmetered"
+      }
+    ],
+    "owned": [],
+    "rental_created": false
+  },
+  "guards": {
+    "at": 1793615642.315107,
+    "runs": [
+      {
+        "id": 41418369594,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "23c3e0560e2e872de1a9a67c748af95d2bd51abe",
+        "created_at": "2026-11-02T09:09:32Z",
+        "updated_at": "2026-11-02T10:09:36Z",
+        "html_url": "https://github.com/ayutaz/voxelshogi/actions/runs/41418369594"
+      },
+      {
+        "id": 41424497166,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "92ba8c6fa928a5490ab4633e29448aece9d80570",
+        "created_at": "2026-11-02T09:54:51Z",
+        "updated_at": "2026-11-02T10:07:17Z",
+        "html_url": "https://github.com/ayutaz/voxelshogi/actions/runs/41424497166"
+      },
+      {
+        "id": 41426729518,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "92ba8c6fa928a5490ab4633e29448aece9d80570",
+        "created_at": "2026-11-02T10:11:09Z",
+        "updated_at": "2026-11-02T10:23:32Z",
+        "html_url": "https://github.com/ayutaz/voxelshogi/actions/runs/41426729518"
+      }
+    ]
+  },
+  "budget": {
+    "approved_total_usd": 100,
+    "reserved_total_usd": 75,
+    "phase5_reserved_usd": 14,
+    "conditional_extra_budget_activated": false,
+    "invoice_retrieved": false
+  },
+  "decision": {
+    "cloudrift_retries_stopped": true,
+    "use_vast_when_funded": true,
+    "paid_deadline_test_passed": false,
+    "hf_recovery_passed": false,
+    "p51_candidate_rejected_for_training": true,
+    "p51_full_verification_complete": false,
+    "reason": "The incomplete fixed-revision validation reports 3 deep teacher targets in 35 sampled positions, below the necessary minimum 8 (2 per train/val x early/late cell). Discard this candidate without claiming the unfinished recomputation passed; do not lower thresholds.",
+    "candidate_revision": "1b86f7e83b70a69cdfa3cc0bd4e9b0886623c472"
+  }
+}

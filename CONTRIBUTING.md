@@ -21,6 +21,8 @@ CI の状態取得は最短10分間隔とし、利用者への報告は状態が
 
 ## 実装と検証
 
+CIは[変更範囲とPR／深い検証の分離](docs/CI_PERFORMANCE.md)を使う。PRは影響する分野の静的・単体・buildを実行し、変異・coverage・実モデル結合試験・E2Eはmain／定期へ移す。mainの深いQuality検証もGateへ結び付け、デプロイ前に成功を要求する。未知の入力は全分野へ分類し、手動／週次は全検証する。必須Gate・CodeQL・main保護と、実行された検証の失敗／中断を無視しない運用は維持する。
+
 - 仕様・ルールを確認し、テストを先に書いて RED を確認してから実装する。期待値は手計算か独立した参照実装で用意し、空の結果で通らないようにする。
 - 新しいテストが対象のバグを検出することを、変異の注入で確認する。一時的な変異は成果物に残さない。
 - ルール変更は `docs/RULESET.md` を先に更新し、互換性に応じて `ruleset_id` を変更する。進捗・完了条件は `docs/ROADMAP.md` に反映する。
@@ -57,7 +59,7 @@ E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e
 
 ## PR と公開の自動チェック
 
-PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の39変異（coreとWASM／Python境界）・Web142変異・Pythonモデル23変異・Python境界／データ／資源監視／pilot／HF公開／本生成／棋譜変換／本生成公開・終了制御／M6教師契約・読み込み／損失・保存再開・CUDA起動前・固定評価・学習済み変換・Vast.ai・共有IP制御／評価v2の契約・runner／Phase5〜6費用制御／評価局面・漏洩照合／研究ラベル・自己対局探索・履歴複製・疎損失・Actor・Policy/Value・paired教師・Replay・世代学習・独立終了監視297変異・CI制御45変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
+PR では docs のみの変更でも、通常 CI、CodeQL、Rust/Web カバレッジ、既知の39変異（coreとWASM／Python境界）・Web142変異・Pythonモデル23変異・Python境界／データ／資源監視／pilot／HF公開／本生成／棋譜変換／本生成公開・終了制御／M6教師契約・読み込み／損失・保存再開・CUDA起動前・固定評価・学習済み変換・Vast.ai・共有IP制御／評価v2の契約・runner／Phase5〜6費用制御／評価局面・漏洩照合／研究ラベル・自己対局探索・履歴複製・疎損失・Actor・Policy/Value・paired教師・Replay・世代学習・独立終了監視・自己対局archive311変異・CI制御45変異の回帰検証を実行する。Pythonジョブは実Rust拡張をビルドし、少量データの生成・全件検証・停止再開もテストする。Webジョブは実WASM単体に加えて `node scripts/ci/search-parity.mjs` でNativeとの全探索結果を照合する。`Web unit coverage` は `node scripts/ci/mutation-web.mjs` でも既知のWorker・観戦・描画準備のバグを注入する。必須チェックは次の8件（M3でPython CodeQLを追加）。
 
 - `CI Gate`（lint、Rust、MSRV、WASM/Web/実ブラウザ E2E、公開E2E用WASMのジョブ間受け渡し、依存監査、PR の dependency-review の成功を集約）
 - `CodeQL (rust)`、`CodeQL (javascript-typescript)`、`CodeQL (actions)`、`CodeQL (python)`

@@ -19,6 +19,7 @@ from training.fit import RunConfig
 from training.supervision import ROOT, label_contract
 
 SCHEMA = "voxelshogi-resume-archive-v1"
+SELFPLAY_SCHEMA = "voxelshogi-selfplay-resume-archive-v1"
 PAYLOAD_FIELDS = {"model", "optimizer", "rng", "progress", "binding"}
 
 
@@ -176,7 +177,14 @@ def decode_tree(tree, tensors):
     return result
 
 
-def _binding(binding):
+def _schema(profile):
+    if profile not in ("m6", "selfplay"):
+        raise ValueError("unknown resume archive profile")
+    return SCHEMA if profile == "m6" else SELFPLAY_SCHEMA
+
+
+def _binding(binding, *, profile="m6"):
+    _schema(profile)
     if set(binding) != {
         "source_commit",
         "cache_sha256",
@@ -186,6 +194,43 @@ def _binding(binding):
     }:
         raise ValueError("resume run binding fields differ")
     config = binding["config"]
+    if profile == "selfplay":
+        from training.selfplay_training import TrainConfig
+
+        contract = binding["contract"]
+        if (
+            type(contract) is not dict
+            or set(contract)
+            != {
+                "schema",
+                "source_commit",
+                "parent_model_sha256",
+                "generation",
+                "architecture",
+            }
+            or contract["schema"] != "voxelshogi-selfplay-training-v1"
+            or contract["source_commit"] != binding["source_commit"]
+            or not re.fullmatch(r"[0-9a-f]{40}", binding["source_commit"])
+            or not re.fullmatch(r"[0-9a-f]{64}", binding["cache_sha256"])
+            or not isinstance(contract["parent_model_sha256"], str)
+            or not re.fullmatch(r"[0-9a-f]{64}", contract["parent_model_sha256"])
+            or type(contract["generation"]) is not int
+            or not 0 <= contract["generation"] < 64
+            or not isinstance(contract["architecture"], str)
+            or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,80}", contract["architecture"])
+        ):
+            raise ValueError(
+                "selfplay resume parent/generation/source contract differs"
+            )
+        try:
+            actual = TrainConfig(
+                **{key: config[key] for key in TrainConfig.__dataclass_fields__}
+            ).value()
+        except (KeyError, TypeError) as error:
+            raise ValueError("selfplay resume config differs") from error
+        if actual != config:
+            raise ValueError("selfplay resume config differs")
+        return
     if (
         binding["contract"] != label_contract()
         or not re.fullmatch(r"[0-9a-f]{40}", binding["source_commit"])
@@ -243,7 +288,7 @@ def _history(path):
     return {"schema": "voxelshogi-training-history-v1", "events": events}
 
 
-def pack_run(source, output):
+def pack_run(source, output, *, profile="m6"):
     _linux()
     import torch
     from safetensors.torch import save_file
@@ -255,9 +300,11 @@ def pack_run(source, output):
     if run.get("schema") != "voxelshogi-training-run-v1":
         raise ValueError("unsupported training run")
     binding = run["binding"]
-    _binding(binding)
+    _binding(binding, profile=profile)
     index = json.loads((source / "checkpoints/latest.json").read_text())
     selected = ["latest"] + (["best"] if index.get("best") is not None else [])
+    if profile == "selfplay" and "best" in selected:
+        raise ValueError("selfplay archive must not contain best selection")
     prepared = {}
     for role in selected:
         path, receipt = checkpoint_receipt(
@@ -296,7 +343,7 @@ def pack_run(source, output):
             "files": descriptors,
         }
     manifest = {
-        "schema": SCHEMA,
+        "schema": _schema(profile),
         "purpose": "resume-state",
         "binding": binding,
         "roles": roles,
@@ -307,7 +354,7 @@ def pack_run(source, output):
     return manifest
 
 
-def verify_archive(folder, *, expected_binding):
+def verify_archive(folder, *, expected_binding, profile="m6"):
     folder = Path(folder)
     if (
         folder.is_symlink()
@@ -316,15 +363,20 @@ def verify_archive(folder, *, expected_binding):
     ):
         raise ValueError("incomplete resume archive")
     manifest = json.loads((folder / "manifest.json").read_text())
-    _binding(expected_binding)
+    _binding(expected_binding, profile=profile)
     if (
-        manifest.get("schema") != SCHEMA
+        manifest.get("schema") != _schema(profile)
         or manifest.get("purpose") != "resume-state"
         or manifest.get("complete") is not True
         or manifest["binding"] != expected_binding
         or not {"latest"} <= set(manifest["roles"]) <= {"latest", "best"}
     ):
         raise ValueError("resume archive schema/binding differs")
+    if profile == "selfplay" and (
+        set(manifest["roles"]) != {"latest"}
+        or manifest["roles"]["latest"]["progress"]["best_val_loss"] is not None
+    ):
+        raise ValueError("selfplay archive cannot contain best selection")
     expected = {"config.json", "history.json"} | {
         f"{role}/{name}"
         for role in manifest["roles"]
@@ -366,12 +418,14 @@ def verify_archive(folder, *, expected_binding):
     return manifest
 
 
-def restore_run(archive, output, *, expected_binding):
+def restore_run(archive, output, *, expected_binding, profile="m6"):
     _linux()
     from safetensors.torch import load_file
 
     archive, output = Path(archive), Path(output)
-    manifest = verify_archive(archive, expected_binding=expected_binding)
+    manifest = verify_archive(
+        archive, expected_binding=expected_binding, profile=profile
+    )
     decoded = {}
     for role, descriptor in manifest["roles"].items():
         tree = json.loads((archive / role / "config.json").read_text())
@@ -399,7 +453,7 @@ def restore_run(archive, output, *, expected_binding):
     atomic_json(
         output / "restoration.json",
         {
-            "schema": SCHEMA,
+            "schema": _schema(profile),
             "verified": True,
             "archive_manifest_sha256": file_hash(archive / "manifest.json"),
             "source_checkpoints": {
@@ -422,16 +476,19 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--expected-run", type=Path)
+    parser.add_argument("--profile", choices=("m6", "selfplay"), default="m6")
     args = parser.parse_args()
     if not args.output.resolve().is_relative_to(ROOT / "runs"):
         parser.error("keep private archives/restores under runs/ on external Linux")
     if args.operation == "pack":
-        result = pack_run(args.source, args.output)
+        result = pack_run(args.source, args.output, profile=args.profile)
     else:
         if args.expected_run is None:
             parser.error("restore requires the reviewed --expected-run binding")
         binding = json.loads(args.expected_run.read_text())["binding"]
-        result = restore_run(args.source, args.output, expected_binding=binding)
+        result = restore_run(
+            args.source, args.output, expected_binding=binding, profile=args.profile
+        )
     print(
         canonical(
             {
