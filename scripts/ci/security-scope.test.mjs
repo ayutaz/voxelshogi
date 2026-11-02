@@ -10,10 +10,10 @@ const scope = (event = 'pull_request', files = ['README.md']) => ({
   outputs: Object.fromEntries(Object.entries(verificationScope(files, event)).map(([key, value]) => [key, String(value)])),
 });
 
-test('only proven documentation-only PR and main comparisons omit CodeQL analysis', () => {
+test('PRs always produce real CodeQL results; only proven docs-only main comparisons omit analysis', () => {
   for (const event of ['pull_request', 'push']) {
-    assert.equal(codeqlRequired(scope(event), event), false);
-    assert.equal(codeqlRequired(scope(event, ['docs/ROADMAP.md', 'CONTRIBUTING.md']), event), false);
+    assert.equal(codeqlRequired(scope(event), event), event === 'pull_request');
+    assert.equal(codeqlRequired(scope(event, ['docs/ROADMAP.md', 'CONTRIBUTING.md']), event), event === 'pull_request');
     for (const files of [null, [], ['unknown/input'], ['crates/core/lib.rs'], ['training/model.py'], ['apps/web/src/App.tsx'], ['.github/workflows/security.yml'], ['docs/generated.json'], ['training/old.py', 'docs/new.md']]) {
       assert.equal(codeqlRequired(scope(event, files), event), true, `${event}: ${JSON.stringify(files)}`);
     }
@@ -22,8 +22,8 @@ test('only proven documentation-only PR and main comparisons omit CodeQL analysi
 
 test('any affected impact category keeps all four language analyses', () => {
   for (const key of keys.filter(key => key !== 'deep')) {
-    const value = scope(); value.outputs[key] = 'true';
-    assert.equal(codeqlRequired(value, 'pull_request'), true, key);
+    const value = scope('push'); value.outputs[key] = 'true';
+    assert.equal(codeqlRequired(value, 'push'), true, key);
   }
 });
 
@@ -72,7 +72,7 @@ test('CLI emits typed analysis output only after validating scope', async () => 
   const root = mkdtempSync(join(tmpdir(), 'voxelshogi-security-scope-'));
   const output = join(root, 'output'), summary = join(root, 'summary');
   try {
-    for (const [event, files, expected] of [['pull_request', ['README.md'], 'false'], ['push', ['docs/ROADMAP.md'], 'false'], ['pull_request', null, 'true'], ['schedule', null, 'true']]) {
+    for (const [event, files, expected] of [['pull_request', ['README.md'], 'true'], ['push', ['docs/ROADMAP.md'], 'false'], ['pull_request', null, 'true'], ['schedule', null, 'true']]) {
       writeFileSync(output, ''); writeFileSync(summary, '');
       const result = spawnSync(process.execPath, [new URL('./security-scope.mjs', import.meta.url).pathname], {
         encoding: 'utf8', env: { ...process.env, GITHUB_EVENT_NAME: event, SCOPE_JSON: JSON.stringify(scope(event, files)), GITHUB_OUTPUT: output, GITHUB_STEP_SUMMARY: summary },
