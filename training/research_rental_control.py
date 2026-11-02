@@ -23,6 +23,11 @@ from training.rental_control import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+HARDWARE = {
+    **{sku: (DC, True) for sku in QUOTES},
+    M6_SHARED_SKU: (M6_SHARED_DC, False),
+    "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),
+}
 ALLOCATIONS = {"phase5": 20, "phase6": 19}
 PURPOSES = {
     "phase5-evaluation",
@@ -115,12 +120,10 @@ class ResearchRental(Rental):
             or not 0 < plan["estimated_seconds"] <= plan["maximum_seconds"] - 900
         ):
             raise ValueError("invalid research purpose, estimate, or budget plan")
-        shared = plan["sku"] == M6_SHARED_SKU
         if (
-            plan["sku"] not in (*QUOTES, M6_SHARED_SKU)
-            or plan["datacenter"] != (M6_SHARED_DC if shared else DC)
+            plan["sku"] not in HARDWARE
             or type(plan["with_public_ip"]) is not bool
-            or plan["with_public_ip"] != (not shared)
+            or (plan["datacenter"], plan["with_public_ip"]) != HARDWARE[plan["sku"]]
         ):
             raise ValueError(
                 "research hardware/location/IP differs from quoted configuration"
@@ -154,7 +157,7 @@ class ResearchRental(Rental):
     def configuration(self):
         plan = self.read_plan()
         return {
-            "skus": (*QUOTES, M6_SHARED_SKU),
+            "skus": tuple(HARDWARE),
             "datacenter": plan["datacenter"],
             "with_public_ip": plan["with_public_ip"],
         }
