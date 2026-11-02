@@ -8,8 +8,15 @@
 |---|---:|---|
 | Pythonを直列実行 | 11分20秒 | [PR #99](https://github.com/ayutaz/voxelshogi/actions/runs/41430347070) |
 | 4シャード＋変更範囲判定 | 6分14秒（約45%短縮） | [PR #101](https://github.com/ayutaz/voxelshogi/actions/runs/41456192962) |
+| PRの短い検証とmainの深い検証を分離 | 2分2秒（変更前比約82%短縮） | [PR #102](https://github.com/ayutaz/voxelshogi/actions/runs/41474974297) |
 
-PR #101でもWebが5分13秒、学習系変異の最長jobが5分45秒だった。Web内ではモデルE2E69秒、通常E2E35秒、カメラ反復61秒、モデル生成36秒を実行していた。これらを通常PRから移す。以下の構成の時間は、新しい実runで計測する。
+PR #101でもWebが5分13秒、学習系変異の最長jobが5分45秒だった。Web内ではモデルE2E69秒、通常E2E35秒、カメラ反復61秒、モデル生成36秒を実行していた。これらを通常PRから移したPR #102では、Webが1分7秒、Python通常検査が1分37秒、Rust通常検査が49秒だった。scope開始15:47:03 UTCからGate終了15:49:05 UTCまでが2分2秒。変更前と同じ開始・終了定義で比較している。workflow起動前のキュー待ちと、独立したCodeQLの終了時間はこの値に含めない。必須8チェックと関連検査の成功を確認して通常mergeした。1〜2分は目標であり、全PRの保証値ではない。
+
+同じPRの[Security run](https://github.com/ayutaz/voxelshogi/actions/runs/41474974403)ではRust CodeQLが182秒で、15:50:06 UTCに最後に完了した。最初の必須検査開始15:47:03 UTCから必須8チェック全体の完了までは**3分3秒**。Gateの2分2秒とは区別する。保護とCodeQL4言語は維持しており、全体1〜2分の目標はまだ未達である。
+
+文書だけの[PR #103の初回run](https://github.com/ayutaz/voxelshogi/actions/runs/41477557229)はscope開始からGate終了まで**1分6秒**。Rust／Web／Python／モデルはscopeの検証のみで、重い処理、依存監査、変異job、artifact配布、デプロイを省いた。CodeQLと必須8チェックの成功を確認した。
+
+統合後のmain `fb1134a`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41477320560)では、深い検証を実際に実行した。Python Native結合試験、モデル変異、学習系変異4シャード、3形式のモデル生成・実ブラウザ推論、通常E2E・カメラ反復、Rust／Web coverage・既知変異が成功。Qualityを含むGateは6分11秒で、その後のCloudflare公開・配信SHA・公開E2E・公開実ファイル照合も成功した。PRでの延期を検証削除へ置き換えていない。
 
 ## PRと深い検証を分ける
 
