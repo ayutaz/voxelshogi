@@ -20,6 +20,10 @@ export function classifyChanges(files) {
   return result;
 }
 
+export function verificationScope(files, eventName) {
+  return { ...classifyChanges(files), deep: eventName !== 'pull_request' };
+}
+
 export function changedFiles(eventName, event, git = execFileSync) {
   if (!['pull_request','push'].includes(eventName)) return null;
   const base = eventName === 'pull_request' ? event.pull_request?.base?.sha : event.before;
@@ -33,7 +37,7 @@ export function changedFiles(eventName, event, git = execFileSync) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const files = changedFiles(process.env.GITHUB_EVENT_NAME, event);
-  const scope = classifyChanges(files);
-  appendFileSync(process.env.GITHUB_OUTPUT, keys.map(k => `${k}=${scope[k]}\n`).join(''));
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### CI change scope\n\n${files === null ? 'Full verification: manual/scheduled event or unavailable comparison.' : `Compared ${files.length} paths against the event base.`}\n\n` + keys.map(k => `- ${k}: ${scope[k] ? 'run' : 'unaffected; omit expensive steps'}\n`).join(''));
+  const scope = verificationScope(files, process.env.GITHUB_EVENT_NAME);
+  appendFileSync(process.env.GITHUB_OUTPUT, [...keys, 'deep'].map(k => `${k}=${scope[k]}\n`).join(''));
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### CI change scope\n\n${files === null ? 'All impact categories: manual/scheduled event or unavailable comparison.' : `Compared ${files.length} paths against the event base.`}\n\n` + keys.map(k => `- ${k}: ${scope[k] ? 'affected' : 'unaffected'}\n`).join('') + `- deep: ${scope.deep ? 'heavy verification enabled' : 'PR fast checks; heavy verification follows on main'}\n`);
 }

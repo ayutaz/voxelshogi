@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { checkGate } from './gate.mjs';
 
-const scopeKeys = ['rust', 'web', 'python', 'models', 'dependencies', 'controls'];
+const scopeKeys = ['rust', 'web', 'python', 'models', 'dependencies', 'controls', 'deep'];
 const passing = () => ({
-  ...Object.fromEntries(['scope', 'lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models', 'python-model-mutations', 'python-training-mutations'].map((name) => [name, { result: 'success' }])),
+  ...Object.fromEntries(['scope', 'lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models', 'python-model-mutations', 'python-training-mutations', 'quality'].map((name) => [name, { result: 'success' }])),
   scope: { result: 'success', outputs: Object.fromEntries(scopeKeys.map(name => [name, 'true'])) },
 });
 
@@ -24,7 +24,7 @@ test('missing and empty results cannot pass', () => {
   const needs = passing();
   delete needs.rust;
   assert.deepEqual(checkGate(needs, 'push'), ['rust: missing result']);
-  assert.equal(checkGate({}, 'push').length, 12);
+  assert.equal(checkGate({}, 'push').length, 13);
 });
 
 test('public E2E runtime handoff must exist and succeed before deployment', () => {
@@ -138,4 +138,44 @@ test('invalid scope cannot authorize skipped jobs', () => {
   delete needs.scope.outputs.rust;
   needs['python-training-mutations'].result = 'skipped';
   assert.deepEqual(checkGate(needs, 'pull_request'), ['scope: invalid outputs', 'python-training-mutations: skipped']);
+});
+
+
+test('PR fast checks may omit deep quality and Python mutation matrices only', () => {
+  const needs = passing(); needs.scope.outputs.deep = 'false';
+  needs.quality.result = 'skipped';
+  needs['python-model-mutations'].result = 'skipped';
+  needs['python-training-mutations'].result = 'skipped';
+  assert.deepEqual(checkGate(needs, 'pull_request'), []);
+  for (const name of ['quality', 'python-model-mutations', 'python-training-mutations']) {
+    for (const result of ['failure', 'cancelled', undefined]) {
+      const bad = structuredClone(needs); bad[name].result = result;
+      assert.deepEqual(checkGate(bad, 'pull_request'), [name + ': ' + (result ?? 'missing result')]);
+    }
+    const bad = structuredClone(needs); delete bad[name];
+    assert.deepEqual(checkGate(bad, 'pull_request'), [name + ': missing result']);
+  }
+  for (const name of ['msrv', 'models', 'web']) {
+    const bad = structuredClone(needs); bad[name].result = 'skipped';
+    assert.deepEqual(checkGate(bad, 'pull_request'), [name + ': skipped']);
+  }
+});
+
+test('main, periodic and manual runs require successful deep quality', () => {
+  for (const event of ['push', 'schedule', 'workflow_dispatch', 'unknown']) {
+    for (const result of ['failure', 'cancelled', 'skipped', undefined]) {
+      const needs = passing(); needs.quality.result = result;
+      assert.deepEqual(checkGate(needs, event), ['quality: ' + (result ?? 'missing result')]);
+    }
+    const needs = passing(); delete needs.quality;
+    assert.deepEqual(checkGate(needs, event), ['quality: missing result']);
+  }
+});
+
+test('deep=false outside PR cannot authorize missing heavy verification', () => {
+  for (const event of ['push', 'schedule', 'workflow_dispatch', 'unknown']) {
+    const needs = passing(); needs.scope.outputs.deep = 'false';
+    needs.quality.result = 'skipped';
+    assert.deepEqual(checkGate(needs, event), ['scope: invalid outputs', 'quality: skipped']);
+  }
 });
