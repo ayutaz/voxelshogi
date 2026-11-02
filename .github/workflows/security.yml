@@ -16,8 +16,13 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    uses: ./.github/workflows/change-scope.yml
+
   codeql:
     name: CodeQL (${{ matrix.language }})
+    needs: scope
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -29,12 +34,21 @@ jobs:
         language: [rust, javascript-typescript, actions, python]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+      - id: proof
+        env:
+          SCOPE_JSON: ${{ toJSON(needs.scope) }}
+        run: node scripts/ci/security-scope.mjs
+      - if: steps.proof.outputs.analyze == 'true'
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
         with:
           languages: ${{ matrix.language }}
           build-mode: none
           queries: security-extended
-      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
+      - if: steps.proof.outputs.analyze == 'true'
+        uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
         with:
           category: /language:${{ matrix.language }}
 

@@ -27,7 +27,7 @@ PR #101でもWebが5分13秒、学習系変異の最長jobが5分45秒だった�
 | Python通常テスト | 実モデル自己対局等の`training/tests/*_native.py`を除いて実行 | Native結合試験を含め全件 |
 | MSRV・coverage・既知変異 | 深い検証へ延期 | 実行。Python学習系は4シャード並列 |
 | モデル3形式の生成・実ブラウザ推論・全E2E・カメラ反復 | 深い検証へ延期 | 実行 |
-| CodeQL 4言語 | 継続 | 継続 |
+| CodeQL 4言語 | コード影響時に継続。文書だけならscope検証 | mainもコード影響時に実行。週次・手動は全解析 |
 | core全変異の調査 | 延期 | 独立Qualityの週次、または手動指定 |
 | デプロイ・公開E2E | 実行しない | mainのアプリ影響時、深い検証成功後 |
 
@@ -40,6 +40,10 @@ PRで省く検証は削除しない。mainではCIからQualityを共通workflow
 6分野のflagに`deep`を加える。PRはdeep=false、それ以外はtrue。未知の入力でもPRでは全分野の短い検証を行い、深い検証はmain以降へ回す。手動・週次は全分野・deepで実行する。
 
 各jobはscope成功と7つのbool文字列を検証し、省略理由をsummaryへ残す。必須8チェック名とmain保護を維持する。PRのcoverage／既知変異checkは実行tierの判定を検証し、計測や変異実行そのものの成功とは報告しない。実結果はmain／定期runで確認する。Gateは対応する省略だけを許可し、失敗・中断・欠落はPRでも許容しない。mainでdeep=falseになった場合も拒否する。
+
+Securityも同じ変更判定を使う。PR／mainで6分野すべての影響がないと確認できた場合だけ、CodeQLの初期化・抽出・解析を省略する。4つの必須CodeQL jobはscopeの成功と7つのbool文字列を検証して省略理由を記録する。コード・共通設定・未知の入力・比較不能は従来どおり全4言語、週次・手動も全解析を行う。文書PRのsuccessは新しいコード解析を行った意味ではない。
+
+この最適化はローカルのNode111テスト・制御63変異・actionlintで確認した実装段階であり、変更後の実CI所要時間は未計測。[GitHubのcode scanning保護](https://docs.github.com/en/code-security/concepts/code-scanning/merge-protection)は必須status checkとは別に働くため、文書のみのPRとmainで解析省略・通常mergeを実証するまで導入完了と数えない。保護が解析結果を要求して取り込みを阻止する場合、保護を解除せず従来の解析を維持する。架空のSARIFや過去の解析を新解析として送信しない。
 
 学習系変異は全catalogをちょうど1シャードへ割り当て、担当テスト集合の隔離baselineを先に通す。通常の全pytestは深い検証で継続する。JUnitのskip・collection error・timeoutを変異検出と数えない。
 

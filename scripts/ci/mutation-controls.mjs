@@ -7,6 +7,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'security-scope-must-succeed', file: 'scripts/ci/security-scope.mjs', before: "scope?.result !== 'success'", after: 'false', test: 'security-scope' },
+  { name: 'security-scope-typed-outputs', file: 'scripts/ci/security-scope.mjs', before: "outputKeys.every(key => ['true', 'false'].includes(scope.outputs?.[key]))", after: 'true', test: 'security-scope' },
+  { name: 'security-any-affected-language', file: 'scripts/ci/security-scope.mjs', before: "impactKeys.some(key => scope.outputs[key] === 'true')", after: 'false', test: 'security-scope' },
+  { name: 'security-periodic-always-analyzes', file: 'scripts/ci/security-scope.mjs', before: "if (!['pull_request', 'push'].includes(eventName)) return true;", after: "if (!['pull_request', 'push'].includes(eventName)) return false;", test: 'security-scope' },
+  { name: 'security-required-check-on-scope-failure', file: '.github/workflows/security.yml', before: "    needs: scope\n    if: always()", after: "    needs: scope\n    if: success()", test: 'security-scope' },
+  { name: 'security-init-requires-proof', file: '.github/workflows/security.yml', before: "      - if: steps.proof.outputs.analyze == 'true'\n        uses: github/codeql-action/init@", after: "      - uses: github/codeql-action/init@", test: 'security-scope' },
+  { name: 'security-analysis-requires-proof', file: '.github/workflows/security.yml', before: "      - if: steps.proof.outputs.analyze == 'true'\n        uses: github/codeql-action/analyze@", after: "      - uses: github/codeql-action/analyze@", test: 'security-scope' },
   { name: 'scope-unknown-full', file: 'scripts/ci/ci-scope.mjs', before: 'else return full(); // New/unclassified input must not silently lose coverage.', after: 'else continue;', test: 'ci-scope' },
   { name: 'scope-rename-both-sides', file: 'scripts/ci/ci-scope.mjs', before: "['diff','--name-only','--no-renames','-z',base,'HEAD']", after: "['diff','--name-only','--find-renames','-z',base,'HEAD']", test: 'ci-scope' },
   { name: 'scope-core-cross-language', file: 'scripts/ci/ci-scope.mjs', before: "['rust','web','python','models']", after: "['rust']", test: 'ci-scope' },
@@ -76,6 +83,12 @@ try {
     cpSync(join(root, 'scripts/browser-memory.mjs'), join(copy, 'scripts/browser-memory.mjs'));
     if (mutation.test === 'model-distribution') for (const file of ['scripts/inference-build.mjs', 'scripts/verify-model-distribution.mjs']) {
       if (file !== mutation.file) cpSync(join(root, file), join(copy, file));
+    }
+    if (mutation.test === 'security-scope') for (const file of ['scripts/ci/ci-scope.mjs', 'scripts/ci/security-scope.mjs', '.github/workflows/security.yml']) {
+      if (file !== mutation.file) {
+        mkdirSync(dirname(join(copy, file)), { recursive: true });
+        cpSync(join(root, file), join(copy, file));
+      }
     }
     const run = () => spawnSync(process.execPath, ['--test', '--test-reporter=tap', test], { cwd: copy, encoding: 'utf8', timeout: 30_000 });
     const baseline = run(); assert.equal(baseline.status, 0, `control baseline failed: ${mutation.name}`);
