@@ -16,11 +16,11 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 ## 自動デプロイ（GitHub Actions）
 
-`.github/workflows/ci.yml` の流れは次のとおり。トリガーはmainへのpush、PR、手動実行（workflow_dispatch）、週次の全検証。最初に変更範囲を比較し、以下の重い処理は影響する場合に実行する。
+`.github/workflows/ci.yml` の流れは次のとおり。トリガーはmainへのpush、PR、手動実行（workflow_dispatch）、週次の全検証。最初に変更範囲と実行tierを判定する。PRは静的・通常単体・build、以下の深い検証はmain／手動／週次で影響する場合に実行する。
 
 1. lint、Rust fmt/clippy/test、MSRV 1.85、依存監査、uv／Pythonの契約・モデルテスト、実モデル専用job。PR では dependency-review も行う
 2. `web`: WASM ビルド、型チェック、Vitest、Native/WASM照合。承認済みの公開設定からuvで3モデルを生成し、ライセンス・clean source・全形式を検証。SHA付きbuild、モデル6件・既存21件の実E2Eを実行する。配信用 `web-dist` と、E2EがNodeで棋譜を再検証する生成WASM `web-e2e-wasm` を別artifactに保存
-3. `CI Gate`: 変更範囲判定・通常検証・モデル変異・学習系4シャードを集約する。影響なしの判定がある依存／変異jobのskipと、main/手動でのPR専用jobのskipだけを許容し、失敗・中断・欠落は拒否する
+3. `CI Gate`: 変更範囲判定・通常検証を集約し、main／手動／週次ではモデル変異・学習系4シャード・共通Qualityのcoverage／既知変異も要求する。影響なしの依存job、PRで延期する深い検証、main/手動でのPR専用jobのskipだけを許容し、失敗・中断・欠落は拒否する
 4. `deploy`: mainのpush・Gate成功・Web影響ありの場合のみ。productionのロック取得後に候補SHAと最新mainを照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じrunの`web-dist`をWranglerで公開する。`web-e2e-wasm`も同じrunからdigest照合付きで復元し、公開前に`pnpm e2e --list`で全テストのimportを確認する
 5. 配信された `build-info.json` のSHAと対象コミットを有限回の取得で照合し、公開URLに対して既存21件・C0追加3件・モデル6件を実行する。モデル配布物とアプリWorker等の実ファイルを同じCI artifactのmanifestへ照合し、hash・長さ・MIME・cacheを保存する
 
