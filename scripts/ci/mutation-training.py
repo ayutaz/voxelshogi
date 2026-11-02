@@ -2248,6 +2248,29 @@ MUTATIONS = [
         "if False",
         "test_runner.py",
     ),
+    (
+        "training-shard-complete-partition",
+        "scripts/ci/mutation-training.py",
+        "    return list(mutations[shard::shards])\n\n\ndef classify_result",
+        "    return list(mutations[shard::shards])[:-1]\n\n\ndef classify_result",
+        "test_mutation_harness.py",
+    ),
+    (
+        "training-shard-unique-catalog",
+        "scripts/ci/mutation-training.py",
+        "    if len({mutation[0] for mutation in mutations}) != len(mutations):\n"
+        '        raise ValueError("mutation catalog contains duplicate names")',
+        "    if False:\n"
+        '        raise ValueError("mutation catalog contains duplicate names")',
+        "test_mutation_harness.py",
+    ),
+    (
+        "training-mutation-no-skips",
+        "scripts/ci/mutation-training.py",
+        '    if returncode == 1 and cases and failures and not errors and not skipped:\n        return "caught"',
+        '    if returncode == 1 and cases and failures and not errors:\n        return "caught"',
+        "test_mutation_harness.py",
+    ),
 ]
 
 
@@ -2282,7 +2305,53 @@ def prepare_baseline_checkout(work):
     return git("rev-parse", "HEAD")
 
 
-def main():
+def select_mutations(mutations, *, shard=None, shards=None):
+    if not mutations or any(
+        not isinstance(mutation[0], str) or not mutation[0] for mutation in mutations
+    ):
+        raise ValueError("mutation catalog must be nonempty and have named entries")
+    if len({mutation[0] for mutation in mutations}) != len(mutations):
+        raise ValueError("mutation catalog contains duplicate names")
+    if shard is None and shards is None:
+        return list(mutations)
+    if (
+        type(shard) is not int
+        or type(shards) is not int
+        or not 1 <= shards <= len(mutations)
+        or not 0 <= shard < shards
+    ):
+        raise ValueError("provide both --shard and --shards for a nonempty partition")
+    return list(mutations[shard::shards])
+
+
+def classify_result(returncode, report, *, name):
+    try:
+        suites = ET.parse(report).getroot()
+    except OSError, ET.ParseError:
+        raise RuntimeError(f"{name}: missing/invalid executed test report") from None
+    cases = suites.findall(".//testcase")
+    failures, errors = suites.findall(".//failure"), suites.findall(".//error")
+    skipped = suites.findall(".//skipped")
+    if returncode == 0 and cases and not failures and not errors and not skipped:
+        return "passed"
+    if returncode == 1 and cases and failures and not errors and not skipped:
+        return "caught"
+    raise RuntimeError(
+        f"{name}: collection/infrastructure/skips/timeouts are not caught mutations"
+    )
+
+
+def main(argv=None):
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--shard", type=int)
+    parser.add_argument("--shards", type=int)
+    args = parser.parse_args(argv)
+    try:
+        selected = select_mutations(MUTATIONS, shard=args.shard, shards=args.shards)
+    except ValueError as error:
+        parser.error(str(error))
     output = ROOT / "coverage/training-mutations"
     output.mkdir(parents=True, exist_ok=True)
     results = []
@@ -2308,9 +2377,14 @@ def main():
             "PYTHONDONTWRITEBYTECODE": "1",
         }
 
-        def run(name, tests=""):
+        def run(name, tests=()):
             report = work / "results.xml"
             report.unlink(missing_ok=True)
+            if isinstance(tests, str):
+                tests = (tests,)
+            targets = [f"training/tests/{test}" for test in tests] or [
+                "training/tests/"
+            ]
             result = subprocess.run(
                 [
                     "uv",
@@ -2319,36 +2393,26 @@ def main():
                     "--no-sync",
                     "pytest",
                     "-q",
-                    f"training/tests/{tests}",
+                    *targets,
                     f"--junitxml={report}",
                 ],
                 cwd=work,
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=180 if not tests else 60,
+                timeout=180 if name == "baseline" else 60,
                 check=False,
             )
             (output / f"{name}.log").write_text(result.stdout + result.stderr)
-            suites = ET.parse(report).getroot()
-            cases = suites.findall(".//testcase")
-            failures, errors = suites.findall(".//failure"), suites.findall(".//error")
-            if (
-                result.returncode == 0
-                and cases
-                and not failures
-                and not errors
-                and not suites.findall(".//skipped")
-            ):
-                return "passed"
-            if result.returncode == 1 and failures and not errors:
-                return "caught"
-            raise RuntimeError(
-                f"{name}: collection/infrastructure/timeouts are not caught mutations"
-            )
+            return classify_result(result.returncode, report, name=name)
 
-        assert run("baseline") == "passed"
-        for name, file, before, after, tests in MUTATIONS:
+        baseline_tests = (
+            tuple(sorted({mutation[-1] for mutation in selected}))
+            if args.shards is not None
+            else ()
+        )
+        assert run("baseline", baseline_tests) == "passed"
+        for name, file, before, after, tests in selected:
             path = work / file
             original = path.read_text()
             # Eligibility is deliberately duplicated in the independent verifier;
@@ -2363,6 +2427,18 @@ def main():
             finally:
                 path.write_text(original)
     (output / "results.json").write_text(json.dumps(results, indent=2) + "\n")
+    (output / "selection.json").write_text(
+        json.dumps(
+            {
+                "shard": args.shard,
+                "shards": args.shards,
+                "catalog_total": len(MUTATIONS),
+                "selected": [mutation[0] for mutation in selected],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
 
 if __name__ == "__main__":

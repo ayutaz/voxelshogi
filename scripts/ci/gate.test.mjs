@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { checkGate } from './gate.mjs';
 
-const passing = () => Object.fromEntries(['lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models'].map((name) => [name, { result: 'success' }]));
+const scopeKeys = ['rust', 'web', 'python', 'models', 'dependencies', 'controls'];
+const passing = () => ({
+  ...Object.fromEntries(['scope', 'lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models', 'python-model-mutations', 'python-training-mutations'].map((name) => [name, { result: 'success' }])),
+  scope: { result: 'success', outputs: Object.fromEntries(scopeKeys.map(name => [name, 'true'])) },
+});
 
 test('all required checks must succeed', () => {
   assert.deepEqual(checkGate(passing(), 'pull_request'), []);
@@ -20,7 +24,7 @@ test('missing and empty results cannot pass', () => {
   const needs = passing();
   delete needs.rust;
   assert.deepEqual(checkGate(needs, 'push'), ['rust: missing result']);
-  assert.equal(checkGate({}, 'push').length, 9);
+  assert.equal(checkGate({}, 'push').length, 12);
 });
 
 test('public E2E runtime handoff must exist and succeed before deployment', () => {
@@ -71,4 +75,67 @@ test('real browser model inference must succeed, including on ordinary PRs', () 
 test('invalid input cannot pass', () => {
   assert.throws(() => checkGate(null, 'push'), /needs/);
   assert.throws(() => checkGate([], 'push'), /needs/);
+});
+
+
+test('each mutation matrix must succeed when Python is affected', () => {
+  for (const name of ['python-model-mutations', 'python-training-mutations']) {
+    for (const result of ['failure', 'cancelled', 'skipped', undefined]) {
+      const needs = passing(); needs[name].result = result;
+      assert.deepEqual(checkGate(needs, 'pull_request'), [`${name}: ${result ?? 'missing result'}`]);
+    }
+    const needs = passing(); delete needs[name];
+    assert.deepEqual(checkGate(needs, 'push'), [`${name}: missing result`]);
+  }
+});
+
+test('unaffected Python permits only skipped mutation matrices, not failures or missing jobs', () => {
+  const base = passing(); base.scope.outputs.python = 'false';
+  base['python-model-mutations'].result = 'skipped';
+  base['python-training-mutations'].result = 'skipped';
+  assert.deepEqual(checkGate(base, 'pull_request'), []);
+  for (const name of ['python-model-mutations', 'python-training-mutations']) {
+    for (const result of ['failure', 'cancelled', undefined]) {
+      const needs = structuredClone(base); needs[name].result = result;
+      assert.deepEqual(checkGate(needs, 'pull_request'), [`${name}: ${result ?? 'missing result'}`]);
+    }
+  }
+  base.python.result = 'skipped';
+  assert.deepEqual(checkGate(base, 'pull_request'), ['python: skipped']);
+});
+
+test('dependency jobs may skip on PR only with validated dependencies=false', () => {
+  const needs = passing(); needs.scope.outputs.dependencies = 'false';
+  needs.audit.result = 'skipped'; needs['dependency-review'].result = 'skipped';
+  assert.deepEqual(checkGate(needs, 'pull_request'), []);
+  for (const name of ['audit', 'dependency-review']) {
+    for (const result of ['failure', 'cancelled', undefined]) {
+      const bad = structuredClone(needs); bad[name].result = result;
+      assert.deepEqual(checkGate(bad, 'pull_request'), [`${name}: ${result ?? 'missing result'}`]);
+    }
+  }
+  needs.scope.outputs.dependencies = 'true';
+  assert.deepEqual(checkGate(needs, 'pull_request'), ['audit: skipped', 'dependency-review: skipped']);
+});
+
+test('scope must succeed and every output must be a literal true/false string', () => {
+  for (const result of ['failure', 'cancelled', 'skipped', undefined]) {
+    const needs = passing(); needs.scope.result = result;
+    assert.deepEqual(checkGate(needs, 'pull_request'), [`scope: ${result ?? 'missing result'}`]);
+  }
+  for (const key of scopeKeys) {
+    for (const value of [undefined, false, true, '', 'FALSE', 'unknown']) {
+      const needs = passing(); needs.scope.outputs[key] = value;
+      assert.deepEqual(checkGate(needs, 'pull_request'), ['scope: invalid outputs']);
+    }
+  }
+  const needs = passing(); delete needs.scope.outputs;
+  assert.deepEqual(checkGate(needs, 'pull_request'), ['scope: invalid outputs']);
+});
+
+test('invalid scope cannot authorize skipped jobs', () => {
+  const needs = passing(); needs.scope.outputs.python = 'false';
+  delete needs.scope.outputs.rust;
+  needs['python-training-mutations'].result = 'skipped';
+  assert.deepEqual(checkGate(needs, 'pull_request'), ['scope: invalid outputs', 'python-training-mutations: skipped']);
 });
