@@ -52,6 +52,9 @@ def _source_check(commit):
 
 
 class ResearchRental(Rental):
+    PLAN_SCHEMA = "voxelshogi-research-rental-plan-v1"
+    HARDWARE_FIELDS = {"sku", "datacenter", "with_public_ip"}
+
     def __init__(
         self,
         *args,
@@ -93,15 +96,13 @@ class ResearchRental(Rental):
                 "purpose",
                 "source_commit",
                 "workload_sha256",
-                "sku",
-                "datacenter",
-                "with_public_ip",
                 "maximum_seconds",
                 "maximum_hourly_usd",
                 "maximum_usd",
                 "estimated_seconds",
             }
-            or plan["schema"] != "voxelshogi-research-rental-plan-v1"
+            | self.HARDWARE_FIELDS
+            or plan["schema"] != self.PLAN_SCHEMA
             or self.phase not in ALLOCATIONS
             or plan["purpose"] not in PURPOSES
             or not plan["purpose"].startswith(self.phase + "-")
@@ -120,14 +121,7 @@ class ResearchRental(Rental):
             or not 0 < plan["estimated_seconds"] <= plan["maximum_seconds"] - 900
         ):
             raise ValueError("invalid research purpose, estimate, or budget plan")
-        if (
-            plan["sku"] not in HARDWARE
-            or type(plan["with_public_ip"]) is not bool
-            or (plan["datacenter"], plan["with_public_ip"]) != HARDWARE[plan["sku"]]
-        ):
-            raise ValueError(
-                "research hardware/location/IP differs from quoted configuration"
-            )
+        sku = self.validate_hardware(plan)
         if (
             self.workload is None
             or self.workload.is_symlink()
@@ -140,8 +134,19 @@ class ResearchRental(Rental):
         ):
             raise ValueError("research workload/source hash differs")
         self._plan_sha256 = digest
-        self.sku = plan["sku"]
+        self.sku = sku
         return plan
+
+    def validate_hardware(self, plan):
+        if (
+            plan["sku"] not in HARDWARE
+            or type(plan["with_public_ip"]) is not bool
+            or (plan["datacenter"], plan["with_public_ip"]) != HARDWARE[plan["sku"]]
+        ):
+            raise ValueError(
+                "research hardware/location/IP differs from quoted configuration"
+            )
+        return plan["sku"]
 
     def quote_seconds(self):
         plan = self.read_plan()
@@ -162,7 +167,7 @@ class ResearchRental(Rental):
             "with_public_ip": plan["with_public_ip"],
         }
 
-    def rent(self, start_guard):
+    def prepare(self):
         plan = self.read_plan()
         self.source_check(plan["source_commit"])
         if self.remote_guard is None:
@@ -184,6 +189,10 @@ class ResearchRental(Rental):
         if self.other_provider_idle is None:
             raise ValueError("cross-provider ownership check is required")
         self.other_provider_idle()
+        return plan
+
+    def rent(self, start_guard):
+        self.prepare()
         return super().rent(start_guard)
 
     def reserve(self):
