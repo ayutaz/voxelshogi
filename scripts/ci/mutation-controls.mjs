@@ -7,6 +7,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'scope-unknown-full', file: 'scripts/ci/ci-scope.mjs', before: 'else return full(); // New/unclassified input must not silently lose coverage.', after: 'else continue;', test: 'ci-scope' },
+  { name: 'scope-rename-both-sides', file: 'scripts/ci/ci-scope.mjs', before: "['diff','--name-only','--no-renames','-z',base,'HEAD']", after: "['diff','--name-only','--find-renames','-z',base,'HEAD']", test: 'ci-scope' },
+  { name: 'scope-core-cross-language', file: 'scripts/ci/ci-scope.mjs', before: "['rust','web','python','models']", after: "['rust']", test: 'ci-scope' },
+  { name: 'required-training-matrix', file: 'scripts/ci/gate.mjs', before: ", 'models', 'python-model-mutations', 'python-training-mutations'].flatMap", after: ", 'models', 'python-model-mutations'].flatMap", test: 'gate' },
+  { name: 'typed-scope-proof', file: 'scripts/ci/gate.mjs', before: "scopeKeys.every((name) => ['true', 'false'].includes(scope.outputs?.[name]))", after: 'true', test: 'gate' },
+  { name: 'unaffected-failure-is-still-failure', file: 'scripts/ci/gate.mjs', before: "validScope && result === 'skipped'", after: 'validScope', test: 'gate' },
   { name: 'benchmark-wait-measured-input', file: 'scripts/trained-benchmark.mjs', before: 'const measured = await Promise.race([completion.then(() => false), waitForMeasured().then(() => true)]);', after: 'const measured = true;', test: 'trained-benchmark' },
   {"name": "portable-evidence-compute", "file": "scripts/trained-browser-evidence.mjs", "before": "assert.equal(validation.information.computePrecision, 'float32', 'FP16 weight-only requires FP32 compute');", "after": "", "test": "trained-browser-evidence"},
   { name: 'benchmark-root-side', file: 'scripts/trained-benchmark.mjs', before: 'if (game.sideToMove() !== fixture.side)', after: 'if (false)', test: 'trained-benchmark' },
