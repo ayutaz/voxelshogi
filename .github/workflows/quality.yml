@@ -19,24 +19,54 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    uses: ./.github/workflows/change-scope.yml
+
   rust-coverage:
     name: Rust core coverage
+    needs: [scope]
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       # Avoid the LLVM coverage mismatches observed with opt-level 2.
       CARGO_PROFILE_TEST_OPT_LEVEL: 0
     steps:
+      - name: Validate CI change scope
+        working-directory: .
+        run: |
+          test "$SCOPE_RESULT" = success
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+            case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
+          done
+          if [ "$REQUIRED" = false ]; then
+            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          RUST_SCOPE: ${{ needs.scope.outputs.rust }}
+          WEB_SCOPE: ${{ needs.scope.outputs.web }}
+          PYTHON_SCOPE: ${{ needs.scope.outputs.python }}
+          MODELS_SCOPE: ${{ needs.scope.outputs.models }}
+          DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
+          CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          REQUIRED: ${{ needs.scope.outputs.rust == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: needs.scope.outputs.rust == 'true'
       - run: rustup show
+        if: needs.scope.outputs.rust == 'true'
       - run: rustup component add llvm-tools-preview
+        if: needs.scope.outputs.rust == 'true'
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        if: needs.scope.outputs.rust == 'true'
         with:
           key: coverage
       - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        if: needs.scope.outputs.rust == 'true'
         with:
           tool: cargo-llvm-cov@0.9.1
       - name: Measure core coverage
+        if: needs.scope.outputs.rust == 'true'
         run: |
           mkdir -p coverage/rust
           cargo llvm-cov --locked -p voxelshogi-core --ignore-filename-regex '/(tests|examples)/' --lcov --output-path coverage/rust/lcov.info
@@ -44,13 +74,16 @@ jobs:
           cargo llvm-cov report --ignore-filename-regex '/(tests|examples)/' --json --summary-only --output-path coverage/rust/summary.json
           test -s coverage/rust/lcov.info
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: needs.scope.outputs.rust == 'true'
         with:
           python-version-file: .python-version
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        if: needs.scope.outputs.rust == 'true'
         with:
           version: '0.11.23'
           enable-cache: false
       - name: Summarize core coverage
+        if: needs.scope.outputs.rust == 'true'
         run: |
           uv run --no-project --python "$(cat .python-version)" python - <<'PY'
           import json, os
@@ -64,6 +97,7 @@ jobs:
               f.write('\nIntegration/reference test files are excluded. Native coverage does not measure the WASM wrapper.\n')
           PY
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: needs.scope.outputs.rust == 'true'
         with:
           name: rust-coverage
           path: coverage/rust
@@ -72,47 +106,82 @@ jobs:
 
   web-coverage:
     name: Web unit coverage
+    needs: [scope]
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Validate CI change scope
+        working-directory: .
+        run: |
+          test "$SCOPE_RESULT" = success
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+            case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
+          done
+          if [ "$REQUIRED" = false ]; then
+            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          RUST_SCOPE: ${{ needs.scope.outputs.rust }}
+          WEB_SCOPE: ${{ needs.scope.outputs.web }}
+          PYTHON_SCOPE: ${{ needs.scope.outputs.python }}
+          MODELS_SCOPE: ${{ needs.scope.outputs.models }}
+          DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
+          CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          REQUIRED: ${{ needs.scope.outputs.web == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: needs.scope.outputs.web == 'true'
       - run: rustup show
+        if: needs.scope.outputs.web == 'true'
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        if: needs.scope.outputs.web == 'true'
       - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
+        if: needs.scope.outputs.web == 'true'
         with:
           tool: wasm-bindgen-cli@0.2.129
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        if: needs.scope.outputs.web == 'true'
         with:
           package_json_file: apps/web/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: needs.scope.outputs.web == 'true'
         with:
           node-version-file: .node-version
           cache: pnpm
           cache-dependency-path: apps/web/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+        if: needs.scope.outputs.web == 'true'
         working-directory: apps/web
       - run: node scripts/ci/check-versions.mjs
+        if: needs.scope.outputs.web == 'true'
       - run: pnpm wasm
+        if: needs.scope.outputs.web == 'true'
         working-directory: apps/web
       - run: pnpm coverage
+        if: needs.scope.outputs.web == 'true'
         working-directory: apps/web
       - name: Detect Worker and store regressions with injected web mutations
+        if: needs.scope.outputs.web == 'true'
         run: node scripts/ci/mutation-web.mjs
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: always()
+        if: needs.scope.outputs.web == 'true' && (always())
         with:
           name: web-mutation-regressions
           path: coverage/web-mutations
           retention-days: 7
           if-no-files-found: error
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: needs.scope.outputs.web == 'true'
         with:
           python-version-file: .python-version
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        if: needs.scope.outputs.web == 'true'
         with:
           version: '0.11.23'
           enable-cache: false
       - name: Summarize Web coverage
+        if: needs.scope.outputs.web == 'true'
         run: |
           uv run --no-project --python "$(cat .python-version)" python - <<'PY'
           import json, os
@@ -126,6 +195,7 @@ jobs:
               f.write('\nIncludes unimported UI/3D source; generated WASM glue is excluded. Browser E2E coverage is not included.\n')
           PY
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: needs.scope.outputs.web == 'true'
         with:
           name: web-coverage
           path: apps/web/coverage
@@ -134,21 +204,48 @@ jobs:
 
   mutation-regressions:
     name: Known mutation regressions
+    needs: [scope]
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Validate CI change scope
+        working-directory: .
+        run: |
+          test "$SCOPE_RESULT" = success
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+            case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
+          done
+          if [ "$REQUIRED" = false ]; then
+            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          RUST_SCOPE: ${{ needs.scope.outputs.rust }}
+          WEB_SCOPE: ${{ needs.scope.outputs.web }}
+          PYTHON_SCOPE: ${{ needs.scope.outputs.python }}
+          MODELS_SCOPE: ${{ needs.scope.outputs.models }}
+          DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
+          CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          REQUIRED: ${{ needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
         with:
           python-version-file: .python-version
       - run: rustup show
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
         with:
           node-version-file: .node-version
       - run: node --test scripts/ci/*.test.mjs
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
       - run: node scripts/ci/mutation-smoke.mjs
+        if: needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true'
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: always()
+        if: (needs.scope.outputs.rust == 'true' || needs.scope.outputs.controls == 'true') && always()
         with:
           name: mutation-regressions
           path: coverage/mutations
