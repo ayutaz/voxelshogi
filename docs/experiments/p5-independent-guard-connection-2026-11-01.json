@@ -1,0 +1,39 @@
+{
+  "schema": "voxelshogi-independent-guard-connection-v1",
+  "dispatch": {
+    "requested_at": 1793543391.701934,
+    "maximum_end_at": 1793546991,
+    "maximum_end_at_utc": "2026-11-01T15:29:51+00:00",
+    "review_retry": 1,
+    "paid_instance_created": false,
+    "workflow_run_id": 41316481651,
+    "url": "https://github.com/ayutaz/voxelshogi/actions/runs/41316481651",
+    "dispatch_confirmed_at": 1793543424.969623,
+    "tag": "voxelshogi-phase5-deadline-smoke-control"
+  },
+  "connection": {
+    "checked_at": 1793544105.119881,
+    "workflow_run_id": 41316481651,
+    "tag": "voxelshogi-phase5-deadline-smoke-control",
+    "maximum_end_at": 1793546991,
+    "remote_stop_at": 1793546091,
+    "main_workflow_arm_succeeded_and_watch_running": true,
+    "paid_instance_created": false
+  },
+  "owned_instance_observation": {
+    "checked_at": 1793544107.428788,
+    "instances": []
+  },
+  "scope": "free main workflow secret/provider connectivity and running independent watcher; no paid rental or independent paid termination proof",
+  "superseded_for_paid_trial": true,
+  "completion": {
+    "conclusion": "success",
+    "source_commit": "6fb85aadcf9cf002deb5e298289fe7abde544599",
+    "completed_log_at_utc": "2026-11-01T15:30:01.7693546Z",
+    "result": {
+      "complete": true,
+      "instance_ids": [],
+      "no_rental_observed": true
+    }
+  }
+}

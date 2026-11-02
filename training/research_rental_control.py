@@ -141,11 +141,14 @@ class ResearchRental(Rental):
         return plan
 
     def quote_seconds(self):
-        seconds = self.read_plan()["maximum_seconds"]
+        plan = self.read_plan()
+        seconds = plan["maximum_seconds"]
         if self._remote_deadline is not None:
             seconds = min(seconds, int(self._remote_deadline - self.clock()) - 60)
-        if seconds < 900:
-            raise ValueError("independent deadline has expired")
+        if seconds < plan["estimated_seconds"] + 1200:
+            raise ValueError(
+                "independent deadline has expired or leaves insufficient time"
+            )
         return seconds
 
     def configuration(self):
@@ -164,12 +167,14 @@ class ResearchRental(Rental):
         spec = self.remote_guard(
             tag=self.tag,
             now=self.clock(),
-            minimum_seconds=plan["estimated_seconds"] + 960,
+            minimum_seconds=plan["estimated_seconds"] + 1260,
         )
         spec.validate(now=self.clock())
+        if spec.maximum_end_at - self.clock() > plan["maximum_seconds"]:
+            raise ValueError("independent deadline exceeds rental budget window")
         if (
             spec.tag != self.tag
-            or spec.maximum_end_at - self.clock() < plan["estimated_seconds"] + 960
+            or spec.maximum_end_at - self.clock() < plan["estimated_seconds"] + 1260
         ):
             raise ValueError("independent deadline identity or remaining time differs")
         self._remote_deadline = spec.maximum_end_at
