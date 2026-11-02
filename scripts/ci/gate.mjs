@@ -2,16 +2,17 @@ import { pathToFileURL } from 'node:url';
 
 export function checkGate(needs, event) {
   if (!needs || Array.isArray(needs) || typeof needs !== 'object') throw new Error('Invalid needs results');
-  const scopeKeys = ['models', 'rust', 'web', 'python', 'dependencies', 'controls'];
+  const scopeKeys = ['models', 'rust', 'web', 'python', 'dependencies', 'controls', 'deep'];
   const scope = needs.scope;
-  const validScope = scope?.result === 'success' && scopeKeys.every((name) => ['true', 'false'].includes(scope.outputs?.[name]));
-  return ['scope', 'lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models', 'python-model-mutations', 'python-training-mutations'].flatMap((name) => {
+  const validScope = scope?.result === 'success' && scopeKeys.every((name) => ['true', 'false'].includes(scope.outputs?.[name])) && (event === 'pull_request' || scope.outputs.deep === 'true');
+  return ['scope', 'lint', 'rust', 'msrv', 'web', 'e2e-runtime', 'audit', 'dependency-review', 'python', 'models', 'python-model-mutations', 'python-training-mutations', 'quality'].flatMap((name) => {
     const result = needs[name]?.result;
     if (name === 'scope' && result === 'success' && !validScope) return ['scope: invalid outputs'];
     if (name === 'dependency-review' && event !== 'pull_request' && result === 'skipped') return [];
     if (validScope && result === 'skipped') {
       if (['audit', 'dependency-review'].includes(name) && scope.outputs.dependencies === 'false') return [];
-      if (['python-model-mutations', 'python-training-mutations'].includes(name) && scope.outputs.python === 'false') return [];
+      if (['python-model-mutations', 'python-training-mutations'].includes(name) && (scope.outputs.python === 'false' || scope.outputs.deep === 'false')) return [];
+      if (name === 'quality' && event === 'pull_request' && scope.outputs.deep === 'false') return [];
     }
     return result === 'success' ? [] : [`${name}: ${result ?? 'missing result'}`];
   });

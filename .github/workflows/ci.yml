@@ -25,6 +25,16 @@ jobs:
   scope:
     uses: ./.github/workflows/change-scope.yml
 
+  quality:
+    name: Deep quality measurements
+    needs: [scope]
+    if: needs.scope.outputs.deep == 'true'
+    uses: ./.github/workflows/quality.yml
+    with:
+      full_mutations: false
+    permissions:
+      contents: read
+
   audit:
     name: Dependency audit
     needs: [scope]
@@ -56,11 +66,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -70,6 +80,7 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
           REQUIRED: ${{ needs.scope.outputs.controls == 'true' || needs.scope.outputs.web == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
@@ -108,7 +119,7 @@ jobs:
       - name: Validate scope and required gate contracts
         run: node --test scripts/ci/ci-scope.test.mjs scripts/ci/gate.test.mjs
       - run: node scripts/ci/mutation-controls.mjs
-        if: needs.scope.outputs.controls == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.controls == 'true')
 
   msrv:
     name: Rust MSRV (1.85)
@@ -121,11 +132,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -135,30 +146,32 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
-          REQUIRED: ${{ needs.scope.outputs.rust == 'true' }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
+          REQUIRED: ${{ needs.scope.outputs.deep == 'true' && (needs.scope.outputs.rust == 'true') }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        if: needs.scope.outputs.rust == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.rust == 'true'
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        if: needs.scope.outputs.rust == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.rust == 'true'
         with:
           python-version-file: .python-version
       - run: rustup toolchain install 1.85.0 --profile minimal
-        if: needs.scope.outputs.rust == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.rust == 'true'
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
-        if: needs.scope.outputs.rust == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.rust == 'true'
         with:
           key: msrv
       - run: cargo +1.85.0 test --locked --workspace --all-targets
-        if: needs.scope.outputs.rust == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.rust == 'true'
 
   gate:
     name: CI Gate
     # Keep fail/cancel detection; do not serialize workflows behind a queued gate.
     if: always()
-    needs: [scope, lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python, python-model-mutations, python-training-mutations, models]
+    needs: [scope, lint, rust, msrv, web, e2e-runtime, audit, dependency-review, python, python-model-mutations, python-training-mutations, models, quality]
     outputs:
-      models_publication: ${{ needs.web.outputs.models_publication }}
+      models_publication: ${{ needs.scope.outputs.deep == 'true' && needs.web.outputs.models_publication || 'false' }}
       web_required: ${{ needs.scope.outputs.web }}
+      deep_required: ${{ needs.scope.outputs.deep }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -181,11 +194,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -195,6 +208,7 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
           REQUIRED: ${{ needs.scope.outputs.python == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: needs.scope.outputs.python == 'true'
@@ -220,20 +234,24 @@ jobs:
         if: needs.scope.outputs.python == 'true'
       - run: uv run --locked ruff format --check export training crates/voxelshogi-python/python scripts/ci/mutation-*.py scripts/ci/prepare-m6-model.py
         if: needs.scope.outputs.python == 'true'
-      - run: uv run --locked pytest -q
-        if: needs.scope.outputs.python == 'true'
+      - name: Fast Python unit contracts
+        if: needs.scope.outputs.python == 'true' && needs.scope.outputs.deep == 'false'
+        run: uv run --locked pytest -q --ignore-glob='training/tests/*_native.py'
+      - name: Full Python unit and native integration contracts
+        if: needs.scope.outputs.python == 'true' && needs.scope.outputs.deep == 'true'
+        run: uv run --locked pytest -q
       - name: Verify remote pilot on CI CPU without claiming GPU measurements
-        if: needs.scope.outputs.python == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.python == 'true')
         run: uv run --locked python -m training.pilot runs/m4/ci-pilot --provider ci --allow-no-gpu --smoke --seconds 30
       - name: Validate private M5 sources and report only aggregate results
-        if: needs.scope.outputs.python == 'true' && (github.event_name == 'workflow_dispatch' && inputs.m5_live)
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.python == 'true' && github.event_name == 'workflow_dispatch' && inputs.m5_live
         timeout-minutes: 5
         run: uv run --locked python -m training.shogitter runs/m5/compatibility
 
   python-model-mutations:
     name: Python model mutation regressions
     needs: [scope]
-    if: needs.scope.outputs.python == 'true'
+    if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.python == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -253,7 +271,7 @@ jobs:
   python-training-mutations:
     name: Python training mutations (${{ matrix.shard }}/4)
     needs: [scope]
-    if: needs.scope.outputs.python == 'true'
+    if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.python == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
@@ -289,11 +307,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -303,62 +321,63 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
-          REQUIRED: ${{ needs.scope.outputs.models == 'true' }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
+          REQUIRED: ${{ needs.scope.outputs.deep == 'true' && (needs.scope.outputs.models == 'true') }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: rustup show
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         with:
           tool: wasm-bindgen-cli@${{ env.WASM_BINDGEN_VERSION }}
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         with:
           python-version-file: .python-version
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         with:
           version: '0.11.23'
           enable-cache: true
       - run: uv sync --locked
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         with:
           package_json_file: apps/web/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         with:
           node-version-file: .node-version
           cache: pnpm
           cache-dependency-path: apps/web/pnpm-lock.yaml
       - run: pnpm --dir apps/web install --frozen-lockfile
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: pnpm --dir apps/web wasm
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: uv run --locked python -m export.generate runs/m3/ci
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - name: Prepare synthetic private arena fixture without training or publication
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: uv run --locked python scripts/ci/prepare-m6-model.py
       - name: Prepare local-only models without publishing binaries
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: node scripts/prepare-inference.mjs runs/m3/ci apps/web/public/models/m3 --local
       - run: pnpm --dir apps/web build
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: pnpm --dir apps/web exec playwright install chromium
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - name: Verify all formats and real Worker interaction
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: pnpm exec playwright test -c model-playwright.config.ts
         working-directory: apps/web
         env:
           PW_CHANNEL: ''
       - name: Verify local-file models in AI spectator and human versus AI
-        if: needs.scope.outputs.models == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: pnpm exec playwright test -c arena-model-playwright.config.ts
         working-directory: apps/web
         env:
@@ -376,11 +395,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -390,6 +409,7 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
           REQUIRED: ${{ needs.scope.outputs.rust == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: needs.scope.outputs.rust == 'true'
@@ -417,7 +437,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     outputs:
-      models_publication: ${{ steps.model_policy.outputs.publication }}
+      models_publication: ${{ steps.model_policy.outputs.publication || 'false' }}
     defaults:
       run:
         working-directory: apps/web
@@ -426,11 +446,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -440,6 +460,7 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
           REQUIRED: ${{ needs.scope.outputs.web == 'true' }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: needs.scope.outputs.web == 'true'
@@ -475,24 +496,32 @@ jobs:
       - run: pnpm test
         if: needs.scope.outputs.web == 'true'
       - name: Compare native and real WASM search
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
         run: node ../../scripts/ci/search-parity.mjs
       - name: Read explicit model publication policy
         if: needs.scope.outputs.web == 'true'
         id: model_policy
-        run: node scripts/model-publication.mjs export/publication.json
+        run: |
+          if [ "$DEEP_SCOPE" = true ]; then
+            node scripts/model-publication.mjs export/publication.json
+          else
+            GITHUB_OUTPUT="$RUNNER_TEMP/model-policy-check" node scripts/model-publication.mjs export/publication.json
+            echo 'publication=false' >> "$GITHUB_OUTPUT"
+          fi
         working-directory: .
+        env:
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        if: needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true')
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true'))
         with:
           python-version-file: .python-version
       - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
-        if: needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true')
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true'))
         with:
           version: '0.11.23'
           enable-cache: true
       - name: Generate approved model variants
-        if: needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true')
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true'))
         working-directory: .
         run: |
           uv sync --locked
@@ -502,37 +531,37 @@ jobs:
       - run: pnpm build
         if: needs.scope.outputs.web == 'true'
       - run: pnpm exec playwright install chromium
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
       - name: Verify approved distribution with real model E2E
-        if: needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true')
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true'))
         run: pnpm exec playwright test -c model-playwright.config.ts
         env:
           PW_CHANNEL: ''
       - run: pnpm e2e
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
         env:
           PW_CHANNEL: ''
           E2E_COMMIT: ${{ github.sha }}
       - name: Repeat search and camera regression without retries
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
         run: pnpm e2e ai.spec.ts --grep '2D/3D and camera' --repeat-each=3 --workers=1 --retries=0
         env:
           PW_CHANNEL: ''
           E2E_COMMIT: ${{ github.sha }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: needs.scope.outputs.web == 'true' && (failure())
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (failure()))
         with:
           name: playwright-report
           path: apps/web/test-results
           retention-days: 7
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
         with:
           name: web-dist
           path: apps/web/dist
           retention-days: 7
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
         with:
           name: web-e2e-wasm
           path: apps/web/src/wasm/pkg
@@ -550,11 +579,11 @@ jobs:
         working-directory: .
         run: |
           test "$SCOPE_RESULT" = success
-          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE"; do
+          for flag in "$RUST_SCOPE" "$WEB_SCOPE" "$PYTHON_SCOPE" "$MODELS_SCOPE" "$DEPENDENCIES_SCOPE" "$CONTROLS_SCOPE" "$DEEP_SCOPE"; do
             case "$flag" in true|false) ;; *) echo 'Invalid CI change scope' >&2; exit 1 ;; esac
           done
           if [ "$REQUIRED" = false ]; then
-            echo '### Expensive checks omitted: this job is unaffected by the compared paths.' >> "$GITHUB_STEP_SUMMARY"
+            echo '### Expensive checks omitted: this job is not required for these paths and this event.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           SCOPE_RESULT: ${{ needs.scope.result }}
@@ -564,22 +593,23 @@ jobs:
           MODELS_SCOPE: ${{ needs.scope.outputs.models }}
           DEPENDENCIES_SCOPE: ${{ needs.scope.outputs.dependencies }}
           CONTROLS_SCOPE: ${{ needs.scope.outputs.controls }}
-          REQUIRED: ${{ needs.scope.outputs.web == 'true' }}
+          DEEP_SCOPE: ${{ needs.scope.outputs.deep }}
+          REQUIRED: ${{ needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true') }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
         with:
           package_json_file: apps/web/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
         with:
           node-version-file: .node-version
       - run: pnpm install --frozen-lockfile
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
         working-directory: apps/web
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
         with:
           name: web-e2e-wasm
           path: apps/web/src/wasm/pkg
@@ -587,13 +617,13 @@ jobs:
       # A fresh checkout has no generated WASM. Collecting the actual suite
       # exercises its Node imports using only the same-run artifact, on PRs too.
       - run: pnpm e2e --list
-        if: needs.scope.outputs.web == 'true'
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true'
         working-directory: apps/web
 
   deploy:
     name: Deploy to Cloudflare
     needs: [gate]
-    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.gate.result == 'success' && needs.gate.outputs.web_required == 'true' }}
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.gate.result == 'success' && needs.gate.outputs.web_required == 'true' && needs.gate.outputs.deep_required == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment:

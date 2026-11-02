@@ -1,44 +1,39 @@
-# CIの実行時間と変更範囲
+# CIの速度と実行する検証
 
-2026-11-02 UTC。目的は、開発中の待ち時間を減らし、必要な検証を実行すること。CI結果の取得は従来どおり最短10分間隔とし、runner上の処理時間とは区別する。
+目的はPRの短いフィードバックと、main／定期実行での深い検証を両立すること。PRは1〜2分を目標とし、実runで判断する。runner待ち・cache・ネットワークによる変動と、結果取得の最短10分間隔は別に扱う。
 
-## 変更前の実測
+## 実測した変更前の状態
 
-PR #99の[CI run](https://github.com/ayutaz/voxelshogi/actions/runs/41430347070)。最初のjob開始からGate終了まで約11分20秒。Python jobは11分8秒で、次の処理を直列に実行していた。
+| 段階 | CIの最初のjob開始〜Gate終了 | 確認元 |
+|---|---:|---|
+| Pythonを直列実行 | 11分20秒 | [PR #99](https://github.com/ayutaz/voxelshogi/actions/runs/41430347070) |
+| 4シャード＋変更範囲判定 | 6分14秒（約45%短縮） | [PR #101](https://github.com/ayutaz/voxelshogi/actions/runs/41456192962) |
 
-| 処理 | 実時間 |
-|---|---:|
-| Python単体・実モデルテスト | 1分12秒 |
-| モデル系変異 | 1分26秒 |
-| 学習系319変異 | 7分50秒 |
-| Python依存環境の同期 | 17秒 |
-| Web build／E2E | 5分14秒（別job） |
-| Web完了後のE2E runtime確認 | 17秒 |
+PR #101でもWebが5分13秒、学習系変異の最長jobが5分45秒だった。Web内ではモデルE2E69秒、通常E2E35秒、カメラ反復61秒、モデル生成36秒を実行していた。これらを通常PRから移す。以下の構成の時間は、新しい実runで計測する。
 
-依存取得よりも、Python検証の直列実行が主な待ち時間だった。初期目標はコード変更時の全体5〜7分程度で、変更後の実runから再計測する。runnerの待ち行列・ネットワーク・cacheの状態で変わるため、保証値にはしない。
+## PRと深い検証を分ける
 
-## 何を実行するか
+| 検証 | PR | main取り込み後・手動・週次 |
+|---|---|---|
+| 変更範囲／Gateの契約・静的検査 | 影響する分を実行 | 影響する分を実行 |
+| Rust fmt/clippy/core通常テスト、WASM／Web単体・型・build | 影響する分を実行 | 影響する分を実行 |
+| Python通常テスト | 実モデル自己対局等の`training/tests/*_native.py`を除いて実行 | Native結合試験を含め全件 |
+| MSRV・coverage・既知変異 | 深い検証へ延期 | 実行。Python学習系は4シャード並列 |
+| モデル3形式の生成・実ブラウザ推論・全E2E・カメラ反復 | 深い検証へ延期 | 実行 |
+| CodeQL 4言語 | 継続 | 継続 |
+| core全変異の調査 | 延期 | 独立Qualityの週次、または手動指定 |
+| デプロイ・公開E2E | 実行しない | mainのアプリ影響時、深い検証成功後 |
 
-PRはeventのbaseからcheckoutされたHEADまで、main pushはeventのbeforeからHEADまでを比較する。renameの検出を無効にし、削除側・追加側の両方を分類する。
+PRで省く検証は削除しない。mainではCIからQualityを共通workflowとして呼び、coverage／既知変異の成功もGateへ結び付ける。独立したQuality週次とCI週次が同じcore全変異を二重起動しないようにする。PRのモデルなしbuildを公開用artifactとして送らず、mainの同一runで生成・検証した成果物だけをデプロイする。
 
-| 変更 | 重い検証 |
-|---|---|
-| README、進捗・計画等のMarkdownのみ | 省略。変更判定／Gateの軽量検査とCodeQLは継続 |
-| `training/` | Python通常テスト・両変異群・実ブラウザモデル検証 |
-| `apps/web/` | Web build／E2E・coverage／Web変異・実ブラウザモデル検証 |
-| `export/` | Python・モデル・Web |
-| `crates/` | Rust・Python・WASM／Web・モデル |
-| CI・共通設定・lock・infrastructure・分類できないファイル | 全検証 |
-| 手動・週次、比較元が不明／取得不能・空diff | 全検証 |
+## 影響範囲と結果の扱い
 
-`scripts/ci/ci-scope.mjs`が分類し、共通workflowがbool文字列6件を返す。各jobは判定の成功と出力型を確認する。省略した内容はjob summaryに記録する。省略対象のRust/Web等の必須jobは軽量な判定検証を実行して成功する。依存audit／review・追加2種類の変異jobのskipだけは、対応するscope=falseの場合にGateが受理する。失敗・中断・欠落はscope=falseでも成功へ変換しない。CodeQLとmain保護は維持する。
+`ci-scope.mjs`はPRのbase〜HEAD、pushのbefore〜HEADを比較する。renameの削除・追加を両方扱い、Markdownだけなら重い処理を省く。training→Python／モデル、Web→Web／モデル、export→Python／モデル／Web、crates→Rust／Python／Web／モデル、共通設定・依存・CI・未知の入力→全分野を対象にする。比較不能・空diffも全分野へ倒す。
 
-## 並列化と再検証
+6分野のflagに`deep`を加える。PRはdeep=false、それ以外はtrue。未知の入力でもPRでは全分野の短い検証を行い、深い検証はmain以降へ回す。手動・週次は全分野・deepで実行する。
 
-Python通常テスト、モデル系変異、学習系変異を別jobにする。学習系は4シャードで並列実行し、各変異をちょうど1回実行する。追加した分割・判定回帰を含むcatalog全体を対象にし、不正な分割や重複名を拒否する。各シャードの隔離baselineは担当テストファイルの和集合を先に実行する。通常テストjobは全テストを継続する。JUnitのskip・collection error・timeoutを変異検出と数えない。
+各jobはscope成功と7つのbool文字列を検証し、省略理由をsummaryへ残す。必須8チェック名とmain保護を維持する。PRのcoverage／既知変異checkは実行tierの判定を検証し、計測や変異実行そのものの成功とは報告しない。実結果はmain／定期runで確認する。Gateは対応する省略だけを許可し、失敗・中断・欠落はPRでも許容しない。mainでdeep=falseになった場合も拒否する。
 
-共通設定変更時および週次・手動実行では全対象を実行し、普段の影響範囲判定だけに依存しない。新しいパッケージや実行入力を追加した場合は、分類と独立した期待値のテストを同じPRで更新する。未知の入力は自動的に全検証となる。
+学習系変異は全catalogをちょうど1シャードへ割り当て、担当テスト集合の隔離baselineを先に通す。通常の全pytestは深い検証で継続する。JUnitのskip・collection error・timeoutを変異検出と数えない。
 
-文書だけのmain更新ではWeb成果物を作り直さず、デプロイもしない。公開`build-info.json`は最後に検証・配信したアプリcommitを示し、文書のみ更新されたmain HEADと異なる場合がある。アプリ影響時は同じrunの検証済み成果物で公開・公開E2Eを行う。[配信手順](DEPLOYMENT.md)。
-
-実装根拠：[GitHub matrix](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/run-job-variations)、[共通workflow](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)。変更後の実測と文書のみPRでの省略確認は後続で記録する。
+文書だけのmain更新は再ビルド・再デプロイを省く。公開SHAは最後に配信したアプリcommitで、文書更新後のmain HEADと異なる場合がある。[配信手順](DEPLOYMENT.md)。

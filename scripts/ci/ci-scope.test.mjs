@@ -55,3 +55,15 @@ test('renaming a code file into documentation keeps its executable impact', asyn
     assert.equal(classifyChanges(paths).python,true);
   } finally { rmSync(root,{recursive:true,force:true}); }
 });
+
+
+test('PRs defer deep checks even for unknown paths; every other event keeps deep verification', async () => {
+  const { verificationScope } = await import('./ci-scope.mjs');
+  assert.deepEqual(verificationScope(['unknown/new.input'], 'pull_request'), {...all, deep:false});
+  assert.deepEqual(verificationScope(null, 'pull_request'), {...all, deep:false});
+  assert.deepEqual(verificationScope(['README.md'], 'pull_request'), {...none, deep:false});
+  for (const event of ['push','schedule','workflow_dispatch','unknown',undefined]) {
+    assert.deepEqual(verificationScope(null, event), {...all, deep:true});
+  }
+  assert.deepEqual(verificationScope(['README.md'], 'push'), {...none, deep:true});
+});
