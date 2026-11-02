@@ -1,5 +1,7 @@
 # P5-2：自己対局の学習と世代更新
 
+2026-11-02 UTC追記：[Parquetによる全Replay退避・世代境界の復旧](P5_SELFPLAY_DATASET.md)を実装。既存のstate archiveと役割を分け、実HF公開・別VM復旧は引き続き未実施。
+
 2026-10-31 UTC追記：学習・世代更新はPR #92で関連CI成功後にmainへ統合した。実HF公開・別VM復旧は未実施。
 
 2026-10-30 UTC。探索・Actor・検証付きPolicy/Value・Replay Bufferに、FP32学習と世代更新を接続する実装。Phase5全体の目的と完了条件は[段階別計画](POST_M6_PLAN.md#phase5)を維持する。

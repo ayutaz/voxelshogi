@@ -12,7 +12,7 @@ import pytest
 pytestmark = pytest.mark.skipif(sys.platform != "linux", reason="external Linux only")
 
 
-def test_real_s_multi_generation_loop_and_copied_run_resume_match(
+def test_real_s_multi_generation_loop_and_portable_dataset_resume_match(
     tmp_path, monkeypatch
 ):
     from safetensors.torch import save_file
@@ -63,7 +63,7 @@ def test_real_s_multi_generation_loop_and_copied_run_resume_match(
     p.update(
         generations=2,
         episodes_per_generation=2,
-        replay_capacity=4,
+        replay_capacity=1,
         opening_plies=1,
         families=p["families"][:2],
     )
@@ -83,7 +83,62 @@ def test_real_s_multi_generation_loop_and_copied_run_resume_match(
         p, model, protected, tmp_path / "partial", max_new_generations=1
     )
     assert not partial["complete"] and partial["generations_completed"] == 1
-    shutil.copytree(tmp_path / "partial", tmp_path / "other-instance")
+    from training.selfplay_dataset import pack_dataset, restore_dataset
+
+    dataset = tmp_path / "portable-data"
+    packed = pack_dataset(tmp_path / "partial", dataset, expected_protocol=p)
+    assert packed["file"]["rows"] == 2
+    # Model artifacts are separate from the dataset and supplied at verified
+    # hashes, as they will be after download from fixed HF state revisions.
+    saved_model = tmp_path / "generation-000.safetensors"
+    shutil.copy2(tmp_path / "partial/generation-000/model.safetensors", saved_model)
+    shutil.rmtree(tmp_path / "partial")
+    # A portable dataset contains every committed episode, including those
+    # outside the active capacity=1 training window.
+    assert packed["replay"]["binding"]["capacity"] == 1
+    assert len(packed["replay"]["entries"]) == 2
+    for models in ({}, {0: model}):
+        rejected = tmp_path / "rejected-models"
+        with pytest.raises(ValueError, match="models|model hash"):
+            restore_dataset(dataset, rejected, expected_protocol=p, models=models)
+        assert not rejected.exists()
+    data = dataset / "episodes.parquet"
+    original = data.read_bytes()
+    data.write_bytes(b"X" + original[1:])
+    with pytest.raises(ValueError, match="bytes/hash"):
+        restore_dataset(
+            dataset,
+            tmp_path / "rejected-data",
+            expected_protocol=p,
+            models={0: saved_model},
+        )
+    assert not (tmp_path / "rejected-data").exists()
+    data.write_bytes(original)
+    from training.hub_release import plan_release
+
+    (dataset / "LICENSE").write_text("CC-BY-4.0 fixture; never published")
+    release = plan_release(
+        dataset,
+        repo_id="voxelshogi/fixture-selfplay",
+        repo_type="dataset",
+        license_id="cc-by-4.0",
+        license_approved=True,
+        source_commit=source,
+    )
+    assert {f["path"] for f in release["files"]} == {
+        "episodes.parquet",
+        "manifest.json",
+        "validation.json",
+        "README.md",
+        "LICENSE",
+    }
+    restore_dataset(
+        dataset,
+        tmp_path / "other-instance",
+        expected_protocol=p,
+        models={0: saved_model},
+    )
+    assert not list((tmp_path / "other-instance").rglob("*.pt"))
     resumed = run_generations(p, model, protected, tmp_path / "other-instance")
     assert full["complete"] and resumed["complete"]
     assert full["generations_completed"] == resumed["generations_completed"] == 2

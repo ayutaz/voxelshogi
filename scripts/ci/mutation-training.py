@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "selfplay-dataset-protocol-binding",
+        "training/selfplay_dataset.py",
+        "or canonical(p) != canonical(expected_protocol)",
+        "or False",
+        "test_selfplay_dataset.py",
+    ),
+    (
+        "selfplay-dataset-boundary",
+        "training/selfplay_dataset.py",
+        'or len(replay["entries"]) != count',
+        "or False",
+        "test_selfplay_dataset.py",
+    ),
+    (
+        "selfplay-dataset-record-fields",
+        "training/selfplay_dataset.py",
+        "            _record(r, p)",
+        "            pass",
+        "test_selfplay_dataset.py",
+    ),
+    (
+        "selfplay-dataset-retain-full-replay",
+        "training/selfplay_dataset.py",
+        "episodes = replay.episodes(window=False)",
+        "episodes = replay.episodes(window=True)",
+        "test_selfplay_generations_native.py",
+    ),
+    (
+        "selfplay-dataset-model-restoration-binding",
+        "training/selfplay_dataset.py",
+        'or path.stat().st_size > 64 * 1024**2\n            or file_hash(path) != record["model_sha256"]',
+        "or path.stat().st_size > 64 * 1024**2\n            or False",
+        "test_selfplay_generations_native.py",
+    ),
+    (
         "research-4090-quoted-hardware",
         "training/research_rental_control.py",
         '    "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),',
