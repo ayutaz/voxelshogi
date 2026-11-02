@@ -43,7 +43,7 @@ PRで省く検証は削除しない。mainではCIからQualityを共通workflow
 
 Securityも同じ変更判定を使う。PR／mainで6分野すべての影響がないと確認できた場合だけ、CodeQLの初期化・抽出・解析を省略する。4つの必須CodeQL jobはscopeの成功と7つのbool文字列を検証して省略理由を記録する。コード・共通設定・未知の入力・比較不能は従来どおり全4言語、週次・手動も全解析を行う。文書PRのsuccessは新しいコード解析を行った意味ではない。
 
-この最適化はローカルのNode111テスト・制御63変異・actionlintで確認した実装段階であり、変更後の実CI所要時間は未計測。[GitHubのcode scanning保護](https://docs.github.com/en/code-security/concepts/code-scanning/merge-protection)は必須status checkとは別に働くため、文書のみのPRとmainで解析省略・通常mergeを実証するまで導入完了と数えない。保護が解析結果を要求して取り込みを阻止する場合、保護を解除せず従来の解析を維持する。架空のSARIFや過去の解析を新解析として送信しない。
+PR #105の実装時点ではローカルのNode111テスト・制御63変異・actionlintを確認し、変更後の実CI所要時間は未計測だった。文書だけの[PR #106](https://github.com/ayutaz/voxelshogi/pull/106)を実経路の確認対象とする。[GitHubのcode scanning保護](https://docs.github.com/en/code-security/concepts/code-scanning/merge-protection)は必須status checkとは別に働くため、導入の判定条件は、文書のみのPRとmainでinit／analyze各0回、必須8チェック成功、保護を維持した通常mergeである。保護が解析結果を要求して取り込みを阻止する場合、保護を解除せず従来の解析を維持する。架空のSARIFや過去の解析を新解析として送信しない。
 
 学習系変異は全catalogをちょうど1シャードへ割り当て、担当テスト集合の隔離baselineを先に通す。通常の全pytestは深い検証で継続する。JUnitのskip・collection error・timeoutを変異検出と数えない。
 
