@@ -771,10 +771,17 @@ MUTATIONS = [
         "test_policy_value.py",
     ),
     (
+        "policy-value-normalization-precision",
+        "training/policy_value.py",
+        "dtype=torch.float64",
+        "dtype=torch.float32",
+        "test_policy_value.py",
+    ),
+    (
         "policy-value-legal-normalization",
         "training/policy_value.py",
-        "logits[0, legal].softmax(dim=0)",
-        "logits[0].softmax(dim=0)[legal]",
+        "logits[0, legal].softmax(dim=0, dtype=torch.float64)",
+        "logits[0].softmax(dim=0, dtype=torch.float64)[legal]",
         "test_policy_value.py",
     ),
     (

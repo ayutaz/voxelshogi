@@ -6,6 +6,38 @@ import math
 import pytest
 
 
+@pytest.mark.parametrize("count,offset", [(3, 0), (3, 4096), (2026, 4096)])
+def test_legal_prior_normalization_matches_scalar_f64_oracle(count, offset):
+    import torch
+
+    from training.policy_value import TorchPolicyValue
+    from training.tests.test_students import Position, model
+
+    actions = list(range(0, 2 * count, 2))
+
+    class ManyLegal(Position):
+        def legal_actions(self):
+            return {action: f"opaque-{action}" for action in reversed(actions)}
+
+    network = model()
+    with torch.no_grad():
+        for i, action in enumerate(actions):
+            network.logits[0, action] = offset + (
+                0 if count == 3 else (i % 41 - 20) / 4
+            )
+        network.logits[0, 1] = 1000000  # This illegal maximum is never normalized.
+    stored = [float(network.logits[0, action].item()) for action in actions]
+    maximum = max(stored)
+    weights = [math.exp(value - maximum) for value in stored]
+    total = math.fsum(weights)
+    expected = [weight / total for weight in weights]
+
+    priors, value = TorchPolicyValue(network, device="cpu")(ManyLegal())
+    assert list(priors) == actions and value == 0
+    assert abs(math.fsum(priors.values()) - 1) <= 1e-14
+    assert list(priors.values()) == pytest.approx(expected, rel=0, abs=1e-14)
+
+
 def test_evaluator_returns_legal_probabilities_and_unflipped_value_without_gradients():
     import torch
 
