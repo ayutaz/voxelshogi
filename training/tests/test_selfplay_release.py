@@ -288,3 +288,99 @@ def test_mac_refused_before_artifact_reads(monkeypatch, tmp_path):
         selfplay_release.publish_staged(
             tmp_path, tmp_path, None, None, upload_budget=None
         )
+
+
+def test_restore_refuses_mac_and_unfrozen_protocol_before_fetch(monkeypatch, tmp_path):
+    from training import selfplay_recovery
+
+    monkeypatch.setattr(selfplay_recovery.sys, "platform", "darwin")
+    with pytest.raises(ValueError, match="Linux"):
+        selfplay_recovery.recover_generations(
+            [],
+            tmp_path,
+            tmp_path,
+            None,
+            None,
+            protocol={},
+            base_model=tmp_path,
+            protected_inputs=tmp_path,
+        )
+    monkeypatch.setattr(selfplay_recovery.sys, "platform", "linux")
+    called = []
+    with pytest.raises(ValueError):
+        selfplay_recovery.recover_generations(
+            [],
+            tmp_path,
+            tmp_path,
+            None,
+            lambda **kw: called.append(kw),
+            protocol={},
+            base_model=tmp_path,
+            protected_inputs=tmp_path,
+        )
+    assert called == []
+
+
+@pytest.mark.parametrize(
+    "change",
+    [None, "protocol", "destination", "traversal", "order", "missing", "duplicate"],
+)
+def test_recovery_descriptor_preflight_binds_order_paths_and_frozen_protocol(
+    tmp_path, change
+):
+    from training.selfplay_recovery import validate_releases
+
+    run, stage, budget = staged(tmp_path)
+    pair = execute(run, stage, budget)
+    bundle = json.loads((stage / "bundle.json").read_text())
+    protocol = deepcopy(bundle["run"]["protocol"])
+    releases = [{"bundle": bundle, "pair": pair}]
+    if change == "protocol":
+        protocol["actor"]["seed"] += 1
+    elif change == "destination":
+        pair["state"]["repo_id"] = "voxelshogi/other-state"
+    elif change == "traversal":
+        bundle["plans"]["dataset"]["files"][0]["path"] = "../outside"
+    elif change == "order":
+        bundle["run"]["generations"][0]["generation"] = 1
+    elif change == "missing":
+        releases = []
+    elif change == "duplicate":
+        releases.append(deepcopy(releases[0]))
+    if change is None:
+        validate_releases(releases, protocol)
+    else:
+        with pytest.raises(ValueError):
+            validate_releases(releases, protocol)
+
+
+def test_multi_generation_recovery_preserves_every_prior_publication_and_model(
+    tmp_path,
+):
+    from training.selfplay_recovery import validate_releases
+
+    run, stage, budget = staged(tmp_path)
+    pair = execute(run, stage, budget)
+    first = {"bundle": json.loads((stage / "bundle.json").read_text()), "pair": pair}
+    second = deepcopy(first)
+    previous = second["bundle"]["run"]["generations"][0]
+    child = deepcopy(previous)
+    child.update(
+        generation=1,
+        parent_model_sha256=previous["model_sha256"],
+        model_sha256="d" * 64,
+        file="generation-001/model.safetensors",
+    )
+    second["bundle"]["run"]["generations"].append(child)
+    second["bundle"]["run"]["publications"].append({"generation": 0, **deepcopy(pair)})
+    releases = [first, second]
+    protocol = first["bundle"]["run"]["protocol"]
+    validate_releases(releases, protocol)
+    for change in ("model", "receipt"):
+        bad = deepcopy(releases)
+        if change == "model":
+            bad[1]["bundle"]["run"]["generations"][0]["model_sha256"] = "e" * 64
+        else:
+            bad[1]["bundle"]["run"]["publications"][0]["state"]["hub_commit"] = "e" * 40
+        with pytest.raises(ValueError, match="lineage"):
+            validate_releases(bad, protocol)

@@ -29,11 +29,24 @@ public/manual・Community OFFを確認してからアップロードする。各
 - 両receiptを得てcursorを書いた直後に中断した場合も、同じrunとpairなら再照合できる。
 - Datasetは現在の公開pair自身を含めないsnapshotであり、それ以前の公開pairは保持する。別VMへ移る際は最新Datasetのplan／receipt、今回のpairと全世代stateのplan／receipt、共通upload ledgerを小さい制御記録として別途保持する。
 
-別VM復旧では、全世代のstateを固定revisionで取得・照合し、対応する子モデルを復元してhashを確認したうえで`restore_dataset`へ渡す。base model・保護入力・protocolも元と一致させる。今回の公開接続だけで、実VM間の復旧や後続世代の成功を主張しない。
+## 別実機への復旧接続
+
+`training/selfplay_recovery.py`は全確定世代のrelease descriptorを受け取り、HFからの全hash照合、各stateの実decode／復旧、子モデルの再exportとhash照合、全ReplayのRust再生を行う。世代順・全モデルの系譜・過去の公開pairを検査し、base model・保護入力・protocolも元と一致させる。完成したrunに今回のpairを反映してから新規outputへ確定する。
+
+`releases.json`は世代0から順に`{"bundle": <bundle.jsonの内容>, "pair": <pair.jsonの内容>}`を並べたJSON配列とする。planとreceiptだけを含む小さい制御記録で、データやcheckpoint、認証値は含めない。実データのダウンロードと復元は外部Linuxで行う。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m training.selfplay_recovery \
+  runs/p5/releases.json runs/p5/selfplay/protocol.json \
+  runs/p5/inputs/base.safetensors runs/p5/inputs/protected.json \
+  runs/p5/recovered/output runs/p5/recovered/workspace
+```
+
+`recovery.json`は復旧したモデル・公開pairと検証範囲を残す。同じVMの別フォルダでも動くため、このファイルだけを別実機復旧の証拠にしない。所有VM IDと旧VMの終了、新VMでの実後続世代を別途記録する。共通upload ledgerも制御側の最新値を引き継ぎ、新しい空のledgerで累積上限を回避しない。
 
 ## 検証と現在の外部条件
 
-メタデータのみの12テストと関連13テストはMacで成功した。遠隔hash確認の省略、送信結果不明時の再送、学習入力bindingの省略、並行更新の無視の4変異をそれぞれ検出した。実Sモデル2世代テストには、run lock解放後のDataset／実state stage、fake Hubへの公開・全hash照合、pairのcursor反映を追加した。実tensor・Parquet・Rustの結合確認はLinux CIで行い、その結果は未確認である。fake Hubの成功は実HF公開の証拠に数えない。
+メタデータの公開／復旧テストと関連テストをMacで実行した。遠隔hash確認の省略、送信結果不明時の再送、学習入力bindingの省略、並行更新の無視、凍結protocolの省略、復旧パスの検査省略の6変異をそれぞれ検出した。実Sモデル2世代テストには、run lock解放後のDataset／実state stage、fake Hubへの公開・全hash照合、pairのcursor反映、元run除去後のstate／Replay復旧と後続世代の一致確認を追加した。独立した変異用checkoutにも、stageが必要とするLICENSEを保持する。実tensor・Parquet・Rustの結合確認はLinux CIで行い、その結果は未確認である。fake Hubの成功は実HF公開の証拠に数えない。
 
 2026-11-03 00:51 UTCの公式API読み取りではVast.aiの認証成功、所有VoxelShogi実機0、条件内RTX5090×1候補1件、残高US$0だった。候補の単価はdisk80GB込み約US$0.75556/時・転送無料であり、予約ではない。利用直前に再確認する。新たな有料実行・予算予約・HF公開は行っていない。
 

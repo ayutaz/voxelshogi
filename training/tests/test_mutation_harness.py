@@ -129,7 +129,13 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
     namespace = module["main"].__globals__
     root = tmp_path / "source"
     root.mkdir()
-    for name in ("pyproject.toml", "uv.lock", ".python-version", ".gitignore"):
+    for name in (
+        "pyproject.toml",
+        "uv.lock",
+        ".python-version",
+        ".gitignore",
+        "LICENSE",
+    ):
         (root / name).write_text("")
     for name in ("training", "export", "crates", "infrastructure"):
         (root / name).mkdir()
@@ -145,6 +151,7 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
     (root / "training/tests/test_a.py").write_text("assert False\n")
     (root / "training/tests/test_b.py").write_text(
         "from pathlib import Path\n"
+        "assert Path('LICENSE').is_file()\n"
         "assert Path('.github/workflows/vast-deadline.yml').read_text() == "
         f"{workflow!r}\n"
         "assert VALUE == 1\n"

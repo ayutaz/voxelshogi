@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "selfplay-recovery-frozen-protocol",
+        "training/selfplay_recovery.py",
+        'run["protocol"] != protocol',
+        "False",
+        "test_selfplay_release.py",
+    ),
+    (
+        "selfplay-recovery-relative-paths",
+        "training/selfplay_recovery.py",
+        'or any(p in ("..", ".") or p.startswith(".") for p in path.parts)',
+        "or False",
+        "test_selfplay_release.py",
+    ),
+    (
         "selfplay-release-fixed-revision-hashes",
         "training/selfplay_release.py",
         "receipt = verify_release(plan, receipt, api, fetch)",
@@ -2434,7 +2448,13 @@ def main(argv=None):
     results = []
     with tempfile.TemporaryDirectory(prefix="voxelshogi-training-mutations-") as tmp:
         work = Path(tmp)
-        for name in ("pyproject.toml", "uv.lock", ".python-version", ".gitignore"):
+        for name in (
+            "pyproject.toml",
+            "uv.lock",
+            ".python-version",
+            ".gitignore",
+            "LICENSE",
+        ):
             shutil.copy2(ROOT / name, work / name)
         for name in ("training", "export", "crates", "infrastructure", ".github"):
             shutil.copytree(
