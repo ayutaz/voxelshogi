@@ -59,6 +59,14 @@ def test_research_purpose_reservation_and_two_guards_precede_paid_create(tmp_pat
     assert Deadline(c.tag, 4600).stop_at < d["stop_at"]
     assert json.loads(budget.read_text())["reserved_total_usd"] == 62
     request = next(data for method, path, data, _ in api.calls if method == "PUT")
+    query = next(data for _, path, data, _ in api.calls if path == "/api/v0/bundles")
+    assert query == {
+        "ask_contract_id": {"eq": 123},
+        "num_gpus": {"eq": 1},
+        "type": "on-demand",
+        "allocated_storage": 80,
+        "limit": 2,
+    }
     assert request["disk"] == 80 and request["label"] == "voxelshogi-phase5-eval-pilot"
     assert request["runtype"] == "ssh_direct" and request["cancel_unavail"] is True
     assert "HF_TOKEN" not in str(request) and "CLOUDRIFT_API_KEY" not in str(request)
