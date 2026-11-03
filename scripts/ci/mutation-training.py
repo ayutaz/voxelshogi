@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-p52-reallocation-phase5-boundary",
+        "training/research_rental_control.py",
+        'ALLOCATIONS = {"phase5": 24, "phase6": 15}',
+        'ALLOCATIONS = {"phase5": 25, "phase6": 15}',
+        "test_research_rental_control.py",
+    ),
+    (
+        "research-p52-reallocation-phase6-boundary",
+        "training/research_rental_control.py",
+        'ALLOCATIONS = {"phase5": 24, "phase6": 15}',
+        'ALLOCATIONS = {"phase5": 24, "phase6": 16}',
+        "test_research_rental_control.py",
+    ),
+    (
         "vast-requote-contract-filter",
         "training/vast_rental_control.py",
         '"ask_contract_id": {"eq": offer_id}',

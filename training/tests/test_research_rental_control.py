@@ -133,7 +133,7 @@ def test_cumulative_and_phase_budgets_are_checked_under_shared_ledger_lock(
     ledger = json.loads(path.read_text())
     row = {"task": "previous", "maximum_usd": 36}
     if case == "phase":
-        row = {"task": "phase5-data", "maximum_usd": 17}
+        row = {"task": "phase5-data", "maximum_usd": 21}
     if case == "duplicate":
         row = {"task": "phase5-evaluation", "maximum_usd": 1, "tag": control.tag}
     if case == "nan":
@@ -317,6 +317,48 @@ def test_phase6_own_allocation_cannot_be_exceeded(tmp_path):
     with pytest.raises(ValueError, match="budget"):
         control.rent(lambda: None)
     assert not any(p.endswith("instances/rent") for p, _ in api.calls)
+
+
+@pytest.mark.parametrize(
+    "phase,previous,accepted",
+    [
+        ("phase5", 20, True),
+        ("phase5", 21, False),
+        ("phase6", 11, True),
+        ("phase6", 12, False),
+    ],
+)
+def test_p52_reallocation_enforces_both_phase_boundaries(
+    tmp_path, phase, previous, accepted
+):
+    # The measured P5-2 plan assigns 24 + 15 = 39 from the existing USD100.
+    # Each request is independently USD4: 20+4=24, 21+4=25, 11+4=15, 12+4=16.
+    control, api, budget, path = setup(tmp_path)
+    control.phase, control.tag = phase, f"voxelshogi-{phase}-reallocation"
+    plan = json.loads(path.read_text())
+    plan["purpose"] = f"{phase}-" + ("selfplay" if phase == "phase5" else "training")
+    path.write_text(json.dumps(plan))
+    ledger = json.loads(budget.read_text())
+    ledger["reservations"].append(
+        {
+            "task": f"{phase}-data" if phase == "phase5" else "phase6-operators",
+            "maximum_usd": previous,
+        }
+    )
+    budget.write_text(json.dumps(ledger))
+    before = budget.read_bytes()
+    if accepted:
+        control.rent(lambda: None)
+        current = json.loads(budget.read_text())
+        assert current["reservations"][:-1] == ledger["reservations"]
+        assert current["reserved_total_usd"] == 61 + previous + 4
+        assert current["approved_total_usd"] == 100
+        assert sum(p.endswith("instances/rent") for p, _ in api.calls) == 1
+    else:
+        with pytest.raises(ValueError, match="budget"):
+            control.rent(lambda: None)
+        assert budget.read_bytes() == before
+        assert not any(p.endswith("instances/rent") for p, _ in api.calls)
 
 
 def test_real_source_check_compares_commit_and_dirty_status(monkeypatch):

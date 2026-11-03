@@ -1,4 +1,18 @@
-# P5-2：Vast初回運用試行の結果
+# P5-2：Vast運用試行の結果
+
+## 小規模試行の成功と資源解放（2026-11-03 UTC）
+
+[固定した成功記録](experiments/p52-vast-trial-success-2026-11-03.json)。所有RTX5090実機58961875、source `40ae236`で2対局・32sample・8学習更新を完了した。子モデルhashは`4033110176314d04544c5bfe4c3ac551ae271f0dcd0c6b63de37bec9d21b1cea`。自然終局0・cutoff2であり、棋力改善・P5-2本条件の証拠ではない。
+
+- 固定入力の取得・全hash照合720.4秒、保護集合作成131.5秒、自己対局と学習3.9秒、世代の両HF公開・照合38.2秒、同じVMでのHF復旧1.3秒。cursor公開を含むworker全体は916.8秒。
+- [Datasetのcursor snapshot](https://huggingface.co/datasets/voxelshogi/voxelshogi-selfplay-v1/tree/b3d81a45ce0e5d81fdb1559c1e77dd3667e1b922)、[再開状態](https://huggingface.co/voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1/tree/ead8140accc264378699adc9e860b66204fd407a)、[集計report](https://huggingface.co/datasets/voxelshogi/voxelshogi-selfplay-run-reports-v1/tree/9e3e1ede7a60276e70f32602ba5a0412553ea888)を固定revisionで全hash照合済み。Dataset／reportはCC-BY-4.0、stateはApache-2.0。4節のCard、public/manual・Community OFFを確認した。
+- [保護集合の固定版](https://huggingface.co/datasets/voxelshogi/voxelshogi-protected-inputs-v1/tree/ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8)をLinuxから公開・全hash照合した。116,008件と元の`protected.json`の全bytes／hashを保持し、次のVMで全コーパスを再取得する必要をなくした。除外範囲を減らしていない。
+- 本条件用の開始局面16件をLinuxのRustで生成・再生した。seed42000〜42015、履歴16手×4・128手×6・256手×6、rootの保護集合との重複0・root間重複0。長い履歴を代表的な終盤と呼ばない。
+- 12:55:21 UTCに実機の削除ack、12:55:23 UTCに全inventoryからの不在を確認した。外部停止期限より早い手動終了であり、この試行を実期限停止の再実証とは数えない。独立監視は資源解放後に取消を依頼した。実期限停止は下記の初回試行で確認済み。
+
+共通state upload ledgerは累積376,685,551 bytes／1 GiB。GPU保守的予約は全体US$78／100、Phase5累積US$17。実請求は未回収、追加US$100は未適用。[本条件と配分変更](P5_SELFPLAY_MAIN.md)へ進み、別VMでの後続世代と48対局を確認する。
+
+## 初回試行：内部締切による未完了
 
 2026-11-03 UTC。[固定した実行・停止記録](experiments/p52-first-vast-trial-2026-11-03.json)。実行sourceは`40ae236`。**独立期限停止と入力保護を確認したが、自己対局学習・HF往復の試行は未完了**。P5-2本条件の48対局を実行したとは扱わない。
 
