@@ -90,16 +90,17 @@ def test_invalid_research_scope_never_reads_provider_or_spends(tmp_path, change)
     assert api.calls == [] and budget.read_bytes() == before
 
 
-def test_zero_balance_wrong_offer_and_cross_provider_conflict_do_not_reserve(tmp_path):
+def test_zero_credit_wrong_offer_and_cross_provider_conflict_do_not_reserve(tmp_path):
     c, api, budget, _ = setup(tmp_path)
     before = budget.read_bytes()
-    api.balance = 0
-    with pytest.raises(ValueError, match="balance"):
+    api.credit = 0
+    api.balance = 100
+    with pytest.raises(ValueError, match="credit"):
         c.rent(lambda: None)
     assert (
         budget.read_bytes() == before and not (c.state / "rent-request.json").exists()
     )
-    api.balance = 10
+    api.credit = 10
     api.offer["id"] = 321
     with pytest.raises(ValueError, match="offer"):
         c.rent(lambda: None)

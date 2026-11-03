@@ -129,13 +129,14 @@ class VastInstanceControl:
         path = self.state / "account.json"
         if path.exists() and json.loads(path.read_text()).get("id") != identity:
             raise ValueError("Vast.ai account differs from the rented account")
-        balance = account.get("balance")
+        # Prepaid funds are "credit"; the separate "balance" may be zero.
+        credit = account.get("credit")
         if minimum_usd and (
-            type(balance) not in (int, float)
-            or not math.isfinite(balance)
-            or balance < minimum_usd
+            type(credit) not in (int, float)
+            or not math.isfinite(credit)
+            or credit < minimum_usd
         ):
-            raise ValueError("Vast.ai balance does not cover the full quoted rental")
+            raise ValueError("Vast.ai credit does not cover the full quoted rental")
         if not path.exists():
             save(path, {"id": identity})
 

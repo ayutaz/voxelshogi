@@ -12,6 +12,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "vast-available-credit-not-balance",
+        "training/vast_rental_control.py",
+        'credit = account.get("credit")',
+        'credit = account.get("balance")',
+        "test_vast_rental_control.py",
+    ),
+    (
         "selfplay-protection-all-history-states",
         "training/selfplay_protection.py",
         "        ids.add(input_identity(game.snapshot()))",

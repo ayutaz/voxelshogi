@@ -48,6 +48,6 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.selfp
 
 メタデータの公開／復旧テストと関連テストをMacで実行した。遠隔hash確認の省略、送信結果不明時の再送、学習入力bindingの省略、並行更新の無視、凍結protocolの省略、復旧パスの検査省略の6変異をそれぞれ検出した。実Sモデル2世代テストには、run lock解放後のDataset／実state stage、fake Hubへの公開・全hash照合、pairのcursor反映、元run除去後のstate／Replay復旧と後続世代の一致確認を追加した。独立した変異用checkoutにも、stageが必要とするLICENSEを保持する。実tensor・Parquet・Rustの結合確認はLinux CIで行い、その結果は未確認である。fake Hubの成功は実HF公開の証拠に数えない。
 
-2026-11-03 00:51 UTCの公式API読み取りではVast.aiの認証成功、所有VoxelShogi実機0、条件内RTX5090×1候補1件、残高US$0だった。候補の単価はdisk80GB込み約US$0.75556/時・転送無料であり、予約ではない。利用直前に再確認する。新たな有料実行・予算予約・HF公開は行っていない。
+2026-11-03 00:51 UTCの公式API読み取りではVast.aiの認証成功、所有VoxelShogi実機0、条件内RTX5090×1候補1件だった。`balance=0`を利用クレジットと取り違えていたが、02:01 UTCに`credit`を確認して訂正した。[訂正記録](experiments/vast-credit-preflight-correction-2026-11-03.json)。追加入金は不要。候補の単価はdisk80GB込み約US$0.75556/時・転送無料であり、予約ではない。利用直前に再確認する。新たな有料実行・予算予約・HF公開は行っていない。
 
-GitHubの`gpu-control`環境にはCloudRiftキーだけが登録されていた。Vastキーの同環境への保存は、自動承認レビューが宛先への明示承認を要求して拒否したため未実行で、ユーザーへ確認中。残高追加と独立停止の準備が完了してから、既定の最大1時間／予約US$1の試行へ進む。
+VastキーのGitHub `gpu-control`環境への保存は、当初は自動承認レビューが宛先への明示承認を要求して拒否した。その後ユーザーが明示承認し、登録を完了した。providerキーをGPUへは送らない。credit判定の修正と関連CI・独立停止の準備を完了してから、既定の最大1時間／予約US$1の試行へ進む。

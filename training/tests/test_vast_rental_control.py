@@ -42,7 +42,8 @@ class Provider:
         self.fail_create = False
         self.retain_after_delete = False
         self.owner_id = 7
-        self.balance = 10
+        self.credit = 10
+        self.balance = 0
 
     def __call__(self, method, path, data=None, params=None):
         self.calls.append((method, path, data, params))
@@ -50,6 +51,7 @@ class Provider:
             return {
                 "id": self.owner_id,
                 "balance": self.balance,
+                "credit": self.credit,
                 "ssh_key": "never-save-this-account-key",
             }
         if path == "/api/v0/bundles":
@@ -359,12 +361,33 @@ def test_changed_api_account_cannot_prove_a_previous_instance_was_deleted(tmp_pa
     assert not (control.state / "terminal.json").exists()
 
 
-def test_insufficient_live_balance_does_not_reserve_or_create(tmp_path):
+def test_insufficient_live_credit_does_not_reserve_or_create(tmp_path):
     control, api, budget, _ = setup(tmp_path)
-    api.balance = 0
-    with pytest.raises(ValueError, match="balance"):
+    api.credit = 0
+    api.balance = 100
+    with pytest.raises(ValueError, match="credit"):
         control.rent(123, lambda: None)
     assert len(json.loads(budget.read_text())["reservations"]) == 1
+    assert not any(method == "PUT" for method, *_ in api.calls)
+
+
+def test_available_credit_is_distinct_from_zero_account_balance(tmp_path):
+    control, api, _, _ = setup(tmp_path)
+    api.credit, api.balance = 12.5, 0
+    control.check_account(minimum_usd=4)
+    assert json.loads((control.state / "account.json").read_text()) == {"id": 7}
+
+
+@pytest.mark.parametrize(
+    "credit", [None, True, -1, 0, 2.31, float("inf"), float("nan"), "10"]
+)
+def test_invalid_or_insufficient_credit_cannot_be_replaced_by_balance(tmp_path, credit):
+    control, api, budget, _ = setup(tmp_path)
+    api.credit, api.balance = credit, 1000
+    before = budget.read_bytes()
+    with pytest.raises(ValueError, match="credit"):
+        control.rent(123, lambda: None)
+    assert budget.read_bytes() == before
     assert not any(method == "PUT" for method, *_ in api.calls)
 
 
