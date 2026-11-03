@@ -4,6 +4,8 @@
 
 ## 現在地
 
+2026-11-03 12:42 UTCの更新：[初回試行](P5_SELFPLAY_TRIAL.md)の記録をPR #112で統合した。次の所有実機58961875でCUDA検査を完了し、同一workerの稼働と固定入力の取得・照合段階を確認した。最大2時間／予約US$2、独立停止runは[41636015301](https://github.com/ayutaz/voxelshogi/actions/runs/41636015301)。14:28:34 UTCの絶対期限に対し、GitHub側の削除開始は14:08:34 UTC。小規模学習・HF往復・本条件の成功は確認待ち。全体予約US$78／100、Phase5 US$17／20、追加US$100は未適用。以下は各追記時点の記録で、残高0という判断は訂正済み。
+
 2026-11-03 UTC・[初回Vast試行](P5_SELFPLAY_TRIAL.md)：CUDAと116,008入力の保護、独立期限停止・実機解放を確認したが、取得・監査が計算用の内部上限を使い切った。学習・HF往復は成功に数えず、次の小規模試行は最大2時間／予約US$2へ修正する。全体の保守的予約は現在US$76／100、Phase5 US$15／20。P5-2本条件は未実施。
 
 2026-11-03 UTC訂正：[Vastの利用クレジット確認](experiments/vast-credit-preflight-correction-2026-11-03.json)。`balance=0`を利用クレジットと取り違えていた。実際の`credit`は試行を賄い、追加入金は不要。独立停止用Vastキーもユーザーの明示承認後にGitHub `gpu-control`環境へ登録した。[世代ごとの公開・復旧](P5_SELFPLAY_RELEASE.md)はPR #108、[保護入力作成](P5_PROTECTED_INPUTS.md)はPR #109で統合済み。有料実行はまだ開始していない。メタデータ確認と実GPU／HF／別VMの達成証拠を区別する。
