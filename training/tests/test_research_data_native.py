@@ -111,3 +111,49 @@ def test_canonical_integer_ids_agree_with_actual_tensor_equivalence():
     assert input_identity(black.snapshot()) == input_identity(white.snapshot())
     black.play("232222")
     assert input_identity(black.snapshot()) != input_identity(white.snapshot())
+
+
+def test_p51_holdout_protection_replays_history_without_adopting_teacher_json(tmp_path):
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from voxelshogi import Game
+
+    from training.feature_cache import file_hash
+    from training.research_data import input_identity
+    from training.research_data_runner import generate_pilot
+    from training.selfplay_protection import p51_holdout_inputs
+
+    p = protocol()
+    folder = tmp_path / "protection-source"
+    generate_pilot(folder, p)
+    manifest = json.loads((folder / "manifest.json").read_text())
+    expected = set()
+    for saved in manifest["games"]:
+        descriptor = saved["file"]
+        path = folder / descriptor["path"]
+        table = pq.read_table(path)
+        rows = table.to_pylist()
+        for row in rows:
+            row["teachers_json"] = "not validated teacher JSON; must never be adopted"
+        pq.write_table(pa.Table.from_pylist(rows, schema=table.schema), path)
+        descriptor.update(bytes=path.stat().st_size, sha256=file_hash(path))
+        if saved["game"]["split"] in ("val", "test"):
+            # Independent reference: reconstruct each complete prefix instead
+            # of collecting snapshots in an incremental replay loop.
+            for length in range(len(saved["record"]["moves"]) + 1):
+                prefix = {
+                    **saved["record"],
+                    "moves": saved["record"]["moves"][:length],
+                    "result": None,
+                    "termination": None,
+                }
+                expected.add(input_identity(Game.from_record(prefix).snapshot()))
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    identities, counts = p51_holdout_inputs(folder, Game)
+    assert identities == expected and len(identities) > 1
+    assert counts == {"train": 1, "val": 1, "test": 1}
+    saved = manifest["games"][1]
+    saved["record"]["moves"][0] = "999999"
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError):
+        p51_holdout_inputs(folder, Game)

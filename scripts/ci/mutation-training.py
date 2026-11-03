@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "selfplay-protection-all-history-states",
+        "training/selfplay_protection.py",
+        "        ids.add(input_identity(game.snapshot()))",
+        "        pass",
+        "test_selfplay_protection.py",
+    ),
+    (
+        "selfplay-protection-nonempty-sources",
+        "training/selfplay_protection.py",
+        "or any(type(ids) is not set or not ids for ids in sources.values())",
+        "or False",
+        "test_selfplay_protection.py",
+    ),
+    (
+        "selfplay-protection-fixed-p51-revision",
+        "training/selfplay_protection.py",
+        'or provenance["p51_dataset_revision"] != P51_REVISION',
+        "or False",
+        "test_selfplay_protection.py",
+    ),
+    (
         "selfplay-recovery-frozen-protocol",
         "training/selfplay_recovery.py",
         'run["protocol"] != protocol',
