@@ -1,0 +1,18 @@
+{
+  "schema": "voxelshogi-p52-operational-trial-v1",
+  "source_commit": "40ae236ef4f15577ac122d0854c7715f83e581b7",
+  "instance_id": 58924518,
+  "ci_run": 41584713521,
+  "independent_guard_run": 41584787471,
+  "pipeline_complete": false,
+  "cuda_preflight": {"gpu": "NVIDIA GeForce RTX 5090", "python": "3.14.9", "torch": "2.14.1+cu130", "driver": "610.43.02", "kernel_forward_backward_verified": true},
+  "inputs": {"dataset_files": 1831, "model_files": 37, "p51_files": 12, "all_input_transfers_verified_on_linux": true, "download_verify_seconds": 656.7870814399794},
+  "protection": {"m4_m6_ids": 113321, "p5_evaluation_ids": 1601, "p51_holdout_ids": 1090, "unique_ids": 116008, "teacher_labels_adopted": 0, "sha256": "364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944", "assembly_seconds": 131.96771930297837},
+  "initial_worker": {"pid": 6577, "reason": "stopped", "generations_completed": 0, "next_slot": 0, "published_generations": 0},
+  "continuation": {"pid": 17413, "same_protocol_required": true, "same_instance_and_deadline": true, "result_retrieved": false, "status": "not counted as successful learning or publication"},
+  "hf_publication": {"paired_artifacts_present": false, "dataset_files": [".gitattributes"], "state_files": [".gitattributes"]},
+  "termination": {"requested_at_utc": "2026-11-03T06:15:20.7254837Z", "release_confirmed_at_utc": "2026-11-03T06:16:20.9247536Z", "guard_conclusion": "success", "current_owned_trial_instances": 0, "external_delete_receipt_reconciled_locally": true},
+  "budget": {"reserved_usd": 1, "project_reserved_usd": 76, "phase5_reserved_usd": 15, "invoice_retrieved": false, "extra_100_usd_activated": false},
+  "next_trial": {"maximum_seconds": 7200, "maximum_usd": 2, "estimated_work_seconds": 1800, "persist_paired_cursor_and_aggregate_report_on_hf": true},
+  "limitations": ["No verified playing-strength result", "No verified completed generation or paired HF publication in this trial", "Same-VM continuation is not a separate-VM recovery", "Account credit is not project budget and reservations are not invoices"]
+}

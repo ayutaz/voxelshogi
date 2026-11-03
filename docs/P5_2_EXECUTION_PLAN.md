@@ -4,6 +4,8 @@
 
 ## 現在地
 
+2026-11-03 UTC・[初回Vast試行](P5_SELFPLAY_TRIAL.md)：CUDAと116,008入力の保護、独立期限停止・実機解放を確認したが、取得・監査が計算用の内部上限を使い切った。学習・HF往復は成功に数えず、次の小規模試行は最大2時間／予約US$2へ修正する。全体の保守的予約は現在US$76／100、Phase5 US$15／20。P5-2本条件は未実施。
+
 2026-11-03 UTC訂正：[Vastの利用クレジット確認](experiments/vast-credit-preflight-correction-2026-11-03.json)。`balance=0`を利用クレジットと取り違えていた。実際の`credit`は試行を賄い、追加入金は不要。独立停止用Vastキーもユーザーの明示承認後にGitHub `gpu-control`環境へ登録した。[世代ごとの公開・復旧](P5_SELFPLAY_RELEASE.md)はPR #108、[保護入力作成](P5_PROTECTED_INPUTS.md)はPR #109で統合済み。有料実行はまだ開始していない。メタデータ確認と実GPU／HF／別VMの達成証拠を区別する。
 
 M6／Phase4の基準モデルは完了。P5-2の探索・Actor・Replay・学習・世代更新・安全なstate archive・Parquet退避／世代境界復旧は実装済み。PR #99では元run削除後の実Sモデル2世代の復旧一致がLinux CIで成功した。一方、本条件の複数世代、実HF公開、別GPU実機からの復旧は未実施。
