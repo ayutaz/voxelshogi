@@ -1,5 +1,7 @@
 # P5-2：自己対局学習の安全な保存・復旧
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
 2026-10-31 UTC。[世代更新](P5_GENERATIONS.md)で使う学習状態を、外部LinuxからHFへ退避し、別実機で継続するためのarchive契約。コードの追加・fake Hubでの検証と、実際の公開・復旧成功を区別する。
 
 ## 目的とゴール
@@ -46,4 +48,4 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.resum
 
 metadata4件は実装前の失敗を確認した。既存のM6 archive・公開・upload ledgerと合わせた軽量39テストが成功し、追加9種類のmetadata変異および更新した既存2種類の変異を検出した。自己対局の本物の小さい学習→JSON＋safetensors→元private checkpoint除去→復旧→model／optimizer一致の追加テストと、pack時のschema変異はLinux CIで実行する。skip・collection error・timeoutを成功に数えない。
 
-この記録は、実HFへのアップロード・全hash照合・別実機復旧の証拠ではない。P5-2とPhase5の完了条件は[段階別計画](POST_M6_PLAN.md#phase5)のまま維持する。
+上記の部品検査だけを実運用の証拠にしない。実HFへのアップロード・全hash照合・別実機での後続世代は[P5-2完了記録](P5_2_COMPLETION.md)を参照。P5-2とPhase5の完了条件は[段階別計画](POST_M6_PLAN.md#phase5)のまま維持する。

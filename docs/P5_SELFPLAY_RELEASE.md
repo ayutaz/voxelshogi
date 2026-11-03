@@ -1,6 +1,8 @@
 # P5-2：世代ごとのHF公開トランザクション
 
-2026-11-03 UTC。`training/selfplay_release.py`で、確定世代のDatasetと再開状態を既存HF公開ハーネスへ接続する。実HF公開・別GPU実機復旧の完了記録ではない。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
+2026-11-03 UTC。`training/selfplay_release.py`で、確定世代のDatasetと再開状態を既存HF公開ハーネスへ接続する。本書はAPIと運用の契約を説明する。本条件の実HF公開・別GPU実機での後続世代は[P5-2完了記録](P5_2_COMPLETION.md)へ分けて保持する。
 
 ## 実行順と成功条件
 
@@ -44,9 +46,9 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.selfp
 
 `recovery.json`は復旧したモデル・公開pairと検証範囲を残す。同じVMの別フォルダでも動くため、このファイルだけを別実機復旧の証拠にしない。所有VM IDと旧VMの終了、新VMでの実後続世代を別途記録する。共通upload ledgerも制御側の最新値を引き継ぎ、新しい空のledgerで累積上限を回避しない。
 
-## 検証と現在の外部条件
+## 実装時の検証と外部条件の履歴
 
-メタデータの公開／復旧テストと関連テストをMacで実行した。遠隔hash確認の省略、送信結果不明時の再送、学習入力bindingの省略、並行更新の無視、凍結protocolの省略、復旧パスの検査省略の6変異をそれぞれ検出した。実Sモデル2世代テストには、run lock解放後のDataset／実state stage、fake Hubへの公開・全hash照合、pairのcursor反映、元run除去後のstate／Replay復旧と後続世代の一致確認を追加した。独立した変異用checkoutにも、stageが必要とするLICENSEを保持する。実tensor・Parquet・Rustの結合確認はLinux CIで行い、その結果は未確認である。fake Hubの成功は実HF公開の証拠に数えない。
+メタデータの公開／復旧テストと関連テストをMacで実行した。遠隔hash確認の省略、送信結果不明時の再送、学習入力bindingの省略、並行更新の無視、凍結protocolの省略、復旧パスの検査省略の6変異をそれぞれ検出した。実Sモデル2世代テストには、run lock解放後のDataset／実state stage、fake Hubへの公開・全hash照合、pairのcursor反映、元run除去後のstate／Replay復旧と後続世代の一致確認を追加した。独立した変異用checkoutにも、stageが必要とするLICENSEを保持する。実tensor・Parquet・Rustの結合確認は、数値修正後のmain `7e44310`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41652351549)で820テスト・skip0と学習系変異4シャードの実行成功を確認した。FP32へ戻す精度変異と非合法手を分母へ含める変異も検出した。CPU CIの時間をGPUの性能値へ流用しない。fake Hubの成功は実HF公開の証拠に数えない。
 
 2026-11-03 00:51 UTCの公式API読み取りではVast.aiの認証成功、所有VoxelShogi実機0、条件内RTX5090×1候補1件だった。`balance=0`を利用クレジットと取り違えていたが、02:01 UTCに`credit`を確認して訂正した。[訂正記録](experiments/vast-credit-preflight-correction-2026-11-03.json)。追加入金は不要。候補の単価はdisk80GB込み約US$0.75556/時・転送無料であり、予約ではない。利用直前に再確認する。新たな有料実行・予算予約・HF公開は行っていない。
 

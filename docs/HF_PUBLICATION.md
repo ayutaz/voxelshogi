@@ -1,5 +1,7 @@
 # Hugging Faceの公開・保存ルール
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
 2026-10-28ユーザー指定。作成したデータセット・モデルの公開先は[voxelshogi組織](https://huggingface.co/voxelshogi)。Macには必要な検証用モデルだけを残し、データセット・学習checkpointを保存しない。小さいmanifest・hash・集計は実行記録として保持する。
 
 ## 作成と公開の契約
@@ -65,7 +67,7 @@ uv run --locked python -m training.hub_release runs/release/model runs/release-p
 
 M6の学習済みモデルと全3形式の参照値は、[専用の推論パッケージprofile](M6_INFERENCE_RELEASE.md)を使う。`artifact_role="inference-package"`でmanifestが列挙した固定入力・全出力だけを追加対象とし、通常profileで任意の`.f32`を許可しない。実学習とライセンス確定・実モデル検証の後、既存の公開／全hash照合を行い、検証済みreceiptから固定revisionのWeb catalog項目を作る。
 
-再開状態は[別承認・専用repoを要求するtraining-state profile](M6_STATE_RELEASE.md)で準備する。通常modelへの混入を許可せず、実送信時には累積1 GiBの共通ledgerをAPI操作前に予約する。optimizer・乱数の公開方針と成果物ライセンスは確認待ちで、実archiveの公開はまだ行っていない。
+再開状態は[別承認・専用repoを要求するtraining-state profile](M6_STATE_RELEASE.md)で準備する。通常modelへの混入を許可せず、実送信時には累積1 GiBの共通ledgerをAPI操作前に予約する。M6のoptimizer・乱数を含む承認済みarchiveは[公開・復旧まで完了](M6_COMPLETION.md)。自己対局は別の承認対象・専用repo・selfplay profileを使い、同じ累積ledgerを引き継ぐ。新たな未確定licenseへ許可を拡張しない。
 
 純粋テストは、送信先違い、private/auto、未承認ライセンス、変更されたファイル、Macでの公開、秘密ファイル・symlink・optimizer、未確認のHub gateを拒否し、API変更前に止まることを検証する。記録用fakeで新規repoのpublic設定、manual設定確認後の送信、親commit固定と転送後のhash不一致も確認する。これらを通常Linux CIと既知変異の回帰へ含める。実repoの作成・公開・実権限・実転送の確認は別の実行記録を必要とする。
 
@@ -79,4 +81,17 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 
 ## 自己対局の再開状態
 
-[P5-2の専用archive・公開profile](P5_SELFPLAY_STATE.md)を使う。`profile="selfplay"`と`artifact_role="selfplay-training-state"`を明示し、旧M6の契約・repoへ混ぜない。public/manual・Community OFF・カード・固定revision全hash・共通upload ledgerは同じ境界を維持する。実自己対局の公開・別VM復旧は未実施であり、コードとfake Hubの成功をその証拠にしない。前述のM6公開前の記述は過去の計画で、M6の実公開・復旧は[M6完了記録](M6_COMPLETION.md)を確認する。
+[P5-2の専用archive・公開profile](P5_SELFPLAY_STATE.md)を使う。`profile="selfplay"`と`artifact_role="selfplay-training-state"`を明示し、旧M6の契約・repoへ混ぜない。public/manual・Community OFF・カード・固定revision全hash・共通upload ledgerは同じ境界を維持する。本条件3世代48対局の公開・別VMでの後続世代は[P5-2完了記録](P5_2_COMPLETION.md)を参照。コードとfake Hubの成功だけを実運用の証拠にしない。前述のM6公開前の記述は過去の計画で、M6の実公開・復旧は[M6完了記録](M6_COMPLETION.md)を確認する。
+
+## P5-2の保存先と復旧情報
+
+| 内容 | repo | license |
+|---|---|---|
+| 完成episode・全世代Replay・protocolと系譜 | `voxelshogi/voxelshogi-selfplay-v1`（dataset） | CC-BY-4.0 |
+| 世代ごとのモデル・optimizer・乱数・進捗 | `voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1`（model） | Apache-2.0 |
+| 元bytesを保持した全保護入力index | `voxelshogi/voxelshogi-protected-inputs-v1`（dataset） | CC-BY-4.0 |
+| typedな集計・全release descriptor・復旧と入力監査 | `voxelshogi/voxelshogi-selfplay-run-reports-v1`（dataset） | CC-BY-4.0 |
+
+各世代の両receipt・bundle/plan・全stateの固定revision・共通upload ledgerを保持してから旧VMを解放する。集計reportはデータや重み、raw log、資格情報を含めず、通常のdataset公開ハーネスで外部Linuxから送る。成功／失敗／不足する証拠を分け、reportの存在だけで本条件完了としない。元VM終了後の別VMでは[復旧手順](P5_SELFPLAY_RELEASE.md)で全ファイル・全Replay・モデルhashを照合し、後続世代を実行する。Datasetのpublished cursor snapshotは、すでに検証した両receiptを反映するための追加snapshotであり、新しい世代ではない。
+
+本条件の実件数・全固定revision・実機IDと限界は[P5-2完了記録](P5_2_COMPLETION.md)。HFのmanual gateは一般利用の取得申請を人が承認する仕組みとして維持し、アップロードの都度承認と取り違えない。

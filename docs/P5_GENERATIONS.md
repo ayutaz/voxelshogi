@@ -1,18 +1,14 @@
 # P5-2：自己対局の学習と世代更新
 
-2026-11-03 UTC追記：[世代ごとのHF公開・全state復旧](P5_SELFPLAY_RELEASE.md)をPR #108で統合した。run lockを解放してからstage／公開し、別実機側では全世代state・子モデル・Replayを復旧する。[保護入力の作成](P5_PROTECTED_INPUTS.md)も接続する。実HF公開・別GPU実機での後続世代は未実施。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
 
-2026-11-02 UTC追記：[Parquetによる全Replay退避・世代境界の復旧](P5_SELFPLAY_DATASET.md)を実装。既存のstate archiveと役割を分け、実HF公開・別VM復旧は引き続き未実施。
-
-2026-10-31 UTC追記：学習・世代更新はPR #92で関連CI成功後にmainへ統合した。実HF公開・別VM復旧は未実施。
-
-2026-10-30 UTC。探索・Actor・検証付きPolicy/Value・Replay Bufferに、FP32学習と世代更新を接続する実装。Phase5全体の目的と完了条件は[段階別計画](POST_M6_PLAN.md#phase5)を維持する。
+本書は学習器・世代更新の契約。実運用の数量と固定HF証拠は[完了記録](P5_2_COMPLETION.md)、合法手確率の数値修正は[停止記録](P5_PRIOR_NORMALIZATION.md)を参照する。
 
 ## 目的と完了条件
 
 完成episodeの訪問分布とValueの出所を保ったまま学習し、親モデルから子モデルへ更新する。protocol・source・入力集合・model hashを固定し、停止後も同じ学習を継続できることを確かめる。
 
-最初の実装の対象は学習器・世代更新・公開再試行の接続。P5-2の実験完了には、本条件の複数世代、HFデータ／再開状態の公開・全hash照合、別実機からの復旧が必要で、現時点では未達。世代CLI単独はHFへ自動公開しない。現在は公開・復旧接続も使い、関連CI・実入力の保護・独立停止・予算と残高を確認してから有料自己対局を開始する。
+世代CLI単独はHFへ自動公開しない。実運用ではrun lockを解放後に世代別公開ハーネスを使い、Dataset／stateの両receiptを照合する。小さいLinux CI・fake Hub試験と、実HF公開・別VM後続世代の証拠を区別する。
 
 ## 学習と再開
 

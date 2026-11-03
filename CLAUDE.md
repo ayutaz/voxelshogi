@@ -1,24 +1,6 @@
 # CLAUDE.md — VoxelShogi
 
-**2026-11-03 14:02 UTC・本条件の数値修正**：[合法手確率和による停止と実GPU検証](docs/P5_PRIOR_NORMALIZATION.md)。第1世代16対局・937更新をHFへ保存後、第2世代でFP32 softmaxの合計誤差を検出した。合法手の正規化だけFP64とする修正を同じ局面・実GPUで検証し、VMは解放済み。修正のCI成功後、M6から新protocolの3世代48対局を再実行する。旧16対局は部分成果であり新48件に含めない。予約は全体80／100・Phase5累積19／24、追加100未適用。以下は過去時点の記録。
-
-**2026-11-03 UTC・小規模試行完了**：[実学習・HF往復・資源解放](docs/P5_SELFPLAY_TRIAL.md)。2対局・32sample・8更新、子モデルhash、HFの両公開／全hash・同VM復旧を確認。116,008件の保護集合もHFへ固定し、試行実機は解放済み。[本条件3世代48対局](docs/P5_SELFPLAY_MAIN.md)を次に実行する。制御の配分はPhase5=24・Phase6=15へ移し、合計39・基本総枠100を保持。予約は全体78／Phase5累積17、追加100未適用。本条件・別VM後続世代・最終全ドキュメント点検は未達。
-
-**2026-11-03 12:42 UTC・稼働中のP5-2試行**：[実行計画の現在地](docs/P5_2_EXECUTION_PLAN.md)。初回Vast試行は独立期限停止・資源解放を確認し、記録をPR #112で統合した。次の所有RTX5090でCUDA検査を完了し、固定入力を取得・照合中。小規模学習・HF往復・本条件3世代48対局・別実機継続は未達。全体予約US$78／100、Phase5 US$17／20、追加US$100は未適用。以下は日付ごとの履歴であり、残高0・入金依頼は訂正済み。
-
-**2026-11-03 UTC・初回Vast試行**：[結果と次の見積もり](docs/P5_SELFPLAY_TRIAL.md)。実RTX5090のCUDA、全固定入力取得・116,008件の保護集合、GHA独立期限停止・実機解放を確認した。取得・監査後に内部締切へ達し、学習更新・HF往復の成功は未確認。保守的予約は全体US$76／100・Phase5 US$15／20。次の小規模試行は実測から最大2時間／予約US$2とし、世代cursorと集計reportもHFへ保存する。P5-2本条件と別実機復旧は未完了。以下の「実GPU試行未実施」は初回起動前の記録。
-
-**2026-11-03 UTC・Vastクレジットの訂正**：`balance=0`を利用クレジットと取り違えていた。`credit`を確認し、追加入金が不要と判明した。独立停止用キーも明示承認後にGitHub `gpu-control`へ登録済み。[訂正記録](docs/experiments/vast-credit-preflight-correction-2026-11-03.json)。PR #108の世代別HF公開・復旧、#109の保護入力作成を統合済み。実GPU試行とP5-2本条件は未実施で、P5-2完了時の全ドキュメント更新・報告・一時停止を維持する。以下の残高0・入金依頼は当時の誤った判断であり、現況として使わない。
-
-**2026-11-02 UTC・次の停止点**：[P5-2までの実行計画](docs/P5_2_EXECUTION_PLAN.md)。自己対局の複数世代・HF公開・別実機復旧を完了したら、状況共有と全ドキュメントの点検・更新を行い、一時停止する。P5-3以降・Phase6の規模と順序は、その結果から再計画する。CI高速化はPR #101・#102を統合済み。
-
-**2026-11-02 UTC・優先順の更新**：[次の実行と打切り判断](docs/P5_NEXT_EXECUTION.md)。CloudRift4090は2回ともPCI起動エラー・資源解放済み。再試行を打ち切り、Vast.aiへ切替（候補あり／残高0、クレジット追加を依頼済み）。予約US$75／100・追加枠未使用。P5-1の未検証候補は学習に使わず、追加費用を止めて検証済みM4/M6からP5-2を先行する。[自己対局データ退避・復旧](docs/P5_SELFPLAY_DATASET.md)の実装とLinux CIを進める。本条件の複数世代・HF全runの別VM復旧・1→2→4GPU・Phase6は未完了。
-
-**2026-10-30 UTCの追記**：[P5-1の終了遅延と再開前の対策](docs/P5_DEADLINE_INCIDENT.md)。使用実機は資源解放済み。計上済み利用から約US$7.56、請求書は未回収。保守的予約額は全体US$73／基本枠100（未予約27）、Phase5 US$12／初期枠20へ修正した。新規有料実行は独立終了監視の検証まで停止する。HF退避は8対局・35局面の部分成果で、教師再計算・監査・再生成は未完了。以下の65／69という値は過去時点の記録。
-
-**M6／Phase4完了（2026-10-29 UTC）、Phase5進行中**：[M6完了記録](docs/M6_COMPLETION.md)。学習・保存再開・HF復旧、全3形式の固定評価・public/manual公開と37ファイル照合、公開catalog差し替えなしの実機48条件・40実切替、3形式のGPU着手・7実モデルE2Eを確認した。2026-10-30 UTCに[P5-0の開発用評価32局](docs/P5_PILOT.md)と全手再生・凍結コーパス照合を完了し、使用GPUも資源解放済み。棋力改善は未確認。次はP5-1の教師・長期対局分布の比較。Phase6〜7は未着手。
-
-**初回本学習の記録**：[FP32変換失敗・Torch固定評価・資源終了](docs/M6_MAIN.md)は過去runの証拠として保持する。本文中の「本学習未実施」等は初回実行前の計画であり、現在地は上記の完了記録を参照。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](docs/P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
 
 9×9×9（729マス・372枚）の三次元将棋を題材にした、再現可能な三次元将棋 AI 研究プラットフォームです。対象は、ルールエンジン、ブラウザゲーム、合成データセット、Transformer モデル、分散学習です。
 
@@ -27,7 +9,7 @@
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- 次の実行計画: `docs/POST_M6_PLAN.md`のP5-1（`docs/P5_DATA_PLAN.md`）→1GPU自己対局→世代比較→複数GPU→構造比較の順。P5-0は完了（`docs/P5_PILOT.md`）。モデル／再開状態はHFでpublic/manual・Community OFF・Apache-2.0、データはCC-BY-4.0。M6予約上限US$20／基本枠24、P5評価US$4とデータ試行US$4を加えプロジェクトUS$69／基本枠100、追加US$100は未使用。実請求は未回収。P5-1の外部試行を開始（`docs/experiments/p5-data-launch-2026-10-30.json`、06:02 UTC時点で入力取得中）。結果と資源終了は確認待ち。
+- P5-2の実行結果と停止点: `docs/P5_2_COMPLETION.md`。本条件48対局・HF保存・別VM継続と全ドキュメント点検後に停止。P5-3・DDP・Phase6は振り返り後に再計画する。
 - 仕様: `docs/PROJECT_SPEC.md`
 - ルール（正）: `docs/RULESET.md`
 - 計画・進捗（フェーズごとの目的とゴール）: `docs/ROADMAP.md`
@@ -71,8 +53,10 @@
 
 ## コマンド
 
+以下の重い検証・探索・計測は外部LinuxまたはCIで行う。Macでこの一覧を一括実行せず、編集・読み取り・変更に必要な軽量確認だけに使う。テスト件数は対象commitのCI結果を正とする。
+
 ```bash
-cargo test --locked --workspace            # Rust（core153件＋WASM境界5件、testはopt-level 2）
+cargo test --locked --workspace            # Rust workspace（testはopt-level 2）
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all
 cargo run --locked --release -p voxelshogi-core --example bench   # 合法手生成の速度
@@ -83,7 +67,7 @@ pnpm wasm          # WASM ビルド（wasm32 target と wasm-bindgen-cli 0.2.129
 pnpm test          # Vitest（実 WASM を Node で読み込む）
 pnpm typecheck
 pnpm build
-E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e # 全21件。ローカルはChrome、CIはPW_CHANNEL=''でChromium
+E2E_COMMIT="$(git rev-parse HEAD)" pnpm e2e # 配信SHAを指定。外部Linux／CIで実行
 pnpm dev
 
 # 以下はリポジトリのルートで実行する
@@ -112,22 +96,14 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - Cloudflare は、ユーザーの個人アカウント（ka1357amnbpdr@gmail.com）を使う。このマシンの wrangler はグローバルには別アカウントでログインしているため、**必ず `scripts/cf.sh`（プロジェクト専用ログイン）経由で wrangler を使う**。素の `wrangler` は使わない（`apps/web` の `pnpm run deploy` も `scripts/cf.sh` を経由する。`pnpm deploy` は pnpm の組み込みコマンドなので使わない）。
 - 将棋ったーの公開棋譜による互換性検証は非公開の作業領域で行う（棋譜をコミット・HF公開しない）。重い検証は承認済み外部Linuxで実行し、Macへ計算を戻さない。
 
-## 現在の進捗と次の作業
+## 現在の進捗と停止後の判断
 
-進捗の詳細と、各フェーズの目的・ゴール（完了条件）は `docs/ROADMAP.md` にある。フェーズを完了とするのは、ゴールの全項目を満たしたときだけ。
+P5-2の本条件48件・3世代・両HF公開計3対・別所有VMでの後続世代を確認した。実行source `1280dc40c61e4ba15f0f5996abc775d900b043a7`、protocol `f4cc205d29a86ab02db9533e39f0001a0e2cdcfe414f14724a8123b7fab589ce`。全48履歴と全学習入力byteのhashを監査し、保護入力116,008件との学習重複0。課金実機・volume0、予約は全体US$85／100・Phase5 US$24／24、Phase6配分15、追加100未適用。実請求は未回収。
 
-- 完了
-  - Phase 0: 調査と設計
-  - Phase 1: ルールエンジン（標準ルール、VSFEN、棋譜、セッション）
-  - Phase 2: Web ゲーム Alpha。https://voxelshogi.yousan-apps.workers.dev に公開し、main への push で CI から自動デプロイされる
-  - M0: CI/CD と品質基盤。必須7チェックによるmain保護、公開E2E、隔離復旧訓練、全758変異の調査と分類を確認済み。PR #3の最終文書も取り込み済みで、統合コミット `1ff4e2f` の本番公開・配信SHA・公開E2E 6件まで2026-10-26（JST）に成功した（`docs/M0_VALIDATION.md` の完了時記録）
-  - R0: 9王ルール3候補と現行1王の対照、計1,052局の比較・全手照合、同一棋譜のA/B観戦試作を完了。PR #7・必須7チェック・main自動公開・実機Chromeの公開E2E 9件と公開用6棋譜のSHA一致を確認した。正式採用と観戦者による理解度評価は保留（`docs/NINE_KINGS_EXPERIMENT.md`）
-  - M1: 探索AI（Rust）。独立参照探索・戦術・上限と再現性、全1,172変異の分類、Native計測を完了（`docs/M1_VALIDATION.md`）
-  - M2: 履歴付きWorker探索・両AIのEasy/Normal観戦・中断と再試行・3D分割を完了。PR #13〜#16の必須CIと通常取り込み、最終main `e212ec7` の自動公開・配信SHA・公開E2E、実機Chromeの全21件・固定7局面の計測と配信artifact照合を確認（`docs/M2_VALIDATION.md`）
-  - M3: 未学習の約502万パラメータ・全3変換・専用Workerを公開。性能計測 `dd3762c` の48組・各backendで20実切替と、完了時公開 `bca5532` のCI・公開E2E・55ファイル照合・最終参照値での実機再照合を確認。モデル・実行コードのhashは同一、再生成参照値の微小差は固定誤差基準内。FP16×M1 WebGPUの基準未達、HTTP 500の失敗と回復も保持（`docs/M3_VALIDATION.md`、`docs/experiments/m3-completion-publication.json`、2026-10-28 JST）
-  - M4 / Phase 3: 1,800局・有効113,321局面・探索教師36,894件を全検証・全再生成し、HFの`production-64`へDataset Card付きで公開。固定Hub commitの全1,831対象ファイルが一致し、実機終了・資源解放・volume 0を確認（[完了記録](docs/M4_COMPLETION.md)、2026-10-29 JST）。
-  - M5: 固定した改定後3局145手の合法性・盤／持ち駒・投了結果が一致。PR #42を必須CI成功後に通常merge。全棋譜の完全互換は主張しない（[記録](docs/M5_PLAN.md)）。
-  - M6 / Phase4: 3 epoch／22,413更新、固定test・各60局、3形式のHF公開、公開実GPU48条件／40切替・3形式着手・7 E2E、資源解放まで完了（[記録](docs/M6_COMPLETION.md)）。
-- **次にやること**: `docs/ROADMAP.md` の「実行計画（マイルストーン）」の順に進める。
-  1. [P5-1の教師と分布の比較](docs/P5_DATA_PLAN.md)を具体化する。[P5-0の開発用評価](docs/P5_PILOT.md)は32局・全手再生・凍結コーパスの物理局面照合まで完了。M6対M1は2勝6敗4引分4打切りで、棋力改善の証明ではない。PR #82〜#87で学習ラベル・PUCT・履歴複製・疎損失・Actor・検証付きPolicy/Valueを取り込み済み。次は教師／長期対局試料とReplay Buffer・世代更新の接続。実際の複数世代自己対局、別実機再開、複数GPU、Phase6の構造比較は未実施で、[段階別計画](docs/POST_M6_PLAN.md)の完了条件を維持する。
-- ユーザー側の準備事項は、`docs/ROADMAP.md` の「ユーザー側の準備」にある。
+- Phase0〜4／M0〜M6とP5-0は完了。既存の固定結果・失敗・対象SHAを保持し、P5-2の結果へ付け替えない。
+- P5-1の未検証教師候補は不採用・残検証保留。holdout全履歴の入力保護を維持し、採用閾値を下げない。
+- P5-2は実行・保存・復旧の検証であり、棋力改善・Phase5全体・正式公開の完了を意味しない。
+- 次のP5-3の世代比較、1→2→4GPU、Phase6の構造・Mモデル・複数seed比較は、今回の結果を振り返って再計画する。自動着手しない。
+- 主用途はAI vs AI観戦。人間対AIは補助機能、人間同士の対局・マルチプレイは実装しない。
+
+全体の目的・各段階の数量ゴールは `docs/ROADMAP.md`、残る課題は `docs/OVERALL_PLAN.md`、P5-2の条件は `docs/P5_SELFPLAY_MAIN.md`、実行結果・HF取得先・費用と限界は `docs/P5_2_COMPLETION.md` を参照する。
