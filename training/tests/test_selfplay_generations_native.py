@@ -83,6 +83,40 @@ def test_real_s_multi_generation_loop_and_portable_dataset_resume_match(
         p, model, protected, tmp_path / "partial", max_new_generations=1
     )
     assert not partial["complete"] and partial["generations_completed"] == 1
+    # Publish through the actual archive/dataset harness only after the run lock
+    # has been released. The fake Hub stores no real external artifacts.
+    from training.selfplay_release import publish_staged, stage_generation
+    from training.tests.test_selfplay_release import Remote
+
+    license_file = tmp_path / "cc-by-4.0.txt"
+    license_file.write_text("CC-BY-4.0 fixture; never published")
+    stage = tmp_path / "release-000"
+    bundle = stage_generation(
+        tmp_path / "partial", stage, protocol=p, dataset_license=license_file
+    )
+    assert bundle["plans"]["state"]["artifact_role"] == "selfplay-training-state"
+    budget = tmp_path / "upload-budget.json"
+    budget.write_text(
+        json.dumps(
+            {
+                "schema": "voxelshogi-state-upload-budget-v1",
+                "approved_maximum_new_bytes": 1024**3,
+                "reservations": [],
+            }
+        )
+    )
+
+    def release_fetch(**kw):
+        assert kw["revision"] == "c" * 40
+        kind = "dataset" if kw["repo_type"] == "dataset" else "state"
+        return stage / kind / kw["filename"]
+
+    pair = publish_staged(
+        tmp_path / "partial", stage, Remote(), release_fetch, upload_budget=budget
+    )
+    assert all(receipt["verified"] for receipt in pair.values())
+    published_run = json.loads((tmp_path / "partial/run.json").read_text())
+    assert published_run["publications"] == [{"generation": 0, **pair}]
     from training.selfplay_dataset import pack_dataset, restore_dataset
 
     dataset = tmp_path / "portable-data"
@@ -93,6 +127,37 @@ def test_real_s_multi_generation_loop_and_portable_dataset_resume_match(
     saved_model = tmp_path / "generation-000.safetensors"
     shutil.copy2(tmp_path / "partial/generation-000/model.safetensors", saved_model)
     shutil.rmtree(tmp_path / "partial")
+    from training.selfplay_recovery import recover_generations
+
+    recovered_dir = tmp_path / "hf-recovered"
+    recovery = recover_generations(
+        [{"bundle": bundle, "pair": pair}],
+        recovered_dir,
+        tmp_path / "recovery-downloads",
+        Remote(),
+        release_fetch,
+        protocol=p,
+        base_model=model,
+        protected_inputs=protected,
+    )
+    assert recovery["verified"] and recovery["generations_restored"] == 1
+    assert (recovered_dir / "generation-000/training/restoration.json").is_file()
+    recovered_run = json.loads((recovered_dir / "run.json").read_text())
+    assert recovered_run["publications"] == [{"generation": 0, **pair}]
+    assert (
+        recovered_dir / "generation-000/model.safetensors"
+    ).read_bytes() == saved_model.read_bytes()
+    recovered_result = run_generations(p, model, protected, recovered_dir)
+    assert (
+        recovered_result["complete"] and recovered_result["generations_completed"] == 2
+    )
+    assert [
+        g["model_sha256"]
+        for g in json.loads((recovered_dir / "run.json").read_text())["generations"]
+    ] == [
+        g["model_sha256"]
+        for g in json.loads((tmp_path / "full/run.json").read_text())["generations"]
+    ]
     # A portable dataset contains every committed episode, including those
     # outside the active capacity=1 training window.
     assert packed["replay"]["binding"]["capacity"] == 1
