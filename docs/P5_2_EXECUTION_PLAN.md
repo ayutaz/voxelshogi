@@ -4,6 +4,8 @@
 
 ## 現在地
 
+2026-11-03 UTC・小規模試行完了：[2対局・32sample・8実更新、HF両公開／全hash照合、同VM復旧と解放](P5_SELFPLAY_TRIAL.md)を確認した。HFの[保護集合](https://huggingface.co/datasets/voxelshogi/voxelshogi-protected-inputs-v1/tree/ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8)は元の116,008件・全bytesのhashを保持する。[本条件48対局と別VM継続](P5_SELFPLAY_MAIN.md)は最大2時間＋3時間／追加予約最大US$5で事前固定する。Phase5の初期枠20では累積22を収められないため、Phase6の未使用配分から4を移しPhase5=24・Phase6=15へ変更する。基本総枠100・追加枠未使用を維持。本条件自体は未着手。
+
 2026-11-03 12:42 UTCの更新：[初回試行](P5_SELFPLAY_TRIAL.md)の記録をPR #112で統合した。次の所有実機58961875でCUDA検査を完了し、同一workerの稼働と固定入力の取得・照合段階を確認した。最大2時間／予約US$2、独立停止runは[41636015301](https://github.com/ayutaz/voxelshogi/actions/runs/41636015301)。14:28:34 UTCの絶対期限に対し、GitHub側の削除開始は14:08:34 UTC。小規模学習・HF往復・本条件の成功は確認待ち。全体予約US$78／100、Phase5 US$17／20、追加US$100は未適用。以下は各追記時点の記録で、残高0という判断は訂正済み。
 
 2026-11-03 UTC・[初回Vast試行](P5_SELFPLAY_TRIAL.md)：CUDAと116,008入力の保護、独立期限停止・実機解放を確認したが、取得・監査が計算用の内部上限を使い切った。学習・HF往復は成功に数えず、次の小規模試行は最大2時間／予約US$2へ修正する。全体の保守的予約は現在US$76／100、Phase5 US$15／20。P5-2本条件は未実施。

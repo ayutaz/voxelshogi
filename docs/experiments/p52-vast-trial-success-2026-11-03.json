@@ -1,0 +1,147 @@
+{
+  "schema": "voxelshogi-p52-operational-trial-success-v1",
+  "source_commit": "40ae236ef4f15577ac122d0854c7715f83e581b7",
+  "instance_id": 58961875,
+  "pipeline_complete": true,
+  "episodes": 2,
+  "samples": 32,
+  "natural": 0,
+  "cutoff": 2,
+  "training_progress": {
+    "best_val_loss": null,
+    "epoch": 1,
+    "examples": 32,
+    "next_batch": 0,
+    "step": 8
+  },
+  "model_sha256": "4033110176314d04544c5bfe4c3ac551ae271f0dcd0c6b63de37bec9d21b1cea",
+  "base_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+  "timings_seconds": {
+    "assemble-protected-inputs": 131.4938559238799,
+    "download-and-verify-inputs": 720.3721469980665,
+    "hf-roundtrip-recovery": 1.2631411827169359,
+    "persist-published-generation-cursor": 17.822439588140696,
+    "publish-paired-releases": 38.215094558894634,
+    "selfplay-and-learning": 3.9326900360174477
+  },
+  "worker_elapsed_seconds": 916.8244570028037,
+  "pair": {
+    "dataset": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "d4b59d602d019beeb5e57adcf10eb48f5671c1b8",
+      "release_sha256": "61b64d4a7be7b8f0aa5d5e1a0a32c677a14c87cc59d57581da0dade2c36516ef",
+      "repo_id": "voxelshogi/voxelshogi-selfplay-v1",
+      "repo_type": "dataset",
+      "verified": true
+    },
+    "state": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "ead8140accc264378699adc9e860b66204fd407a",
+      "release_sha256": "f3aac560f724c405c5927f4882d81a88f12eb5ed3e2d7ca5b1276994d87fa23f",
+      "repo_id": "voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1",
+      "repo_type": "model",
+      "verified": true
+    }
+  },
+  "published_cursor": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "b3d81a45ce0e5d81fdb1559c1e77dd3667e1b922",
+    "release_sha256": "b37dc7ceff26b859fdd8b40f3433a0da2b8a1b0e3602dac5bdaace24c1405186",
+    "repo_id": "voxelshogi/voxelshogi-selfplay-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "same_vm_hf_recovery_verified": true,
+  "run_report": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "9e3e1ede7a60276e70f32602ba5a0412553ea888",
+    "release_sha256": "eb11e1a6b84d0489d498ac8aad9ba49e18aa1c90918b3dafb43dc29a2bd2a1b6",
+    "repo_id": "voxelshogi/voxelshogi-selfplay-run-reports-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "protected_inputs_release": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8",
+    "release_sha256": "81f182162a9a0046d34f71503389c946483c0af7866080181ec50e0c5b8d7d89",
+    "repo_id": "voxelshogi/voxelshogi-protected-inputs-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "protected_inputs_sha256": "364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944",
+  "protected_input_count": 116008,
+  "state_upload_budget": {
+    "reserved_bytes": 376685551,
+    "approved_maximum_bytes": 1073741824
+  },
+  "termination_request": {
+    "at": 1793710521.767116,
+    "instance_ids": [
+      58961875
+    ],
+    "destruction_acknowledged": true
+  },
+  "terminal": {
+    "provider": "vast.ai",
+    "checked_at": 1793710523.422986,
+    "instances": [],
+    "complete": true
+  },
+  "independent_guard": {
+    "run_id": 41636015301,
+    "cancellation_requested_after_verified_early_cleanup": true,
+    "reason": "early manual termination; actual deadline stopping proven separately by first trial"
+  },
+  "hf_settings_verified": [
+    {
+      "repo_id": "voxelshogi/voxelshogi-selfplay-v1",
+      "repo_type": "dataset",
+      "revision": "b3d81a45ce0e5d81fdb1559c1e77dd3667e1b922",
+      "public": true,
+      "gated": "manual",
+      "community_disabled": true
+    },
+    {
+      "repo_id": "voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1",
+      "repo_type": "model",
+      "revision": "ead8140accc264378699adc9e860b66204fd407a",
+      "public": true,
+      "gated": "manual",
+      "community_disabled": true
+    },
+    {
+      "repo_id": "voxelshogi/voxelshogi-protected-inputs-v1",
+      "repo_type": "dataset",
+      "revision": "ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8",
+      "public": true,
+      "gated": "manual",
+      "community_disabled": true
+    },
+    {
+      "repo_id": "voxelshogi/voxelshogi-selfplay-run-reports-v1",
+      "repo_type": "dataset",
+      "revision": "9e3e1ede7a60276e70f32602ba5a0412553ea888",
+      "public": true,
+      "gated": "manual",
+      "community_disabled": true
+    }
+  ],
+  "budget": {
+    "conservative_reservation_usd": 2,
+    "project_reserved_usd": 78,
+    "phase5_reserved_usd": 17,
+    "invoice_retrieved": false,
+    "additional_100_usd_activated": false
+  },
+  "limitations": [
+    "Small trial is not the frozen 48-episode P5-2 experiment",
+    "Same-VM HF roundtrip is not separate-VM recovery",
+    "Two cutoff bootstraps are not observed game outcomes",
+    "No playing-strength improvement established"
+  ]
+}
