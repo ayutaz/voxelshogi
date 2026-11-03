@@ -45,7 +45,11 @@ class TorchPolicyValue(TorchStudent):
         if not -1 <= estimate <= 1:
             raise ValueError("policy/value output is outside [-1,1]")
         with torch.inference_mode():
-            probabilities = logits[0, legal].softmax(dim=0).cpu().tolist()
+            # The network stays FP32. Thousands of legal moves require FP64
+            # normalization to preserve the search kernel's probability mass.
+            probabilities = (
+                logits[0, legal].softmax(dim=0, dtype=torch.float64).cpu().tolist()
+            )
         self.calls += 1
         return dict(zip(legal, probabilities, strict=True)), estimate
 
