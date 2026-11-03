@@ -22,7 +22,7 @@ Linux上のTDDでは、等確率3手、共通offset4,096、合法手2,026件を�
 第1世代16対局・3,746 sample・937更新、116,008件の保護入力との学習重複0、自然勝敗0・自然引分4・cutoff12。全16履歴と学習入力hashを独立監査し、次の固定revisionで全ファイルhash・public/manual・Community OFFを照合済み。
 
 - [Dataset](https://huggingface.co/datasets/voxelshogi/voxelshogi-selfplay-v1/tree/32de8493dea0ec861e42144816b19f28e091d835)：CC-BY-4.0。
-- [State](https://huggingface.co/voxelshogi/voxelshogi-selfplay-state-v1/tree/6805b08f3bf2e70b082ffe7a929c4b821ac3d618)：Apache-2.0。
+- [State](https://huggingface.co/voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1/tree/6805b08f3bf2e70b082ffe7a929c4b821ac3d618)：Apache-2.0。
 - [停止時の集計report](https://huggingface.co/datasets/voxelshogi/voxelshogi-selfplay-run-reports-v1/tree/c3fdb29d361a5275c7c59f15353a0b87f5a8e2f1)：CC-BY-4.0。全体の成功を示すreportではない。
 
 workerの停止を実PIDで確認し、記録・数値修正の検証を回収後、14:02 UTCにVMの削除応答と全件一覧からの不在を確認した。元の最大US$2予約は取り消さず、全体予約US$80／100・Phase5 US$19／24を保持する。実請求は未回収。
