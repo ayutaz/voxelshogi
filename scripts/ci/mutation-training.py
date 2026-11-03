@@ -12,6 +12,34 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "selfplay-release-fixed-revision-hashes",
+        "training/selfplay_release.py",
+        "receipt = verify_release(plan, receipt, api, fetch)",
+        'receipt = {**receipt, "verified": True, "community_disabled": True}',
+        "test_selfplay_release.py",
+    ),
+    (
+        "selfplay-release-unknown-upload-outcome",
+        "training/selfplay_release.py",
+        "if attempted.exists():",
+        "if False:",
+        "test_selfplay_release.py",
+    ),
+    (
+        "selfplay-release-input-binding",
+        "training/selfplay_release.py",
+        'or binding["cache_sha256"] != record["input_sha256"]',
+        "or False",
+        "test_selfplay_release.py",
+    ),
+    (
+        "selfplay-release-concurrent-cursor",
+        "training/selfplay_release.py",
+        "if current != expected and current != after:",
+        "if False:",
+        "test_selfplay_release.py",
+    ),
+    (
         "vast-research-independent-admission",
         "training/vast_research_control.py",
         "plan = self.prepare()",

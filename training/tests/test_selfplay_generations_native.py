@@ -83,6 +83,40 @@ def test_real_s_multi_generation_loop_and_portable_dataset_resume_match(
         p, model, protected, tmp_path / "partial", max_new_generations=1
     )
     assert not partial["complete"] and partial["generations_completed"] == 1
+    # Publish through the actual archive/dataset harness only after the run lock
+    # has been released. The fake Hub stores no real external artifacts.
+    from training.selfplay_release import publish_staged, stage_generation
+    from training.tests.test_selfplay_release import Remote
+
+    license_file = tmp_path / "cc-by-4.0.txt"
+    license_file.write_text("CC-BY-4.0 fixture; never published")
+    stage = tmp_path / "release-000"
+    bundle = stage_generation(
+        tmp_path / "partial", stage, protocol=p, dataset_license=license_file
+    )
+    assert bundle["plans"]["state"]["artifact_role"] == "selfplay-training-state"
+    budget = tmp_path / "upload-budget.json"
+    budget.write_text(
+        json.dumps(
+            {
+                "schema": "voxelshogi-state-upload-budget-v1",
+                "approved_maximum_new_bytes": 1024**3,
+                "reservations": [],
+            }
+        )
+    )
+
+    def release_fetch(**kw):
+        assert kw["revision"] == "c" * 40
+        kind = "dataset" if kw["repo_type"] == "dataset" else "state"
+        return stage / kind / kw["filename"]
+
+    pair = publish_staged(
+        tmp_path / "partial", stage, Remote(), release_fetch, upload_budget=budget
+    )
+    assert all(receipt["verified"] for receipt in pair.values())
+    published_run = json.loads((tmp_path / "partial/run.json").read_text())
+    assert published_run["publications"] == [{"generation": 0, **pair}]
     from training.selfplay_dataset import pack_dataset, restore_dataset
 
     dataset = tmp_path / "portable-data"

@@ -32,7 +32,7 @@ restore_dataset(
 
 `models`は各確定世代の番号から、別途取得・検証済みのsafetensorsへの対応。全モデルのSHA-256を照合し、不足・差異は復旧先の作成前に拒否する。全episodeをRustで再生し、凍結した世代別Actor設定とseed、合法手、ラベル計算、訪問数・呼び出し数を再検査する。PUCTのニューラル推論そのものを再実行したとはしない。
 
-復旧先は新規ディレクトリに限定する。モデルのコピー後にもhashを検査し、Replayと全モデルがそろってから`run.json`をcommit pointとして書く。base modelとprotected-inputsはprotocolが固定する別入力として取得する。世代のDatasetとstateを固定revisionで照合し、両receiptを公開cursorへ反映する運用ハーネスは引き続き必要。
+復旧先は新規ディレクトリに限定する。モデルのコピー後にもhashを検査し、Replayと全モデルがそろってから`run.json`をcommit pointとして書く。base modelとprotected-inputsはprotocolが固定する別入力として取得する。世代のDatasetとstateを固定revisionで照合し、両receiptを公開cursorへ反映する接続は[公開トランザクション](P5_SELFPLAY_RELEASE.md)を使う。実HF公開・別VM復旧の証拠はまだない。
 
 ## 公開
 
