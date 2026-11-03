@@ -1,0 +1,17 @@
+{
+  "schema": "voxelshogi-vast-credit-correction-v1",
+  "observed_at_utc": "2026-11-03T02:01:06Z",
+  "read_only_api": "/api/v0/users/current/",
+  "account_identity_confirmed_to_user": true,
+  "available_credit_field": "credit",
+  "available_credit_covers_one_hour_trial": true,
+  "balance_field_was_zero": true,
+  "prior_no_credit_conclusion_was_incorrect": true,
+  "additional_deposit_required": false,
+  "gpu_control_vast_secret_registered_after_explicit_approval": true,
+  "provider_credentials_forwarded_to_gpu": false,
+  "new_rentals_started": 0,
+  "new_budget_reservations": 0,
+  "official_cli_reference": "https://github.com/vast-ai/vast-python/blob/master/vast.py",
+  "limitation": "Account credit does not increase the approved project budget. Prior raw balance observations remain historical evidence of the mistaken field selection."
+}
