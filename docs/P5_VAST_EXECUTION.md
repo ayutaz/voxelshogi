@@ -1,8 +1,10 @@
 # Vast.aiでのPhase5／6研究ジョブ
 
-研究用の用途・予算・絶対期限をVast.aiへ接続する。M6の完了済み承認を流用せず、`training.vast_research_control`を使う。[初回Vast試行](P5_SELFPLAY_TRIAL.md)では実CUDA・固定入力取得と保護集合・独立期限停止を確認したが、学習とHF往復は未完了。2026-11-03 UTCの次の小規模試行は最大2時間／予約US$2。P5-2本条件と別実機での後続世代は未達である。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
 
-利用可能な前払いクレジットは公式APIの`credit`を確認する。`balance=0`をクレジット不足と扱わない（[訂正記録](experiments/vast-credit-preflight-correction-2026-11-03.json)）。個人アカウントの残高やメールアドレスを公開記録へ保存しない。サービス残高とプロジェクト予算は別であり、今回の保守的予約は全体US$78／100、Phase5 US$17／20。追加US$100は未適用。
+研究用の用途・予算・絶対期限には`training.vast_research_control`を使う。実CUDA・学習・HF保存／復旧・資源解放は[P5-2完了記録](P5_2_COMPLETION.md)、実機での独立期限削除は[初回試行](P5_SELFPLAY_TRIAL.md)を確認する。通常の早期解放と期限停止を混同しない。
+
+利用可能な前払い額は`credit`を確認し、`balance=0`をクレジット不足と扱わない。個人の残高・メール・資格情報を公開記録へ保存しない。全体US$85／基本枠100、Phase5 US$24／配分24。Phase6配分15、条件付き追加US$100は未適用。保守的予約とサービス残高・確定請求は別である。
 
 Planは`voxelshogi-vast-research-plan-v1`。共通のpurpose、source_commit、workload_sha256、maximum_seconds、maximum_hourly_usd、maximum_usd、estimated_secondsに、正の整数のoffer_idとdisk_gb=80を加える。最大30分〜4時間・US$1/時以下・単RTX5090・転送無料・verified・CUDA13対応・専用SSH鍵という既存見積もり条件を維持する。source・workload・planの改変、両サービスの所有競合、残高不足、重複予約を作成前に拒否する。
 

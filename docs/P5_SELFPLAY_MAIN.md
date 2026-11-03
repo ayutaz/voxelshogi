@@ -1,6 +1,8 @@
 # P5-2：本条件48対局と別VM継続の実行条件
 
-2026-11-03 UTC。[小規模試行の成功](P5_SELFPLAY_TRIAL.md)を受けた事前条件。最初の本条件実行は第1世代16対局の公開後に[確率和誤差で停止](P5_PRIOR_NORMALIZATION.md)。実機は解放済みで、修正のCI後に新source・protocolで再実行する。旧16件を新しい48件に数えず、別VM継続も未完了。この計画を完了記録として扱わない。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
+本書は実行前に固定した条件を保持する。修正前の部分成果は[停止記録](P5_PRIOR_NORMALIZATION.md)、修正後の実数・固定HF revision・別VM後続世代・資源解放は[完了記録](P5_2_COMPLETION.md)。小規模2件と旧16件は本条件48件へ含めない。
 
 ## 目的とゴール
 
@@ -16,7 +18,7 @@ M6を基点に3世代×16対局＝48 episodeを実行し、各世代で全手検
 | 探索・Actor | seed314159、32 simulations、最大深さ64、c_puct=1。追加256手上限、最初16手は温度1、以降0。Dirichlet fraction0.25／alpha0.3、bootstrap discount1 |
 | 学習 | CUDA FP32、AdamW、learning rate0.0001、weight decay0.01、1epoch、batch4、threads2、save_every128。世代ごとにoptimizerを作り直し、holdoutで選択しない |
 | 保護集合 | 116,008件、SHA-256 `364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944`。[HF固定版](https://huggingface.co/datasets/voxelshogi/voxelshogi-protected-inputs-v1/tree/ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8)を全hash照合し、元の全bytesを使用。P5-1教師の採用0 |
-| sourceとprotocol | 関連CI成功後のclean source、全開始棋譜、保護集合、設定をworkload／protocolへ固定し、レンタル前にhashを記録する。開始棋譜を生成したsource `40ae236`の来歴も保持 |
+| sourceとprotocol | 関連CI成功後のclean source `1280dc40c61e4ba15f0f5996abc775d900b043a7`、protocol `f4cc205d29a86ab02db9533e39f0001a0e2cdcfe414f14724a8123b7fab589ce`。全開始棋譜・保護集合・設定をレンタル前に固定した。開始棋譜を生成したsource `40ae236`の来歴も保持。合法手の正規化だけFP64、モデルと学習はFP32 |
 
 追加256手や長い開始履歴で自然終局を保証しない。自然終局・ルール上の引分・cutoffを実数で別報告し、全cutoffも負の結果として残す。開始履歴の長さだけで中終盤の代表性を証明したとはしない。
 
@@ -29,7 +31,7 @@ M6を基点に3世代×16対局＝48 episodeを実行し、各世代で全手検
 
 両枠ともRTX5090×1・disk80GB・転送無料・総単価US$1/時以下、既存制御のclean source／workload hash・所有照合・独立期限停止を維持する。内部計算締切は絶対期限の30分前、GitHub側の削除は20分前。各実行後は即時解放し、上限までGPUを保持しない。未確定世代を完了と数えず、期限不足を理由に48件や探索上限を実行中に減らさない。
 
-追加予約は最大合計US$5で、全体予約US$78→83、Phase5 US$17→22となる。従来のPhase5初期枠20だけではUS$2不足するため、未使用のPhase6配分からUS$4を移し、**Phase5 US$24・Phase6 US$15**とする。M4/M6の既存予約・基本総枠US$100・配分合計US$39を保ち、条件付き追加US$100は有効化しない。Phase6の実行はP5-2後の停止・振り返りを待つ。実請求は未回収、予約とサービス残高は別である。
+修正後の2VMの最大追加予約は合計US$5。修正前の失敗runのUS$2も残し、全体US$85／基本枠100、Phase5 US$24／配分24。Phase6配分15、条件付き追加US$100は未適用。保守的予約とサービス残高・確定請求は別である。 未使用Phase6からUS$4を移した配分変更はPR #114で境界テスト・変異検出と必須CI成功後に統合済み。実請求は未回収。
 
 配分境界は、Phase5の20+4=24を許可し21+4=25を拒否、Phase6の11+4=15を許可し12+4=16を拒否する独立した期待値で検証する。総枠100・既存予約保持・超過時の作成前拒否も継続する。
 

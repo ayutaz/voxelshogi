@@ -1,5 +1,9 @@
 # Phase5自己対局：探索とActorの契約
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
+探索・Actor・実モデル・保存／学習と両HF公開は接続済み。本条件の実績は[完了記録](P5_2_COMPLETION.md)。以下は探索／Actorの契約と実装時の独立検証であり、参照木だけを実自己対局の証拠にしない。
+
 完成episodeの独立した再生・ラベル検証と保存は[Replay Buffer](P5_REPLAY.md)を参照。
 
 2026-10-30。[P5-2](POST_M6_PLAN.md#phase5)に向け、最初の探索方式を
@@ -101,7 +105,7 @@ episode内の任意の手からの再開は、このActorでは実装しない�
 特徴量・出力の検査を共有し、全合法手だけでsoftmaxした確率と、
 現在の手番視点のValueを返す。Valueを反転・clampしない。
 推論はeval／inference modeで行い、推論モデルの勾配を無効にする。
-現在のファイルloaderはFP32のTransformer-Sだけを扱う。
+現在のファイルloaderはFP32のTransformer-Sだけを扱う。合法手logitsのsoftmaxだけをFP64で計算し、数千手ある場合も探索の確率和許容差1e-6を維持する。[数値修正と実GPU再現](P5_PRIOR_NORMALIZATION.md)を参照。モデル・logits・学習のFP32と区別する。
 
 `load_policy_value`には期待するSHA-256とCPU／CUDAを明示する。
 通常ファイル・safetensors形式・512MiB以下を要求し、読み込み前後のhash、
@@ -139,7 +143,7 @@ Actorは手書きportで温度のCDF、rootノイズ、自然終局／bootstrap�
 先後の1手詰め、11手の履歴からの千日手、MaxPlies棋譜の再生も確認する。
 ここでのモデルは手書きの既知policy／valueで、学習済みモデルの性能評価ではない。
 
-この後、evaluatorとActorを完成episodeの検証・保存・読み込み、
-[全合法手を分母にする疎な損失](P5_TARGETS.md)と、Replay Buffer・世代更新・保存再開を接続する。
-外部Linuxで複数世代を実行し、別実機での復旧・固定評価まで通してP5-2〜3を判定する。
+evaluatorとActorは完成episodeの検証・保存・読み込み、
+[全合法手を分母にする疎な損失](P5_TARGETS.md)、Replay Buffer・世代更新・HF保存再開へ接続済み。
+本条件の別実機後続世代はP5-2、固定評価での棋力比較は未実施のP5-3として分けて判定する。
 この小さい参照木のテストを、実3D将棋の自己対局実績と読み替えない。

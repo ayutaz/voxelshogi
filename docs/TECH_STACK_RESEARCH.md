@@ -1,5 +1,9 @@
 # VoxelShogi 技術スタック調査（デューデリジェンス）
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
+P5-2は既存の729 token／FP32 Transformer-S・Rust履歴を使い、合法手の確率正規化だけをFP64へ修正した。[実GPUでの数値検証](P5_PRIOR_NORMALIZATION.md)と[実行・HF復旧](P5_2_COMPLETION.md)を参照。以下の市場価格・外部ライブラリ調査・当時の測定は取得日を固定し、現在の速度や新しい発注条件へ流用しない。DDP・別構造・Mモデルは未実施。
+
 - 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-30**（公式料金の最終照合は2026-10-26）
 - 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch単GPU学習と将来のDDP（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。

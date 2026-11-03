@@ -1,5 +1,7 @@
 # P5-2：完成episodeの検証とReplay Buffer
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
 2026-10-30。[自己対局Actor](P5_SELFPLAY.md)と学習の間を接続する。
 生成・学習・モデル更新の複数世代、別実機での復旧は後続であり、この部品だけで
 P5-2全体を完了としない。
@@ -16,7 +18,7 @@ P5-2全体を完了としない。
 v1の打切りラベルだけから元の推定値を逆算せず、v2では未割引の最終推定値・
 その手番・履歴上のplyを`bootstrap`へ保存する。自然終局なら`bootstrap=null`。
 元のmodel hash、source commit、設定とopening全履歴をepisode IDへ結ぶ。
-v1を自動でv2と解釈しない。まだ自己対局データをHFで公開した段階ではない。
+v1を自動でv2と解釈しない。本条件48対局のHF公開・全hash照合と別VM継続は[P5-2完了記録](P5_2_COMPLETION.md)で確認する。
 
 [verify_episode](../training/replay.py)へ、検証済みloaderと固定workloadから得た
 期待source・model hash・ActorConfigを渡す。episode自身の宣言値を期待値にしない。
@@ -56,5 +58,6 @@ capacityは選択windowの上限で、ディスク保持量の上限ではない
 再開cursorを検証する。新規18変異を実行済み失敗で検出し、通常CIへ含める。
 実Rustの打切り・詰み・11手の千日手prefixと保存復元はLinux統合テストで確認する。
 
-次はReplayからの訪問分布／Value別batch、学習・モデル更新、HFでのデータ／再開状態の
-退避・全hash照合を接続する。その後に複数世代と別実機再開を実測し、世代比較へ進む。
+Replayからの訪問分布／Value別batch、学習・モデル更新は[世代更新](P5_GENERATIONS.md)、
+HFでの両公開は[公開トランザクション](P5_SELFPLAY_RELEASE.md)へ接続済み。
+本条件の複数世代と別実機継続の結果を共有して停止し、世代比較は振り返り後に計画する。

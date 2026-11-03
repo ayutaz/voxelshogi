@@ -1,5 +1,7 @@
 # P5-2：自己対局へ入れない入力の固定
 
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
 2026-11-03 UTC。`training/selfplay_protection.py`は、検証済みの既存コーパス・開発評価・P5-1のholdoutから、自己対局学習の除外集合を作る。探索・教師の再計算・学習は行わない。Rust再生や大きいコーパスの読み取りを伴うため、実データでの作成は外部Linuxに限定する。
 
 ## 保護する対象
@@ -31,3 +33,9 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.selfp
 ## 確認範囲
 
 メタデータ4テストでは、sampleされない途中局面と終端の保護、違法な履歴／初期盤／結果の拒否、入力元別件数と一意な合併、空入力・不正ID・違うrevision・未照合HF receiptの拒否を確認した。Linux CIには実Rust・Parquetで、教師JSONを学習不能な内容へ変更してもholdout履歴の保護だけは行う試験を置く。各prefixを独立に復元した参照集合と比較する。これらは実固定コーパスでの保護集合作成や、実GPUでの漏洩監査完了を意味しない。
+
+## 照合済み集合を別VMで使う
+
+[固定HF index](https://huggingface.co/datasets/voxelshogi/voxelshogi-protected-inputs-v1/tree/ec3bfa0acfa6c5c9f59f98bf1750a3143c0007d8)は、上記の全固定入力から作成した116,008件を保存する。`protected.parquet`のexclusions splitは`input_id: string`の一列で、整列済みの一意IDを保持する。`config.json`は元の`protected.json`の全bytesで、SHA-256は`364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944`。`manifest.json`には元revision・全件の入力監査・転送receiptを保持し、`validation.json`はParquet全IDの往復一致を記録する。
+
+外部Linuxで固定revisionの全6ファイルを既存公開ハーネスで照合し、config.jsonのbytesをそのままprotocolの保護入力へ渡す。JSONを再整形せず、protocolのhash・件数・出所を照合する。全コーパスの再取得を省くための固定indexで、除外範囲を減らす方法ではない。教師の採用数は0。CC-BY-4.0、public/manual・Community OFF、4節のDataset Cardを維持する。

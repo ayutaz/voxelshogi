@@ -1,6 +1,8 @@
 # P5-2：自己対局データの退避と世代境界からの復旧
 
-2026-11-02 UTC。目的は、元の実行フォルダやpickle形式のcheckpointへ依存せず、確定世代までのReplayと親子モデルの系譜を別の外部Linuxへ移すこと。実装は`training/selfplay_dataset.py`。実際のHF公開・別VMでの学習再開は後続で、Linux CIでの復旧とは区別する。
+**2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
+
+2026-11-02 UTC。目的は、元の実行フォルダやpickle形式のcheckpointへ依存せず、確定世代までのReplayと親子モデルの系譜を別の外部Linuxへ移すこと。実装は`training/selfplay_dataset.py`。本条件3世代48対局の実HF公開・別VMでの後続世代は[P5-2完了記録](P5_2_COMPLETION.md)を参照。以下は退避・復旧の契約であり、Linux CIの小さい試験と本条件の証拠を区別する。
 
 ## 含める内容と復旧地点
 
@@ -32,7 +34,7 @@ restore_dataset(
 
 `models`は各確定世代の番号から、別途取得・検証済みのsafetensorsへの対応。全モデルのSHA-256を照合し、不足・差異は復旧先の作成前に拒否する。全episodeをRustで再生し、凍結した世代別Actor設定とseed、合法手、ラベル計算、訪問数・呼び出し数を再検査する。PUCTのニューラル推論そのものを再実行したとはしない。
 
-復旧先は新規ディレクトリに限定する。モデルのコピー後にもhashを検査し、Replayと全モデルがそろってから`run.json`をcommit pointとして書く。base modelとprotected-inputsはprotocolが固定する別入力として取得する。世代のDatasetとstateを固定revisionで照合し、両receiptを公開cursorへ反映する接続は[公開トランザクション](P5_SELFPLAY_RELEASE.md)を使う。実HF公開・別VM復旧の証拠はまだない。
+復旧先は新規ディレクトリに限定する。モデルのコピー後にもhashを検査し、Replayと全モデルがそろってから`run.json`をcommit pointとして書く。base modelとprotected-inputsはprotocolが固定する別入力として取得する。世代のDatasetとstateを固定revisionで照合し、両receiptを公開cursorへ反映する接続は[公開トランザクション](P5_SELFPLAY_RELEASE.md)を使う。本条件の固定revision・実機ID・後続世代の証拠は[完了記録](P5_2_COMPLETION.md)へ分けて保持する。
 
 ## 公開
 
