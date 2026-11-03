@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "vast-requote-contract-filter",
+        "training/vast_rental_control.py",
+        '"ask_contract_id": {"eq": offer_id}',
+        '"id": {"eq": offer_id}',
+        "test_vast_rental_control.py",
+    ),
+    (
+        "vast-research-requote-contract-filter",
+        "training/vast_research_control.py",
+        '"ask_contract_id": {"eq": plan["offer_id"]}',
+        '"id": {"eq": plan["offer_id"]}',
+        "test_vast_research_control.py",
+    ),
+    (
         "vast-available-credit-not-balance",
         "training/vast_rental_control.py",
         'credit = account.get("credit")',

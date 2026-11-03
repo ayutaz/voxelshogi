@@ -52,7 +52,8 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
             "POST",
             "/api/v0/bundles",
             {
-                "id": {"eq": plan["offer_id"]},
+                "ask_contract_id": {"eq": plan["offer_id"]},
+                "num_gpus": {"eq": 1},
                 "type": "on-demand",
                 "allocated_storage": DISK_GB,
                 "limit": 2,

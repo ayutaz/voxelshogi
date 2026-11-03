@@ -1,0 +1,14 @@
+{
+  "schema": "voxelshogi-vast-offer-filter-correction-v1",
+  "observed_date_utc": "2026-11-03",
+  "read_only_api": "/api/v0/bundles/",
+  "selected_offer_id": 58291028,
+  "id_filter_with_single_gpu_results": 0,
+  "ask_contract_id_filter_with_single_gpu_results": 1,
+  "returned_id_equals_requested_contract": true,
+  "create_was_blocked_before_budget_reservation": true,
+  "new_instances_created": 0,
+  "new_budget_reservations": 0,
+  "change": "Use ask_contract_id for requoting, while requiring exactly one returned offer with the expected response id and all hardware/price conditions.",
+  "reference": "https://docs.vast.ai/api-reference/search/search-offers"
+}

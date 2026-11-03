@@ -269,7 +269,8 @@ class VastRental(VastInstanceControl, M6Rental):
             "POST",
             "/api/v0/bundles",
             {
-                "id": {"eq": offer_id},
+                "ask_contract_id": {"eq": offer_id},
+                "num_gpus": {"eq": 1},
                 "type": "on-demand",
                 "allocated_storage": DISK_GB,
                 "limit": 2,

@@ -55,6 +55,13 @@ class Provider:
                 "ssh_key": "never-save-this-account-key",
             }
         if path == "/api/v0/bundles":
+            # The real bundles endpoint filters contracts by ask_contract_id;
+            # the response's id is not an equivalent search predicate.
+            if "id" in data or (
+                "ask_contract_id" in data
+                and data["ask_contract_id"] != {"eq": self.offer["id"]}
+            ):
+                return {"offers": []}
             return {"offers": [copy.deepcopy(self.offer)]}
         if path == "/api/v1/instances":
             if self.pages:
@@ -178,6 +185,19 @@ def test_guard_and_shared_reservation_precede_create_and_use_local_public_key(tm
     assert json.loads(budget.read_text())["reserved_total_usd"] == 45
     assert control.attach_key()["success"] is True
     assert api.calls[-1][2] == {"ssh_key": "ssh-ed25519 opaque fixture"}
+
+
+def test_exact_contract_is_requoted_before_reserving_and_creating(tmp_path):
+    control, api, _, _ = setup(tmp_path)
+    control.rent(123, lambda: None)
+    query = next(data for _, path, data, _ in api.calls if path == "/api/v0/bundles")
+    assert query == {
+        "ask_contract_id": {"eq": 123},
+        "num_gpus": {"eq": 1},
+        "type": "on-demand",
+        "allocated_storage": 80,
+        "limit": 2,
+    }
 
 
 def test_missing_approval_and_guard_failure_cannot_create_a_paid_instance(tmp_path):
