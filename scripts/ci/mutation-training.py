@@ -12,6 +12,48 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-extension-proof",
+        "training/research_budget.py",
+        "and marker == extension_record()",
+        "and True",
+        "test_research_budget.py",
+    ),
+    (
+        "research-extension-partial-activation",
+        "training/research_budget.py",
+        "and marker is None",
+        "and True",
+        "test_research_budget.py",
+    ),
+    (
+        "research-extension-preserve-prior-ledger",
+        "training/research_budget.py",
+        "result = deepcopy(ledger)",
+        "result = ledger",
+        "test_research_budget.py",
+    ),
+    (
+        "research-extension-prior-counters",
+        "training/research_budget.py",
+        'ledger.get("reserved_total_usd") != reserved',
+        "False",
+        "test_research_budget.py",
+    ),
+    (
+        "research-extension-remaining-budget",
+        "training/research_budget.py",
+        "remaining_unreserved_usd=200 - reserved",
+        "remaining_unreserved_usd=100 - reserved",
+        "test_research_budget.py",
+    ),
+    (
+        "research-extension-evidence-binding",
+        "training/research_budget.py",
+        "hashlib.sha256(EVIDENCE.read_bytes()).hexdigest()",
+        '"0" * 64',
+        "test_research_budget.py",
+    ),
+    (
         "evaluation-rental-hourly-cap",
         "training/vast_evaluation_control.py",
         "MAXIMUM_HOURLY_USD = 0.75",
@@ -412,9 +454,9 @@ MUTATIONS = [
     ),
     (
         "research-recorded-allocations-match",
-        "training/research_rental_control.py",
-        'or ledger.get("research_allocations_usd") != ALLOCATIONS',
-        "or False",
+        "training/research_budget.py",
+        "allocations == BASIC_ALLOCATIONS",
+        "True",
         "test_research_rental_control.py",
     ),
     (
@@ -503,16 +545,16 @@ MUTATIONS = [
     ),
     (
         "research-p53-trial-phase5-boundary",
-        "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 38, "phase6": 1}',
-        'ALLOCATIONS = {"phase5": 39, "phase6": 1}',
+        "training/research_budget.py",
+        'BASIC_ALLOCATIONS = {"phase5": 38, "phase6": 1}',
+        'BASIC_ALLOCATIONS = {"phase5": 39, "phase6": 1}',
         "test_research_rental_control.py",
     ),
     (
         "research-p53-trial-phase6-boundary",
-        "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 38, "phase6": 1}',
-        'ALLOCATIONS = {"phase5": 38, "phase6": 2}',
+        "training/research_budget.py",
+        'BASIC_ALLOCATIONS = {"phase5": 38, "phase6": 1}',
+        'BASIC_ALLOCATIONS = {"phase5": 38, "phase6": 2}',
         "test_research_rental_control.py",
     ),
     (
@@ -1894,14 +1936,14 @@ MUTATIONS = [
     (
         "research-project-cap",
         "training/research_rental_control.py",
-        "reserved + cap > 100",
+        "reserved + cap > total_limit",
         "False",
         "test_research_rental_control.py",
     ),
     (
         "research-phase-cap",
         "training/research_rental_control.py",
-        "or phase_reserved + cap > ALLOCATIONS[self.phase]",
+        "or phase_reserved + cap > allocations[self.phase]",
         "or False",
         "test_research_rental_control.py",
     ),

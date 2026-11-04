@@ -1,0 +1,44 @@
+{
+  "schema": "voxelshogi-conditional-gpu-budget-evidence-v1",
+  "recorded_at_utc": "2026-11-04T04:26:17Z",
+  "scope": "P5-3 timing completion, 150 development games, one-factor diagnosis, and actual 1/2/4-GPU benchmark with save/resume",
+  "existing_approval": "User authorized an additional USD100 if the GPU budget is insufficient; no new approval is inferred from service credit.",
+  "basic_limit_usd": 100,
+  "approved_extra_usd": 100,
+  "extended_limit_usd": 200,
+  "prior_reserved_usd": 89.75,
+  "prior_reservations": 21,
+  "startup_attempt": {
+    "instance_id": 59053218,
+    "machine_id": 96679,
+    "quoted_hourly_usd": 0.5925925925925926,
+    "reserved_maximum_usd": 2.75,
+    "status_before_retirement": "loading",
+    "ssh_probe": "connection refused",
+    "bootstrap_or_scientific_worker_started": false,
+    "retirement_reason": "Remaining deadline no longer accommodates the frozen 7200-second work estimate plus 1260-second retirement reserve.",
+    "delete_acknowledged": true,
+    "full_inventory_absence_confirmed": true,
+    "conservative_reservation_retained": true
+  },
+  "next_quote": {
+    "offer_id": 52391516,
+    "machine_id": 132598,
+    "quoted_hourly_usd": 0.5808888888888889,
+    "transfer_each_direction_usd_per_gb": 0.0006510416666666666,
+    "verification": "verified",
+    "gpu": "RTX 5090",
+    "num_gpus": 1,
+    "rental_not_yet_requested_at_record_time": true
+  },
+  "remaining_units": [
+    {"purpose": "timing retry and full input audit", "maximum_usd": 2.75},
+    {"purpose": "150 development games", "maximum_usd": 2.75},
+    {"purpose": "results-led one-factor diagnosis", "maximum_usd": 2},
+    {"purpose": "actual 1/2/4-GPU measurements and save/resume", "maximum_usd": 4}
+  ],
+  "forecast_total_usd": 101.25,
+  "shortage_usd": 1.25,
+  "cost_scope": "Conservative reservations and bounded estimates, not retrieved invoices. Future unit durations must be requoted after timing; the USD200 authorization does not reserve or spend USD200.",
+  "activation_policy": "Apply only after the controller PR and integrated main checks succeed. Preserve all prior reservations; allocate the approved extra100 to Phase5, keep Phase6 at1, and bind the ledger to this evidence SHA256."
+}

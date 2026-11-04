@@ -1,7 +1,7 @@
 """Phase5/6 small single-GPU rentals inside the existing project budget.
 
-No provider access happens at import. Multi-GPU jobs and conditional extra-budget
-activation require measured quotes and a separate extension of this controller.
+No provider access happens at import. Conditional extra-budget activation is an
+explicit, evidence-bound ledger transition; rentals never activate it themselves.
 """
 
 import fcntl
@@ -21,6 +21,7 @@ from training.rental_control import (
     Rental,
     save,
 )
+from training.research_budget import BASIC_ALLOCATIONS, budget_limits
 
 ROOT = Path(__file__).resolve().parents[1]
 HARDWARE = {
@@ -28,9 +29,8 @@ HARDWARE = {
     M6_SHARED_SKU: (M6_SHARED_DC, False),
     "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),
 }
-# Priced-transfer evaluation and DDP units: move USD12 of unused Phase6 allocation.
-# The project remains USD100; the conditional extra USD100 is not activated.
-ALLOCATIONS = {"phase5": 38, "phase6": 1}
+# Default allocations remain unchanged until the ledger's explicit activation.
+ALLOCATIONS = dict(BASIC_ALLOCATIONS)
 PURPOSES = {
     "phase5-evaluation",
     "phase5-data",
@@ -207,18 +207,14 @@ class ResearchRental(Rental):
         with self.budget.open("r+") as stream:
             fcntl.flock(stream, fcntl.LOCK_EX)
             ledger = json.load(stream)
+            total_limit, allocations = budget_limits(ledger)
             rows = ledger.get("reservations")
-            if (
-                ledger.get("approved_total_usd") != 100
-                or ledger.get("research_allocations_usd") != ALLOCATIONS
-                or not isinstance(rows, list)
-                or any(
-                    not isinstance(row, dict)
-                    or type(row.get("maximum_usd")) not in (int, float)
-                    or not math.isfinite(row["maximum_usd"])
-                    or row["maximum_usd"] < 0
-                    for row in rows
-                )
+            if not isinstance(rows, list) or any(
+                not isinstance(row, dict)
+                or type(row.get("maximum_usd")) not in (int, float)
+                or not math.isfinite(row["maximum_usd"])
+                or row["maximum_usd"] < 0
+                for row in rows
             ):
                 raise ValueError("invalid shared project budget")
             reserved = sum(row["maximum_usd"] for row in rows)
@@ -228,8 +224,8 @@ class ResearchRental(Rental):
                 if str(row.get("task", "")).startswith(self.phase + "-")
             )
             if (
-                reserved + cap > 100
-                or phase_reserved + cap > ALLOCATIONS[self.phase]
+                reserved + cap > total_limit
+                or phase_reserved + cap > allocations[self.phase]
                 or any(row.get("tag") == self.tag for row in rows)
             ):
                 raise ValueError(
@@ -248,7 +244,7 @@ class ResearchRental(Rental):
             )
             ledger.update(
                 reserved_total_usd=reserved + cap,
-                remaining_unreserved_usd=100 - reserved - cap,
+                remaining_unreserved_usd=total_limit - reserved - cap,
             )
             stream.seek(0)
             json.dump(ledger, stream, indent=2)
