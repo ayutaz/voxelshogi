@@ -170,3 +170,50 @@ def test_stop_after_an_update_saves_that_global_cursor_without_emitting_more_wor
     assert seen == [1] and [p["step"] for p in saved] == [1]
     assert result["reason"] == "stopped" and result["progress"]["examples"] == 4
     assert result["measured_updates"] == 0 and result["examples_per_second"] is None
+
+
+@pytest.mark.parametrize("device_type", ["cuda", "cpu"])
+def test_rank_seed_targets_its_own_cuda_device_without_seeding_other_devices(
+    device_type,
+):
+    from contextlib import contextmanager
+    from types import SimpleNamespace
+
+    from training.distributed_loop import seed_rank
+
+    calls, active = [], [0]
+
+    @contextmanager
+    def device(target):
+        previous = active[0]
+        active[0] = target.index
+        try:
+            yield
+        finally:
+            active[0] = previous
+
+    torch = SimpleNamespace(
+        random=SimpleNamespace(
+            default_generator=SimpleNamespace(
+                manual_seed=lambda seed: calls.append(("cpu-torch", seed))
+            )
+        ),
+        cuda=SimpleNamespace(
+            device=device,
+            manual_seed=lambda seed: calls.append(("cuda", active[0], seed)),
+        ),
+    )
+    seed_rank(
+        63001,
+        1,
+        SimpleNamespace(type=device_type, index=1),
+        random=SimpleNamespace(seed=lambda seed: calls.append(("python", seed))),
+        np=SimpleNamespace(
+            random=SimpleNamespace(seed=lambda seed: calls.append(("numpy", seed)))
+        ),
+        torch=torch,
+    )
+    expected = [("python", 63002), ("numpy", 63002), ("cpu-torch", 63002)]
+    if device_type == "cuda":
+        expected.append(("cuda", 1, 63002))
+    assert calls == expected and active[0] == 0

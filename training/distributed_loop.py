@@ -12,6 +12,15 @@ from training.distributed_training import DistributedConfig
 from training.research_data import fingerprint
 
 
+def seed_rank(seed, rank, device, *, random, np, torch):
+    random.seed(seed + rank)
+    np.random.seed((seed + rank) % 2**32)
+    torch.random.default_generator.manual_seed(seed + rank)
+    if device.type == "cuda":
+        with torch.cuda.device(device):
+            torch.cuda.manual_seed(seed + rank)
+
+
 def check_cursor(progress, config):
     if (
         type(progress) is not dict
@@ -306,11 +315,7 @@ def fit_schedule(
                 atomic_json(folder / "schedule.json", schedule)
 
             rank0_io(create)
-            random.seed(config.seed + rank)
-            np.random.seed((config.seed + rank) % 2**32)
-            torch.random.default_generator.manual_seed(config.seed + rank)
-            if device.type == "cuda":
-                torch.cuda.manual_seed(config.seed + rank)
+            seed_rank(config.seed, rank, device, random=random, np=np, torch=torch)
             progress = {
                 "epoch": 0,
                 "next_batch": 0,

@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "ddp-loop-seed-device",
+        "training/distributed_loop.py",
+        "        with torch.cuda.device(device):\n            torch.cuda.manual_seed(seed + rank)",
+        "        torch.cuda.manual_seed(seed + rank)",
+        "test_distributed_loop.py",
+    ),
+    (
+        "ddp-loop-seed-rank",
+        "training/distributed_loop.py",
+        "torch.random.default_generator.manual_seed(seed + rank)",
+        "torch.random.default_generator.manual_seed(seed)",
+        "test_distributed_loop.py",
+    ),
+    (
         "ddp-loop-schedule-order",
         "training/distributed_loop.py",
         'or schedule.get("order_sha256") != fingerprint(schedule["batches"])',
