@@ -168,9 +168,11 @@ def fit_schedule(
     from training.checkpoint import atomic_json, deterministic_runtime
     from training.distributed_benchmark import global_schedule
     from training.distributed_training import (
+        REDUCTION,
         _process_group,
         _raw_model,
         distributed_update,
+        enable_rank_ordered_reduction,
         load_distributed_checkpoint,
         save_distributed_checkpoint,
         validate_distributed_binding,
@@ -222,6 +224,7 @@ def fit_schedule(
         ):
             raise ValueError("invalid distributed input/configuration")
         raw = _raw_model(model, world_size)
+        enable_rank_ordered_reduction(model, rank=rank, world_size=world_size)
         parameters = list(raw.parameters())
         if not parameters or any(
             p.dtype != torch.float32 or p.device.type != config.device
@@ -259,7 +262,8 @@ def fit_schedule(
             "config": config.value(),
             "environment": runtime_environment(config),
             "contract": {
-                "schema": "voxelshogi-distributed-training-v1",
+                "schema": "voxelshogi-distributed-training-v2",
+                "gradient_reduction": REDUCTION,
                 **input_binding,
                 "world_size": world_size,
                 "schedule_sha256": schedule["order_sha256"],

@@ -13,6 +13,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "distributed-fixed-rank-sum-order",
+        "training/distributed_training.py",
+        "for value in buffers[1:]:",
+        "for value in reversed(buffers[1:]):",
+        "test_rank_ordered_mean.py",
+    ),
+    (
+        "distributed-fixed-rank-mean-scale",
+        "training/distributed_training.py",
+        "return result.div_(len(buffers))",
+        "return result",
+        "test_rank_ordered_mean.py",
+    ),
+    (
+        "distributed-fixed-rank-input-alias",
+        "training/distributed_training.py",
+        "result = buffers[0].clone()",
+        "result = buffers[0]",
+        "test_rank_ordered_mean.py",
+    ),
+    (
+        "distributed-reduction-binding-strategy",
+        "training/distributed_training.py",
+        'if contract.get("gradient_reduction") != REDUCTION:',
+        "if False:",
+        "test_distributed_reduction_binding.py",
+    ),
+    (
+        "distributed-reduction-hook-registration",
+        "training/distributed_training.py",
+        "model.register_comm_hook((dist, world_size), _rank_ordered_hook)",
+        "pass",
+        "test_rank_ordered_gradient_native.py",
+    ),
+    (
         "distributed-history-profile-isolation",
         "training/resume_archive.py",
         'if profile == "distributed":\n                previous = _distributed_history_event(event, config, previous)',
