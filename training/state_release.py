@@ -30,10 +30,7 @@ def reserve_state_upload(path, plan):
             raise ValueError(
                 "state upload already reserved; audit instead of resending"
             )
-        if (
-            sum(row["maximum_bytes"] for row in reservations) + amount
-            > maximum
-        ):
+        if sum(row["maximum_bytes"] for row in reservations) + amount > maximum:
             raise ValueError("training-state upload budget exceeded")
         reservations.append({"release_sha256": release, "maximum_bytes": amount})
         stream.seek(0)
