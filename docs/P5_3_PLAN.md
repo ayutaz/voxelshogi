@@ -11,7 +11,7 @@
 - [全コーパス・後続入力の監査](../training/generation_audit.py)：M4全split、全P5-2公開sample、保護入力を列挙し、評価開始後の全局面・終端を物理局面と手番正規化入力の両方で照合する。固定revision取得とhash照合は実行側の先行条件である。
 - [評価runner](../training/evaluation_v2_runner.py)の`--resume`：各対局をhash付きreceiptへ確定し、再開時に同じprotocol・全保存hash・metadata・Rust再生を検査して完了済みを再利用する。未確定ファイル・同時実行・条件や環境の変更は拒否する。既定の新規実行は既存出力を上書きしない。
 
-小さいmetadata／fake portsの43テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
+小さいmetadata／fake portsの45テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
 
 ## 現在地と優先順位の根拠
 
