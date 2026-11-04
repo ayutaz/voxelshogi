@@ -17,7 +17,7 @@ from training.evaluation_jobs import (
     read_case_rows,
     validate_case_plan,
 )
-from training.evaluation_v2 import fingerprint
+from training.evaluation_v2 import NEURAL_POLICIES, fingerprint
 from training.evaluation_v2_runner import (
     checked_execution,
     execution_runtime,
@@ -45,9 +45,7 @@ def _artifacts(cohorts, artifacts):
         raise ValueError("every cohort artifact mapping is required")
     for name, spec in cohorts.items():
         roles = {
-            k
-            for k, p in spec["participants"].items()
-            if p["policy"] == "legal-argmax-v1"
+            k for k, p in spec["participants"].items() if p["policy"] in NEURAL_POLICIES
         }
         if type(artifacts[name]) is not dict or set(artifacts[name]) != roles:
             raise ValueError("artifact roles differ from the full protocol")

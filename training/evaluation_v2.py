@@ -18,6 +18,7 @@ from training.evaluation import classify_result
 SCHEMA = "voxelshogi-evaluation-v2"
 RULESET = "voxelshogi-standard-v1"
 STRATA = {"opening", "middlegame", "endgame", "tactical"}
+NEURAL_POLICIES = frozenset({"legal-argmax-v1", "puct32-v1"})
 
 
 def fingerprint(value):
@@ -85,10 +86,15 @@ def validate_protocol(protocol):
             or set(participant) != {"artifact_sha256", "backend", "policy"}
             or not _hash(participant["artifact_sha256"])
             or participant["policy"]
-            not in ("legal-argmax-v1", "alphabeta-v1", "random-canonical-v1")
+            not in (*NEURAL_POLICIES, "alphabeta-v1", "random-canonical-v1")
             or (
-                participant["backend"] not in ("torch-cpu", "torch-cuda", "ort-cpu")
-                if participant["policy"] == "legal-argmax-v1"
+                participant["backend"]
+                not in (
+                    ("torch-cpu", "torch-cuda", "ort-cpu")
+                    if participant["policy"] == "legal-argmax-v1"
+                    else ("torch-cpu", "torch-cuda")
+                )
+                if participant["policy"] in NEURAL_POLICIES
                 else participant["backend"]
                 != ("rust" if participant["policy"] == "alphabeta-v1" else "python-rng")
             )

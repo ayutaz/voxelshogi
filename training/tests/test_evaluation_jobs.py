@@ -203,7 +203,7 @@ def fake_execution(monkeypatch, spec):
     monkeypatch.setattr(
         jobs,
         "_context",
-        lambda *a: (
+        lambda *a, **kw: (
             SimpleNamespace(from_record=lambda r: FakeGame(r, mate_after=1)),
             {"model": choose, "opponent": choose},
             {"source_commit": spec["source_commit"], "fake_port": True},
@@ -257,7 +257,7 @@ def test_fake_case_resume_refuses_changed_environment_without_overwriting_prefix
     original = first.read_bytes()
     context = jobs._context
     monkeypatch.setattr(
-        jobs, "_context", lambda *a: (*context(*a)[:2], {"changed": True})
+        jobs, "_context", lambda *a, **kw: (*context(*a, **kw)[:2], {"changed": True})
     )
     with pytest.raises(ValueError, match="runtime"):
         jobs.run_case_assignment(spec, {}, folder, case_id="ending", resume=True)

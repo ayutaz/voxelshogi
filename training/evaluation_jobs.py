@@ -15,6 +15,7 @@ from pathlib import Path
 
 from training.checkpoint import atomic_json
 from training.evaluation_v2 import (
+    NEURAL_POLICIES,
     summarize_matches,
     validate_match_rows,
     validate_protocol,
@@ -173,9 +174,9 @@ def _lease(folder):
         yield
 
 
-def _context(protocol, artifacts):
+def _context(protocol, artifacts, *, stop_requested=lambda: False):
     game, required, commit = checked_execution(protocol, artifacts)
-    players = _prepare_players(protocol, artifacts)
+    players = _prepare_players(protocol, artifacts, stop_requested=stop_requested)
     return game, players, execution_runtime(protocol, required, commit)
 
 
@@ -199,7 +200,9 @@ def run_case_assignment(
                 return saved
         elif folder.exists():
             raise FileExistsError(folder)
-        game, players, runtime = _context(protocol, artifacts)
+        game, players, runtime = _context(
+            protocol, artifacts, stop_requested=stop_requested
+        )
         if saved and saved["runtime"] != runtime:
             raise ValueError("resumed case runtime differs from saved environment")
         if not resume:
@@ -454,7 +457,7 @@ def run_case_plan(
         required = {
             role
             for role, p in spec["participants"].items()
-            if p["policy"] == "legal-argmax-v1"
+            if p["policy"] in NEURAL_POLICIES
         }
         if type(artifacts[name]) is not dict or set(artifacts[name]) != required:
             raise ValueError("unexpected or missing evaluation artifact")
