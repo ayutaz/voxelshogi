@@ -1,0 +1,41 @@
+{
+  "schema": "voxelshogi-p53-budget-activation-record-v1",
+  "activated_at": 1793770972.422467,
+  "extra_100_activated": true,
+  "previous_total_limit_usd": 100,
+  "approved_total_usd": 200,
+  "prior_reservations_preserved": 22,
+  "reserved_total_unchanged_usd": 92.5,
+  "remaining_unreserved_usd": 107.5,
+  "previous_allocations_usd": {
+    "phase5": 38,
+    "phase6": 1
+  },
+  "allocations_usd": {
+    "phase5": 138,
+    "phase6": 1
+  },
+  "before_ledger_sha256": "d7b573f41b4b104a448010637166a87d51f1c762843c587b13652d60db89f0f3",
+  "after_ledger_sha256": "37b1c70b6db8253f5e7b81c3374a1970fea97d251166142cd6428a6186ee7a9f",
+  "shortage_evidence_sha256": "e8db5e21144ba2d559f34c6af033fabd35461fe706bbb38f608102d6f14356bc",
+  "main_admission": {
+    "verified_at": 1793770841.2167318,
+    "source_commit": "8d1922ca7adbf2b39d19c99721d26c8359a77103",
+    "main_merge_commit": "8d1922ca7adbf2b39d19c99721d26c8359a77103",
+    "source_pr": 129,
+    "budget_policy_pr": 128,
+    "source_tree_matches_main": true,
+    "ci_run": 41779584359,
+    "ci_conclusion": "success",
+    "security_run": 41779584218,
+    "security_conclusion": "success",
+    "native_job": 126407885613,
+    "native_summary": "2026-11-04T05:32:04.0230125Z 1032 passed, 21 warnings in 84.26s (0:01:24)",
+    "native_log_sha256": "a966e333cc836f5eba977b1f4b015070e1165756d48c4b91ba5903fe5ef779df",
+    "training_mutation_shards_success": 4,
+    "training_mutation_catalog": 430
+  },
+  "owned_resources_zero_before_activation": true,
+  "new_rental_requests": 0,
+  "basis": "Previously authorized conditional extra GPU100; measured conservative forecast101.25 exceeds basic100. All prior reservations retained; actual invoices not retrieved. This is an upper bound, not an immediate spend."
+}

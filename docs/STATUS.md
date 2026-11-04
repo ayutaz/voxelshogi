@@ -1,6 +1,6 @@
 # 現在の状態と文書の案内
 
-2026-11-04 05:02 UTC。[P5-3bの8局試行](P5_3_TRIAL.md)は、全手再生・全入力重複監査・固定HF全hash・実機解放まで完了した。保存済み7局を再利用し、残り1局だけを実行した。M6／G2とも0勝2敗1自然引分1打切りで、棋力改善は未確認。ユーザーの「5まで進めて」の範囲は継続し、**150局・結果に基づく診断・実1／2／4GPUの測定は未完了**である。
+2026-11-04 05:42 UTC。[P5-3bの8局試行](P5_3_TRIAL.md)は、全手再生・全入力重複監査・固定HF全hash・実機解放まで完了した。保存済み7局を再利用し、残り1局だけを実行した。M6／G2とも0勝2敗1自然引分1打切りで、棋力改善は未確認。ユーザーの「5まで進めて」の範囲は継続し、**150局・結果に基づく診断・実1／2／4GPUの測定は未完了**である。
 
 ## 現在使えるもの
 
@@ -24,7 +24,7 @@ M6のFP32・FP16重み／FP32計算・INT8重み／FP32計算は、HFから取�
 
 P5-2のデータ／再開状態・保護index・集計reportは、[完了記録の固定revision一覧](P5_2_COMPLETION.md)から取得する。public/manualのダウンロード申請・Community OFF・Card・承認済みlicenseを維持する。データとcheckpointは外部Linuxから直接転送し、Macに中継しない。今回の自己対局stateをWebの変換済みモデルとして扱わない。
 
-P5-3b完了実機は05:02:39 UTCに解放を確認し、プロジェクト所有のVast実機は0。終了時の保守的予約は22件・US$92.5／基本100で、実請求未取得の予約を減らしていない。[費用配分と承認済み追加100の適用](P5_3_EXECUTION_BUDGET.md)を、controller・ledger・根拠hashの一致で管理する。Vastの利用可能クレジットは`credit`で確認し、サービス残高と予算承認を区別する。[P5-2時点の費用と停止](P5_2_COMPLETION.md)も履歴として保持する。
+P5-3b完了実機は05:02:39 UTCに解放を確認し、プロジェクト所有のVast実機は0。05:42:52 UTCに、承認済み追加100を根拠hash・統合CI・所有資源0の照合後に適用した。現在の総枠は**200、予約22件・92.5、未予約107.5**。既存予約の減額や新しい課金要求は行っていない。[費用配分と適用証跡](P5_3_EXECUTION_BUDGET.md)を参照する。Vastの利用可能クレジットは`credit`で確認し、サービス残高と予算承認を区別する。[P5-2時点の費用と停止](P5_2_COMPLETION.md)も履歴として保持する。
 
 Pythonは3.14を基本に、依存未対応時のみ3.13。Macは編集・読み取り・軽量確認、探索・生成・性能計測・学習は承認済みVast.ai／CloudRift、重い回帰はGitHub Actionsで行う。
 
@@ -45,7 +45,7 @@ M3着手前に確認した3D操作中の探索テストの観測競合は、入�
 
 ブランチ・PR・main保護・必須8チェックと通常mergeを維持する。PRは影響範囲の短い検証、main／定期は深い回帰を行う。[CIの実行範囲と実測](CI_PERFORMANCE.md)。文書だけのmain更新ではアプリを再配信しないため、公開SHAはmain HEADと異なることがある。[配信手順](DEPLOYMENT.md)。
 
-PR128統合main `0f7e6ab`では[変異baselineの失敗](https://github.com/ayutaz/voxelshogi/actions/runs/41776165445)を検知した。隔離checkoutに予算根拠JSONが欠けており、[PR129](https://github.com/ayutaz/voxelshogi/pull/129)で修正・Linuxの深いCIを検証中。追加100はまだ実ledgerへ適用していない。後続の文書のみのCI成功を、この実装失敗の解消証拠にはしない。
+PR128統合main `0f7e6ab`の[変異baseline失敗](https://github.com/ayutaz/voxelshogi/actions/runs/41776165445)は、隔離checkoutの予算根拠JSON同梱漏れだった。[PR129](https://github.com/ayutaz/voxelshogi/pull/129)は手動の深いCIと必須8チェック後に通常mergeし、統合main `8d1922c`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41779584359)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41779584218)も成功した。Native1,032件・21 warnings・84.26秒、全430変異の4 shardを実行済み。文書のみの成功で失敗を置き換えてはいない。CIの時間はGPU性能値へ流用しない。
 
 数値修正の[PR #115](https://github.com/ayutaz/voxelshogi/pull/115)は必須8チェック・関連CI成功後に通常mergeした。統合main `7e44310`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41652351549)ではFull Python unit and native integration、学習系変異4シャード、深いQuality・モデル結合・公開検証が成功。[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41652351458)の全4言語も成功した。
 
