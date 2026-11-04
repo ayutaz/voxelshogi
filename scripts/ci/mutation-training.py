@@ -13,6 +13,48 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "state-capacity-explicit-approval",
+        "training/state_upload_budget.py",
+        "if approved is not True or not _approval_reference(approval_reference):",
+        "if not _approval_reference(approval_reference):",
+        "test_state_upload_extension.py",
+    ),
+    (
+        "state-capacity-preserve-reservations",
+        "training/state_upload_budget.py",
+        "result = deepcopy(value)",
+        'result = deepcopy(value)\n    result["reservations"] = []',
+        "test_state_upload_extension.py",
+    ),
+    (
+        "state-capacity-prefix-binding",
+        "training/state_upload_budget.py",
+        '_prefix_hash(prefix) != record["prior_reservations_sha256"]',
+        "False",
+        "test_state_upload_extension.py",
+    ),
+    (
+        "state-capacity-new-ceiling",
+        "training/state_upload_budget.py",
+        "maximum != EXTENDED_MAXIMUM",
+        "False",
+        "test_state_upload_extension.py",
+    ),
+    (
+        "state-capacity-reservation-limit",
+        "training/state_release.py",
+        "maximum = upload_budget_limit(value)",
+        "maximum = 2 * 1024**3",
+        "test_state_upload_extension.py",
+    ),
+    (
+        "state-capacity-source-version",
+        "training/state_upload_budget.py",
+        'if upload_budget_limit(value) != BASIC_MAXIMUM or not value["reservations"]:',
+        'if not value["reservations"]:',
+        "test_state_upload_extension.py",
+    ),
+    (
         "distributed-fixed-rank-sum-order",
         "training/distributed_training.py",
         "for value in buffers[1:]:",
@@ -2574,7 +2616,7 @@ MUTATIONS = [
     (
         "state-release-budget-total",
         "training/state_release.py",
-        'sum(row["maximum_bytes"] for row in reservations) + amount\n            > MAXIMUM_NEW_BYTES',
+        'sum(row["maximum_bytes"] for row in reservations) + amount > maximum',
         "False",
         "test_training_state_release.py",
     ),

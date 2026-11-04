@@ -8,8 +8,7 @@ import re
 from pathlib import Path
 
 from training.resume_archive import verify_archive
-
-MAXIMUM_NEW_BYTES = 1024**3
+from training.state_upload_budget import upload_budget_limit
 
 
 def reserve_state_upload(path, plan):
@@ -25,30 +24,13 @@ def reserve_state_upload(path, plan):
     with path.open("r+") as stream:
         fcntl.flock(stream, fcntl.LOCK_EX)
         value = json.load(stream)
-        reservations = value.get("reservations")
-        if (
-            value.get("schema") != "voxelshogi-state-upload-budget-v1"
-            or type(value.get("approved_maximum_new_bytes")) is not int
-            or value["approved_maximum_new_bytes"] != MAXIMUM_NEW_BYTES
-            or not isinstance(reservations, list)
-            or any(
-                set(row) != {"release_sha256", "maximum_bytes"}
-                or not isinstance(row["release_sha256"], str)
-                or not re.fullmatch(r"[0-9a-f]{64}", row["release_sha256"])
-                or type(row["maximum_bytes"]) is not int
-                or row["maximum_bytes"] <= 0
-                for row in reservations
-            )
-        ):
-            raise ValueError("unapproved or invalid training-state upload budget")
+        maximum = upload_budget_limit(value)
+        reservations = value["reservations"]
         if any(row["release_sha256"] == release for row in reservations):
             raise ValueError(
                 "state upload already reserved; audit instead of resending"
             )
-        if (
-            sum(row["maximum_bytes"] for row in reservations) + amount
-            > MAXIMUM_NEW_BYTES
-        ):
+        if sum(row["maximum_bytes"] for row in reservations) + amount > maximum:
             raise ValueError("training-state upload budget exceeded")
         reservations.append({"release_sha256": release, "maximum_bytes": amount})
         stream.seek(0)
