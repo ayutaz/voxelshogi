@@ -20,6 +20,7 @@ from training.supervision import ROOT, label_contract
 
 SCHEMA = "voxelshogi-resume-archive-v1"
 SELFPLAY_SCHEMA = "voxelshogi-selfplay-resume-archive-v1"
+DISTRIBUTED_SCHEMA = "voxelshogi-distributed-resume-archive-v1"
 PAYLOAD_FIELDS = {"model", "optimizer", "rng", "progress", "binding"}
 
 
@@ -178,8 +179,10 @@ def decode_tree(tree, tensors):
 
 
 def _schema(profile):
-    if profile not in ("m6", "selfplay"):
+    if profile not in ("m6", "selfplay", "distributed"):
         raise ValueError("unknown resume archive profile")
+    if profile == "distributed":
+        return DISTRIBUTED_SCHEMA
     return SCHEMA if profile == "m6" else SELFPLAY_SCHEMA
 
 
@@ -194,6 +197,11 @@ def _binding(binding, *, profile="m6"):
     }:
         raise ValueError("resume run binding fields differ")
     config = binding["config"]
+    if profile == "distributed":
+        from training.distributed_training import validate_distributed_binding
+
+        validate_distributed_binding(binding)
+        return
     if profile == "selfplay":
         from training.selfplay_training import TrainConfig
 
@@ -303,8 +311,8 @@ def pack_run(source, output, *, profile="m6"):
     _binding(binding, profile=profile)
     index = json.loads((source / "checkpoints/latest.json").read_text())
     selected = ["latest"] + (["best"] if index.get("best") is not None else [])
-    if profile == "selfplay" and "best" in selected:
-        raise ValueError("selfplay archive must not contain best selection")
+    if profile in ("selfplay", "distributed") and "best" in selected:
+        raise ValueError(f"{profile} archive must not contain best selection")
     prepared = {}
     for role in selected:
         path, receipt = checkpoint_receipt(
@@ -317,6 +325,10 @@ def pack_run(source, output, *, profile="m6"):
             or payload["progress"] != receipt["progress"]
         ):
             raise ValueError("resume payload differs from verified receipt")
+        if profile == "distributed":
+            from training.distributed_training import validate_distributed_payload
+
+            validate_distributed_payload(payload)
         prepared[role] = (payload, receipt)
     history = _history(source / "events.jsonl")
     output.mkdir(parents=True, exist_ok=False)
@@ -372,11 +384,11 @@ def verify_archive(folder, *, expected_binding, profile="m6"):
         or not {"latest"} <= set(manifest["roles"]) <= {"latest", "best"}
     ):
         raise ValueError("resume archive schema/binding differs")
-    if profile == "selfplay" and (
+    if profile in ("selfplay", "distributed") and (
         set(manifest["roles"]) != {"latest"}
         or manifest["roles"]["latest"]["progress"]["best_val_loss"] is not None
     ):
-        raise ValueError("selfplay archive cannot contain best selection")
+        raise ValueError(f"{profile} archive cannot contain best selection")
     expected = {"config.json", "history.json"} | {
         f"{role}/{name}"
         for role in manifest["roles"]
@@ -437,6 +449,10 @@ def restore_run(archive, output, *, expected_binding, profile="m6"):
             or state["progress"] != descriptor["progress"]
         ):
             raise ValueError("decoded resume payload binding/progress differs")
+        if profile == "distributed":
+            from training.distributed_training import validate_distributed_payload
+
+            validate_distributed_payload(state)
         decoded[role] = state
     history = json.loads((archive / "history.json").read_text())
     if history["schema"] != "voxelshogi-training-history-v1" or not isinstance(
@@ -476,7 +492,9 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--expected-run", type=Path)
-    parser.add_argument("--profile", choices=("m6", "selfplay"), default="m6")
+    parser.add_argument(
+        "--profile", choices=("m6", "selfplay", "distributed"), default="m6"
+    )
     args = parser.parse_args()
     if not args.output.resolve().is_relative_to(ROOT / "runs"):
         parser.error("keep private archives/restores under runs/ on external Linux")

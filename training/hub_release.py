@@ -51,6 +51,7 @@ def _canonical(value):
 STATE_REPOS = {
     "training-state": "voxelshogi/voxelshogi-transformer-s-training-state",
     "selfplay-training-state": "voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1",
+    "distributed-training-state": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
 }
 
 
@@ -216,7 +217,11 @@ def plan_release(
         if (
             isinstance(manifest, dict)
             and manifest.get("schema")
-            in ("voxelshogi-resume-archive-v1", "voxelshogi-selfplay-resume-archive-v1")
+            in (
+                "voxelshogi-resume-archive-v1",
+                "voxelshogi-selfplay-resume-archive-v1",
+                "voxelshogi-distributed-resume-archive-v1",
+            )
             and artifact_role not in STATE_REPOS
         ):
             raise ValueError(

@@ -95,3 +95,9 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 各世代の両receipt・bundle/plan・全stateの固定revision・共通upload ledgerを保持してから旧VMを解放する。集計reportはデータや重み、raw log、資格情報を含めず、通常のdataset公開ハーネスで外部Linuxから送る。成功／失敗／不足する証拠を分け、reportの存在だけで本条件完了としない。元VM終了後の別VMでは[復旧手順](P5_SELFPLAY_RELEASE.md)で全ファイル・全Replay・モデルhashを照合し、後続世代を実行する。Datasetのpublished cursor snapshotは、すでに検証した両receiptを反映するための追加snapshotであり、新しい世代ではない。
 
 本条件の実件数・全固定revision・実機IDと限界は[P5-2完了記録](P5_2_COMPLETION.md)。HFのmanual gateは一般利用の取得申請を人が承認する仕組みとして維持し、アップロードの都度承認と取り違えない。
+
+## P5-4の分散学習state
+
+[1／2／4GPU比較](P5_4_PLAN.md)の保存は`profile="distributed"`・`artifact_role="distributed-training-state"`を使う。候補repoは`voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1`（model、Apache-2.0）。public/manual・Community OFFとState Cardの4節を維持する。共有model／optimizerと全rankの乱数・共通進捗をtyped archiveへ入れ、source・入力・global schedule・world size・FP32設定を照合する。
+
+通常modelへの混入を拒否し、M6／自己対局から引き継いだ同じ累積1GiB upload ledgerを使う。過去の予約を減らしたり初期化したりせず、実bytesを予約してから外部Linuxで公開・全hash照合する。このprofileの準備やCPUテストだけでは、実repo公開・GPU保存再開が完了したことにはならない。
