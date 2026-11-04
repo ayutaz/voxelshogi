@@ -299,6 +299,18 @@ def test_participant_policy_backend_and_source_are_frozen_before_execution():
         summarize(rows(changed), changed)
 
 
+@pytest.mark.parametrize("role", ["model", "opponent"])
+def test_caller_artifact_binding_is_checked_independently_of_valid_saved_rows(role):
+    from training.evaluation_v2 import summarize_matches
+
+    spec = protocol()
+    games = rows(spec)  # Every saved condition and row is valid and unchanged.
+    identities = {"model_sha256": "a" * 64, "opponent_sha256": "b" * 64}
+    identities[role + "_sha256"] = "c" * 64
+    with pytest.raises(ValueError, match="participant hash"):
+        summarize_matches(games, spec, **identities)
+
+
 def test_sensitivity_screen_requires_both_predeclared_size_and_termination():
     spec = protocol()
     for i in range(2):

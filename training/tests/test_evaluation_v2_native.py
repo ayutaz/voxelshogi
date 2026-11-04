@@ -118,3 +118,33 @@ def test_saved_run_detects_tampered_result_file_before_replay(tmp_path):
     path.write_text(json.dumps(row))
     with pytest.raises(ValueError, match="hash"):
         verify_run(folder)
+
+
+def test_resume_keeps_committed_match_bytes_and_finishes_exactly_the_missing_games(
+    tmp_path,
+):
+    from training.evaluation_v2_runner import run_protocol, verify_run
+    from training.feature_cache import file_hash
+
+    spec = native_protocol()
+    folder = tmp_path / "resume"
+    first = folder / "hand-mate-b.json"
+    with pytest.raises(InterruptedError):
+        run_protocol(spec, {}, folder, stop_requested=first.exists)
+    original_hash = file_hash(first)
+    assert json.loads((folder / "run.json").read_text())["games"] == 1
+    resumed = run_protocol(spec, {}, folder, resume=True)
+    assert file_hash(first) == original_hash
+    assert resumed["overall"]["games"] == 4
+    assert verify_run(folder) == resumed
+    assert run_protocol(spec, {}, folder, resume=True) == resumed
+    # Same deterministic moves/outcomes as a fresh run; elapsed times are real.
+    fresh = tmp_path / "uninterrupted"
+    run_protocol(spec, {}, fresh)
+    for case in spec["cases"]:
+        for side in ("b", "w"):
+            name = f"{case['id']}-{side}.json"
+            assert (
+                json.loads((folder / name).read_text())["record"]
+                == json.loads((fresh / name).read_text())["record"]
+            )

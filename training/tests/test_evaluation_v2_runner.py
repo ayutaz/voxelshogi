@@ -136,3 +136,145 @@ def test_random_policy_identifies_python_rng_separately_from_rust_search():
     spec["participants"]["opponent"]["backend"] = "rust"
     with pytest.raises(ValueError):
         validate_protocol(spec)
+
+
+def partial_run(tmp_path):
+    import json
+
+    from training.evaluation_v2 import fingerprint
+    from training.feature_cache import file_hash
+    from training.tests.test_evaluation_v2 import rows
+
+    spec = protocol()
+    folder = tmp_path / "run"
+    folder.mkdir()
+    (folder / "protocol.json").write_text(json.dumps(spec))
+    row = rows(spec)[0]
+    name = "tactic-b.json"
+    path = folder / name
+    path.write_text(json.dumps(row))
+    receipt = {
+        "complete": False,
+        "protocol_sha256": fingerprint(spec),
+        "games": 1,
+        "runtime": {"source_commit": spec["source_commit"]},
+        "files": [
+            {"path": name, "bytes": path.stat().st_size, "sha256": file_hash(path)}
+        ],
+    }
+    (folder / "run.json").write_text(json.dumps(receipt))
+    return spec, folder, row, receipt
+
+
+def test_partial_resume_checks_bound_hashes_and_every_saved_row_before_reuse(tmp_path):
+    from training.evaluation_v2_runner import read_partial_run
+
+    spec, folder, row, receipt = partial_run(tmp_path)
+    assert read_partial_run(folder, spec) == ([row], receipt)
+    path = folder / "tactic-b.json"
+    path.write_text(path.read_text() + " ")
+    with pytest.raises(ValueError, match="hash|bytes"):
+        read_partial_run(folder, spec)
+    import json
+
+    row["elapsed_seconds"] += 1.0
+    path.write_text(json.dumps(row))
+    assert path.stat().st_size == receipt["files"][0]["bytes"]
+    with pytest.raises(ValueError, match="hash"):
+        read_partial_run(folder, spec)
+
+
+def test_partial_resume_refuses_orphan_files_changed_protocol_and_incomplete_bindings(
+    tmp_path,
+):
+    import json
+
+    from training.evaluation_v2_runner import read_partial_run
+
+    spec, folder, row, receipt = partial_run(tmp_path)
+    (folder / "tactic-w.json").write_text(json.dumps(row))
+    with pytest.raises(ValueError, match="uncommitted|inventory"):
+        read_partial_run(folder, spec)
+    (folder / "tactic-w.json").unlink()
+    (folder / "protocol.json").write_text(json.dumps(dict(spec, purpose="holdout")))
+    with pytest.raises(ValueError, match="protocol"):
+        read_partial_run(folder, spec)
+    (folder / "protocol.json").write_text(json.dumps(spec))
+    changed = deepcopy(spec)
+    changed["search_limits"]["max_nodes"] += 1
+    with pytest.raises(ValueError, match="protocol"):
+        read_partial_run(folder, changed)
+    receipt["games"] = 2
+    (folder / "run.json").write_text(json.dumps(receipt))
+    with pytest.raises(ValueError):
+        read_partial_run(folder, spec)
+
+
+def test_fake_port_resume_keeps_committed_matches_and_skips_their_execution(
+    monkeypatch, tmp_path
+):
+    import json
+    import sys
+    from types import SimpleNamespace
+
+    from training.evaluation_v2_runner import run_protocol, verify_run
+
+    spec = protocol()
+    participant = {
+        "artifact_sha256": "b" * 64,
+        "policy": "alphabeta-v1",
+        "backend": "rust",
+    }
+    spec["participants"] = {"model": dict(participant), "opponent": dict(participant)}
+    monkeypatch.setattr("training.evaluation_v2_runner.sys.platform", "linux")
+    monkeypatch.setitem(
+        sys.modules,
+        "voxelshogi",
+        SimpleNamespace(
+            Game=SimpleNamespace(from_record=lambda r: FakeGame(r, mate_after=1))
+        ),
+    )
+    monkeypatch.setattr(
+        "training.evaluation_v2_runner.subprocess.check_output",
+        lambda cmd, **kw: spec["source_commit"] if cmd[1] == "rev-parse" else "",
+    )
+    calls = []
+
+    def choose(_):
+        calls.append(1)
+        return 7
+
+    monkeypatch.setattr(
+        "training.evaluation_v2_runner._prepare_players",
+        lambda *a: {"model": choose, "opponent": choose},
+    )
+    monkeypatch.setattr("training.evaluation_v2_runner.verify_record", lambda *a: None)
+    folder = tmp_path / "fake-resume"
+    first = folder / "tactic-b.json"
+    with pytest.raises(InterruptedError):
+        run_protocol(spec, {}, folder, stop_requested=first.exists)
+    before = first.read_bytes()
+    assert json.loads((folder / "run.json").read_text())["games"] == 1
+    result = run_protocol(spec, {}, folder, resume=True)
+    assert first.read_bytes() == before and len(calls) == 4
+    assert result["overall"]["games"] == 4 and verify_run(folder) == result
+    assert run_protocol(spec, {}, folder, resume=True) == result
+    assert len(calls) == 4  # a complete receipt does not allocate/execute new players
+
+
+def test_partial_resume_rechecks_metadata_even_when_changed_file_hash_is_rebound(
+    tmp_path,
+):
+    import json
+
+    from training.evaluation_v2_runner import read_partial_run
+    from training.feature_cache import file_hash
+
+    spec, folder, row, receipt = partial_run(tmp_path)
+    row["model_sha256"] = "f" * 64
+    path = folder / "tactic-b.json"
+    path.write_text(json.dumps(row))
+    receipt["files"][0].update(bytes=path.stat().st_size, sha256=file_hash(path))
+    (folder / "run.json").write_text(json.dumps(receipt))
+    with pytest.raises(ValueError):
+        read_partial_run(folder, spec)
