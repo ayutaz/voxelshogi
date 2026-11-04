@@ -1,6 +1,8 @@
 # P5-3後半からP5-4までの費用配分
 
-2026-11-04 UTC。最初の8局試行は7局を確定して時間上限に達した。[7局の固定HF版](https://huggingface.co/datasets/voxelshogi/voxelshogi-generation-evaluation-v1/tree/2041939e2399ebaffe9df7005cccedc393f2d6c6)を保存済みで、残り1局・全入力監査・150局・診断・実1／2／4GPUは未完了である。今回の「5まで進めて」の範囲で、次の有料単位を準備する。
+2026-11-04 UTC。最初の8局試行は7局を確定して時間上限に達したが、その7局を復元して残り1局・全入力監査・固定HF全hash・実機解放を完了した。[8局の実績](P5_3_TRIAL.md)と[旧7局の固定HF版](https://huggingface.co/datasets/voxelshogi/voxelshogi-generation-evaluation-v1/tree/2041939e2399ebaffe9df7005cccedc393f2d6c6)を両方残す。150局・診断・実1／2／4GPUは未完了であり、引き続き「5まで進めて」の範囲で進める。
+
+**05:02 UTC・試行終了時**：所有Vast実機0、保守的予約22件・92.5／基本100。追加100の制御はPR128で取り込んだが、統合mainの変異baselineで根拠JSON同梱漏れが見つかったため、実ledgerへは未適用。PR129で必要なJSONだけを同梱し、実Native・全4変異shardを検証してから統合mainで再確認する。失敗したCIを文書のみの成功で置き換えず、予約減額や追加枠適用で回避しない。以下の89.75・101.25は起動前に固定した不足根拠である。
 
 ## 起動待ち終了後の不足と承認済み追加枠
 
