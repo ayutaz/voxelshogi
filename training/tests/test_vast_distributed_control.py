@@ -31,9 +31,9 @@ def setup(tmp_path):
     plan.update(
         schema="voxelshogi-vast-distributed-plan-v1",
         purpose="phase5-distributed",
-        maximum_hourly_usd=3,
+        maximum_hourly_usd=3.5,
         maximum_transfer_usd=1,
-        maximum_usd=4,
+        maximum_usd=4.5,
     )
     path.write_text(json.dumps(plan))
     api.offer = four_offer()
@@ -81,8 +81,8 @@ def test_four_gpu_quote_counts_shared_disk_once_and_prices_both_directions():
         {"cuda_max_good": 12.9},
         {"direct_port_count": 0},
         {"disk_space": 79},
-        {"dph_base": 3.01},
-        {"dph_total": 3.01},
+        {"dph_base": 3.51},
+        {"dph_total": 3.51},
         {"dph_total": True},
         {"dph_base": False},
         {"inet_up_cost": 0.011},
@@ -104,12 +104,12 @@ def test_four_gpu_reserves_compute_plus_network_before_guard_and_paid_create(tmp
         assert not any(method == "PUT" for method, *_ in api.calls)
         ledger = json.loads(budget.read_text())
         assert ledger["reservations"][:-1] == original
-        assert ledger["reservations"][-1]["maximum_usd"] == 4
+        assert ledger["reservations"][-1]["maximum_usd"] == 4.5
         assert ledger["reservations"][-1]["task"] == "phase5-distributed"
 
     result = control.rent(ready)
     assert result["instance_ids"] == [456]
-    assert json.loads(budget.read_text())["reserved_total_usd"] == 65
+    assert json.loads(budget.read_text())["reserved_total_usd"] == 65.5
     query = next(
         data for _, endpoint, data, _ in api.calls if endpoint == "/api/v0/bundles"
     )
@@ -117,7 +117,7 @@ def test_four_gpu_reserves_compute_plus_network_before_guard_and_paid_create(tmp
     assert query["num_gpus"] == {"eq": 4}
     assert query["allocated_storage"] == 80
     preflight = json.loads((control.state / "preflight.json").read_text())
-    assert preflight["num_gpus"] == 4 and preflight["maximum_usd"] == 4
+    assert preflight["num_gpus"] == 4 and preflight["maximum_usd"] == 4.5
     assert control.terminate()["complete"] is True
 
 
@@ -233,3 +233,27 @@ def test_distributed_cli_starts_its_matching_backup_guard(
     assert calls[0][1:3] == ["-m", "training.vast_distributed_control"]
     assert "guard" in calls[0] and str(state) in calls[0]
     assert json.loads(capsys.readouterr().out) == {"complete": False}
+
+
+def test_current_verified_quote_and_two_hour_reservation_are_hand_calculated(tmp_path):
+    value = four_offer() | {
+        "dph_base": 3.2,
+        "dph_total": 3.222222222222222,
+        "storage_total_cost": 0.022222222222222223,
+    }
+    assert quote_four_gpu(value)["hourly_usd"] == pytest.approx(3.222222222222222)
+    edge = value | {"dph_base": 3.48, "dph_total": 3.5, "storage_total_cost": 0.02}
+    assert quote_four_gpu(edge)["hourly_usd"] == 3.5
+    control, api, budget, path = setup(tmp_path)
+    plan = json.loads(path.read_text()) | {"maximum_seconds": 7200, "maximum_usd": 8}
+    path.write_text(json.dumps(plan))
+    control.remote_guard = lambda **kw: Deadline(kw["tag"], 8200)
+    api.offer = value
+    old = json.loads(budget.read_text())["reservations"]
+    result = control.rent(lambda: None)
+    assert result["instance_ids"] == [456]
+    new = json.loads(budget.read_text())
+    assert new["reservations"][:-1] == old
+    assert new["reservations"][-1]["maximum_usd"] == 8  # 2h × $3.5 + $1 network.
+    assert new["reserved_total_usd"] == 69
+    assert control.terminate()["complete"] is True

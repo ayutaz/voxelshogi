@@ -5,7 +5,7 @@ import math
 from training.vast_rental_control import quote_offer
 from training.vast_research_control import ResearchVastRental, main
 
-MAXIMUM_HOURLY_USD = 3
+MAXIMUM_HOURLY_USD = 3.5
 TRANSFER_RESERVE_USD = 1
 ESTIMATED_DOWNLOAD_GB = 40
 ESTIMATED_UPLOAD_GB = 10
