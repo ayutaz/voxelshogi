@@ -13,6 +13,8 @@
 
 小さいmetadata／fake portsの45テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
 
+P5-4の[共通データ順](../training/distributed_benchmark.py)も準備する。同じglobal batchと更新数から全更新のsample indexを固定し、1／2／4 rankへ重複もpaddingもなく等分する。Valueの出所が異なるsampleは同じbatchに混ぜず、端数はGPU数によらず全体で除外して件数を記録する。純粋な13テストと3変異で確認した範囲は、このスケジュールだけである。DDPの勾配同期・保存再開・実GPU時間／VRAM／通信／費用の完了を意味しない。
+
 ## 現在地と優先順位の根拠
 
 [P5-2](P5_2_COMPLETION.md)は3世代48対局、raw sample 11,534件、延べ学習19,244件、4,812更新、HFの各世代保存・全件照合・別所有VMでの継続まで完了した。自然勝敗0・自然引分13・cutoff35で、棋力改善は未確認。文書更新の[PR #116](https://github.com/ayutaz/voxelshogi/pull/116)は通常merge済みで、統合main `4c847768200592fca1038983e8d1885858471365`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41682313021)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41682313058)は成功した。

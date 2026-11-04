@@ -12,6 +12,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "distributed-rank-disjoint-ownership",
+        "training/distributed_benchmark.py",
+        "return batch[rank * width : (rank + 1) * width]",
+        "return batch[:width]",
+        "test_distributed_benchmark.py",
+    ),
+    (
+        "distributed-global-drop-incomplete",
+        "training/distributed_benchmark.py",
+        "complete = [batch for batch in candidates if len(batch) == global_batch]",
+        "complete = candidates",
+        "test_distributed_benchmark.py",
+    ),
+    (
+        "distributed-record-omitted-examples",
+        "training/distributed_benchmark.py",
+        "dropped += sum(len(batch) for batch in candidates if len(batch) < global_batch)",
+        "dropped += 0",
+        "test_distributed_benchmark.py",
+    ),
+    (
         "research-recorded-allocations-match",
         "training/research_rental_control.py",
         'or ledger.get("research_allocations_usd") != ALLOCATIONS',
