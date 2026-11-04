@@ -190,14 +190,11 @@ def _counts(games):
     }
 
 
-def summarize_matches(rows, protocol, *, model_sha256, opponent_sha256):
-    """Require the exact preregistered cohort; result metadata is not Rust proof."""
+def validate_match_rows(rows, protocol, *, require_complete=True):
+    """Validate saved metadata without pretending to replay native rules."""
     digest = validate_protocol(protocol)
-    if (
-        model_sha256 != protocol["participants"]["model"]["artifact_sha256"]
-        or opponent_sha256 != protocol["participants"]["opponent"]["artifact_sha256"]
-    ):
-        raise ValueError("invalid evaluation participant hash")
+    model_sha256 = protocol["participants"]["model"]["artifact_sha256"]
+    opponent_sha256 = protocol["participants"]["opponent"]["artifact_sha256"]
     cases = {case["id"]: case for case in protocol["cases"]}
     expected = {(name, side) for name in cases for side in ("b", "w")}
     games = {}
@@ -251,8 +248,21 @@ def summarize_matches(rows, protocol, *, model_sha256, opponent_sha256):
         ):
             raise ValueError("evaluation result/prefix/limit differs")
         games[key] = {**row, "additional_plies": plies, "stratum": case["stratum"]}
-    if set(games) != expected:
+    if require_complete and set(games) != expected:
         raise ValueError("incomplete evaluation cohort")
+    return games
+
+
+def summarize_matches(rows, protocol, *, model_sha256, opponent_sha256):
+    """Require the exact preregistered cohort; result metadata is not Rust proof."""
+    digest = validate_protocol(protocol)
+    if (
+        model_sha256 != protocol["participants"]["model"]["artifact_sha256"]
+        or opponent_sha256 != protocol["participants"]["opponent"]["artifact_sha256"]
+    ):
+        raise ValueError("invalid evaluation participant hash")
+    games = validate_match_rows(rows, protocol)
+    cases = {case["id"]: case for case in protocol["cases"]}
     ordered = [games[key] for key in sorted(games)]
     pair_wins = [
         sum(games[name, side]["outcome"] == "win" for side in ("b", "w"))

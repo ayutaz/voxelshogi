@@ -2,6 +2,17 @@
 
 2026-11-04 JST。ユーザーの「ドキュメントを最新にして、ここからの計画を教えてください」に対応する計画。今回の作業範囲は文書更新と共有であり、GPUの再起動・追加学習・評価対局はまだ行わない。
 
+**同日の実行指示**：その後の「5まで進めて」で、表の1〜5（P5-3a〜d、P5-4）の実行が指示された。以下の計画値を事前条件へ固定し、各段階の実測・監査・HF保存・資源解放を確認して進める。4GPUを測らないまま今回の5までを完了とはしない。Phase6以降は今回の範囲外である。
+
+## 実装の接続先
+
+- [固定した局面定義とLinux生成](../training/generation_cases.py)：時間試行2局面と本比較15局面を分離し、戦術3件が同じfamilyの変形であることも明示する。Rustで全開始履歴・手計算の詰みoracle・入力IDの一意性を確認する。
+- [世代差の集計と入力集合の監査](../training/generation_evaluation.py)：共通条件・同じ先後pairを検査し、M6との差を10,000回再標本化する。cutoffの勝点範囲を保持する。
+- [全コーパス・後続入力の監査](../training/generation_audit.py)：M4全split、全P5-2公開sample、保護入力を列挙し、評価開始後の全局面・終端を物理局面と手番正規化入力の両方で照合する。固定revision取得とhash照合は実行側の先行条件である。
+- [評価runner](../training/evaluation_v2_runner.py)の`--resume`：各対局をhash付きreceiptへ確定し、再開時に同じprotocol・全保存hash・metadata・Rust再生を検査して完了済みを再利用する。未確定ファイル・同時実行・条件や環境の変更は拒否する。既定の新規実行は既存出力を上書きしない。
+
+小さいmetadata／fake portsの43テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
+
 ## 現在地と優先順位の根拠
 
 [P5-2](P5_2_COMPLETION.md)は3世代48対局、raw sample 11,534件、延べ学習19,244件、4,812更新、HFの各世代保存・全件照合・別所有VMでの継続まで完了した。自然勝敗0・自然引分13・cutoff35で、棋力改善は未確認。文書更新の[PR #116](https://github.com/ayutaz/voxelshogi/pull/116)は通常merge済みで、統合main `4c847768200592fca1038983e8d1885858471365`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41682313021)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41682313058)は成功した。
@@ -50,7 +61,7 @@ repo名・全release descriptorは[P5-2完了記録](P5_2_COMPLETION.md)を正�
 - 同一familyの変形は明示する。15組のopening-pairを独立した15戦術と呼ばず、同じ開始局面を全モデル・先後で共有する。8局の時間試行は別集合とする。
 - M4／M6とP5-2の全世代の実学習入力、および保護集合と照合する。評価開始局面だけでなく、開始後の全継続局面・終端を対象に、物理局面と手番正規化されたモデル入力IDの両方を調べる。共通prefixの扱いと履歴も記録する。
 - 現行`evaluation_cases.audit`の凍結M6コーパス・物理局面監査だけでは、この後続データ・正規化入力の要件を満たさない。共通入力IDとP5-2の監査を再利用して接続し、非空の対象件数・重複・除外・hashを確認する。重複を見つけた結果を非重複評価と呼ばず、都合の良い対局だけ削除しない。
-- caseと全participantがそろった機械可読protocolは未作成。既存8局面の固定generatorを15局面へ拡張する部分、全世代との漏洩監査、モデル間の差分集計がP5-3aの実装対象である。
+- 実行ごとのsourceとparticipantを結ぶ機械可読protocolは、固定した局面定義から外部Linuxで作成する。元の8局面generatorと過去の評価は保持し、今回の15局面・全世代との漏洩監査・差分集計を専用経路へ分ける。実対局前にprotocol・hash・取得receiptを保存し、試行の結果で本比較の局面を選び直さない。
 
 ### 集計と終了の基準
 

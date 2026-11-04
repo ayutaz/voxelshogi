@@ -15,6 +15,7 @@ from training.evaluation_v2 import (
     RULESET,
     fingerprint,
     summarize_matches,
+    validate_match_rows,
     validate_protocol,
 )
 from training.feature_cache import file_hash
@@ -179,7 +180,91 @@ def verify_record(row, case):
         raise ValueError("evaluation result differs from Rust replay")
 
 
-def run_protocol(protocol, artifacts, folder, *, stop_requested=lambda: False):
+def _descriptors(folder, rows):
+    result = []
+    for row in rows:
+        name = f"{row['case_id']}-{row['model_side']}.json"
+        path = folder / name
+        result.append(
+            {"path": name, "sha256": file_hash(path), "bytes": path.stat().st_size}
+        )
+    return result
+
+
+def _read_metadata(path):
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 32 * 1024**2:
+        raise ValueError("invalid saved evaluation metadata")
+    return json.loads(path.read_text())
+
+
+def read_partial_run(folder, protocol):
+    """Read a committed prefix; native replay is still required before reuse."""
+    folder = Path(folder)
+    if folder.is_symlink() or not folder.is_dir():
+        raise ValueError("missing or symlink evaluation folder")
+    if _read_metadata(folder / "protocol.json") != protocol:
+        raise ValueError("saved evaluation protocol differs")
+    saved = _read_metadata(folder / "run.json")
+    files = saved.get("files", [])
+    expected = [
+        f"{case['id']}-{side}.json" for case in protocol["cases"] for side in ("b", "w")
+    ]
+    if (
+        type(saved.get("complete")) is not bool
+        or saved.get("protocol_sha256") != validate_protocol(protocol)
+        or type(files) is not list
+        or type(saved.get("games")) is not int
+        or saved["games"] != len(files)
+        or len(files) > len(expected)
+        or any(
+            type(f) is not dict or set(f) != {"path", "bytes", "sha256"} for f in files
+        )
+        or [f["path"] for f in files] != expected[: len(files)]
+    ):
+        raise ValueError("saved evaluation inventory/protocol differs")
+    allowed = {"protocol.json", "run.json", "summary.json", *(f["path"] for f in files)}
+    if {p.name for p in folder.glob("*.json")} - allowed:
+        raise ValueError("uncommitted evaluation game inventory requires inspection")
+    rows = []
+    for descriptor in files:
+        path = folder / descriptor["path"]
+        row = _read_metadata(path)
+        if (
+            type(descriptor["bytes"]) is not int
+            or path.stat().st_size != descriptor["bytes"]
+            or file_hash(path) != descriptor["sha256"]
+        ):
+            raise ValueError("saved evaluation match bytes/hash differs")
+        rows.append(row)
+    validate_match_rows(rows, protocol, require_complete=saved["complete"])
+    return rows, saved
+
+
+def run_protocol(
+    protocol, artifacts, folder, *, stop_requested=lambda: False, resume=False
+):
+    if sys.platform != "linux":
+        raise ValueError("evaluation/model/search execution requires external Linux")
+    if type(resume) is not bool:
+        raise ValueError("explicit evaluation resume flag required")
+    import fcntl
+
+    folder = Path(folder)
+    folder.parent.mkdir(parents=True, exist_ok=True)
+    lock = folder.parent / f".{folder.name}.evaluation.lock"
+    if folder.is_symlink() or lock.is_symlink():
+        raise ValueError("symlink evaluation output/lock")
+    with lock.open("a") as stream:
+        try:
+            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ValueError("evaluation already has a running owner") from None
+        return _execute_protocol(
+            protocol, artifacts, folder, stop_requested=stop_requested, resume=resume
+        )
+
+
+def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
     if sys.platform != "linux":
         raise ValueError("evaluation/model/search execution requires external Linux")
     from voxelshogi import Game
@@ -206,9 +291,21 @@ def run_protocol(protocol, artifacts, folder, *, stop_requested=lambda: False):
         if opening.snapshot()["finished"] or opening.record() != case["opening"]:
             raise ValueError("evaluation opening must be unfinished and Rust canonical")
     folder = Path(folder)
-    folder.mkdir(parents=True, exist_ok=False)
-    atomic_json(folder / "protocol.json", protocol)
-    atomic_json(folder / "run.json", {"complete": False, "protocol_sha256": digest})
+    saved, rows = None, []
+    if resume:
+        rows, saved = read_partial_run(folder, protocol)
+        cases = {c["id"]: c for c in protocol["cases"]}
+        for row in rows:
+            verify_record(row, cases[row["case_id"]])
+        if saved["complete"]:
+            return verify_run(folder)
+    else:
+        folder.mkdir(parents=True, exist_ok=False)
+        atomic_json(folder / "protocol.json", protocol)
+        atomic_json(
+            folder / "run.json",
+            {"complete": False, "protocol_sha256": digest, "games": 0, "files": []},
+        )
     players = _prepare_players(protocol, artifacts)
     runtime = {
         "python": platform.python_version(),
@@ -226,13 +323,27 @@ def run_protocol(protocol, artifacts, folder, *, stop_requested=lambda: False):
                 gpu=torch.cuda.get_device_name(0),
                 cuda_lock_sha256=file_hash(ROOT / "infrastructure/cuda/uv.lock"),
             )
-    atomic_json(
-        folder / "run.json",
-        {"complete": False, "protocol_sha256": digest, "runtime": runtime},
-    )
-    rows = []
+    if saved and saved.get("runtime", runtime) != runtime:
+        raise ValueError("resumed evaluation runtime differs from saved environment")
+
+    def save_partial():
+        atomic_json(
+            folder / "run.json",
+            {
+                "complete": False,
+                "protocol_sha256": digest,
+                "runtime": runtime,
+                "games": len(rows),
+                "files": _descriptors(folder, rows),
+            },
+        )
+
+    save_partial()
+    completed = {(row["case_id"], row["model_side"]) for row in rows}
     for case in protocol["cases"]:
         for side in ("b", "w"):
+            if (case["id"], side) in completed:
+                continue
             choose = {
                 role: player
                 or _native_player(
@@ -258,6 +369,7 @@ def run_protocol(protocol, artifacts, folder, *, stop_requested=lambda: False):
             verify_record(row, case)
             atomic_json(folder / f"{case['id']}-{side}.json", row)
             rows.append(row)
+            save_partial()
     result = summarize_matches(
         rows,
         protocol,
@@ -347,13 +459,19 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--model", type=Path)
     parser.add_argument("--opponent", type=Path)
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     artifacts = {
         name: getattr(args, name)
         for name in ("model", "opponent")
         if getattr(args, name) is not None
     }
-    result = run_protocol(json.loads(args.protocol.read_text()), artifacts, args.output)
+    result = run_protocol(
+        json.loads(args.protocol.read_text()),
+        artifacts,
+        args.output,
+        resume=args.resume,
+    )
     print(json.dumps(result, allow_nan=False))
 
 
