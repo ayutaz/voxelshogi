@@ -12,6 +12,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "four-device-inventory-count",
+        "training/distributed_preflight.py",
+        "if type(rows) is not list or len(rows) != 4:",
+        "if type(rows) is not list:",
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-distinct-uuid",
+        "training/distributed_preflight.py",
+        "if len(set(identifiers)) != 4:",
+        "if False:",
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-child-uuid",
+        "training/distributed_preflight.py",
+        'result["uuid"] != row["uuid"]',
+        "False",
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-child-runtime",
+        "training/distributed_preflight.py",
+        'facts = validate_facts(result["facts"])',
+        'facts = result["facts"]',
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-typed-visible-count",
+        "training/distributed_preflight.py",
+        'or type(facts["gpu_count"]) is not int',
+        "or False",
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-hand-kernel",
+        "training/distributed_preflight.py",
+        'or result["kernel"] != KERNEL',
+        "or False",
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-visible-selection",
+        "training/distributed_preflight.py",
+        'CUDA_VISIBLE_DEVICES=row["uuid"]',
+        'CUDA_VISIBLE_DEVICES="0"',
+        "test_distributed_preflight.py",
+    ),
+    (
+        "four-device-no-hf-token",
+        "training/distributed_preflight.py",
+        '            "HF_TOKEN",',
+        '            "UNUSED_HF_TOKEN",',
+        "test_distributed_preflight.py",
+    ),
+    (
         "evaluation-rental-hourly-cap",
         "training/vast_evaluation_control.py",
         "MAXIMUM_HOURLY_USD = 0.75",
