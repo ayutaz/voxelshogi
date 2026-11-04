@@ -4,6 +4,16 @@
 
 **同日・実行中の途中記録**：source `f72c35f175050cb137c017bfaf3b5a4f9c1fc8e7`、RTX5090×1を上限2時間・US$2で起動した。全体予約87／基本100、Phase5／6配分26・13、追加100未適用。1,831入力ファイルとM6・3子世代を固定HF revisionで照合・復旧し、01:57 UTC時点で6／8局が確定した。確定6局を[途中版の固定HF revision](https://huggingface.co/datasets/voxelshogi/voxelshogi-generation-evaluation-v1/tree/f6ee1d9a9f5ffa68fe93f8e943009f2f36061989)へLinuxから直接保存し、public/manual・Community OFF・全ファイルhashを確認した。これは8局完走・入力重複監査・資源終了の証拠ではない。[小さいreceipt](experiments/p53-timing-prefix-2026-11-04.json)。以下は起動前に固定した目的と計画である。
 
+## 最初の実行結果：7／8局で中断
+
+02:20 UTCの計算停止で、M6は4局完走・最終子世代は3局確定となった。最後の子世代・長い履歴・白側の1局は未完走である。7局は[固定HF revision](https://huggingface.co/datasets/voxelshogi/voxelshogi-generation-evaluation-v1/tree/2041939e2399ebaffe9df7005cccedc393f2d6c6)へLinuxから直接保存し、全ファイルhash・public/manual・Community OFFを照合した。Dataset Cardも7／8・部分実行・監査未完了を明記する。先の6局snapshotは途中記録として保持する。
+
+[中断と終了の小さい証跡](experiments/p53-timing-interrupted-2026-11-04.json)に実数と出典を残す。独立guardは02:31:22 UTCに所有実機59036831を削除し、02:32:22に明示応答と全一覧での不在を確認した。制御側も終了receiptを確定し、CloudRiftにもこのプロジェクトの稼働実機がないことを確認した。別用途の実機には操作していない。予約は87／基本100、追加100未適用で、実請求は未回収である。
+
+入力取得は497.96秒、3世代復旧は113.78秒、M6の4局は1296.00秒。中断までのworker全体は3798.45秒で、全8局の時間ではない。収集できた250資源sampleのCPU累積は3428.61秒、RSS最大約2.13GiB、device全体のGPU使用メモリ最大768MiB・利用率平均0.016%だった。これらは観測対象と範囲を限定した値であり、GPU学習速度や並列化の効果を証明しない。
+
+残り1局を補い、全入力重複監査を終えるまでP5-3bは未完了。入力ID indexの退避完了証跡も得られておらず、再利用できるものとして扱わない。保存済み7局のbyte・protocolは変更せず、既存状態を照合して再開する。150局は局面pair単位の並列実行をLinux CIで検証してから、準備・監査・退避も含めて見積もり直す。
+
 ## 目的と数量ゴール
 
 - M6基点とP5-2最後の子モデルを、時間試行専用の2開始局面で先後交換する。2モデル×2局面×2色＝8局。15開始局面の本比較とは別集合にし、8局を150局へ合算しない。

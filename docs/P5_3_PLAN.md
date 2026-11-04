@@ -10,6 +10,11 @@
 - [世代差の集計と入力集合の監査](../training/generation_evaluation.py)：共通条件・同じ先後pairを検査し、M6との差を10,000回再標本化する。cutoffの勝点範囲を保持する。
 - [全コーパス・後続入力の監査](../training/generation_audit.py)：M4全split、全P5-2公開sample、保護入力を列挙し、評価開始後の全局面・終端を物理局面と手番正規化入力の両方で照合する。固定revision取得とhash照合は実行側の先行条件である。
 - [評価runner](../training/evaluation_v2_runner.py)の`--resume`：各対局をhash付きreceiptへ確定し、再開時に同じprotocol・全保存hash・metadata・Rust再生を検査して完了済みを再利用する。未確定ファイル・同時実行・条件や環境の変更は拒否する。既定の新規実行は既存出力を上書きしない。
+- [局面ごとの並列評価](../training/evaluation_jobs.py)：全cohortのprotocolを縮めず、1開始局面・先後2局を1仕事にする。5 cohort×15局面＝75仕事・150局。同時実行は1〜16プロセスに制限し、各色の確定hashを再開時にも保持する。集約はRustで再生した元ファイルのbyteをそのままコピーし、全局面・先後・runtimeの一致を要求する。起動結果が不明な仕事や生存中のPIDを自動で再起動しない。
+
+並列評価のLinuxコマンドは `uv run --project infrastructure/cuda --locked python -m training.evaluation_jobs pool --plan PLAN.json --artifacts ARTIFACTS.json --output OUTPUT`。planは `plan_case_jobs` から作り、artifactsはcohortごとのroleと固定重みのpathを持つ。再開だけ `--resume` を明示する。完了済み対局は再実行せず、停止signalは所有する子へ伝える。入力監査・HF公開・費用と絶対期限の制御は外側の実行単位で引き続き必要であり、並列runner単独の成功を実験全体の完了としない。
+
+2026-11-04の最初の試行は7／8局で時間上限となり、保存済み7局をHFへ退避した。残り1局と全入力監査は未完了。[試行記録](P5_3_TRIAL.md)を保持し、ここから並列化の実効果と本比較の時間を実GPUで測る。CIの速度やGPU使用率の小ささから、対局の並列化率を測定済みとしない。
 
 小さいmetadata／fake portsの45テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
 

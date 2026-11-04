@@ -264,12 +264,13 @@ def run_protocol(
         )
 
 
-def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
+def checked_execution(protocol, artifacts):
+    """Check the full immutable protocol and every root before player allocation."""
     if sys.platform != "linux":
         raise ValueError("evaluation/model/search execution requires external Linux")
     from voxelshogi import Game
 
-    digest = validate_protocol(protocol)
+    validate_protocol(protocol)
     commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
@@ -290,6 +291,33 @@ def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
         opening = Game.from_record(case["opening"])
         if opening.snapshot()["finished"] or opening.record() != case["opening"]:
             raise ValueError("evaluation opening must be unfinished and Rust canonical")
+    return Game, required, commit
+
+
+def execution_runtime(protocol, required, commit):
+    """Capture the same execution binding for sequential and assigned-case jobs."""
+    runtime = {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "source_commit": commit,
+        "uv_lock_sha256": file_hash(ROOT / "uv.lock"),
+    }
+    if required:
+        import torch
+
+        runtime["torch"] = str(torch.__version__)
+        if any(p["backend"] == "torch-cuda" for p in protocol["participants"].values()):
+            runtime.update(
+                cuda=torch.version.cuda,
+                gpu=torch.cuda.get_device_name(0),
+                cuda_lock_sha256=file_hash(ROOT / "infrastructure/cuda/uv.lock"),
+            )
+    return runtime
+
+
+def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
+    Game, required, commit = checked_execution(protocol, artifacts)
+    digest = validate_protocol(protocol)
     folder = Path(folder)
     saved, rows = None, []
     if resume:
@@ -307,22 +335,7 @@ def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
             {"complete": False, "protocol_sha256": digest, "games": 0, "files": []},
         )
     players = _prepare_players(protocol, artifacts)
-    runtime = {
-        "python": platform.python_version(),
-        "platform": platform.platform(),
-        "source_commit": commit,
-        "uv_lock_sha256": file_hash(ROOT / "uv.lock"),
-    }
-    if required:
-        import torch
-
-        runtime["torch"] = str(torch.__version__)
-        if any(p["backend"] == "torch-cuda" for p in protocol["participants"].values()):
-            runtime.update(
-                cuda=torch.version.cuda,
-                gpu=torch.cuda.get_device_name(0),
-                cuda_lock_sha256=file_hash(ROOT / "infrastructure/cuda/uv.lock"),
-            )
+    runtime = execution_runtime(protocol, required, commit)
     if saved and saved.get("runtime", runtime) != runtime:
         raise ValueError("resumed evaluation runtime differs from saved environment")
 
