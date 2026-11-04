@@ -13,6 +13,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "distributed-single-rank-group-hook",
+        "training/distributed_training.py",
+        "    _raw_model(model, world_size)\n    if world_size == 1:\n        return\n",
+        "    _raw_model(model, world_size)\n    if dist is None:\n        return\n",
+        "test_single_rank_reduction.py",
+    ),
+    (
         "state-capacity-explicit-approval",
         "training/state_upload_budget.py",
         "if approved is not True or not _approval_reference(approval_reference):",
