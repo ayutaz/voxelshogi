@@ -29,6 +29,14 @@
 
 ## 正しさと保存
 
+[固定更新ループ](../training/distributed_loop.py)の`fit_schedule`は同じglobal scheduleを再構築し、更新cursor・入力・初期重み・構成・runtimeをbindingへ固定する。全rankで停止flagを共有し、0・中間・最終状態を既存のDDP保存境界へ渡す。再開では新しいmodel／optimizerへ読み込み、残りの更新だけを実行する。実行前の不一致とrank0の保存失敗を全rankへ伝え、同じ出力には排他leaseを取る。
+
+更新ごとのCUDA同期・rank最大時間の合計と、準備後から最終更新までの壁時計時間を別々に残す。後者には中間checkpoint・event IOを含み、最終checkpointは除く。先頭から全更新を連続実行した試行だけをprimary throughputの対象とし、中断・再開確認は件数を保持して速度を未設定にする。Torchのrank別peak allocated／reservedはdevice全体のVRAMではない。
+
+同moduleの`communication_probe`は、モデルのFP32勾配byte数に合わせた独立all-reduceを行い、各rankの1の和がworld sizeになることを全要素で確かめる。既定は準備5回＋測定20回。fill・検査・barrier・時間集計は測定区間から分け、1rankは通信なしと明記する。このprobeから学習中の通信割合を算出しない。
+
+ループの手計算テストは4更新・batch4・準備1更新で、時間2・4・6・8秒を与える。測定は3更新・12例・18秒、中間2と最終4で保存となる。実2rankのAdamWで連続4更新と新しいmodel／optimizerへの2＋2再開、rank1だけの停止要求と実all-reduceの和をLinux Nativeテストで確認する。これらは実GPU測定に先行する正しさの検証であり、1／2／4GPUの実績とはしない。
+
 [DDPの更新・checkpoint境界](../training/distributed_training.py)は等しいlocal batchの平均勾配を使う。モデルとoptimizerの一致・共通binding・進捗を全rankで検査してから、共有する重み／optimizerを1組と各rankのPython・NumPy・Torch・使用中CUDAの乱数を保存する。GPU0の乱数だけを全rankへ複製せず、未使用GPUのcontextも作らない。
 
 Linuxの2プロセスGlooテストでは、手計算のMSE・勾配・SGD momentum更新を期待値にする。4sampleの最初の重みは0.03、再開後2更新目は0.07455となる条件で、各rankの担当indexと別々の乱数復旧も確かめる。別のAdamW経路でJSON＋safetensors archiveを作り、新しいrunへ復旧して連続更新との重み・optimizerの一致を確認する。CPUテストの成功をGPU性能の証拠にはしない。
