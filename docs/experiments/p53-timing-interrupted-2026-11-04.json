@@ -1,0 +1,100 @@
+{
+  "schema": "voxelshogi-generation-evaluation-interrupted-evidence-v1",
+  "source_commit": "f72c35f175050cb137c017bfaf3b5a4f9c1fc8e7",
+  "completed_games": 7,
+  "target_games": 8,
+  "pipeline_complete": false,
+  "cohorts": {
+    "m6": {
+      "complete": true,
+      "games": 4,
+      "protocol_sha256": "deec226a512c6d0d1fa5c48b09df87746e89155b032d60b6301872eb48aef1b6"
+    },
+    "g2": {
+      "complete": false,
+      "games": 3,
+      "protocol_sha256": "57554b4c94a3f259b6f635387864f198d62c566a009b4432ba2c29136b271aca"
+    }
+  },
+  "failure": {
+    "complete": false,
+    "elapsed_seconds": 3798.4469305961393,
+    "error_type": "InterruptedError",
+    "stage": "g2-matches",
+    "timings_seconds": {
+      "fixed-HF-inputs": 497.9641600959003,
+      "freeze-evaluation-protocols": 0.8836104501970112,
+      "m6-matches": 1296.0019577653147,
+      "restore-all-three-selfplay-generations": 113.78222884982824
+    }
+  },
+  "actual_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "2041939e2399ebaffe9df7005cccedc393f2d6c6",
+    "release_sha256": "1d7d3c38464e34b3681af5806ca256d8ae259cdca77be539fb5073cd3f5f27c8",
+    "repo_id": "voxelshogi/voxelshogi-generation-evaluation-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "validation": {
+    "files": [
+      {
+        "bytes": 10854,
+        "path": "matches.parquet",
+        "sha256": "b8cf57686b7d78ce2197cd3a6da4a843056d0fc5d01f2b3d861f145dd20b4803"
+      }
+    ],
+    "input_audit_passed": null,
+    "pipeline_complete": false,
+    "roundtrip_verified": true,
+    "rows": 7,
+    "rust_replayed_all_published_matches": true
+  },
+  "resource_observations": {
+    "interval_seconds": 10,
+    "last_cpu_seconds": 3428.61,
+    "mean_device_gpu_util_percent": 0.016,
+    "peak_device_gpu_memory_mib": 768.0,
+    "peak_rss_bytes": 2282553344,
+    "samples": 250,
+    "scope": "process RSS/CPU; whole-device GPU memory/utilization samples, not model-attributed VRAM; stage times measured separately"
+  },
+  "owned_vast_release": {
+    "provider": "vast.ai",
+    "checked_at": 1793760228.876586,
+    "instances": [],
+    "complete": true
+  },
+  "independent_guard": {
+    "completion": {
+      "complete": true,
+      "instance_ids": [
+        59036831
+      ]
+    },
+    "guard_run_id": 41749916285,
+    "log_sha256": "0c1e67f9e88ef0e3d4875d56f3e754b8b7fe456639fe06c0c38e0a9f71d2c764",
+    "request": {
+      "at": 1793759482.2138655,
+      "event": "termination_requested",
+      "instance_ids": [
+        59036831
+      ]
+    },
+    "scope": "independent owned-label guard: explicit successful destruction response followed by absence from complete inventory"
+  },
+  "cloudrift": {
+    "checked_at": 1793760223.84477,
+    "project_instances": 0,
+    "scope": "CloudRift active/initializing/deactivating project tags"
+  },
+  "input_overlap_audit_complete": false,
+  "input_identity_index_verified": false,
+  "reservation_usd": 87,
+  "basic_budget_usd": 100,
+  "extra_budget_activated": false,
+  "actual_invoice_recovered": false,
+  "storage_scope": "dataset/model bytes stayed on owned external Linux and Hugging Face; Mac stores small metadata only",
+  "next": "recover the byte-identical seven committed games and finish only the missing assigned game; enumerate and audit all input identities before claiming the eight-game trial complete"
+}
