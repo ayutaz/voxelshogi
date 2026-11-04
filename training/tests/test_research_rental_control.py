@@ -20,6 +20,7 @@ def setup(tmp_path):
         json.dumps(
             {
                 "approved_total_usd": 100,
+                "research_allocations_usd": {"phase5": 26, "phase6": 13},
                 "reservations": [
                     {"task": "m4", "maximum_usd": 41},
                     {"task": "m6-main", "maximum_usd": 20},
@@ -133,7 +134,7 @@ def test_cumulative_and_phase_budgets_are_checked_under_shared_ledger_lock(
     ledger = json.loads(path.read_text())
     row = {"task": "previous", "maximum_usd": 36}
     if case == "phase":
-        row = {"task": "phase5-data", "maximum_usd": 21}
+        row = {"task": "phase5-data", "maximum_usd": 23}
     if case == "duplicate":
         row = {"task": "phase5-evaluation", "maximum_usd": 1, "tag": control.tag}
     if case == "nan":
@@ -322,17 +323,17 @@ def test_phase6_own_allocation_cannot_be_exceeded(tmp_path):
 @pytest.mark.parametrize(
     "phase,previous,accepted",
     [
-        ("phase5", 20, True),
-        ("phase5", 21, False),
-        ("phase6", 11, True),
-        ("phase6", 12, False),
+        ("phase5", 22, True),
+        ("phase5", 23, False),
+        ("phase6", 9, True),
+        ("phase6", 10, False),
     ],
 )
-def test_p52_reallocation_enforces_both_phase_boundaries(
+def test_p53_trial_reallocation_enforces_both_phase_boundaries(
     tmp_path, phase, previous, accepted
 ):
-    # The measured P5-2 plan assigns 24 + 15 = 39 from the existing USD100.
-    # Each request is independently USD4: 20+4=24, 21+4=25, 11+4=15, 12+4=16.
+    # P5-3 timing trial transfers USD2: 26 + 13 = 39; project stays100.
+    # USD4 probes: 22+4=26, 23+4=27, 9+4=13, 10+4=14.
     control, api, budget, path = setup(tmp_path)
     control.phase, control.tag = phase, f"voxelshogi-{phase}-reallocation"
     plan = json.loads(path.read_text())
@@ -486,3 +487,47 @@ def test_remote_guard_cannot_outlive_the_reserved_job_budget(tmp_path):
     with pytest.raises(ValueError, match="independent.*budget"):
         control.rent(lambda: None)
     assert not api.calls and budget.read_bytes() == before
+
+
+def test_p53_two_dollar_timing_trial_preserves_all_prior_reservations(tmp_path):
+    from training.remote_deadline import Deadline
+    from training.research_rental_control import ALLOCATIONS
+
+    control, api, budget, path = setup(tmp_path)
+    plan = json.loads(path.read_text())
+    plan.update(maximum_seconds=7200, maximum_usd=2, estimated_seconds=4500)
+    path.write_text(json.dumps(plan))
+    control.remote_guard = lambda **kw: Deadline(kw["tag"], 8200)
+    ledger = json.loads(budget.read_text())
+    ledger["reservations"].append({"task": "phase5-selfplay", "maximum_usd": 24})
+    budget.write_text(json.dumps(ledger))
+    control.rent(lambda: None)
+    current = json.loads(budget.read_text())
+    assert current["reservations"][:-1] == ledger["reservations"]
+    assert (
+        current["reserved_total_usd"] == 87
+        and current["remaining_unreserved_usd"] == 13
+    )
+    assert current["approved_total_usd"] == 100
+    assert ALLOCATIONS == {"phase5": 26, "phase6": 13}
+    assert sum(ALLOCATIONS.values()) == 39
+
+
+@pytest.mark.parametrize(
+    "allocation", [None, {"phase5": 24, "phase6": 15}, {"phase5": 27, "phase6": 13}]
+)
+def test_recorded_phase_allocations_must_match_controller_before_new_paid_create(
+    tmp_path, allocation
+):
+    control, api, budget, _ = setup(tmp_path)
+    ledger = json.loads(budget.read_text())
+    if allocation is None:
+        del ledger["research_allocations_usd"]
+    else:
+        ledger["research_allocations_usd"] = allocation
+    budget.write_text(json.dumps(ledger))
+    before = budget.read_bytes()
+    with pytest.raises(ValueError, match="budget"):
+        control.rent(lambda: None)
+    assert budget.read_bytes() == before
+    assert not any(p.endswith("instances/rent") for p, _ in api.calls)
