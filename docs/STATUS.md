@@ -1,6 +1,6 @@
 # 現在の状態と文書の案内
 
-2026-11-04 JST。[P5-2の自己対局3世代・HF保存・別VM継続](P5_2_COMPLETION.md)は完了。ユーザーの「5まで進めて」で、[次の計画](P5_3_PLAN.md)のP5-3a〜dとP5-4まで実行を再開した。現在は局面定義・世代差集計・全入力監査・対局単位の中断再開を接続し、実GPU試行の前に検証している。**8／150局と1／2／4GPUの実測・棋力改善は未完了。**
+2026-11-04 05:42 UTC。[P5-3bの8局試行](P5_3_TRIAL.md)は、全手再生・全入力重複監査・固定HF全hash・実機解放まで完了した。保存済み7局を再利用し、残り1局だけを実行した。M6／G2とも0勝2敗1自然引分1打切りで、棋力改善は未確認。ユーザーの「5まで進めて」の範囲は継続し、**150局・結果に基づく診断・実1／2／4GPUの測定は未完了**である。
 
 ## 現在使えるもの
 
@@ -14,6 +14,7 @@
 | P5-0 | 開発評価32局・全手再生・凍結コーパス照合を完了。棋力改善の証拠ではない。[固定した結果](P5_PILOT.md) |
 | P5-1 | 今回の8対局・35局面候補は採用条件未達で学習不採用。追加教師検証は保留。holdout全履歴の入力IDだけを後続学習から保護。[判断](P5_NEXT_EXECUTION.md) |
 | P5-2 | 48対局・3世代の実更新と系譜、全手再生・入力byte hash、HF両公開計3対、別の所有VMでの後続世代を確認。[結果と限界](P5_2_COMPLETION.md) |
+| P5-3b | 時間試行8／8局、M4全116,921行・自己対局raw11,534件・保護116,008入力との照合で重複0、HF保存と実機解放。[実数と制約](P5_3_TRIAL.md) |
 
 公開画面の9王比較室と旧URLの導線は撤去済み。9王の正式採用は行っておらず、標準1王を維持する。[比較当時の研究記録](NINE_KINGS_EXPERIMENT.md)は保持する。
 
@@ -23,7 +24,7 @@ M6のFP32・FP16重み／FP32計算・INT8重み／FP32計算は、HFから取�
 
 P5-2のデータ／再開状態・保護index・集計reportは、[完了記録の固定revision一覧](P5_2_COMPLETION.md)から取得する。public/manualのダウンロード申請・Community OFF・Card・承認済みlicenseを維持する。データとcheckpointは外部Linuxから直接転送し、Macに中継しない。今回の自己対局stateをWebの変換済みモデルとして扱わない。
 
-P5-3再開時の読み取り確認でもVastのプロジェクト所有実機0・CloudRift idle。保守的予約は全体US$85／100、Phase5 US$24。追加US$100は未適用。[最初の8局試行](P5_3_TRIAL.md)は2時間・US$2を上限とし、未使用Phase6から2を移して配分26・13へ変更する準備を進める。controllerとledgerの一致を検査し、統合後に全過去予約を保持してledgerを更新する。コード変更だけでは予約・レンタルを行わない。Vastの利用可能クレジットは`credit`で確認し、サービス残高と予算承認を区別する。[過去の費用と停止の証拠](P5_2_COMPLETION.md)。
+P5-3b完了実機は05:02:39 UTCに解放を確認し、プロジェクト所有のVast実機は0。05:42:52 UTCに、承認済み追加100を根拠hash・統合CI・所有資源0の照合後に適用した。現在の総枠は**200、予約22件・92.5、未予約107.5**。既存予約の減額や新しい課金要求は行っていない。[費用配分と適用証跡](P5_3_EXECUTION_BUDGET.md)を参照する。Vastの利用可能クレジットは`credit`で確認し、サービス残高と予算承認を区別する。[P5-2時点の費用と停止](P5_2_COMPLETION.md)も履歴として保持する。
 
 Pythonは3.14を基本に、依存未対応時のみ3.13。Macは編集・読み取り・軽量確認、探索・生成・性能計測・学習は承認済みVast.ai／CloudRift、重い回帰はGitHub Actionsで行う。
 
@@ -34,7 +35,7 @@ Pythonは3.14を基本に、依存未対応時のみ3.13。Macは編集・読み
 - 新しい自己対局モデルの固定評価・変換・実機検証・Web採用、モバイル／低性能端末、長時間観戦と表示の理解しやすさは後続の課題。
 - 本条件の結果から、必要なら終盤分布・教師・探索・cutoff率を診断する。弱いモデルのまま大きい学習へ自動拡大しない。
 
-次の順序は条件・不足実装の整備→8局の時間試行→4モデル各30局とM1対照30局、合計150局の開発用比較。現行runnerの合法argmaxを共通方式とし、PUCT全体の強さとは分ける。実行・予算・判断の詳細は[P5-3計画](P5_3_PLAN.md)、全体の残課題は[全体計画](OVERALL_PLAN.md)、各フェーズの目的は[ROADMAP](ROADMAP.md)を参照する。
+次は4モデル各30局とM1対照30局、合計150局の開発用比較。75 opening-pairの並列実行と、中断時の確定棋譜のHF保存を接続して実行単位を固定する。現行runnerの合法argmaxを共通方式とし、PUCT全体の強さとは分ける。その後に1要因診断、実1／2／4GPUと各保存再開を行う。詳細は[P5-3計画](P5_3_PLAN.md)、残課題は[全体計画](OVERALL_PLAN.md)、各フェーズの目的は[ROADMAP](ROADMAP.md)を参照する。
 
 ## 過去の課題（C0で対応済み）
 
@@ -43,6 +44,8 @@ M3着手前に確認した3D操作中の探索テストの観測競合は、入�
 ## 品質と履歴の確認元
 
 ブランチ・PR・main保護・必須8チェックと通常mergeを維持する。PRは影響範囲の短い検証、main／定期は深い回帰を行う。[CIの実行範囲と実測](CI_PERFORMANCE.md)。文書だけのmain更新ではアプリを再配信しないため、公開SHAはmain HEADと異なることがある。[配信手順](DEPLOYMENT.md)。
+
+PR128統合main `0f7e6ab`の[変異baseline失敗](https://github.com/ayutaz/voxelshogi/actions/runs/41776165445)は、隔離checkoutの予算根拠JSON同梱漏れだった。[PR129](https://github.com/ayutaz/voxelshogi/pull/129)は手動の深いCIと必須8チェック後に通常mergeし、統合main `8d1922c`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41779584359)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41779584218)も成功した。Native1,032件・21 warnings・84.26秒、全430変異の4 shardを実行済み。文書のみの成功で失敗を置き換えてはいない。CIの時間はGPU性能値へ流用しない。
 
 数値修正の[PR #115](https://github.com/ayutaz/voxelshogi/pull/115)は必須8チェック・関連CI成功後に通常mergeした。統合main `7e44310`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41652351549)ではFull Python unit and native integration、学習系変異4シャード、深いQuality・モデル結合・公開検証が成功。[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41652351458)の全4言語も成功した。
 
