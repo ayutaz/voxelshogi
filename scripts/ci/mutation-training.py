@@ -13,6 +13,41 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "vast-m6-ssh-startup-required",
+        "training/vast_rental_control.py",
+        '"onstart": onstart,',
+        '"onstart": "",',
+        "test_vast_ssh_startup.py",
+    ),
+    (
+        "vast-research-ssh-startup-required",
+        "training/vast_research_control.py",
+        '"onstart": onstart,',
+        '"onstart": "",',
+        "test_vast_ssh_startup.py",
+    ),
+    (
+        "vast-ssh-startup-idempotence",
+        "training/vast_rental_control.py",
+        'if ! grep -Fxq -- "$ssh_public_key" /root/.ssh/authorized_keys; then',
+        "if true; then",
+        "test_vast_ssh_startup.py",
+    ),
+    (
+        "vast-ssh-startup-comment-quoting",
+        "training/vast_rental_control.py",
+        "shlex.quote(public_key)",
+        "public_key",
+        "test_vast_ssh_startup.py",
+    ),
+    (
+        "vast-ssh-startup-one-line-key",
+        "training/vast_rental_control.py",
+        'or "\\n" in public_key\n        or "\\r" in public_key',
+        "or False",
+        "test_vast_ssh_startup.py",
+    ),
+    (
         "pool-snapshot-known-lease",
         "training/evaluation_pool_archive.py",
         "names -= locks",
