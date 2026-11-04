@@ -116,8 +116,13 @@ def _worker(rank, directory):
             expected_binding=partial["binding"],
             profile="distributed",
         )
-        assert (root / "fresh-restore/events.jsonl").read_bytes() == original_events
         events = [json.loads(line) for line in original_events.splitlines()]
+        restored_events = [
+            json.loads(line)
+            for line in (root / "fresh-restore/events.jsonl").read_text().splitlines()
+        ]
+        assert restored_events == events
+        assert (root / "resumed/events.jsonl").read_bytes() == original_events
         assert [e["global_step"] for e in events] == [1, 2]
         assert [e["measured"] for e in events] == [False, True]
     dist.barrier()
