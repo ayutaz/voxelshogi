@@ -19,6 +19,12 @@ from training.vast_rental_control import (
 class ResearchVastRental(VastInstanceControl, ResearchRental):
     PLAN_SCHEMA = "voxelshogi-vast-research-plan-v1"
     HARDWARE_FIELDS = {"offer_id", "disk_gb"}
+    NUM_GPUS = 1
+    OFFER_QUOTER = staticmethod(quote_offer)
+    GUARD_MODULE = "training.vast_research_control"
+
+    def minimum_credit(self, quote, plan):
+        return quote["hourly_usd"] * plan["maximum_seconds"] / 3600
 
     def validate_hardware(self, plan):
         if (
@@ -53,7 +59,7 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
             "/api/v0/bundles",
             {
                 "ask_contract_id": {"eq": plan["offer_id"]},
-                "num_gpus": {"eq": 1},
+                "num_gpus": {"eq": self.NUM_GPUS},
                 "type": "on-demand",
                 "allocated_storage": DISK_GB,
                 "limit": 2,
@@ -65,13 +71,11 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
             or offers[0].get("id") != plan["offer_id"]
         ):
             raise ValueError("Vast.ai research offer is not uniquely available")
-        quote = quote_offer(offers[0])
+        quote = self.OFFER_QUOTER(offers[0])
         public_key = (self.state / "id_ed25519.pub").read_text().strip()
         if not public_key.startswith("ssh-ed25519 "):
             raise ValueError("dedicated SSH public key is missing")
-        self.check_account(
-            minimum_usd=quote["hourly_usd"] * plan["maximum_seconds"] / 3600
-        )
+        self.check_account(minimum_usd=self.minimum_credit(quote, plan))
         now = self.clock()
         seconds = self.quote_seconds()
         self.reserve()
@@ -133,7 +137,7 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
         return {"instance_ids": [identity], "stop_at": now + seconds - 900}
 
 
-def main():
+def main(*, control_type=None):
     import argparse
     import math
     import subprocess
@@ -181,7 +185,8 @@ def main():
     ):
         parser.error("rent requires --plan --workload --guard-run")
     tag = "voxelshogi-" + args.phase + "-" + state.name
-    control = ResearchVastRental(
+    control_class = control_type or ResearchVastRental
+    control = control_class(
         state,
         VastClient(project_key(ROOT, "VAST_API_KEY")),
         tag=tag,
@@ -202,7 +207,9 @@ def main():
                 [
                     sys.executable,
                     "-m",
-                    "training.vast_research_control",
+                    getattr(
+                        control_class, "GUARD_MODULE", "training.vast_research_control"
+                    ),
                     str(state),
                     "guard",
                     "--budget",

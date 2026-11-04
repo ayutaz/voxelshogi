@@ -1,0 +1,32 @@
+{
+  "schema": "voxelshogi-market-quote-observation-v1",
+  "checked_at_unix": 1793756461.773922,
+  "read_only": true,
+  "rental_created": false,
+  "candidate": {
+    "id": 45378425,
+    "machine_id": 46154,
+    "gpu_name": "RTX 5090",
+    "num_gpus": 4,
+    "gpu_ram": 32607,
+    "cpu_ram": 257800,
+    "cpu_cores_effective": 64.0,
+    "disk_space": 3055.5,
+    "verification": "verified",
+    "reliability2": 0.9974986,
+    "cuda_max_good": 13.2,
+    "driver_version": "595.71.05",
+    "direct_port_count": 256,
+    "dph_base": 2.24,
+    "dph_total": 2.2622222222222224,
+    "storage_total_cost": 0.022222222222222223,
+    "inet_up_cost": 0.00390625,
+    "inet_down_cost": 0.00390625,
+    "rentable": true,
+    "rented": false,
+    "geolocation": "Japan, JP"
+  },
+  "quote_is_not_inventory_guarantee": true,
+  "official_pricing_units": "https://docs.vast.ai/api-reference/search/search-offers",
+  "scope": "candidate for a future same-host1/2/4GPU measurement; actual measured hardware and actual usage costs remain separate"
+}

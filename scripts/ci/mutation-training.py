@@ -12,6 +12,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "distributed-rental-four-gpu-query",
+        "training/vast_distributed_control.py",
+        "    NUM_GPUS = 4",
+        "    NUM_GPUS = 1",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-transfer-reservation",
+        "training/vast_distributed_control.py",
+        'return super().cost_cap(plan) + plan["maximum_transfer_usd"]',
+        "return super().cost_cap(plan)",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-transfer-credit",
+        "training/vast_distributed_control.py",
+        'return super().minimum_credit(quote, plan) + plan["maximum_transfer_usd"]',
+        "return super().minimum_credit(quote, plan)",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-transfer-price",
+        "training/vast_distributed_control.py",
+        "or not 0 <= value <= 0.01",
+        "or not 0 <= value <= 0.02",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-raw-number-type",
+        "training/vast_distributed_control.py",
+        "type(offer[field]) not in (int, float)",
+        "False",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-physical-disk-price",
+        "training/vast_distributed_control.py",
+        "normalized[field] = offer[field] / 4",
+        "normalized[field] = offer[field]",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-total-hourly-cap",
+        "training/vast_distributed_control.py",
+        "if hourly > MAXIMUM_HOURLY_USD or estimate > TRANSFER_RESERVE_USD:",
+        "if estimate > TRANSFER_RESERVE_USD:",
+        "test_vast_distributed_control.py",
+    ),
+    (
+        "distributed-rental-matching-guard-module",
+        "training/vast_research_control.py",
+        'getattr(\n                        control_class, "GUARD_MODULE", "training.vast_research_control"\n                    )',
+        '"training.vast_research_control"',
+        "test_vast_distributed_control.py",
+    ),
+    (
         "distributed-archive-world-size",
         "training/distributed_training.py",
         'or contract["world_size"] not in (1, 2, 4)',
@@ -329,7 +385,7 @@ MUTATIONS = [
     (
         "vast-research-balance-admission",
         "training/vast_research_control.py",
-        'minimum_usd=quote["hourly_usd"] * plan["maximum_seconds"] / 3600',
+        "minimum_usd=self.minimum_credit(quote, plan)",
         "minimum_usd=0",
         "test_vast_research_control.py",
     ),
