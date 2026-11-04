@@ -51,6 +51,18 @@ uv run --locked python -m training.hub_release runs/m6/archive runs/m6/state-pla
 
 転送失敗・応答喪失でも予約は残す。既存Hub commitとファイルの照合を先に行い、成功したか不明なアップロードを盲目的に繰り返さない。返ったreceiptと固定revisionの全照合を確認し、新しいLinux runへの再取得・復旧まで確かめる。GPU終了前に小さいledger／manifest／receiptを制御側へ回収し、次のレンタルで継承する。Macへarchiveやモデルを中継しない。
 
+## 保存容量の移行機能（実運用は承認待ち）
+
+2026-11-04のP5-4では15予約・1,044,495,137 bytesを保持し、残り29,246,687 bytesとなった。[4GPU再開の不一致と退避](P5_4_PARITY_FAILURE.md)を受け、次の6 archiveは各最大64MiB、合計後の保守的予約は最大1,447,148,321 bytesを見込む。累積2GiBへの増量はユーザーへ確認中であり、**実運用ledgerはv1・1GiBのまま。増量も追加アップロードも実行していない。**
+
+`training.state_upload_budget.extend_upload_budget`は、実際の承認を得た呼び出し側が`approved=True`と承認元を識別する`approval_reference`を渡した場合だけ、新しいv2 ledgerの値を返す。関数自体はファイルを書かず、HFへ接続せず、ユーザーの承認を代行しない。既存の空でないv1 ledgerを検査し、全予約を同じ順・値で複製し、旧上限・旧予約数・旧予約prefixのSHA-256・承認参照を移行記録へ固定する。
+
+v1の上限は1GiBを維持する。v2は2GiBだけを受け付け、移行記録の欠落、旧prefixの削除・変更・並べ替え、旧予約の重複、再移行、任意の増額を拒否する。以降の追加予約でもprefixを検査し、重複planと累積超過を送信前に拒否する。file lock・flush・fsyncと転送失敗時の予約保持は従来どおりである。
+
+実際に移行する際は、承認・関連CI・最新の制御側ledger hashを確認し、既存の15予約を新しい空ledgerで上書きしない。単一の所有制御プロセスがlock下で新しい値を保存し、remoteへ複製した古いledgerを後から重ね書きしない。有料storage追加・既存HF履歴の削除／書き換えは行わない。GPU起動前に次の全6 archiveを保存できる容量を照合する。
+
+純粋metadataの新規30テストで、承認必須・旧予約の不変性・prefix・version・累積上限・重複・書き込み前拒否を検証し、新規6変異の検出を確認した。これは容量の利用承認や実際のHF転送の証拠ではない。
+
 ## 検証と残作業
 
 opaque metadataを使う対象4ファイル52テストで、別の公開承認・宛先・期待binding、余分なファイル・hash・best・symlink・Card、送信前予約・重複・上限・Mac拒否、API失敗時の予約保持を検証する。追加5変異と全回帰はCIへ含める。モデルやTensorはMacで実行しない。
