@@ -152,7 +152,7 @@ def test_credit_must_cover_the_transfer_reserve_as_well_as_compute(tmp_path):
     assert budget.read_bytes() == before and not any(m == "PUT" for m, *_ in api.calls)
 
 
-@pytest.mark.parametrize("task,amount", [("other", 36), ("phase5-selfplay", 23)])
+@pytest.mark.parametrize("task,amount", [("other", 36), ("phase5-selfplay", 34)])
 def test_compute_only_fit_cannot_ignore_network_in_shared_or_phase_cap(
     tmp_path, task, amount
 ):

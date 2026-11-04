@@ -10,6 +10,11 @@
 - [世代差の集計と入力集合の監査](../training/generation_evaluation.py)：共通条件・同じ先後pairを検査し、M6との差を10,000回再標本化する。cutoffの勝点範囲を保持する。
 - [全コーパス・後続入力の監査](../training/generation_audit.py)：M4全split、全P5-2公開sample、保護入力を列挙し、評価開始後の全局面・終端を物理局面と手番正規化入力の両方で照合する。固定revision取得とhash照合は実行側の先行条件である。
 - [評価runner](../training/evaluation_v2_runner.py)の`--resume`：各対局をhash付きreceiptへ確定し、再開時に同じprotocol・全保存hash・metadata・Rust再生を検査して完了済みを再利用する。未確定ファイル・同時実行・条件や環境の変更は拒否する。既定の新規実行は既存出力を上書きしない。
+- [局面ごとの並列評価](../training/evaluation_jobs.py)：全cohortのprotocolを縮めず、1開始局面・先後2局を1仕事にする。5 cohort×15局面＝75仕事・150局。同時実行は1〜16プロセスに制限し、各色の確定hashを再開時にも保持する。集約はRustで再生した元ファイルのbyteをそのままコピーし、全局面・先後・runtimeの一致を要求する。起動結果が不明な仕事や生存中のPIDを自動で再起動しない。
+
+並列評価のLinuxコマンドは `uv run --project infrastructure/cuda --locked python -m training.evaluation_jobs pool --plan PLAN.json --artifacts ARTIFACTS.json --output OUTPUT`。planは `plan_case_jobs` から作り、artifactsはcohortごとのroleと固定重みのpathを持つ。再開だけ `--resume` を明示する。完了済み対局は再実行せず、停止signalは所有する子へ伝える。入力監査・HF公開・費用と絶対期限の制御は外側の実行単位で引き続き必要であり、並列runner単独の成功を実験全体の完了としない。
+
+2026-11-04の最初の試行は7／8局で時間上限となり、保存済み7局をHFへ退避した。残り1局と全入力監査は未完了。[試行記録](P5_3_TRIAL.md)を保持し、ここから並列化の実効果と本比較の時間を実GPUで測る。CIの速度やGPU使用率の小ささから、対局の並列化率を測定済みとしない。
 
 小さいmetadata／fake portsの45テストと新規12変異はMacの軽量確認で検証した。実局面・全手再生・実中断再開はLinux CIのNativeテストで検証し、実GPU・8／150局・1／2／4GPUの完了とは分ける。
 
@@ -85,6 +90,8 @@ repo名・全release descriptorは[P5-2完了記録](P5_2_COMPLETION.md)を正�
 | 主な時間が探索・監査・転送にある | 工程別の時間、CPU／GPU利用を点検 | 学習DDPだけで全体が速くなると仮定せず、効果を測れる部分から改善 |
 
 ## 費用・日程・実行場所
+
+**最初の試行後の配分案**：[後半の実行予算](P5_3_EXECUTION_BUDGET.md)で、未予約Phase6から11を移しPhase5／6＝37・2とする。残り1局2・150局3・診断2・DDP4を上限案に分け、全体予約87から最大98へ収める。controllerとledgerへの適用・各単位の実行は別の検証済み手順で行い、ここで11を一括予約したり追加100を有効化したりしない。以下は初回試行前の配分と見積もりである。
 
 計画作成時の保守的予約はUS$85／基本枠100、未予約15。Phase5は配分24／予約24で空き0、Phase6は配分15が未使用だった。[8局試行の2時間・US$2の見積もり](P5_3_TRIAL.md)に合わせ、Phase6から2を移し、配分26・13、合計39とする変更を準備した。controllerと共通ledgerの完全一致を検査し、コード・関連CIの統合後に過去の予約を保持してledgerを更新する。未予約15を両Phaseへ二重計上しない。Vastのサービスクレジットと予算承認は別であり、`balance=0`を資金不足と読まない。
 

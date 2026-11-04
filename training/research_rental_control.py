@@ -28,9 +28,9 @@ HARDWARE = {
     M6_SHARED_SKU: (M6_SHARED_DC, False),
     "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),
 }
-# P5-3 timing trial: reassign another USD2 of the unspent Phase6 allocation.
+# Remaining P5-3 and DDP units: move USD11 of unused Phase6 allocation.
 # The project remains USD100; the conditional extra USD100 is not activated.
-ALLOCATIONS = {"phase5": 26, "phase6": 13}
+ALLOCATIONS = {"phase5": 37, "phase6": 2}
 PURPOSES = {
     "phase5-evaluation",
     "phase5-data",
