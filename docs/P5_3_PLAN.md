@@ -37,6 +37,8 @@ P5-4の[共通データ順](../training/distributed_benchmark.py)も準備する
 
 先に測るのは、保存できたモデルの対局上の違いである。P5-2の終局内訳だけで評価局面の感度を判断せず、[P5-0の開発用評価](P5_PILOT.md)の自然終局率75%／87.5%も別条件の結果として保持する。観戦表示は同じ棋譜を使って並行準備できる。DDPやTransformer-Mへの投資は、評価と工程別の時間から判断する。
 
+**11:45 UTC・診断完了**：[固定重みの12局と実参照13件](P5_3_DIAGNOSIS.md)をRustで再生し、全入力重複0、HF固定revision全hash、実機解放を確認した。先手詰み成功はargmax1／3対PUCT32が3／3。判断は追加測定で、新規学習やWeb採用は行わない。残る「5まで」は実1／2／4GPU・各保存再開である。
+
 ## 次に実行する順番と数量ゴール
 
 以下は次回実行用の計画値で、達成済みの値や実行指示ではない。着手時にclean source・実局面・seed・hash・上限を機械可読protocolへ固定する。
@@ -67,7 +69,7 @@ P5-4は工程別測定で学習部分の並列化に価値があると判断し�
 
 repo名・全release descriptorは[P5-2完了記録](P5_2_COMPLETION.md)を正とする。stateからの復旧・子モデル再exportとhash照合は外部Linuxで行う。
 
-現行の[評価契約](../training/evaluation_v2.py)と[runner](../training/evaluation_v2_runner.py)は`legal-argmax-v1`、`alphabeta-v1`、`random-canonical-v1`を扱い、PUCT方式は評価participantとして未接続。まず4モデルを同じTorch CUDA FP32の合法argmaxで比較し、M1は同じRust探索予算（候補：深さ3・20,000ノード・TT4,096）に固定する。比較する重み以外の条件をそろえる。
+現行の[評価契約](../training/evaluation_v2.py)と[runner](../training/evaluation_v2_runner.py)は`legal-argmax-v1`、`alphabeta-v1`、`random-canonical-v1`を扱い、PUCT方式は当初未接続だったが、PR #133で固定32 simulationsと実参照観測を接続し、12局診断まで確認した。150局は4モデルを同じTorch CUDA FP32の合法argmaxで比較し、M1は同じRust探索予算（候補：深さ3・20,000ノード・TT4,096）に固定する。比較する重み以外の条件をそろえる。
 
 これはPolicyを直接使うモデルの比較である。自己対局で使った32 simulationsのPUCTを含むシステム全体の改善は、この結果だけで判定しない。PUCT比較が必要なら方式・探索予算・温度・noise・seedを別protocolで固定し、評価境界への接続をTDD・参照木・変異検出・Linux結合試験から追加する。
 
