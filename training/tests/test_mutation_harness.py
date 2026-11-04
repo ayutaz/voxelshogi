@@ -122,6 +122,7 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
     tmp_path,
     monkeypatch,
 ):
+    import hashlib
     import json
     import sys
 
@@ -146,6 +147,16 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
     (root / ".github/workflows/vast-deadline.yml").write_text(workflow)
     (root / "training/tests").mkdir()
     (root / "training/value.py").write_text("VALUE = 1\n")
+    # Real policy code reads a reviewed JSON outside training/. The isolated
+    # baseline must include that file with its original bytes and path.
+    evidence = b'{"measured_shortage_usd":1.25}\n'
+    evidence_path = "docs/experiments/p53-budget-extension-2026-11-04.json"
+    (root / "docs/experiments").mkdir(parents=True)
+    (root / evidence_path).write_bytes(evidence)
+    source_root = Path(__file__).resolve().parents[2]
+    (root / "training/research_budget.py").write_text(
+        (source_root / "training/research_budget.py").read_text()
+    )
     # Unassigned files intentionally fail: they must not enter this shard's
     # isolated baseline. The ordinary CI unit job still runs all real tests.
     (root / "training/tests/test_a.py").write_text("assert False\n")
@@ -154,6 +165,11 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
         "assert Path('LICENSE').is_file()\n"
         "assert Path('.github/workflows/vast-deadline.yml').read_text() == "
         f"{workflow!r}\n"
+        f"assert Path({evidence_path!r}).is_file()\n"
+        "import runpy\n"
+        "policy=runpy.run_path('training/research_budget.py')\n"
+        "assert policy['extension_record']()['evidence_sha256'] == "
+        f"{hashlib.sha256(evidence).hexdigest()!r}\n"
         "assert VALUE == 1\n"
     )
     (root / "training/tests/test_c.py").write_text("assert False\n")
