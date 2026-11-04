@@ -13,6 +13,7 @@ from training.vast_rental_control import (
     VastInstanceControl,
     instance_inventory,
     quote_offer,
+    ssh_onstart,
 )
 
 
@@ -75,6 +76,7 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
         public_key = (self.state / "id_ed25519.pub").read_text().strip()
         if not public_key.startswith("ssh-ed25519 "):
             raise ValueError("dedicated SSH public key is missing")
+        onstart = ssh_onstart(public_key)
         self.check_account(minimum_usd=self.minimum_credit(quote, plan))
         now = self.clock()
         seconds = self.quote_seconds()
@@ -121,6 +123,7 @@ class ResearchVastRental(VastInstanceControl, ResearchRental):
                 "target_state": "running",
                 "cancel_unavail": True,
                 "env": "-e NVIDIA_DRIVER_CAPABILITIES=all",
+                "onstart": onstart,
             },
         )
         identity = result.get("new_contract")

@@ -1,0 +1,55 @@
+{
+  "schema": "voxelshogi-p53-comparison-startup-attempts-v1",
+  "observed_at_utc": "2026-11-04T08:21:51.345795+00:00",
+  "source_commit": "239c08197e2a95e59fd82896cde5bf2c68886861",
+  "target_games": 150,
+  "scientific_games_started": 0,
+  "bootstrap_started": false,
+  "new_scientific_payload_uploaded": false,
+  "attempts": [
+    {
+      "control": "evaluation-comparison1-control",
+      "instance_id": 59071179,
+      "result": "host docker_build() error writing dockerfile",
+      "deleted_and_inventory_absent": true,
+      "reservation_retained_usd": 3.5
+    },
+    {
+      "control": "evaluation-comparison2-control",
+      "instance_id": null,
+      "result": "createHTTP400; no instance in repeated complete inventories; original request not resent",
+      "deletion_acknowledgement": null,
+      "reservation_retained_usd": 3.5
+    },
+    {
+      "control": "evaluation-comparison3-control",
+      "instance_id": 59073662,
+      "result": "SSH publickey rejected; exact-key association refresh and one in-place reboot did not establish access",
+      "deleted_and_inventory_absent": true,
+      "reservation_retained_usd": 3.5
+    },
+    {
+      "control": "evaluation-comparison4-control",
+      "instance_id": 59076895,
+      "result": "Correct pre-registered public key present at creation and offered by client; relay/direct SSH still rejected it",
+      "deleted_and_inventory_absent": true,
+      "reservation_retained_usd": 3.5
+    }
+  ],
+  "project_paid_resources_at_final_check": 0,
+  "cloudrift_project_idle": true,
+  "unrelated_workloads_untouched": true,
+  "approved_total_usd": 200,
+  "reserved_total_usd": 106.5,
+  "reservations": 26,
+  "remaining_unreserved_usd": 93.5,
+  "actual_invoices_retrieved": false,
+  "next_change": "Explicit owned-container onstart appends dedicated public key, preserves other keys and enforces directory700/file600; test real SSH separately after all related CI succeeds.",
+  "not_established": "Precise remote SSH failure cause or effectiveness of the proposed onstart on real GPU hosts.",
+  "remaining_goal": [
+    "150 development games and full audit/HF save/release",
+    "results-led one-factor diagnosis",
+    "actual1/2/4GPU measurements and each save/resume/HF/release"
+  ],
+  "official_create_api": "https://docs.vast.ai/api-reference/instances/create-instance"
+}

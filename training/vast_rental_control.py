@@ -3,6 +3,7 @@
 import json
 import math
 import re
+import shlex
 
 from training.m6_rental_control import M6Rental, validate_m6_approval
 from training.rental_control import save
@@ -10,6 +11,27 @@ from training.rental_control import save
 DISK_GB = 80
 MAXIMUM_SECONDS = 14400
 IMAGE = "nvidia/cuda@sha256:e3fd439288969c0c78d52768cda4a10ab20f408180d6fa2933f94f7af7810cb0"
+
+
+def ssh_onstart(public_key):
+    """Set up only the task public key inside the owned root CUDA container."""
+    if (
+        not isinstance(public_key, str)
+        or not public_key.startswith("ssh-ed25519 ")
+        or "\n" in public_key
+        or "\r" in public_key
+    ):
+        raise ValueError("one dedicated Ed25519 public key required")
+    return (
+        "set -eu\n"
+        "install -d -m 700 /root/.ssh\n"
+        "touch /root/.ssh/authorized_keys\n"
+        "chmod 600 /root/.ssh/authorized_keys\n"
+        "ssh_public_key=" + shlex.quote(public_key) + "\n"
+        'if ! grep -Fxq -- "$ssh_public_key" /root/.ssh/authorized_keys; then\n'
+        "  printf '%s\\n' \"$ssh_public_key\" >> /root/.ssh/authorized_keys\n"
+        "fi\n"
+    )
 
 
 def quote_offer(offer):
@@ -286,6 +308,7 @@ class VastRental(VastInstanceControl, M6Rental):
         key = (self.state / "id_ed25519.pub").read_text().strip()
         if not key.startswith("ssh-ed25519 "):
             raise ValueError("dedicated SSH public key is missing")
+        onstart = ssh_onstart(key)
         self.check_account(minimum_usd=quote["hourly_usd"] * MAXIMUM_SECONDS / 3600)
         self.reserve()
         now = self.clock()
@@ -319,6 +342,7 @@ class VastRental(VastInstanceControl, M6Rental):
                 "target_state": "running",
                 "cancel_unavail": True,
                 "env": "-e NVIDIA_DRIVER_CAPABILITIES=all",
+                "onstart": onstart,
             },
         )
         identity = response.get("new_contract")
