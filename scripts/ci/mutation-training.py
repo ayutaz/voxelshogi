@@ -266,15 +266,15 @@ MUTATIONS = [
     (
         "research-p53-trial-phase5-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 26, "phase6": 13}',
-        'ALLOCATIONS = {"phase5": 27, "phase6": 13}',
+        'ALLOCATIONS = {"phase5": 37, "phase6": 2}',
+        'ALLOCATIONS = {"phase5": 38, "phase6": 2}',
         "test_research_rental_control.py",
     ),
     (
         "research-p53-trial-phase6-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 26, "phase6": 13}',
-        'ALLOCATIONS = {"phase5": 26, "phase6": 14}',
+        'ALLOCATIONS = {"phase5": 37, "phase6": 2}',
+        'ALLOCATIONS = {"phase5": 37, "phase6": 3}',
         "test_research_rental_control.py",
     ),
     (
