@@ -29,6 +29,14 @@
 - CUDA同期を含む更新時間と準備・保存・復旧を分ける。rankごとのTorch peak allocated／reserved bytesと、device全体の観測値を混同しない。
 - 通信の単独probeと学習全体の時間を別に保存する。単独all-reduceの所要時間を、そのままDDP学習中の通信割合とは呼ばない。
 
+## 実機試行で見つかった履歴境界の修正
+
+2026-11-04、source `516da1a9ef8c07310f8bc987854df3ab67c35cf6`の実1GPU・連続128更新は完走した。後続processでNVML GPUアクセスを失い、一度の所有コンテナ再起動後も再発したため、この試行は1／2／4GPU比較の完了とは扱わない。完走済み128更新と失敗前の全metadata hashを保持し、2／4GPU・HF経由の中間再開は未完了である。
+
+退避準備では、`fit_schedule`の`global_step`・`indices`・`measured`・`value_kind`を持つ更新ログを、旧archiveのM6／自己対局用history whitelistが拒否する不整合も見つかった。旧sourceで、実2rank CPUの`fit_schedule → pack_run`が同じ拒否で失敗することを再現した。GPUアクセス喪失とは別の問題である。
+
+`distributed` profileだけで元の更新順・index・準備期間・Value由来をそのまま保持する。件数・型・重複index・有限な非負metrics・global batch・準備境界・連続したstepとcheckpoint cursorを検査し、M6／自己対局profileの許可範囲は広げない。直接checkpointを保存した既存の空historyも引き続き扱う。実2rank CPUでは2更新をarchiveし、新しいrun／model／AdamWへ復旧して残り2更新を実行し、連続4更新とのmodel・optimizer・RNG一致と全4更新ログの保持を検証する。これは外部GPUの全3構成・各HF再開を代替する結果ではない。
+
 ## 正しさと保存
 
 [固定更新ループ](../training/distributed_loop.py)の`fit_schedule`は同じglobal scheduleを再構築し、更新cursor・入力・初期重み・構成・runtimeをbindingへ固定する。全rankで停止flagを共有し、0・中間・最終状態を既存のDDP保存境界へ渡す。再開では新しいmodel／optimizerへ読み込み、残りの更新だけを実行する。実行前の不一致とrank0の保存失敗を全rankへ伝え、同じ出力には排他leaseを取る。

@@ -19,6 +19,7 @@ def _worker(rank, directory):
     from training.distributed_loop import communication_probe, fit_schedule
     from training.distributed_training import DistributedConfig
     from training.research_targets import ACTIONS, visit_policy
+    from training.resume_archive import pack_run, restore_run
     from training.selfplay_training import Samples
     from training.tests.test_checkpoint import assert_state_equal
 
@@ -105,12 +106,27 @@ def _worker(rank, directory):
         max_new_steps=2,
     )
     assert partial["reason"] == "max_steps" and partial["progress"]["step"] == 2
+    if rank == 0:
+        original_events = (root / "resumed/events.jsonl").read_bytes()
+        manifest = pack_run(root / "resumed", root / "archive", profile="distributed")
+        assert manifest["roles"]["latest"]["progress"]["step"] == 2
+        restore_run(
+            root / "archive",
+            root / "fresh-restore",
+            expected_binding=partial["binding"],
+            profile="distributed",
+        )
+        assert (root / "fresh-restore/events.jsonl").read_bytes() == original_events
+        events = [json.loads(line) for line in original_events.splitlines()]
+        assert [e["global_step"] for e in events] == [1, 2]
+        assert [e["measured"] for e in events] == [False, True]
+    dist.barrier()
     restored, restored_optimizer = setup()
     resumed = fit_schedule(
         restored,
         restored_optimizer,
         data,
-        root / "resumed",
+        root / "fresh-restore",
         config=config,
         input_binding=input_binding,
         rank=rank,
@@ -130,6 +146,19 @@ def _worker(rank, directory):
         and resumed["examples_per_second"] is None
     )
     assert full["binding"] == resumed["binding"]
+    if rank == 0:
+        final = pack_run(
+            root / "fresh-restore", root / "final-archive", profile="distributed"
+        )
+        assert final["roles"]["latest"]["progress"]["step"] == 4
+        history = json.loads((root / "final-archive/history.json").read_text())[
+            "events"
+        ]
+        assert [e["global_step"] for e in history] == [1, 2, 3, 4]
+        assert [e["indices"] for e in history] == json.loads(
+            (root / "continuous/schedule.json").read_text()
+        )["batches"]
+    dist.barrier()
     assert len(full["rank_memory"]) == 2
     stopped, stopped_optimizer = setup()
     stop = fit_schedule(
