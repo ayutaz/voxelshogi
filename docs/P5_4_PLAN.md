@@ -20,6 +20,8 @@
 
 ## 同じ条件で比較する
 
+起動後は[4GPU専用preflight](../training/distributed_preflight.py)で物理GPUのUUIDが4個あり、互いに異なることを検査する。UUIDごとに`CUDA_VISIBLE_DEVICES`を設定した別プロセスを起動し、各プロセスに見えるGPUが正確に1台であること、RTX5090・driver・VRAM・固定Python／Torch／CUDA環境と、手計算した行列積・勾配が一致することを確認する。既存の単GPU検査へ物理4台を1台と偽って渡さない。1／2／4GPUの測定には、この検査を通った同じUUID列の先頭1／2／4個を使う。Macのfake-portテストと変異検出は検査処理の確認であり、実GPU4台の検査結果ではない。
+
 - 同じTransformer-Sの開始重み、検証済み自己対局入力、保護集合を使う。source・HF固定revision・全hashと実学習sampleのhashを固定する。評価holdoutを学習へ混ぜない。
 - global batch 16、128更新、最初の16更新を準備期間とする案を[設定](../training/distributed_training.py)へ明示する。測定対象は残り112更新。同じ学習率・AdamW設定・FP32で、TF32や量子化を使わない。実機起動前に最終条件をprotocolへ固定する。
 - [共通スケジュール](../training/distributed_benchmark.py)で先に全更新のindexを固定する。各更新をrankへ等分し、GPU数によってsampleを追加・複製・間引きしない。Value由来はbatch内で統一し、全体で除外した端数を記録する。
