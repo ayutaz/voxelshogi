@@ -246,7 +246,7 @@ def test_fake_port_resume_keeps_committed_matches_and_skips_their_execution(
 
     monkeypatch.setattr(
         "training.evaluation_v2_runner._prepare_players",
-        lambda *a: {"model": choose, "opponent": choose},
+        lambda *a, **kw: {"model": choose, "opponent": choose},
     )
     monkeypatch.setattr("training.evaluation_v2_runner.verify_record", lambda *a: None)
     folder = tmp_path / "fake-resume"

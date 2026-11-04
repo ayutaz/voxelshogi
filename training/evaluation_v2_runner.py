@@ -12,6 +12,7 @@ from pathlib import Path
 from training.checkpoint import atomic_json
 from training.evaluation import classify_result
 from training.evaluation_v2 import (
+    NEURAL_POLICIES,
     RULESET,
     fingerprint,
     summarize_matches,
@@ -115,10 +116,23 @@ def _native_player(policy, limits, seed):
     return choose
 
 
-def _prepare_players(protocol, artifacts):
+def _observed_player(player, role, observer):
+    if observer is None:
+        return player
+
+    def choose(game):
+        observer(role, game)
+        return player(game)
+
+    return choose
+
+
+def _prepare_players(
+    protocol, artifacts, *, stop_requested=lambda: False, observe_input=None
+):
     players = {}
     for role, participant in protocol["participants"].items():
-        if participant["policy"] != "legal-argmax-v1":
+        if participant["policy"] not in NEURAL_POLICIES:
             if participant["artifact_sha256"] != rust_policy_identity(
                 participant["policy"],
                 protocol["source_commit"],
@@ -136,6 +150,21 @@ def _prepare_players(protocol, artifacts):
             raise ValueError("evaluation model artifact hash differs")
         if participant["backend"] not in ("torch-cpu", "torch-cuda"):
             raise ValueError("this runner supports selected M6 Torch weights only")
+        if participant["policy"] == "puct32-v1":
+            from training.evaluation_puct import load_puct_player
+
+            players[role] = load_puct_player(
+                path,
+                expected_sha256=participant["artifact_sha256"],
+                device="cuda" if participant["backend"] == "torch-cuda" else "cpu",
+                stop_requested=stop_requested,
+                observe_input=(
+                    (lambda game, role=role: observe_input(role, game))
+                    if observe_input is not None
+                    else None
+                ),
+            )
+            continue
         import torch
         from safetensors.torch import load_file
 
@@ -150,7 +179,9 @@ def _prepare_players(protocol, artifacts):
         seed_all(314159)
         model = make_model(314159)
         model.load_state_dict(load_file(path, device="cpu"), strict=True)
-        players[role] = TorchStudent(model, device=device)
+        players[role] = _observed_player(
+            TorchStudent(model, device=device), role, observe_input
+        )
     return players
 
 
@@ -241,7 +272,13 @@ def read_partial_run(folder, protocol):
 
 
 def run_protocol(
-    protocol, artifacts, folder, *, stop_requested=lambda: False, resume=False
+    protocol,
+    artifacts,
+    folder,
+    *,
+    stop_requested=lambda: False,
+    resume=False,
+    observe_input=None,
 ):
     if sys.platform != "linux":
         raise ValueError("evaluation/model/search execution requires external Linux")
@@ -260,7 +297,12 @@ def run_protocol(
         except BlockingIOError:
             raise ValueError("evaluation already has a running owner") from None
         return _execute_protocol(
-            protocol, artifacts, folder, stop_requested=stop_requested, resume=resume
+            protocol,
+            artifacts,
+            folder,
+            stop_requested=stop_requested,
+            resume=resume,
+            observe_input=observe_input,
         )
 
 
@@ -282,7 +324,7 @@ def checked_execution(protocol, artifacts):
     required = {
         role
         for role, p in protocol["participants"].items()
-        if p["policy"] == "legal-argmax-v1"
+        if p["policy"] in NEURAL_POLICIES
     }
     if set(artifacts) != required:
         raise ValueError("unexpected or missing evaluation artifact")
@@ -315,7 +357,9 @@ def execution_runtime(protocol, required, commit):
     return runtime
 
 
-def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
+def _execute_protocol(
+    protocol, artifacts, folder, *, stop_requested, resume, observe_input=None
+):
     Game, required, commit = checked_execution(protocol, artifacts)
     digest = validate_protocol(protocol)
     folder = Path(folder)
@@ -334,7 +378,9 @@ def _execute_protocol(protocol, artifacts, folder, *, stop_requested, resume):
             folder / "run.json",
             {"complete": False, "protocol_sha256": digest, "games": 0, "files": []},
         )
-    players = _prepare_players(protocol, artifacts)
+    players = _prepare_players(
+        protocol, artifacts, stop_requested=stop_requested, observe_input=observe_input
+    )
     runtime = execution_runtime(protocol, required, commit)
     if saved and saved.get("runtime", runtime) != runtime:
         raise ValueError("resumed evaluation runtime differs from saved environment")

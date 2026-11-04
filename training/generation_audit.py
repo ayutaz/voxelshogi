@@ -9,7 +9,7 @@ from training.evaluation_v2 import fingerprint
 from training.evaluation_v2_runner import position_identity, verify_run
 from training.feature_cache import file_hash
 from training.generation_cases import replay_scored_identities
-from training.generation_evaluation import audit_evaluation_inputs
+from training.generation_evaluation import _inventory, audit_evaluation_inputs
 from training.research_data import input_identity
 from training.supervision import RULESET
 
@@ -51,7 +51,28 @@ def collect_corpus_identities(rows, *, expected_rows, snapshot_factory):
     )
 
 
-def audit_generation_runs(folders, corpus, selfplay, *, expected_protocol, protection):
+def include_observed_inputs(cases, observed):
+    """Include actual neural queries off the played path; never replace a case."""
+    if observed is None:
+        return cases
+    if (
+        type(observed) is not dict
+        or not observed
+        or cases.keys() & observed.keys()
+        or any(
+            type(value) is not dict or set(value) != {"positions", "inputs"}
+            for value in observed.values()
+        )
+    ):
+        raise ValueError("nonempty disjoint observed query inventories required")
+    _inventory({name: value["positions"] for name, value in observed.items()})
+    _inventory({name: value["inputs"] for name, value in observed.items()})
+    return {**cases, **observed}
+
+
+def audit_generation_runs(
+    folders, corpus, selfplay, *, expected_protocol, protection, observed_inputs=None
+):
     """Verify inputs before reporting complete physical/canonical membership."""
     if sys.platform != "linux":
         raise ValueError("full generation/corpus audit requires external Linux")
@@ -117,7 +138,9 @@ def audit_generation_runs(folders, corpus, selfplay, *, expected_protocol, prote
             "protocol_sha256": receipt["protocol_sha256"],
             "games": receipt["games"],
         }
-    result = audit_evaluation_inputs(physical, inputs, cases)
+    result = audit_evaluation_inputs(
+        physical, inputs, include_observed_inputs(cases, observed_inputs)
+    )
     return {
         **result,
         "schema": "voxelshogi-generation-input-audit-v1",
@@ -133,6 +156,16 @@ def audit_generation_runs(folders, corpus, selfplay, *, expected_protocol, prote
         "selfplay_exclusion_scope": "all published raw samples across all generations; conservative superset if any training window/eligibility excluded rows",
         "protected_file_sha256": file_hash(protection),
         "runs": receipts,
+        **(
+            {
+                "observed_input_counts": {
+                    name: {kind: len(ids) for kind, ids in value.items()}
+                    for name, value in observed_inputs.items()
+                }
+            }
+            if observed_inputs is not None
+            else {}
+        ),
         "identity_set_sha256": {
             "physical": {n: fingerprint(sorted(ids)) for n, ids in physical.items()},
             "model_input": {n: fingerprint(sorted(ids)) for n, ids in inputs.items()},
