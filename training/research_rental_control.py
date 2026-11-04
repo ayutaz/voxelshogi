@@ -28,9 +28,9 @@ HARDWARE = {
     M6_SHARED_SKU: (M6_SHARED_DC, False),
     "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),
 }
-# P5-2 measured trial: reassign USD4 of the unspent Phase6 allocation.
+# P5-3 timing trial: reassign another USD2 of the unspent Phase6 allocation.
 # The project remains USD100; the conditional extra USD100 is not activated.
-ALLOCATIONS = {"phase5": 24, "phase6": 15}
+ALLOCATIONS = {"phase5": 26, "phase6": 13}
 PURPOSES = {
     "phase5-evaluation",
     "phase5-data",
@@ -206,6 +206,7 @@ class ResearchRental(Rental):
             rows = ledger.get("reservations")
             if (
                 ledger.get("approved_total_usd") != 100
+                or ledger.get("research_allocations_usd") != ALLOCATIONS
                 or not isinstance(rows, list)
                 or any(
                     not isinstance(row, dict)

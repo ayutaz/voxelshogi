@@ -12,6 +12,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-recorded-allocations-match",
+        "training/research_rental_control.py",
+        'or ledger.get("research_allocations_usd") != ALLOCATIONS',
+        "or False",
+        "test_research_rental_control.py",
+    ),
+    (
         "generation-common-conditions",
         "training/generation_evaluation.py",
         "_conditions(protocol) != _conditions(reference)",
@@ -96,17 +103,17 @@ MUTATIONS = [
         "test_evaluation_v2_runner.py",
     ),
     (
-        "research-p52-reallocation-phase5-boundary",
+        "research-p53-trial-phase5-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 24, "phase6": 15}',
-        'ALLOCATIONS = {"phase5": 25, "phase6": 15}',
+        'ALLOCATIONS = {"phase5": 26, "phase6": 13}',
+        'ALLOCATIONS = {"phase5": 27, "phase6": 13}',
         "test_research_rental_control.py",
     ),
     (
-        "research-p52-reallocation-phase6-boundary",
+        "research-p53-trial-phase6-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 24, "phase6": 15}',
-        'ALLOCATIONS = {"phase5": 24, "phase6": 16}',
+        'ALLOCATIONS = {"phase5": 26, "phase6": 13}',
+        'ALLOCATIONS = {"phase5": 26, "phase6": 14}',
         "test_research_rental_control.py",
     ),
     (

@@ -23,7 +23,7 @@ M6のFP32・FP16重み／FP32計算・INT8重み／FP32計算は、HFから取�
 
 P5-2のデータ／再開状態・保護index・集計reportは、[完了記録の固定revision一覧](P5_2_COMPLETION.md)から取得する。public/manualのダウンロード申請・Community OFF・Card・承認済みlicenseを維持する。データとcheckpointは外部Linuxから直接転送し、Macに中継しない。今回の自己対局stateをWebの変換済みモデルとして扱わない。
 
-最終の所有課金実機・volumeは2026-11-03 17:14 UTCの確認で0。保守的予約は全体US$85／100、Phase5 US$24／配分24、Phase6配分15。追加US$100は未適用。Phase5の配分空きは0で、次回の見積もりではPhase6配分と未予約15を二重計上せず、配分変更または条件付き追加枠の適用をledgerへ記録する。[費用と停止の証拠](P5_2_COMPLETION.md)。Vastの利用可能クレジットは`credit`で確認し、`balance=0`をクレジット不足とする誤りは訂正済み。
+P5-3再開時の読み取り確認でもVastのプロジェクト所有実機0・CloudRift idle。保守的予約は全体US$85／100、Phase5 US$24。追加US$100は未適用。[最初の8局試行](P5_3_TRIAL.md)は2時間・US$2を上限とし、未使用Phase6から2を移して配分26・13へ変更する準備を進める。controllerとledgerの一致を検査し、統合後に全過去予約を保持してledgerを更新する。コード変更だけでは予約・レンタルを行わない。Vastの利用可能クレジットは`credit`で確認し、サービス残高と予算承認を区別する。[過去の費用と停止の証拠](P5_2_COMPLETION.md)。
 
 Pythonは3.14を基本に、依存未対応時のみ3.13。Macは編集・読み取り・軽量確認、探索・生成・性能計測・学習は承認済みVast.ai／CloudRift、重い回帰はGitHub Actionsで行う。
 
