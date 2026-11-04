@@ -15,6 +15,8 @@
 
 P5-4の[共通データ順](../training/distributed_benchmark.py)も準備する。同じglobal batchと更新数から全更新のsample indexを固定し、1／2／4 rankへ重複もpaddingもなく等分する。Valueの出所が異なるsampleは同じbatchに混ぜず、端数はGPU数によらず全体で除外して件数を記録する。純粋な13テストと3変異で確認した範囲は、このスケジュールだけである。DDPの勾配同期・保存再開・実GPU時間／VRAM／通信／費用の完了を意味しない。
 
+[P5-4の測定と保存計画](P5_4_PLAN.md)は別に定義する。更新境界とrank別乱数を含む専用archiveをLinuxで検証し、1／2／4GPUの実測とは区別する。GPUを使わないLinux CIの値からGPU速度や費用を算出しない。
+
 ## 現在地と優先順位の根拠
 
 [P5-2](P5_2_COMPLETION.md)は3世代48対局、raw sample 11,534件、延べ学習19,244件、4,812更新、HFの各世代保存・全件照合・別所有VMでの継続まで完了した。自然勝敗0・自然引分13・cutoff35で、棋力改善は未確認。文書更新の[PR #116](https://github.com/ayutaz/voxelshogi/pull/116)は通常merge済みで、統合main `4c847768200592fca1038983e8d1885858471365`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41682313021)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41682313058)は成功した。

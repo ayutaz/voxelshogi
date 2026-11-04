@@ -76,9 +76,11 @@ def state_inventory(folder, plan, card):
     manifest = verify_archive(
         folder,
         expected_binding=plan["expected_binding"],
-        profile="selfplay"
-        if plan["artifact_role"] == "selfplay-training-state"
-        else "m6",
+        profile={
+            "training-state": "m6",
+            "selfplay-training-state": "selfplay",
+            "distributed-training-state": "distributed",
+        }[plan["artifact_role"]],
     )
     expected = {name: None for name in ("manifest.json", "README.md", "LICENSE")}
     if (folder / "NOTICE").exists():
