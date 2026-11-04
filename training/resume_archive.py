@@ -259,7 +259,62 @@ def _descriptor(folder, path):
     }
 
 
-def _history(path):
+def _distributed_history_event(event, config, previous):
+    fields = {
+        "global_step",
+        "indices",
+        "measured",
+        "examples",
+        "elapsed_seconds",
+        "policy_loss",
+        "value_mse",
+        "loss",
+        "gradient_norm",
+        "value_kind",
+    }
+    if set(event) != fields:
+        raise ValueError("distributed history fields differ")
+    step, indices, examples = event["global_step"], event["indices"], event["examples"]
+    if (
+        type(step) is not int
+        or not 1 <= step <= 100000
+        or previous is not None
+        and step != previous + 1
+        or type(examples) is not int
+        or not 4 <= examples <= 64
+        or examples % 4
+        or type(indices) is not list
+        or len(indices) != examples
+        or any(type(i) is not int or i < 0 for i in indices)
+        or len(set(indices)) != examples
+        or type(event["measured"]) is not bool
+        or event["value_kind"] not in ("terminal-v1", "bootstrap-v1")
+        or any(
+            type(event[k]) not in (int, float)
+            or not math.isfinite(event[k])
+            or event[k] < 0
+            for k in (
+                "elapsed_seconds",
+                "policy_loss",
+                "value_mse",
+                "loss",
+                "gradient_norm",
+            )
+        )
+        or event["elapsed_seconds"] == 0
+    ):
+        raise ValueError("invalid distributed history update")
+    if config is not None and (
+        examples != config["global_batch"]
+        or step > config["updates"]
+        or event["measured"] != (step > config["warmup_updates"])
+    ):
+        raise ValueError("distributed history work/warmup differs")
+    return step
+
+
+def _history(path, *, profile="m6", config=None, progress=None):
+    _schema(profile)
     allowed = {
         "event",
         "attempt",
@@ -279,13 +334,17 @@ def _history(path):
         "masked_legal_rate",
         "reason",
     }
-    events = []
+    events, previous = [], None
     if path.exists():
         if path.is_symlink():
             raise ValueError("history must be a regular file")
         for line in path.read_text().splitlines():
             event = json.loads(line)
-            if set(event) - allowed or event.get("event") not in (
+            if type(event) is not dict:
+                raise ValueError("history event must be an object")
+            if profile == "distributed":
+                previous = _distributed_history_event(event, config, previous)
+            elif set(event) - allowed or event.get("event") not in (
                 "train",
                 "validation",
                 "finish",
@@ -293,6 +352,9 @@ def _history(path):
                 raise ValueError("unknown raw log fields cannot enter a resume archive")
             canonical(event)
             events.append(event)
+    if profile == "distributed" and events and progress is not None:
+        if events[-1]["global_step"] != progress["step"]:
+            raise ValueError("distributed history checkpoint cursor differs")
     return {"schema": "voxelshogi-training-history-v1", "events": events}
 
 
@@ -330,7 +392,12 @@ def pack_run(source, output, *, profile="m6"):
 
             validate_distributed_payload(payload)
         prepared[role] = (payload, receipt)
-    history = _history(source / "events.jsonl")
+    history = _history(
+        source / "events.jsonl",
+        profile=profile,
+        config=binding["config"],
+        progress=prepared["latest"][0]["progress"],
+    )
     output.mkdir(parents=True, exist_ok=False)
     atomic_json(output / "config.json", run)
     atomic_json(output / "history.json", history)

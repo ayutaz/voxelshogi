@@ -13,6 +13,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "distributed-history-profile-isolation",
+        "training/resume_archive.py",
+        'if profile == "distributed":\n                previous = _distributed_history_event(event, config, previous)',
+        'if profile in ("m6", "selfplay", "distributed"):\n                previous = _distributed_history_event(event, config, previous)',
+        "test_distributed_history.py",
+    ),
+    (
+        "distributed-history-warmup-flag",
+        "training/resume_archive.py",
+        'event["measured"] != (step > config["warmup_updates"])',
+        "False",
+        "test_distributed_history.py",
+    ),
+    (
+        "distributed-archive-history-profile-forwarding",
+        "training/resume_archive.py",
+        'history = _history(\n        source / "events.jsonl",\n        profile=profile,',
+        'history = _history(\n        source / "events.jsonl",\n        profile="m6",',
+        "test_distributed_loop_native.py",
+    ),
+    (
         "evaluation-query-puct-observer",
         "training/evaluation_puct.py",
         "                self.observe_input(position)",
