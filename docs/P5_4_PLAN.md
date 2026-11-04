@@ -1,6 +1,6 @@
 # P5-4：1／2／4GPUの学習比較
 
-2026-11-04 JST。[今回の実行範囲](P5_3_PLAN.md)の5番目。P5-3の実測を待つ間に共通スケジュールと保存境界を準備する。ここに記したGPU測定はまだ実行結果ではない。
+2026-11-04 JST。[今回の実行範囲](P5_3_PLAN.md)の5番目。[起動・故障・HFへの部分退避と解放](P5_4_STARTUP.md)を記録した。実1GPUの連続128更新は完走したが、その後GPUアクセスを失った。実2／4GPUと各保存再開は未完了であり、別の同一ホストで全3構成を測り直す。以下の共通条件と完了基準を維持する。
 
 ## 目的と数量ゴール
 
@@ -11,6 +11,8 @@
 ## 4GPUの借用条件
 
 [専用controller](../training/vast_distributed_control.py)はRTX5090×4・80GBディスク・verified・信頼性0.99以上・CUDA13対応・driver580以上を扱う。GPUごとに約32GB VRAM、ホスト合計でCPU RAM 98,304 MB以上（API値）と24以上のeffective CPU coreを要求する。旧1GPUの上限US$1/時・転送無料の契約は維持する。
+
+故障後の次試行はこの共通条件に加えてdriver595以上・別hostを選び、親のCPU archive／復旧処理もTorch2 threadへ制限する。rankの学習条件・精度は変えない。部分退避後の共通upload ledgerは9件・681,575,704 bytesで、次の6 archiveには各65,361,020 bytesの上限を使う。固定の累積1GiBを増やさず、実ファイル量で検査する。
 
 [読み取り在庫記録](experiments/p54-four-gpu-quotes-2026-11-04.json)では、verifiedなRTX5090×4がディスク込み約US$2.26222/時、転送は各方向US$0.00390625/GBだった。これは2026-11-04 01:41 UTC時点の候補であり、起動予約や在庫保証ではない。[公式API仕様](https://docs.vast.ai/api-reference/search/search-offers)の転送料単位を確認した。
 

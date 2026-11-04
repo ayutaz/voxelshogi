@@ -1,0 +1,986 @@
+{
+  "schema": "voxelshogi-p54-startup-observation-v1",
+  "at": 1793795395.098926,
+  "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+  "workload": {
+    "schema": "voxelshogi-p54-frozen-benchmark-workload-v1",
+    "admitted": true,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "comparison150_and_diagnosis_verified": true,
+    "run_label": "voxelshogi-phase5-distributed-benchmark1-control",
+    "control_operator_sha256": "710a12eab22f4bfd86a26742c0d2f1f3247b44c0ae8e2cea8a3789cad32f3646",
+    "world_sizes": [
+      1,
+      2,
+      4
+    ],
+    "expected_state_publications": 6,
+    "maximum_state_archive_bytes": 67108864,
+    "minimum_effective_cpus": 16,
+    "minimum_memory_bytes": 85899345920,
+    "nccl_environment": {},
+    "maximum_seconds": 7200,
+    "maximum_hourly_usd": 3,
+    "maximum_transfer_usd": 1,
+    "maximum_usd": 7,
+    "estimated_seconds": 4500,
+    "config": {
+      "seed": 63001,
+      "global_batch": 16,
+      "updates": 128,
+      "warmup_updates": 16,
+      "resume_at": 64,
+      "learning_rate": 0.0001,
+      "weight_decay": 0.01,
+      "threads": 2,
+      "device": "cuda"
+    },
+    "resume_model_tolerance": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "resume_optimizer_tolerance": {
+      "atol": 1e-07,
+      "rtol": 1e-05
+    },
+    "resume_rng_exact_required": true,
+    "files": {
+      "worker.py": "f6f025da3417af7c5bede044d1ee04e1c5b2fc1a8f980c7562dcd7083570ec5b",
+      "rank-worker.py": "fad81ea0be88778b0f19a5f6ebc275136a1ab00ea62383cbee9c04c8a47742ae",
+      "state-comparison.py": "aa612aa214dd6d3ba5361a4b5470aeee81e80c5492f2725f653f39a790bb265c",
+      "model-plan.json": "58af0c728ba5774b0919b0f0bb1044f90f5e6c023e1296a7a33e995032076a4e",
+      "model-receipt.json": "6a7dbc6dbddcb5e567ed54b0881c1f3b6d4a9725c725f406a2104bcb8abc5d30",
+      "protection-plan.json": "6a9a5cec6ec25af1a0a57e92c0e0eedc9d5e04360eaedf468f8526ec7ba988a9",
+      "protection-receipt.json": "75552958f3a65f4341e5ee572175397b79e64b173294a1902075adb50788551d",
+      "selfplay-protocol.json": "abfb8e57dcb54d08004c869c16797822503bb36774e5b6abd36420a4548e07cf",
+      "recovery-releases.json": "c1719313be20a93794f9cfb6d1d1da3848c9d551bf7d44be42e5e65759af8260",
+      "source-proof.json": "85d50c34777f23c04d722423fa6f4a94171f4f156afbc60d6a85b43bc92a1890",
+      "comparison-proof.json": "ef6f669dc123658f3bd0d02efbc9e323a92297431f08292d393b8feef3f2eca9",
+      "diagnosis-proof.json": "5474eb4e30f9e2598ab47b2d9f4ba2141cb630317c3b94aa3223a09a8fdfc801",
+      "market-quote.json": "6b25ddc91bb97a84423d702b14c9e47c2d95acf0a84ae6141cc9233693f605fc",
+      "state-upload-budget.json": "1275bff23dca45c3d9dc413a35b56b6c08ccd9cc9aafedeb1a83612f99840c10",
+      "bootstrap.sh": "181da5e90674368f7ea23566b1341d06c44ea45957fc2a6b5785c14e38227666"
+    },
+    "success": "actual1/2/4GPU same-global-work measurements, each mid fixed-HF fresh restore,6 state archives and result dataset verified; owned resources released separately",
+    "scope": "bounded performance and continuation measurement; no Phase6 or new Web model adoption"
+  },
+  "quote": {
+    "provider": "vast.ai",
+    "offer_id": 53696800,
+    "gpu": "RTX 5090",
+    "num_gpus": 4,
+    "disk_gb": 80,
+    "hourly_usd": 2.2622222222222224,
+    "inet_up_usd_per_gb": 0.00390625,
+    "inet_down_usd_per_gb": 0.005208333333333333,
+    "estimated_download_gb": 40,
+    "estimated_upload_gb": 10,
+    "estimated_transfer_usd": 0.24739583333333331,
+    "transfer_reserve_usd": 1,
+    "bandwidth": "metered; fixed-workload estimate plus conservative reserve",
+    "maximum_seconds": 7090,
+    "maximum_usd": 7,
+    "checked_at": 1793792813.558722
+  },
+  "deadline": {
+    "requested_at": 1793792813.558722,
+    "stop_at": 1793799003.558722,
+    "maximum_end_at": 1793799903.558722,
+    "hourly_usd": 2.2622222222222224,
+    "consumption_cap_usd": 7
+  },
+  "instance_id": 59098603,
+  "startup_observations": [
+    {
+      "at": 1793793407.027483,
+      "instance": {
+        "id": 59098603,
+        "label": "voxelshogi-phase5-distributed-benchmark1-control",
+        "actual_status": "loading",
+        "status_msg": "#7 166.1 Get:39 http://archive.ubuntu.com/ubuntu noble/main amd64 libedit2 amd64 3.1-20230828-1build1 [97.6 kB]\n",
+        "cur_state": "running",
+        "intended_status": "running",
+        "start_date": 1793792814.3460634
+      },
+      "read_only": true
+    },
+    {
+      "at": 1793793695.141243,
+      "instance": {
+        "id": 59098603,
+        "label": "voxelshogi-phase5-distributed-benchmark1-control",
+        "actual_status": "loading",
+        "status_msg": "#7 431.6 Get:118 http://archive.ubuntu.com/ubuntu noble/main amd64 python3-distro all 1.9.0-1 [19.0 kB]\n",
+        "cur_state": "running",
+        "intended_status": "running",
+        "start_date": 1793792814.3460634
+      },
+      "read_only": true
+    }
+  ],
+  "ssh_account_public_key_registration_required": true,
+  "no_unrelated_current_instances_at_registration": true,
+  "ssh_bootstrap_start": {
+    "at": 1793794034.9089699,
+    "instance_id": 59098603,
+    "bootstrap_requested_once": true,
+    "request_marker_created_on_remote": true,
+    "observed_stdout": "started",
+    "operator_exit_code": 0,
+    "scientific_benchmark_started": false
+  },
+  "bootstrap_network_diagnostic": {
+    "download_host": "releases.astral.sh",
+    "download_path": "/github/uv/releases/download/0.11.23/uv-x86_64-unknown-linux-gnu.tar.gz",
+    "allowed_official_uv_endpoint": true,
+    "probes": [
+      {
+        "mode": "default",
+        "exit_code": 0,
+        "http_status": "200",
+        "elapsed_seconds": 7.211647580843419,
+        "error_class": null
+      },
+      {
+        "mode": "ipv4",
+        "exit_code": 0,
+        "http_status": "200",
+        "elapsed_seconds": 1.5227975598536432,
+        "error_class": null
+      }
+    ],
+    "body_saved": false,
+    "at": 1793794346.69649
+  },
+  "bootstrap_network_remediation": {
+    "at": 1793794527.4398634,
+    "changed": true,
+    "owned_container_only": true,
+    "configuration_sha256": "32131b1c67bfefc37183edf80893481fd4854c49012e2ea48e26bfeeb6d2bf58",
+    "configuration": "http1.1\nconnect-timeout = 20\nmax-time = 300\nretry = 2\n",
+    "reason": "Observed HTTP2 PROTOCOL_ERROR in pinned uv installer; bounded HTTP1.1 for subsequent curl invocations; no current process restart or package/source/version change"
+  },
+  "bootstrap_process_observation": {
+    "bootstrap_pid": 473,
+    "owned_processes": [
+      {
+        "pid": 473,
+        "ppid": 1,
+        "elapsed_seconds": 869,
+        "name": "bash"
+      },
+      {
+        "pid": 474,
+        "ppid": 473,
+        "elapsed_seconds": 869,
+        "name": "bash"
+      },
+      {
+        "pid": 5673,
+        "ppid": 474,
+        "elapsed_seconds": 57,
+        "name": "sh"
+      },
+      {
+        "pid": 5712,
+        "ppid": 5673,
+        "elapsed_seconds": 57,
+        "name": "curl",
+        "download_hosts": [
+          "static.rust-lang.org"
+        ],
+        "regular_tmp_files": [
+          {
+            "name": "rustup-init",
+            "bytes": 3846144
+          }
+        ]
+      }
+    ],
+    "bootstrap_exit": null,
+    "at": 1793794881.368505
+  },
+  "observed_benchmark_runs": 0,
+  "scope": "Startup failure and partial primary preservation history. No complete1/2/4GPU comparison or GPU continuation is claimed; each attempt retains its own source, host, costs and publication evidence.",
+  "startup_retirement_decision": {
+    "at": 1793795013.851341,
+    "instance_id": 59098603,
+    "decision": "retire-slow-startup-and-replace-host",
+    "reason": "Both official uv fallback and independent Rust installer downloads observed around70KB/s; setup had not reached source checkout or CUDA dependencies after more than35min rental. Prefer a fresh eligible host rather than spend the remaining fixed compute window on this startup. Active bootstrap is intentionally retired, not inferred terminal from an observation timeout.",
+    "bootstrap_known_live_at_last_observation": {
+      "bootstrap_pid": 473,
+      "owned_processes": [
+        {
+          "pid": 473,
+          "ppid": 1,
+          "elapsed_seconds": 869,
+          "name": "bash"
+        },
+        {
+          "pid": 474,
+          "ppid": 473,
+          "elapsed_seconds": 869,
+          "name": "bash"
+        },
+        {
+          "pid": 5673,
+          "ppid": 474,
+          "elapsed_seconds": 57,
+          "name": "sh"
+        },
+        {
+          "pid": 5712,
+          "ppid": 5673,
+          "elapsed_seconds": 57,
+          "name": "curl",
+          "download_hosts": [
+            "static.rust-lang.org"
+          ],
+          "regular_tmp_files": [
+            {
+              "name": "rustup-init",
+              "bytes": 3846144
+            }
+          ]
+        }
+      ],
+      "bootstrap_exit": null,
+      "at": 1793794881.368505
+    },
+    "previous_observation": {
+      "bootstrap_pid": 473,
+      "owned_processes": [
+        {
+          "pid": 473,
+          "ppid": 1,
+          "elapsed_seconds": 645,
+          "name": "bash"
+        },
+        {
+          "pid": 474,
+          "ppid": 473,
+          "elapsed_seconds": 645,
+          "name": "bash"
+        },
+        {
+          "pid": 5373,
+          "ppid": 474,
+          "elapsed_seconds": 613,
+          "name": "sh"
+        },
+        {
+          "pid": 5531,
+          "ppid": 5373,
+          "elapsed_seconds": 298,
+          "name": "curl",
+          "download_hosts": [
+            "github.com"
+          ],
+          "regular_tmp_files": [
+            {
+              "name": "input.tar.gz",
+              "bytes": 21098496
+            }
+          ]
+        }
+      ],
+      "bootstrap_exit": null,
+      "at": 1793794657.9290502
+    },
+    "scientific_jobs_started": 0,
+    "state_publications": 0,
+    "reservation_retained_usd": 7,
+    "current_hf_upload_budget_unchanged": true,
+    "candidate_quote_snapshot": "runs/p5/p54-current-market.json",
+    "selected_next_offer": 57349291,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "replacement_may_start_only_after_owner_delete_ack_and_full_inventory_absence": true
+  },
+  "final_ownership": {
+    "checked_at": 1793795085.907277,
+    "instance_id": 59098603,
+    "vast_project_instances": [],
+    "cloudrift_project_idle": true,
+    "destruction_acknowledged": true,
+    "inventory_absent": true,
+    "resources_released": true,
+    "scientific_jobs": 0,
+    "state_publications": 0,
+    "reservation_retained_usd": 7,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "dedicated_public_account_key_registered": true,
+    "unrelated_workloads_untouched": true,
+    "reason": "Intentional retirement of slow live startup, not an inferred terminal from timeout."
+  },
+  "termination_request": {
+    "at": 1793795020.916353,
+    "instance_ids": [
+      59098603
+    ],
+    "destruction_acknowledged": true
+  },
+  "terminal": {
+    "provider": "vast.ai",
+    "checked_at": 1793795022.47504,
+    "instances": [],
+    "complete": true
+  },
+  "rental_compute_estimate_usd": 1.3870926347688393,
+  "actual_invoice_recovered": false,
+  "second_attempt": {
+    "instance_id": 59103114,
+    "machine_id": 99796,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "driver": "580.95.05",
+    "quote": {
+      "provider": "vast.ai",
+      "offer_id": 57349291,
+      "gpu": "RTX 5090",
+      "num_gpus": 4,
+      "disk_gb": 80,
+      "hourly_usd": 2.4148148148148145,
+      "inet_up_usd_per_gb": 0.00390625,
+      "inet_down_usd_per_gb": 0.0026041666666666665,
+      "estimated_download_gb": 40,
+      "estimated_upload_gb": 10,
+      "estimated_transfer_usd": 0.14322916666666666,
+      "transfer_reserve_usd": 1,
+      "bandwidth": "metered; fixed-workload estimate plus conservative reserve",
+      "maximum_seconds": 7097,
+      "maximum_usd": 7,
+      "checked_at": 1793795178.8620942
+    },
+    "deadline": {
+      "requested_at": 1793795178.8620942,
+      "stop_at": 1793801375.8620942,
+      "maximum_end_at": 1793802275.8620942,
+      "hourly_usd": 2.4148148148148145,
+      "consumption_cap_usd": 7
+    },
+    "observed_effective_cpus": 92.16,
+    "observed_memory_limit_bytes": 366997405696,
+    "dedicated_cpu_or_ram_guaranteed": false,
+    "physical_gpu_uuids": [
+      "GPU-0b7896f7-fc1b-93a7-6d61-3656c4f9046e",
+      "GPU-b5d10d16-82a8-9b4d-21d4-96e60ead3283",
+      "GPU-e61e73ac-fdae-3382-c448-58808c1a1d52",
+      "GPU-67e2ec64-f991-e0f8-e951-7ba872c69faa"
+    ],
+    "four_isolated_cuda_matrix_gradient_probes_verified": true,
+    "nccl_hand_sum_probe": {
+      "exit_code": 0,
+      "elapsed_seconds": 9.276744365692139,
+      "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+      "probe_sha256": "9192f8aab88927ebd3137e428acf36f20a486996a825004158df618f80831b6f",
+      "cuda_visible_devices": [
+        "GPU-0b7896f7-fc1b-93a7-6d61-3656c4f9046e",
+        "GPU-b5d10d16-82a8-9b4d-21d4-96e60ead3283",
+        "GPU-e61e73ac-fdae-3382-c448-58808c1a1d52",
+        "GPU-67e2ec64-f991-e0f8-e951-7ba872c69faa"
+      ],
+      "nccl_environment": {},
+      "nccl_image_metadata": {
+        "NCCL_VERSION": "2.27.7-1"
+      },
+      "result": {
+        "verified": true,
+        "world_size": 4,
+        "ranks": [
+          {
+            "rank": 0,
+            "device": "cuda:0",
+            "sum": 10,
+            "elements": 8388608
+          },
+          {
+            "rank": 1,
+            "device": "cuda:1",
+            "sum": 10,
+            "elements": 8388608
+          },
+          {
+            "rank": 2,
+            "device": "cuda:2",
+            "sum": 10,
+            "elements": 8388608
+          },
+          {
+            "rank": 3,
+            "device": "cuda:3",
+            "sum": 10,
+            "elements": 8388608
+          }
+        ],
+        "repeats": 3,
+        "expected_sum": 10,
+        "scope": "NCCL transport admission only; no training performance, checkpoint or HF publication"
+      },
+      "nvidia_topology": "\t\u001b[4mGPU0\tGPU1\tGPU2\tGPU3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\u001b[0m\nGPU0\t X \tNODE\tNODE\tSYS\t0-23,96-119\t0\t\tN/A\nGPU1\tNODE\t X \tNODE\tSYS\t0-23,96-119\t0\t\tN/A\nGPU2\tNODE\tNODE\t X \tSYS\t0-23,96-119\t0\t\tN/A\nGPU3\tSYS\tSYS\tSYS\t X \t24-47,120-143\t1\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+      "lscpu": {
+        "lscpu": [
+          {
+            "field": "Architecture:",
+            "data": "x86_64"
+          },
+          {
+            "field": "CPU op-mode(s):",
+            "data": "32-bit, 64-bit"
+          },
+          {
+            "field": "Address sizes:",
+            "data": "52 bits physical, 57 bits virtual"
+          },
+          {
+            "field": "Byte Order:",
+            "data": "Little Endian"
+          },
+          {
+            "field": "CPU(s):",
+            "data": "192"
+          },
+          {
+            "field": "On-line CPU(s) list:",
+            "data": "0-191"
+          },
+          {
+            "field": "Vendor ID:",
+            "data": "GenuineIntel"
+          },
+          {
+            "field": "Model name:",
+            "data": "Genuine Intel(R) 0000"
+          },
+          {
+            "field": "CPU family:",
+            "data": "6"
+          },
+          {
+            "field": "Model:",
+            "data": "207"
+          },
+          {
+            "field": "Thread(s) per core:",
+            "data": "2"
+          },
+          {
+            "field": "Core(s) per socket:",
+            "data": "48"
+          },
+          {
+            "field": "Socket(s):",
+            "data": "2"
+          },
+          {
+            "field": "Stepping:",
+            "data": "1"
+          },
+          {
+            "field": "CPU(s) scaling MHz:",
+            "data": "22%"
+          },
+          {
+            "field": "CPU max MHz:",
+            "data": "4000.0000"
+          },
+          {
+            "field": "CPU min MHz:",
+            "data": "800.0000"
+          },
+          {
+            "field": "BogoMIPS:",
+            "data": "3600.00"
+          },
+          {
+            "field": "Flags:",
+            "data": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 invpcid_single intel_ppin cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities ibpb_exit_to_user"
+          },
+          {
+            "field": "Virtualization:",
+            "data": "VT-x"
+          },
+          {
+            "field": "L1d cache:",
+            "data": "4.5 MiB (96 instances)"
+          },
+          {
+            "field": "L1i cache:",
+            "data": "3 MiB (96 instances)"
+          },
+          {
+            "field": "L2 cache:",
+            "data": "192 MiB (96 instances)"
+          },
+          {
+            "field": "L3 cache:",
+            "data": "520 MiB (2 instances)"
+          },
+          {
+            "field": "NUMA node(s):",
+            "data": "4"
+          },
+          {
+            "field": "NUMA node0 CPU(s):",
+            "data": "0-23,96-119"
+          },
+          {
+            "field": "NUMA node1 CPU(s):",
+            "data": "24-47,120-143"
+          },
+          {
+            "field": "NUMA node2 CPU(s):",
+            "data": "48-71,144-167"
+          },
+          {
+            "field": "NUMA node3 CPU(s):",
+            "data": "72-95,168-191"
+          },
+          {
+            "field": "Vulnerability Gather data sampling:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Indirect target selection:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Itlb multihit:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability L1tf:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Mds:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Meltdown:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Mmio stale data:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Reg file data sampling:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Retbleed:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Spec rstack overflow:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Spec store bypass:",
+            "data": "Mitigation; Speculative Store Bypass disabled via prctl and seccomp"
+          },
+          {
+            "field": "Vulnerability Spectre v1:",
+            "data": "Mitigation; usercopy/swapgs barriers and __user pointer sanitization"
+          },
+          {
+            "field": "Vulnerability Spectre v2:",
+            "data": "Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S"
+          },
+          {
+            "field": "Vulnerability Srbds:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Tsa:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Tsx async abort:",
+            "data": "Not affected"
+          },
+          {
+            "field": "Vulnerability Vmscape:",
+            "data": "Mitigation; IBPB before exit to userspace"
+          }
+        ]
+      }
+    },
+    "original_worker_launch": {
+      "pid": 7125,
+      "create_time": 1793796096.64,
+      "at": 1793796096.9241862,
+      "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+    },
+    "original_worker_failure": {
+      "complete": false,
+      "elapsed_seconds": 544.9165306659415,
+      "error_type": "RuntimeError",
+      "stage": "world1-validation-first64",
+      "states_verified": 0,
+      "worlds_finished": 0
+    },
+    "completed_primary_worlds": [
+      1
+    ],
+    "primary": {
+      "attempt_wall_seconds": 17.1886605869513,
+      "binding": {
+        "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+        "config": {
+          "device": "cuda",
+          "global_batch": 16,
+          "learning_rate": 0.0001,
+          "optimizer": {
+            "betas": [
+              0.9,
+              0.999
+            ],
+            "eps": 1e-08,
+            "foreach": false,
+            "fused": false,
+            "name": "AdamW"
+          },
+          "precision": "float32",
+          "resume_at": 64,
+          "seed": 63001,
+          "tf32": false,
+          "threads": 2,
+          "updates": 128,
+          "warmup_updates": 16,
+          "weight_decay": 0.01
+        },
+        "contract": {
+          "architecture": "transformer-s-full-v1",
+          "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+          "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+          "schema": "voxelshogi-distributed-training-v1",
+          "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+          "world_size": 1
+        },
+        "environment": {
+          "capability": [
+            12,
+            0
+          ],
+          "cuda": "13.0",
+          "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+          "cudnn": 92400,
+          "deterministic": true,
+          "device": "cuda",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+          "machine": "x86_64",
+          "python": "3.14.9",
+          "tf32": false,
+          "torch": "2.14.1+cu130"
+        },
+        "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+      },
+      "continuous_primary_eligible": true,
+      "examples_per_second": 126.70618164727122,
+      "measured_examples": 1792,
+      "measured_seconds": 13.538544291863218,
+      "measured_updates": 112,
+      "measured_window_seconds": 14.142956379102543,
+      "memory_scope": "per-rank Torch peak allocation/reservation for this attempt, reset after warmup when crossed; not whole-device VRAM",
+      "new_steps": 128,
+      "progress": {
+        "best_val_loss": null,
+        "epoch": 0,
+        "examples": 2048,
+        "next_batch": 128,
+        "step": 128
+      },
+      "rank_memory": [
+        {
+          "device": "cuda:0",
+          "peak_allocated_bytes": 3688706560,
+          "peak_reserved_bytes": 4133486592,
+          "rank": 0
+        }
+      ],
+      "reason": "complete",
+      "timing_scope": "max-rank synchronized update intervals separately from the post-warmup wall window; wall includes interior checkpoint and event IO, excludes final checkpoint; resume-check attempts are not primary throughput",
+      "update_examples_per_second": 132.36282730020002
+    },
+    "gpu_continuation_worlds": [],
+    "primary_hash_preservation": {
+      "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+      "primary_updates": 128,
+      "original_worker_terminal": true,
+      "validation_failed_before_directory_creation": true,
+      "original_metadata_sha256": {
+        "continuous-1/first-attempt.json": "a8cc687d607cdc2f13d31483b6d314d1da0df113cb84e94ff3b6e8664c12acea",
+        "continuous-1/communication.json": "71eb598362a06583fda48408bc8fe7e4223a9532f54a8908c181c07bd52222d1",
+        "continuous-1/run.json": "7d2abf1ea4940abe80d6763e030078aca2f3b77364acb1a8684454f4a89bb8e8",
+        "continuous-1/schedule.json": "e13c36b534dea6266160ee919a7d53d0b0bab2f0aaca275aa563cd7d636d4d06",
+        "continuous-1/events.jsonl": "121612b44c85ba1513e60ceb5832395bced702b5740a8a722e919ebe696017e2",
+        "training-inputs.json": "ae812b341b9e9fd773cfbf52a71b79aff81a4eb8ea3cca06656c10d71c201f9a",
+        "recovery.json": "6adb9f0cf4ffefdc51dd728733ccece56a9b13a448dd0b9d029464584afa7cf7"
+      },
+      "state_publications": 0
+    },
+    "nvml_failed_after_primary": {
+      "exit_code": 255,
+      "stdout": "Failed to initialize NVML: Unknown Error\n",
+      "stderr": ""
+    },
+    "one_container_reboot": {
+      "at": 1793797187.7870321,
+      "instance_id": 59103114,
+      "same_owned_container_only": true,
+      "reason": "Confirmed persistent nvidia-smi NVML Unknown Error after primary128; original worker terminal, validation failed before initialization; preserve primary hashes and root disk.",
+      "deadline_extended": false,
+      "new_instance_created": false,
+      "maximum_reboots": 1,
+      "acknowledged": true,
+      "response_fields": [
+        "success"
+      ]
+    },
+    "nvml_failed_again_after_reboot": {
+      "exit_code": 255,
+      "stdout": "Failed to initialize NVML: Unknown Error\n"
+    },
+    "full_benchmark_complete": false,
+    "scientific_results_cross_host_combined": false,
+    "partial_dry1": {
+      "at": 1793800329.0788007,
+      "cpu_archive_and_restore_verified": true,
+      "history_records": 128,
+      "step": 128,
+      "archive_bytes_before_card": 60419587,
+      "gpu_work_started": false,
+      "published": false
+    },
+    "partial_compare1": {
+      "at": 1793800673.9267092,
+      "original_to_typed_to_fresh_checkpoint_exact": true,
+      "model_optimizer_rng_progress_binding_exact": true,
+      "tensors": 350,
+      "scalars": 1398,
+      "gpu_continuation_completed": false
+    },
+    "partial_publication_complete1": {
+      "archive_bytes": 60433110,
+      "dataset_publication": {
+        "community_disabled": true,
+        "dry_run": false,
+        "hub_commit": "d19111106c97d5a65c87c4fd8390e87f31137a99",
+        "release_sha256": "39a445da62f9667a37af820e93bbcee06f013faeeba2f9c6bfaef528da9efe04",
+        "repo_id": "voxelshogi/voxelshogi-distributed-benchmark-v1",
+        "repo_type": "dataset",
+        "verified": true
+      },
+      "full_benchmark_complete": false,
+      "future_six_archive_cap_bytes_each": 65361020,
+      "gpu_continuation_worlds": [],
+      "preservation_complete": true,
+      "primary_worlds": [
+        1
+      ],
+      "publisher_commit": "03fe80f8a59c0bf3b184776ffcad182f5ea062c7",
+      "resources_released": false,
+      "state_publication": {
+        "community_disabled": true,
+        "dry_run": false,
+        "hub_commit": "7a3528d5afc7751cc48a77efa00ad369b2508dbb",
+        "release_sha256": "a45e282716bf1a755e96f7ca3a8fabc75d21daa42035982a9a25163d94afc868",
+        "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+        "repo_type": "model",
+        "verified": true
+      },
+      "state_upload_budget_final": {
+        "approved_maximum_new_bytes": 1073741824,
+        "reservations": [
+          {
+            "maximum_bytes": 60417110,
+            "release_sha256": "fdaecd5ae848e1682718a7da8b612a4bf0443da7a888118107cc8a5136f5edac"
+          },
+          {
+            "maximum_bytes": 127929925,
+            "release_sha256": "0fbfb70b29479668d9b640306c3673870a866ec3d3277f43a4fa005ebc7ab808"
+          },
+          {
+            "maximum_bytes": 127944556,
+            "release_sha256": "23f7ef85dbab0be946209fa87e5a40f10d4e0e34c576fa801f4aa380f0eea6d9"
+          },
+          {
+            "maximum_bytes": 60393960,
+            "release_sha256": "f3aac560f724c405c5927f4882d81a88f12eb5ed3e2d7ca5b1276994d87fa23f"
+          },
+          {
+            "maximum_bytes": 60861158,
+            "release_sha256": "245978da0fe3614fb5af2e3dbac6504387725763d180de9d9b3b923a2372c7c5"
+          },
+          {
+            "maximum_bytes": 60861154,
+            "release_sha256": "cf6c09b36df839ebc3049ef4b49988cfcb693cff3af0f9cbace42e890be6207a"
+          },
+          {
+            "maximum_bytes": 61361681,
+            "release_sha256": "0496bc11ca42d5a9b95bca9a0002c6b5fbad23d357c5b90c38af4c0928edd61c"
+          },
+          {
+            "maximum_bytes": 61373050,
+            "release_sha256": "f1e7d40dfef04c2da270a07dcac2660fcb5c6d016e3685bd77be75afed32a965"
+          },
+          {
+            "maximum_bytes": 60433110,
+            "release_sha256": "a45e282716bf1a755e96f7ca3a8fabc75d21daa42035982a9a25163d94afc868"
+          }
+        ],
+        "schema": "voxelshogi-state-upload-budget-v1"
+      },
+      "training_source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+    },
+    "final_ownership": {
+      "checked_at": 1793800961.487232,
+      "instance_id": 59103114,
+      "vast_project_instances": [],
+      "cloudrift_project_idle": true,
+      "destruction_acknowledged": true,
+      "inventory_absent": true,
+      "resources_released": true,
+      "completed_primary_worlds": [
+        1
+      ],
+      "gpu_continuation_worlds": [],
+      "state_publications": 1,
+      "dataset_publications": 1,
+      "partial_preservation_verified": true,
+      "full_benchmark_complete": false,
+      "reservation_retained_usd": 7,
+      "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+      "archive_publisher_commit": "03fe80f8a59c0bf3b184776ffcad182f5ea062c7",
+      "dedicated_public_account_key_registered": true,
+      "unrelated_workloads_untouched": true,
+      "state_publication": {
+        "community_disabled": true,
+        "dry_run": false,
+        "hub_commit": "7a3528d5afc7751cc48a77efa00ad369b2508dbb",
+        "release_sha256": "a45e282716bf1a755e96f7ca3a8fabc75d21daa42035982a9a25163d94afc868",
+        "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+        "repo_type": "model",
+        "verified": true
+      },
+      "dataset_publication": {
+        "community_disabled": true,
+        "dry_run": false,
+        "hub_commit": "d19111106c97d5a65c87c4fd8390e87f31137a99",
+        "release_sha256": "39a445da62f9667a37af820e93bbcee06f013faeeba2f9c6bfaef528da9efe04",
+        "repo_id": "voxelshogi/voxelshogi-distributed-benchmark-v1",
+        "repo_type": "dataset",
+        "verified": true
+      },
+      "reason": "NVML access failed after one primary and recurred after one container reboot. Partial typed state/results preserved and fixed-HF verified before retirement."
+    },
+    "termination_request": {
+      "at": 1793800956.05249,
+      "instance_ids": [
+        59103114
+      ],
+      "destruction_acknowledged": true
+    },
+    "terminal": {
+      "provider": "vast.ai",
+      "checked_at": 1793800958.379592,
+      "instances": [],
+      "complete": true
+    }
+  },
+  "provider_reported_charges_after_release": {
+    "at": 1793801028.552356,
+    "official_endpoint": "https://console.vast.ai/api/v0/charges/",
+    "all_pages_checked": true,
+    "day_utc": "2026-11-04",
+    "only_owned_p54_instances_saved": true,
+    "rows": [
+      {
+        "start": 1793750400,
+        "end": 1793750400,
+        "type": "instance",
+        "source": "instance-59103114",
+        "amount": 3.754,
+        "label": "voxelshogi-phase5-distributed-benchmark2-control",
+        "items": [
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "gpu",
+            "source": null,
+            "description": "1.550 hours at $2.400/hour",
+            "amount": 3.72
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "disk",
+            "source": null,
+            "description": "1.614 hours at $0.015/hour",
+            "amount": 0.024
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "bwd",
+            "source": null,
+            "description": "3.8 GB Downloaded at $0.003/GB",
+            "amount": 0.01
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "bwu",
+            "source": null,
+            "description": "0.1 GB Uploaded at $0.000/GB",
+            "amount": 0.0
+          }
+        ]
+      },
+      {
+        "start": 1793750400,
+        "end": 1793750400,
+        "type": "instance",
+        "source": "instance-59098603",
+        "amount": 0.811,
+        "label": "voxelshogi-phase5-distributed-benchmark1-control",
+        "items": [
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "gpu",
+            "source": null,
+            "description": "0.356 hours at $2.240/hour",
+            "amount": 0.797
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "disk",
+            "source": null,
+            "description": "0.612 hours at $0.022/hour",
+            "amount": 0.014
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "bwd",
+            "source": null,
+            "description": "0.1 GB Downloaded at $0.000/GB",
+            "amount": 0.0
+          },
+          {
+            "start": 1793750400,
+            "end": 1793750400,
+            "type": "bwu",
+            "source": null,
+            "description": "Bandwidth (upload)",
+            "amount": 0.0
+          }
+        ]
+      }
+    ],
+    "scope": "Provider reported per-instance charges at observation time; not certified as finalized invoices; no account-wide credit difference attributed to project."
+  }
+}
