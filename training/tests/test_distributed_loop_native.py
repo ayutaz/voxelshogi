@@ -10,7 +10,7 @@ import pytest
 pytestmark = pytest.mark.skipif(sys.platform != "linux", reason="external Linux only")
 
 
-def _worker(rank, directory):
+def _worker(rank, directory, world_size):
     import numpy as np
     import torch
     import torch.distributed as dist
@@ -28,7 +28,7 @@ def _worker(rank, directory):
         "gloo",
         init_method="file://" + str(root / "rendezvous"),
         rank=rank,
-        world_size=2,
+        world_size=world_size,
         timeout=timedelta(seconds=60),
     )
     config = DistributedConfig(
@@ -90,7 +90,7 @@ def _worker(rank, directory):
         config=config,
         input_binding=input_binding,
         rank=rank,
-        world_size=2,
+        world_size=world_size,
     )
     expected_rng = torch.rand(3)
     first, first_optimizer = setup()
@@ -102,7 +102,7 @@ def _worker(rank, directory):
         config=config,
         input_binding=input_binding,
         rank=rank,
-        world_size=2,
+        world_size=world_size,
         max_new_steps=2,
     )
     assert partial["reason"] == "max_steps" and partial["progress"]["step"] == 2
@@ -135,7 +135,7 @@ def _worker(rank, directory):
         config=config,
         input_binding=input_binding,
         rank=rank,
-        world_size=2,
+        world_size=world_size,
         resume=True,
     )
     assert_state_equal(continuous.module.state_dict(), restored.module.state_dict())
@@ -164,7 +164,7 @@ def _worker(rank, directory):
             (root / "continuous/schedule.json").read_text()
         )["batches"]
     dist.barrier()
-    assert len(full["rank_memory"]) == 2
+    assert len(full["rank_memory"]) == world_size
     stopped, stopped_optimizer = setup()
     stop = fit_schedule(
         stopped,
@@ -174,16 +174,16 @@ def _worker(rank, directory):
         config=config,
         input_binding=input_binding,
         rank=rank,
-        world_size=2,
+        world_size=world_size,
         stop_requested=lambda: rank == 1,
     )
     assert stop["reason"] == "stopped" and stop["progress"]["step"] == 0
     communication = communication_probe(
-        stopped, device="cpu", rank=rank, world_size=2, warmup=1, repeats=3
+        stopped, device="cpu", rank=rank, world_size=world_size, warmup=1, repeats=3
     )
     assert communication["tensor_bytes"] == 12  # two logits and one value weight, FP32
     assert (
-        communication["verified_sum"] == 2
+        communication["verified_sum"] == world_size
         and len(communication["timings_seconds"]) == 3
     )
     assert communication["max_rank_mean_seconds"] > 0
@@ -193,13 +193,14 @@ def _worker(rank, directory):
     dist.destroy_process_group()
 
 
-def test_two_rank_full_loop_matches_fresh_resume_and_collectively_stops(tmp_path):
+@pytest.mark.parametrize("world_size", [2, 4])
+def test_rank_full_loop_matches_fresh_resume_and_collectively_stops(
+    tmp_path, world_size
+):
     import torch.multiprocessing as mp
 
-    mp.spawn(_worker, args=(str(tmp_path),), nprocs=2, join=True)
+    mp.spawn(_worker, args=(str(tmp_path), world_size), nprocs=world_size, join=True)
     assert [
-        json.loads((tmp_path / f"rank-{rank}.json").read_text()) for rank in range(2)
-    ] == [
-        {"exact_resume": True, "collective_stop": True},
-        {"exact_resume": True, "collective_stop": True},
-    ]
+        json.loads((tmp_path / f"rank-{rank}.json").read_text())
+        for rank in range(world_size)
+    ] == [{"exact_resume": True, "collective_stop": True}] * world_size

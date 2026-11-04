@@ -7,6 +7,54 @@ from dataclasses import asdict, dataclass
 
 from training.fit import RunConfig
 
+REDUCTION = "rank-ordered-float32-v1"
+
+
+def rank_ordered_mean(buffers):
+    """Average in rank order; the FP32 caller supplies clones and pointwise ops."""
+    if (
+        type(buffers) not in (list, tuple)
+        or len(buffers) not in (1, 2, 4)
+        or any(
+            b.shape != buffers[0].shape or b.dtype != buffers[0].dtype for b in buffers
+        )
+    ):
+        raise ValueError("rank count or gradient bucket layout differs")
+    result = buffers[0].clone()
+    for value in buffers[1:]:
+        result.add_(value)
+    return result.div_(len(buffers))
+
+
+def _rank_ordered_hook(state, bucket):
+    import torch
+
+    dist, world_size = state
+    buffer = bucket.buffer()
+    if buffer.dtype != torch.float32:
+        raise ValueError("rank-ordered gradients require float32")
+    values = [torch.empty_like(buffer) for _ in range(world_size)]
+    # The collective transports bytes; only the explicit rank-order loop sums.
+    dist.all_gather(values, buffer)
+    result = rank_ordered_mean(values)
+    future = torch.futures.Future()
+    future.set_result(result)
+    return future
+
+
+def enable_rank_ordered_reduction(model, *, rank, world_size):
+    dist = _process_group(rank, world_size)
+    _raw_model(model, world_size)
+    if dist is None:
+        return
+    installed = getattr(model, "_voxelshogi_gradient_reduction", None)
+    if installed == REDUCTION:
+        return
+    if installed is not None:
+        raise ValueError("different gradient reduction already installed")
+    model.register_comm_hook((dist, world_size), _rank_ordered_hook)
+    model._voxelshogi_gradient_reduction = REDUCTION
+
 
 @dataclass(frozen=True)
 class DistributedConfig:
@@ -52,18 +100,29 @@ class DistributedConfig:
 def validate_distributed_binding(binding):
     """Validate immutable global work and topology in a portable resume archive."""
     contract = binding["contract"]
+    fields = {
+        "schema",
+        "source_commit",
+        "initial_model_sha256",
+        "architecture",
+        "world_size",
+        "schedule_sha256",
+    }
+    if (
+        isinstance(contract, dict)
+        and contract.get("schema") == "voxelshogi-distributed-training-v2"
+    ):
+        fields.add("gradient_reduction")
+        if contract.get("gradient_reduction") != REDUCTION:
+            raise ValueError("distributed gradient reduction differs")
     if (
         type(contract) is not dict
-        or set(contract)
-        != {
-            "schema",
-            "source_commit",
-            "initial_model_sha256",
-            "architecture",
-            "world_size",
-            "schedule_sha256",
-        }
-        or contract["schema"] != "voxelshogi-distributed-training-v1"
+        or set(contract) != fields
+        or contract["schema"]
+        not in (
+            "voxelshogi-distributed-training-v1",
+            "voxelshogi-distributed-training-v2",
+        )
         or contract["source_commit"] != binding["source_commit"]
         or not re.fullmatch(r"[0-9a-f]{40}", binding["source_commit"])
         or not re.fullmatch(r"[0-9a-f]{64}", binding["cache_sha256"])
@@ -170,6 +229,7 @@ def distributed_update(model, optimizer, data, batch, *, device, rank, world_siz
     """Apply one globally fixed update, with DDP averaging equal local means."""
     dist = _process_group(rank, world_size)
     _raw_model(model, world_size)
+    enable_rank_ordered_reduction(model, rank=rank, world_size=world_size)
     from training.distributed_benchmark import rank_indices
     from training.selfplay_training import update_step
 
