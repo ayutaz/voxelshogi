@@ -2,6 +2,7 @@
 
 import json
 import os
+import runpy
 import shutil
 import subprocess
 import tempfile
@@ -11,6 +12,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
+    (
+        "training-shard-policy-evidence",
+        "scripts/ci/mutation-training.py",
+        "        shutil.copy2(evidence, destination)\n",
+        "        pass\n",
+        "test_mutation_harness.py",
+    ),
+    (
+        "training-shard-policy-evidence-bytes",
+        "scripts/ci/mutation-training.py",
+        "        shutil.copy2(evidence, destination)\n",
+        '        destination.write_bytes(b"{}\\n")\n',
+        "test_mutation_harness.py",
+    ),
     (
         "research-extension-proof",
         "training/research_budget.py",
@@ -3113,6 +3128,12 @@ def main(argv=None):
                 work / name,
                 ignore=shutil.ignore_patterns("target", "pkg", "__pycache__", ".venv"),
             )
+        # Read the metadata-only policy to retain its actual reviewed path,
+        # without copying all documentation into every mutation shard.
+        evidence = runpy.run_path(str(ROOT / "training/research_budget.py"))["EVIDENCE"]
+        destination = work / evidence.relative_to(ROOT)
+        destination.parent.mkdir(parents=True)
+        shutil.copy2(evidence, destination)
         (work / "scripts/ci").mkdir(parents=True)
         shutil.copy2(Path(__file__), work / "scripts/ci/mutation-training.py")
         prepare_baseline_checkout(work)
