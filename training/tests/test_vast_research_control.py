@@ -186,7 +186,7 @@ def test_unknown_create_response_is_audited_by_label_and_cannot_restart(tmp_path
     assert c.terminate()["complete"] is True
 
 
-@pytest.mark.parametrize("task,amount", [("other", 39), ("phase5-selfplay", 37)])
+@pytest.mark.parametrize("task,amount", [("other", 39), ("phase5-selfplay", 38)])
 def test_new_vast_plan_keeps_shared_project_and_phase_reservations(
     tmp_path, task, amount
 ):
