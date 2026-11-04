@@ -1,0 +1,106 @@
+{
+  "recorded_at": 1793768631.967551,
+  "complete": true,
+  "stage": "timing8-only",
+  "source_commit": "f72c35f175050cb137c017bfaf3b5a4f9c1fc8e7",
+  "control_source_commit": "ae9979dbf18f5621a31a278fd2dda0809f7a1696",
+  "parent_seven_reused": true,
+  "actual_games": 8,
+  "new_games_this_worker": 1,
+  "all_records_rust_replayed": true,
+  "audit_counts": {
+    "m4_rows": 116921,
+    "selfplay_generations": 3,
+    "selfplay_episodes": 48,
+    "selfplay_raw_samples": 11534,
+    "protected_inputs": 116008,
+    "evaluated_unique_inputs": 1482
+  },
+  "overlaps_by_source": {
+    "model_input": {
+      "m4-test": 0,
+      "m4-train": 0,
+      "m4-val": 0,
+      "protected": 0,
+      "selfplay-all-published-samples": 0
+    },
+    "physical": {
+      "m4-test": 0,
+      "m4-train": 0,
+      "m4-val": 0,
+      "selfplay-all-published-samples": 0
+    }
+  },
+  "publication": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "7513e66f213abb00dd5134efe99003ed932eda51",
+    "release_sha256": "fb795bd7fad56e9cce451f4076adcd88825f023748fabd40f2cb4255e6f81502",
+    "repo_id": "voxelshogi/voxelshogi-generation-evaluation-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "worker_seconds": 939.3728691367432,
+  "timings_seconds": {
+    "fixed-HF-evaluation-publication": 1.4818048533052206,
+    "fixed-HF-inputs": 155.8861467447132,
+    "freeze-evaluation-protocols": 0.5290686516091228,
+    "full-physical-and-canonical-input-audit": 248.07306553702801,
+    "g2-matches": 458.09506356623024,
+    "m6-matches": 0.1726422980427742,
+    "restore-all-three-selfplay-generations": 71.62272844742984
+  },
+  "reservation_usd_retained": 2.75,
+  "resources_released": true,
+  "deleted_instance_id": 59057485,
+  "basic_reserved_total_usd": 92.5,
+  "timing_caveat": "Seven historical records retain their original measured durations. This worker resumed one game on a different physical CPU host; elapsed timings must not be treated as a continuous same-host eight-game benchmark.",
+  "remaining_goal": [
+    "150 development games",
+    "results-led diagnosis",
+    "actual1/2/4GPU measurements and save/resume"
+  ],
+  "schema": "voxelshogi-p53-timing-completed-v1",
+  "destruction_acknowledged": true,
+  "terminal_receipt": {
+    "provider": "vast.ai",
+    "checked_at": 1793768559.6966631,
+    "instances": [],
+    "complete": true
+  },
+  "resource_summary": {
+    "interval_seconds": 10,
+    "last_cpu_seconds": 824.23,
+    "mean_device_gpu_util_percent": 0.0,
+    "peak_device_gpu_memory_mib": 740.0,
+    "peak_rss_bytes": 3710341120,
+    "samples": 83,
+    "scope": "process RSS/CPU; whole-device GPU memory/utilization samples, not model-attributed VRAM; stage times measured separately"
+  },
+  "observed_hardware": {
+    "platform": "Linux-5.15.0-191-generic-x86_64-with-glibc2.39",
+    "cpu_model": "AMD EPYC 9135 16-Core Processor",
+    "allowed_cpu_count": 32,
+    "cgroup_cpu_max": "768000 100000",
+    "cgroup_memory_max": "129502281728",
+    "scope": "Observed container affinity/cgroup and GPU inventory; not dedicated CPU allocation or a performance measurement"
+  },
+  "metadata_sha256": {
+    "manifest.json": "b1b846fa5aead612a947b68bb66e7bf1d1e16d530321b5d70b1015cf7f0c1138",
+    "README.md": "92604172305f767e56ea2712b278ca66d9817511e7faead81501edecfa414484",
+    "validation.json": "5ac4e5908b7aed4e065ff23b64555a1dc21dfe201327fe9225dbf3acb1252522"
+  },
+  "all_state_and_data_bytes_verified_on": "external Linux; actual payloads were not copied to Mac",
+  "natural_results_each_model": {
+    "wins": 0,
+    "losses": 2,
+    "draws": 1,
+    "cutoffs": 1,
+    "games": 4,
+    "pairs": 2,
+    "score_bounds": [
+      0.125,
+      0.375
+    ]
+  }
+}
