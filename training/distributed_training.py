@@ -45,7 +45,7 @@ def _rank_ordered_hook(state, bucket):
 def enable_rank_ordered_reduction(model, *, rank, world_size):
     dist = _process_group(rank, world_size)
     _raw_model(model, world_size)
-    if dist is None:
+    if world_size == 1:
         return
     installed = getattr(model, "_voxelshogi_gradient_reduction", None)
     if installed == REDUCTION:

@@ -52,7 +52,9 @@ def _worker(rank, directory, world_size):
             return logits.expand(len(features), -1), self.weight * features[:, :1, 0]
 
     def setup():
-        model = DistributedDataParallel(Heads())
+        model = Heads()
+        if world_size > 1:
+            model = DistributedDataParallel(model)
         optimizer = torch.optim.AdamW(
             model.parameters(),
             lr=config.learning_rate,
@@ -138,7 +140,9 @@ def _worker(rank, directory, world_size):
         world_size=world_size,
         resume=True,
     )
-    assert_state_equal(continuous.module.state_dict(), restored.module.state_dict())
+    original_raw = continuous.module if world_size > 1 else continuous
+    restored_raw = restored.module if world_size > 1 else restored
+    assert_state_equal(original_raw.state_dict(), restored_raw.state_dict())
     assert_state_equal(optimizer.state_dict(), restored_optimizer.state_dict())
     torch.testing.assert_close(torch.rand(3), expected_rng, rtol=0, atol=0)
     assert full["progress"]["examples"] == resumed["progress"]["examples"] == 16
@@ -175,25 +179,28 @@ def _worker(rank, directory, world_size):
         input_binding=input_binding,
         rank=rank,
         world_size=world_size,
-        stop_requested=lambda: rank == 1,
+        stop_requested=lambda: rank == (1 if world_size > 1 else 0),
     )
     assert stop["reason"] == "stopped" and stop["progress"]["step"] == 0
     communication = communication_probe(
         stopped, device="cpu", rank=rank, world_size=world_size, warmup=1, repeats=3
     )
     assert communication["tensor_bytes"] == 12  # two logits and one value weight, FP32
-    assert (
-        communication["verified_sum"] == world_size
-        and len(communication["timings_seconds"]) == 3
-    )
-    assert communication["max_rank_mean_seconds"] > 0
+    assert communication["verified_sum"] == world_size
+    if world_size == 1:
+        assert communication["collective"] == "none-single-rank"
+        assert communication["timings_seconds"] == []
+        assert communication["max_rank_mean_seconds"] is None
+    else:
+        assert len(communication["timings_seconds"]) == 3
+        assert communication["max_rank_mean_seconds"] > 0
     (root / f"rank-{rank}.json").write_text(
         json.dumps({"exact_resume": True, "collective_stop": True})
     )
     dist.destroy_process_group()
 
 
-@pytest.mark.parametrize("world_size", [2, 4])
+@pytest.mark.parametrize("world_size", [1, 2, 4])
 def test_rank_full_loop_matches_fresh_resume_and_collectively_stops(
     tmp_path, world_size
 ):

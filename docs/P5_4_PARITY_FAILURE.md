@@ -47,3 +47,9 @@ DDPの勾配bucketをFP32のままall-gatherで運び、rank0→1→2→3の順�
 保存・照合後、15:51:09 UTCに所有VMの削除とVast／CloudRiftのプロジェクト課金資源0を確認した。独立期限guardは解放後に取り消した。保守的な予約は31件・US$133／200で保持し、実請求と区別する。
 
 共通state upload ledgerは15予約・1,044,495,137／1,073,741,824 bytesで、残り29,246,687 bytes。約60MBのarchiveをもう1件送る余地がない。[累積1GiBの保存上限](M6_STATE_RELEASE.md)と過去予約を維持し、上限の再承認なしに増量・履歴削除・ledgerの初期化をしない。次の有料試行は修正の必須CIと保存容量の条件をそろえてから起動する。
+
+## 再検証で見つかった単一rank境界
+
+2026-11-04 23:17 UTC、後続の実機で全CUDA・NCCL検査と固定入力／lossless cacheの元SHA一致を確認した後、1GPUの開始前検査が`AttributeError`で停止した。学習更新・state送信は0件。通信groupを初期化済みの1rankと通常モデルを使う経路で、DDP hookの登録を試みていた。groupがない1rankと2／4rankのテストだけでは、この組み合わせを覆えていなかった。
+
+rank／groupとモデルの検査を維持したうえで、1rankはgroupの有無によらずhookを登録せず、2／4rankだけでrank順の集約を使う。実1rank Gloo＋通常モデルのAdamW更新・archive・新model／optimizerへの復旧・継続・停止を、実2／4rankと同じNativeテストへ追加する。Macではfake groupの登録境界と変異検出だけを検証する。全CI成功前に実GPUの学習を再開しない。
