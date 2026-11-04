@@ -1,0 +1,809 @@
+{
+  "schema": "voxelshogi-p53-diagnosis-completion-v1",
+  "verified": true,
+  "verified_at": 1793792741.267319,
+  "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+  "games": 12,
+  "queries": 13,
+  "full_input_audit_performed": true,
+  "input_audit_passed": true,
+  "decision": "additional-measurement",
+  "diagnosis": {
+    "actual_games": 12,
+    "black_mate_wins_by_arm": {
+      "argmax": 1,
+      "puct32": 3
+    },
+    "black_verified_details": {
+      "argmax": {
+        "by_case": {
+          "mate-offset-2": {
+            "last_move": "232341",
+            "outcome": "cutoff",
+            "result": {
+              "Draw": {
+                "reason": "MaxPlies"
+              }
+            }
+          },
+          "mate-offset-3": {
+            "last_move": "699589",
+            "outcome": "win",
+            "result": {
+              "Win": {
+                "reason": "Checkmate",
+                "winner": "Black"
+              }
+            }
+          },
+          "mate-offset-4": {
+            "last_move": "232341",
+            "outcome": "cutoff",
+            "result": {
+              "Draw": {
+                "reason": "MaxPlies"
+              }
+            }
+          }
+        },
+        "checkmates": 1,
+        "known_oracle_action_count": 0,
+        "natural_wins": 1
+      },
+      "puct32": {
+        "by_case": {
+          "mate-offset-2": {
+            "last_move": "333343",
+            "outcome": "win",
+            "result": {
+              "Win": {
+                "reason": "Checkmate",
+                "winner": "Black"
+              }
+            }
+          },
+          "mate-offset-3": {
+            "last_move": "699589",
+            "outcome": "win",
+            "result": {
+              "Win": {
+                "reason": "Checkmate",
+                "winner": "Black"
+              }
+            }
+          },
+          "mate-offset-4": {
+            "last_move": "333322",
+            "outcome": "win",
+            "result": {
+              "Win": {
+                "reason": "Checkmate",
+                "winner": "Black"
+              }
+            }
+          }
+        },
+        "checkmates": 3,
+        "known_oracle_action_count": 0,
+        "natural_wins": 3
+      }
+    },
+    "changed_factor": "participants.model.policy",
+    "decision": "additional-measurement",
+    "expected_games": 12,
+    "input_audit_passed": true,
+    "limitations": "three related starts, descriptive diagnostic only; no population strength or training-distribution conclusion",
+    "model_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+    "new_training_performed": false,
+    "reason": "More immediate mates in this one related family; wider predeclared policy evaluation is required before adoption.",
+    "same_tactical_family": true,
+    "schema": "voxelshogi-one-factor-policy-diagnosis-v1",
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "summaries": {
+      "argmax": {
+        "by_side": {
+          "b": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 1.0,
+            "cutoffs": 2,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.04884980261946718,
+              "total": 0.14654940785840154
+            },
+            "games": 3,
+            "losses": 0,
+            "score_bounds": [
+              0.3333333333333333,
+              1.0
+            ],
+            "termination_rate": 0.3333333333333333,
+            "win_rate": 0.3333333333333333,
+            "wins": 1
+          },
+          "w": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.0,
+            "cutoffs": 0,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.025427694316022098,
+              "total": 0.0762830829480663
+            },
+            "games": 3,
+            "losses": 3,
+            "score_bounds": [
+              0.0,
+              0.0
+            ],
+            "termination_rate": 1.0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        },
+        "by_stratum": {
+          "tactical": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.25,
+            "cutoffs": 2,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.03713874846774464,
+              "total": 0.22283249080646783
+            },
+            "games": 6,
+            "losses": 3,
+            "score_bounds": [
+              0.16666666666666666,
+              0.5
+            ],
+            "termination_rate": 0.6666666666666666,
+            "win_rate": 0.16666666666666666,
+            "wins": 1
+          }
+        },
+        "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+        "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+        "model_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+        "opponent_sha256": "773962226dc27d2d54e4db43291ac6fe0e85ca9698ceb8e1152693a6860a51e2",
+        "overall": {
+          "additional_plies": {
+            "max": 1,
+            "mean": 1.0,
+            "min": 1
+          },
+          "completed_score_rate": 0.25,
+          "cutoffs": 2,
+          "draws": 0,
+          "elapsed_seconds": {
+            "mean": 0.03713874846774464,
+            "total": 0.22283249080646783
+          },
+          "games": 6,
+          "losses": 3,
+          "paired_win_rate95": [
+            0.0,
+            0.5
+          ],
+          "pairs": 3,
+          "score_bounds": [
+            0.16666666666666666,
+            0.5
+          ],
+          "termination_rate": 0.6666666666666666,
+          "win_rate": 0.16666666666666666,
+          "wins": 1
+        },
+        "protocol_sha256": "44c679abc36f7a10637dcc49bce4de182434f069dc2e63a14f61d2366da55471",
+        "schema": "voxelshogi-evaluation-v2",
+        "sensitivity": {
+          "criteria": {
+            "minimum_pairs": 15,
+            "minimum_termination_rate": 0.25
+          },
+          "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+          "sufficient": false
+        },
+        "verification_scope": "all match records Rust replayed; full-corpus leakage audit is separate"
+      },
+      "puct32": {
+        "by_side": {
+          "b": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 1.0,
+            "cutoffs": 0,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.014004443345280984,
+              "total": 0.042013330035842955
+            },
+            "games": 3,
+            "losses": 0,
+            "score_bounds": [
+              1.0,
+              1.0
+            ],
+            "termination_rate": 1.0,
+            "win_rate": 1.0,
+            "wins": 3
+          },
+          "w": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.0,
+            "cutoffs": 0,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.02519934733087818,
+              "total": 0.07559804199263453
+            },
+            "games": 3,
+            "losses": 3,
+            "score_bounds": [
+              0.0,
+              0.0
+            ],
+            "termination_rate": 1.0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        },
+        "by_stratum": {
+          "tactical": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 0,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.019601895338079583,
+              "total": 0.11761137202847749
+            },
+            "games": 6,
+            "losses": 3,
+            "score_bounds": [
+              0.5,
+              0.5
+            ],
+            "termination_rate": 1.0,
+            "win_rate": 0.5,
+            "wins": 3
+          }
+        },
+        "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+        "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+        "model_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+        "opponent_sha256": "773962226dc27d2d54e4db43291ac6fe0e85ca9698ceb8e1152693a6860a51e2",
+        "overall": {
+          "additional_plies": {
+            "max": 1,
+            "mean": 1.0,
+            "min": 1
+          },
+          "completed_score_rate": 0.5,
+          "cutoffs": 0,
+          "draws": 0,
+          "elapsed_seconds": {
+            "mean": 0.019601895338079583,
+            "total": 0.11761137202847749
+          },
+          "games": 6,
+          "losses": 3,
+          "paired_win_rate95": [
+            0.5,
+            0.5
+          ],
+          "pairs": 3,
+          "score_bounds": [
+            0.5,
+            0.5
+          ],
+          "termination_rate": 1.0,
+          "win_rate": 0.5,
+          "wins": 3
+        },
+        "protocol_sha256": "a2109c96f9a4cdbb7c106082f1494ec0842f5ebb229556ff5ab00ec454276395",
+        "schema": "voxelshogi-evaluation-v2",
+        "sensitivity": {
+          "criteria": {
+            "minimum_pairs": 15,
+            "minimum_termination_rate": 0.25
+          },
+          "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+          "sufficient": false
+        },
+        "verification_scope": "all match records Rust replayed; full-corpus leakage audit is separate"
+      }
+    },
+    "web_model_adoption": false
+  },
+  "publication": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "22bfbdbb3aaa5234722db543e8d16f685944537e",
+    "release_sha256": "a670ddfd40d1e629e58b99c2986cf9b5c09c1a99b616033c87b203d14ccf1f1a",
+    "repo_id": "voxelshogi/voxelshogi-generation-evaluation-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "resources_released": true,
+  "elapsed_worker_seconds": 1280.0696588050341,
+  "timings_seconds": {
+    "argmax-six-games": 0.37342206097673625,
+    "fixed-HF-diagnosis-publication": 13.132221718900837,
+    "fixed-HF-inputs": 951.3118269889383,
+    "freeze-one-factor-protocols": 1.2304890099912882,
+    "full-played-and-queried-input-audit": 219.49565828591585,
+    "puct32-six-games": 0.22128573001828045,
+    "restore-all-three-selfplay-generations": 90.90363054396585
+  },
+  "evidence": {
+    "workload.json": "56c60fe1451d16ffb7fc619f5a2223016834f099315a3f4e01bde6df666db9cb",
+    "plan.json": "648cd72ab0f05f042e34d3eadef1611afbbd65969bf9f74167fdf2fc53da518c",
+    "host-admission.json": "15b1500328f486932dc14316ddd8ecafa40373c6c59b1ed122b4e4dd3865a860",
+    "source-proof.json": "85d50c34777f23c04d722423fa6f4a94171f4f156afbc60d6a85b43bc92a1890",
+    "termination-request.json": "8006dc812ad33a979ce900963dd43f689b7a80cf1cf9a599a3e48492f19a66ea",
+    "terminal.json": "55eb0d2ca5325a25765376b8cbd83bfd1bdb2c3831ac4f5b040b1a34c06cb421",
+    "final-ownership.json": "baa358bede72096e4f60ca4fa5262f62ddcf5d80f5aed695ec9f1873a83ce3d6",
+    "evidence/complete.json": "3f246d0c21f865ce9c8104b0f44a40bc131a02282bd1048790d2233a12d8b7fa",
+    "evidence/input-audit.json": "e1ab5a74b5c6eb9e9dbe2634a01f1d2c3685516bfba8d0940ea5ae11fde943f7",
+    "evidence/diagnosis.json": "9b760763fb6f6bf3872dc5b848634e567957460286ca38ee3632c4a22a86b970",
+    "evidence/query-summary.json": "e749828ba5e5d4eb21ca56c9cbcacd739dd84c9562499ca5766024a8f6d20ba0",
+    "evidence/frozen-protocols.json": "5de418b37f58082753ad5049c85ae2ac4bcd63c494fda5bd10c9f22428faf139",
+    "evidence/resource-summary.json": "02c206a74ca50b26deffeb867c2728788f961ee1550f24e27f0e67c52e9f247c",
+    "hf-metadata-review/publication-000/README.md": "37f27b164e3c4ad809eca37eacf61aeccedc144f6f2c4b52a9f522c11a8787df",
+    "hf-metadata-review/publication-000/manifest.json": "5f320a83e4fed76fcfcb05a776490a65ac88fee4a061c7da42125f2808500b15",
+    "hf-metadata-review/publication-000/receipt.json": "a63a52bd3675bf91589b2e6fdc573e924d9474eb28c113e1799523cc601b78d4"
+  },
+  "release": {
+    "checked_at": 1793792741.260617,
+    "instance_id": 59094933,
+    "vast_project_instances": [],
+    "cloudrift_project_idle": true,
+    "destruction_acknowledged": true,
+    "inventory_absent": true,
+    "resources_released": true,
+    "scientific_games": 12,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6",
+    "unrelated_workloads_untouched": true,
+    "reservation_retained_usd": 2
+  },
+  "input_audit": {
+    "cases_with_overlap": [],
+    "corpus_contract": {
+      "config": "production-64",
+      "evaluation": {
+        "cutoff_is_draw": false,
+        "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+        "max_plies": 256,
+        "opening_plies": 8,
+        "opening_seeds": {
+          "random": [
+            7000,
+            7001,
+            7002,
+            7003,
+            7004,
+            7005,
+            7006,
+            7007,
+            7008,
+            7009,
+            7010,
+            7011,
+            7012,
+            7013,
+            7014,
+            7015,
+            7016,
+            7017,
+            7018,
+            7019
+          ],
+          "search": [
+            8000,
+            8001,
+            8002,
+            8003,
+            8004,
+            8005,
+            8006,
+            8007,
+            8008,
+            8009
+          ]
+        },
+        "opponent_seed": "100000 + opening seed",
+        "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+        "primary_win_rate": "wins / games_started",
+        "schema": "voxelshogi-evaluation-v1",
+        "search_limits": {
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "table_capacity": 4096
+        },
+        "swap_model_colors": true
+      },
+      "features": "voxelshogi-standard-features-v1",
+      "loss_policy": "mean cross entropy over engine-supplied legal actions",
+      "loss_value": "mean squared error",
+      "loss_value_weight": 1,
+      "mate_score": 1000000,
+      "policy_actions": 1067985,
+      "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+      "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+      "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+      "ruleset_id": "voxelshogi-standard-v1",
+      "schema": "voxelshogi-supervision-v1",
+      "selection_split": "val",
+      "test_role": "final selected checkpoint and predeclared conversion comparison only",
+      "training_seed": 314159,
+      "value_scale": 1000,
+      "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+    },
+    "corpus_counts": {
+      "rows": 116921,
+      "rows_by_split": {
+        "test": 11631,
+        "train": 93544,
+        "val": 11746
+      },
+      "unique_inputs": 113321,
+      "unique_physical": 113321
+    },
+    "corpus_inventory_sha256": "6dbcea9e7f1a52c52c869623fec849443fe13885dc39f1bf19191292e7aeef98",
+    "evaluation_counts": {
+      "inputs": 16,
+      "positions": 16
+    },
+    "identity_set_sha256": {
+      "model_input": {
+        "m4-test": "6d38e8f6d7530fa202a0b635438a71139886545c56ace6a418470f01f1b13066",
+        "m4-train": "f0b01bd832d45bf988a8ce22a3d4a30d2afa8de3958e51fd447c82eb13fd9be0",
+        "m4-val": "486b60b893faef49fedc231113ceddc7e00062319d9da411e3adb6568ac84b70",
+        "protected": "8874850f0c4814d652ddddd4c4d18fa24a0073ee0d67b23423be0aa7b2f855d9",
+        "selfplay-all-published-samples": "d6a1915d6e85ad5f826b37f9ede8297c873b251a802ef3a30e522be8aa0deed9"
+      },
+      "physical": {
+        "m4-test": "6ec956af0cd450d4091ef7199d44fd4c05ad16995e92edc7af1df885e5373981",
+        "m4-train": "dfb66b05c085e744184be8ece512c45183c59ab2877a60bee412ef7252fa835d",
+        "m4-val": "45f2100d54b7c01762f3015557391e90002aa4eb1f72909030f65c86d4774abd",
+        "selfplay-all-published-samples": "c592894a24fff552e8fc512b0be549539b0e3496072d679ef2a403661f85faab"
+      }
+    },
+    "observed_input_counts": {
+      "neural-query/argmax/model": {
+        "inputs": 3,
+        "positions": 3
+      },
+      "neural-query/puct32/model": {
+        "inputs": 10,
+        "positions": 10
+      }
+    },
+    "overlaps_by_source": {
+      "model_input": {
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "protected": 0,
+        "selfplay-all-published-samples": 0
+      },
+      "physical": {
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "selfplay-all-published-samples": 0
+      }
+    },
+    "passed": true,
+    "protected_file_sha256": "364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944",
+    "runs": {
+      "argmax": {
+        "games": 6,
+        "protocol_sha256": "44c679abc36f7a10637dcc49bce4de182434f069dc2e63a14f61d2366da55471",
+        "run_sha256": "bb76f0dd43e70e7fbd315d81542e3f0cd376789fba8e287d684c678f30bc5393"
+      },
+      "puct32": {
+        "games": 6,
+        "protocol_sha256": "a2109c96f9a4cdbb7c106082f1494ec0842f5ebb229556ff5ab00ec454276395",
+        "run_sha256": "27aef02c0a345571e427b352d0fbd0e66af6240c40ca9757ead0827e9a7a4e6e"
+      }
+    },
+    "schema": "voxelshogi-generation-input-audit-v1",
+    "scope": "all supplied scored continuation and terminal positions and side-canonical inputs; shared book prefix excluded; producer enumeration must be independently verified",
+    "selfplay_episodes": 48,
+    "selfplay_exclusion_scope": "all published raw samples across all generations; conservative superset if any training window/eligibility excluded rows",
+    "selfplay_generations": 3,
+    "selfplay_manifest_sha256": "44b0462cab00e072c25ecc027d81e1019b96c7843a68ffd50d66a7521726ac3b",
+    "selfplay_protocol_sha256": "f4cc205d29a86ab02db9533e39f0001a0e2cdcfe414f14724a8123b7fab589ce",
+    "selfplay_raw_samples_checked": 11534,
+    "source_identity_counts": {
+      "model_input": {
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "protected": 116008,
+        "selfplay-all-published-samples": 11254
+      },
+      "physical": {
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "selfplay-all-published-samples": 11254
+      }
+    }
+  },
+  "query_summary": {
+    "actual_rust_query_histories_replayed": true,
+    "by_arm": {
+      "argmax": 3,
+      "puct32": 10
+    },
+    "queries": 13,
+    "trace_sha256": "3c7332cdc0ed32dea5addad7b47a2976f2011f08e27bfaeb9c9c8bff728b30d1",
+    "unique_observed": {
+      "neural-query/argmax/model": {
+        "inputs": 3,
+        "positions": 3
+      },
+      "neural-query/puct32/model": {
+        "inputs": 10,
+        "positions": 10
+      }
+    }
+  },
+  "resource_summary": {
+    "interval_seconds": 10,
+    "memory_pressure_stop_requested": false,
+    "peak_device_gpu_memory_mib": 768.0,
+    "peak_summed_owned_rss_bytes": 3128107008,
+    "root_cpu_seconds": 321.330911358,
+    "samples": 127,
+    "scope": "whole device sampled GPU memory; summed owned RSS may double count shared pages; timings separate; not model-attributed or DDP performance"
+  },
+  "publication_validation": {
+    "files": [
+      {
+        "bytes": 6221,
+        "path": "matches.parquet",
+        "sha256": "4eedacaf26acc76d71547be283b088c38b3ef85d20cc937a440597fac5b98961"
+      },
+      {
+        "bytes": 6040,
+        "path": "queries.parquet",
+        "sha256": "54810b5cf0bd7eacad0a7d181602607253c15a1cb2bbad6074ed7158d33f241e"
+      }
+    ],
+    "input_audit_passed": true,
+    "pipeline_complete": true,
+    "queries": 13,
+    "roundtrip_verified": true,
+    "rows": 12,
+    "rust_replayed_all_observed_query_histories": true,
+    "rust_replayed_all_published_matches": true
+  },
+  "publication_plan": {
+    "files": [
+      {
+        "bytes": 18657,
+        "path": "LICENSE",
+        "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+      },
+      {
+        "bytes": 3231,
+        "path": "README.md",
+        "sha256": "37f27b164e3c4ad809eca37eacf61aeccedc144f6f2c4b52a9f522c11a8787df"
+      },
+      {
+        "bytes": 371160,
+        "path": "manifest.json",
+        "sha256": "5f320a83e4fed76fcfcb05a776490a65ac88fee4a061c7da42125f2808500b15"
+      },
+      {
+        "bytes": 6221,
+        "path": "matches.parquet",
+        "sha256": "4eedacaf26acc76d71547be283b088c38b3ef85d20cc937a440597fac5b98961"
+      },
+      {
+        "bytes": 6040,
+        "path": "queries.parquet",
+        "sha256": "54810b5cf0bd7eacad0a7d181602607253c15a1cb2bbad6074ed7158d33f241e"
+      },
+      {
+        "bytes": 437,
+        "path": "validation.json",
+        "sha256": "332e7b414407bbf1503c90281642a4b76e6bf6fa8784e23d2f7ed8d0d316ce13"
+      }
+    ],
+    "gated": "manual",
+    "license": "cc-by-4.0",
+    "license_approved": true,
+    "private": false,
+    "repo_id": "voxelshogi/voxelshogi-generation-evaluation-v1",
+    "repo_type": "dataset",
+    "schema": 1,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+  },
+  "frozen_protocols": {
+    "changed_factor": "participants.model.policy",
+    "protocols": {
+      "argmax": {
+        "bootstrap": {
+          "resamples": 10000,
+          "seed": 314159
+        },
+        "cases": [
+          {
+            "id": "mate-offset-2",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/2K6 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63000,
+            "stratum": "tactical"
+          },
+          {
+            "id": "mate-offset-3",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/3K5 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63001,
+            "stratum": "tactical"
+          },
+          {
+            "id": "mate-offset-4",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/4K4 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63002,
+            "stratum": "tactical"
+          }
+        ],
+        "participants": {
+          "model": {
+            "artifact_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+            "backend": "torch-cuda",
+            "policy": "legal-argmax-v1"
+          },
+          "opponent": {
+            "artifact_sha256": "773962226dc27d2d54e4db43291ac6fe0e85ca9698ceb8e1152693a6860a51e2",
+            "backend": "rust",
+            "policy": "alphabeta-v1"
+          }
+        },
+        "purpose": "development",
+        "ruleset_id": "voxelshogi-standard-v1",
+        "schema": "voxelshogi-evaluation-v2",
+        "search_limits": {
+          "max_depth": 3,
+          "max_nodes": 20000,
+          "table_capacity": 4096
+        },
+        "sensitivity": {
+          "minimum_pairs": 15,
+          "minimum_termination_rate": 0.25
+        },
+        "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+      },
+      "puct32": {
+        "bootstrap": {
+          "resamples": 10000,
+          "seed": 314159
+        },
+        "cases": [
+          {
+            "id": "mate-offset-2",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/2K6 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63000,
+            "stratum": "tactical"
+          },
+          {
+            "id": "mate-offset-3",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/3K5 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63001,
+            "stratum": "tactical"
+          },
+          {
+            "id": "mate-offset-4",
+            "max_additional_plies": 1,
+            "opening": {
+              "initial": "8k/9/9/9/9/9/9/9/9|9/9/7+R1/9/9/9/9/9/9|9/9/6G2/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/9|9/9/9/9/9/9/9/9/4K4 b - 1",
+              "moves": [],
+              "result": null,
+              "ruleset_id": "voxelshogi-standard-v1",
+              "termination": null
+            },
+            "seed": 63002,
+            "stratum": "tactical"
+          }
+        ],
+        "participants": {
+          "model": {
+            "artifact_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+            "backend": "torch-cuda",
+            "policy": "puct32-v1"
+          },
+          "opponent": {
+            "artifact_sha256": "773962226dc27d2d54e4db43291ac6fe0e85ca9698ceb8e1152693a6860a51e2",
+            "backend": "rust",
+            "policy": "alphabeta-v1"
+          }
+        },
+        "purpose": "development",
+        "ruleset_id": "voxelshogi-standard-v1",
+        "schema": "voxelshogi-evaluation-v2",
+        "search_limits": {
+          "max_depth": 3,
+          "max_nodes": 20000,
+          "table_capacity": 4096
+        },
+        "sensitivity": {
+          "minimum_pairs": 15,
+          "minimum_termination_rate": 0.25
+        },
+        "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+      }
+    },
+    "same_tactical_family": true,
+    "source_commit": "516da1a9ef8c07310f8bc987854df3ab67c35cf6"
+  },
+  "cost_scope": {
+    "reservation_usd": 2,
+    "quoted_hourly_usd": 0.6044444444444445,
+    "invoice_recovered": false,
+    "total_approved_usd": 200,
+    "reservations_after_diagnosis_usd": 112,
+    "past_reservations_retained": true
+  }
+}
