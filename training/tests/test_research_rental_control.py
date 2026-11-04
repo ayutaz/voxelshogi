@@ -20,7 +20,7 @@ def setup(tmp_path):
         json.dumps(
             {
                 "approved_total_usd": 100,
-                "research_allocations_usd": {"phase5": 37, "phase6": 2},
+                "research_allocations_usd": {"phase5": 38, "phase6": 1},
                 "reservations": [
                     {"task": "m4", "maximum_usd": 41},
                     {"task": "m6-main", "maximum_usd": 20},
@@ -73,11 +73,11 @@ def test_remaining_p53_and_ddp_fit_existing_basic_budget_with_distinct_phase_cap
 ):
     from training.research_rental_control import ALLOCATIONS
 
-    assert ALLOCATIONS == {"phase5": 37, "phase6": 2}
+    assert ALLOCATIONS == {"phase5": 38, "phase6": 1}
     assert sum(ALLOCATIONS.values()) == 39
     common = None
     prior = None
-    for index, dollars in enumerate((2, 3, 2, 4)):
+    for index, dollars in enumerate((2.75, 2.75, 2, 4)):
         root = tmp_path / str(index)
         root.mkdir()
         control, api, budget, path = setup(root)
@@ -93,15 +93,17 @@ def test_remaining_p53_and_ddp_fit_existing_basic_budget_with_distinct_phase_cap
         control.tag = "voxelshogi-phase5-bounded-unit-" + str(index)
         plan = json.loads(path.read_text())
         plan.update(
-            maximum_seconds=dollars * 3600, maximum_usd=dollars, estimated_seconds=300
+            maximum_seconds=int(dollars * 3600),
+            maximum_usd=dollars,
+            estimated_seconds=300,
         )
         path.write_text(json.dumps(plan))
         control.reserve()
         assert not api.calls
     final = json.loads(common.read_text())
     assert final["reservations"][: len(prior)] == prior
-    assert final["reserved_total_usd"] == 98 and final["approved_total_usd"] == 100
-    assert final["remaining_unreserved_usd"] == 2
+    assert final["reserved_total_usd"] == 98.5 and final["approved_total_usd"] == 100
+    assert final["remaining_unreserved_usd"] == 1.5
 
 
 def test_existing_project_and_new_purpose_caps_preserve_all_m6_reservations(tmp_path):
@@ -170,7 +172,7 @@ def test_cumulative_and_phase_budgets_are_checked_under_shared_ledger_lock(
     ledger = json.loads(path.read_text())
     row = {"task": "previous", "maximum_usd": 36}
     if case == "phase":
-        row = {"task": "phase5-data", "maximum_usd": 34}
+        row = {"task": "phase5-data", "maximum_usd": 35}
     if case == "duplicate":
         row = {"task": "phase5-evaluation", "maximum_usd": 1, "tag": control.tag}
     if case == "nan":
@@ -314,14 +316,14 @@ def test_phase6_does_not_spend_phase5_allocation_and_has_its_own_cap(tmp_path):
     control.tag = "voxelshogi-phase6-eval-pilot"
     plan = json.loads(path.read_text())
     plan["purpose"] = "phase6-training"
-    plan.update(maximum_seconds=7200, maximum_usd=2, estimated_seconds=3000)
-    control.remote_guard = lambda **kw: Deadline(kw["tag"], 8200)
+    plan.update(maximum_seconds=3600, maximum_usd=1, estimated_seconds=300)
+    control.remote_guard = lambda **kw: Deadline(kw["tag"], 4600)
     path.write_text(json.dumps(plan))
     ledger = json.loads(budget.read_text())
     ledger["reservations"].append({"task": "phase5-selfplay", "maximum_usd": 20})
     budget.write_text(json.dumps(ledger))
     control.rent(lambda: None)
-    assert json.loads(budget.read_text())["reserved_total_usd"] == 83
+    assert json.loads(budget.read_text())["reserved_total_usd"] == 82
 
 
 def test_consistent_but_overlong_quote_is_still_rejected(tmp_path):
@@ -363,8 +365,8 @@ def test_phase6_own_allocation_cannot_be_exceeded(tmp_path):
 @pytest.mark.parametrize(
     "phase,previous,accepted",
     [
-        ("phase5", 33, True),
-        ("phase5", 34, False),
+        ("phase5", 34, True),
+        ("phase5", 35, False),
         ("phase6", 0, True),
         ("phase6", 1, False),
     ],
@@ -372,8 +374,8 @@ def test_phase6_own_allocation_cannot_be_exceeded(tmp_path):
 def test_p53_trial_reallocation_enforces_both_phase_boundaries(
     tmp_path, phase, previous, accepted
 ):
-    # Remaining units transfer USD11: 37 + 2 = 39; project stays100.
-    # Phase5 USD4 probes:33+4=37,34+4=38; Phase6 USD2:0+2=2,1+2=3.
+    # Priced-transfer units:38+1=39, project stays100.
+    # Phase5 USD4 probes:34+4=38,35+4=39; Phase6 USD1:0+1=1,1+1=2.
     control, api, budget, path = setup(tmp_path)
     control.phase, control.tag = phase, f"voxelshogi-{phase}-reallocation"
     plan = json.loads(path.read_text())
@@ -381,8 +383,8 @@ def test_p53_trial_reallocation_enforces_both_phase_boundaries(
     if phase == "phase6":
         from training.remote_deadline import Deadline
 
-        plan.update(maximum_seconds=7200, maximum_usd=2, estimated_seconds=3000)
-        control.remote_guard = lambda **kw: Deadline(kw["tag"], 8200)
+        plan.update(maximum_seconds=3600, maximum_usd=1, estimated_seconds=300)
+        control.remote_guard = lambda **kw: Deadline(kw["tag"], 4600)
     path.write_text(json.dumps(plan))
     ledger = json.loads(budget.read_text())
     ledger["reservations"].append(
@@ -554,12 +556,18 @@ def test_p53_two_dollar_timing_trial_preserves_all_prior_reservations(tmp_path):
         and current["remaining_unreserved_usd"] == 13
     )
     assert current["approved_total_usd"] == 100
-    assert ALLOCATIONS == {"phase5": 37, "phase6": 2}
+    assert ALLOCATIONS == {"phase5": 38, "phase6": 1}
     assert sum(ALLOCATIONS.values()) == 39
 
 
 @pytest.mark.parametrize(
-    "allocation", [None, {"phase5": 26, "phase6": 13}, {"phase5": 38, "phase6": 2}]
+    "allocation",
+    [
+        None,
+        {"phase5": 26, "phase6": 13},
+        {"phase5": 37, "phase6": 2},
+        {"phase5": 39, "phase6": 1},
+    ],
 )
 def test_recorded_phase_allocations_must_match_controller_before_new_paid_create(
     tmp_path, allocation

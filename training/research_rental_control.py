@@ -28,9 +28,9 @@ HARDWARE = {
     M6_SHARED_SKU: (M6_SHARED_DC, False),
     "rtx49-18-80-450-kn-packed.1": ("ap-east-tw-kn-2", False),
 }
-# Remaining P5-3 and DDP units: move USD11 of unused Phase6 allocation.
+# Priced-transfer evaluation and DDP units: move USD12 of unused Phase6 allocation.
 # The project remains USD100; the conditional extra USD100 is not activated.
-ALLOCATIONS = {"phase5": 37, "phase6": 2}
+ALLOCATIONS = {"phase5": 38, "phase6": 1}
 PURPOSES = {
     "phase5-evaluation",
     "phase5-data",

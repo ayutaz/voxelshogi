@@ -12,6 +12,48 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "evaluation-rental-hourly-cap",
+        "training/vast_evaluation_control.py",
+        "MAXIMUM_HOURLY_USD = 0.75",
+        "MAXIMUM_HOURLY_USD = 1",
+        "test_vast_evaluation_control.py",
+    ),
+    (
+        "evaluation-rental-download-price",
+        "training/vast_evaluation_control.py",
+        'ESTIMATED_DOWNLOAD_GB * offer["inet_down_cost"]',
+        'ESTIMATED_DOWNLOAD_GB * offer["inet_up_cost"]',
+        "test_vast_evaluation_control.py",
+    ),
+    (
+        "evaluation-rental-network-reserve",
+        "training/vast_evaluation_control.py",
+        'return super().cost_cap(plan) + plan["maximum_transfer_usd"]',
+        "return super().cost_cap(plan)",
+        "test_vast_evaluation_control.py",
+    ),
+    (
+        "evaluation-rental-network-credit",
+        "training/vast_evaluation_control.py",
+        'return super().minimum_credit(quote, plan) + plan["maximum_transfer_usd"]',
+        "return super().minimum_credit(quote, plan)",
+        "test_vast_evaluation_control.py",
+    ),
+    (
+        "evaluation-rental-network-plan",
+        "training/vast_evaluation_control.py",
+        'or plan["maximum_transfer_usd"] != TRANSFER_RESERVE_USD',
+        "or False",
+        "test_vast_evaluation_control.py",
+    ),
+    (
+        "evaluation-rental-purpose",
+        "training/vast_evaluation_control.py",
+        'or plan["purpose"]\n            not in ("phase5-evaluation", "phase5-data", "phase5-selfplay")',
+        "or False",
+        "test_vast_evaluation_control.py",
+    ),
+    (
         "ddp-loop-seed-device",
         "training/distributed_loop.py",
         "        with torch.cuda.device(device):\n            torch.cuda.manual_seed(seed + rank)",
@@ -462,15 +504,15 @@ MUTATIONS = [
     (
         "research-p53-trial-phase5-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 37, "phase6": 2}',
-        'ALLOCATIONS = {"phase5": 38, "phase6": 2}',
+        'ALLOCATIONS = {"phase5": 38, "phase6": 1}',
+        'ALLOCATIONS = {"phase5": 39, "phase6": 1}',
         "test_research_rental_control.py",
     ),
     (
         "research-p53-trial-phase6-boundary",
         "training/research_rental_control.py",
-        'ALLOCATIONS = {"phase5": 37, "phase6": 2}',
-        'ALLOCATIONS = {"phase5": 37, "phase6": 3}',
+        'ALLOCATIONS = {"phase5": 38, "phase6": 1}',
+        'ALLOCATIONS = {"phase5": 38, "phase6": 2}',
         "test_research_rental_control.py",
     ),
     (
