@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+from contextlib import ExitStack
 from pathlib import Path
 
 from training.checkpoint import atomic_json
@@ -88,6 +89,13 @@ def collect_pool(folder, expected_plan, *, replay=None, is_live=_handle_live):
         if path.is_symlink() or not path.is_dir():
             raise ValueError("invalid pool job/launch directory")
         names = {p.name for p in path.iterdir()}
+        if directory == "jobs":
+            locks = {"." + name + ".evaluation.lock" for name in known}
+            for name in names & locks:
+                item = path / name
+                if item.is_symlink() or not item.is_file() or item.stat().st_size != 0:
+                    raise ValueError("invalid case lease metadata")
+            names -= locks
         allowed = known if directory == "jobs" else {n + ".json" for n in known}
         if not names <= allowed:
             raise ValueError("foreign pool job/launch")
@@ -174,10 +182,13 @@ def pack_pool(folder, output, *, expected_plan, owner):
     import pyarrow.parquet as pq
 
     _owner(owner)
+    validate_case_plan(expected_plan)
     output = Path(output)
     if output.exists() or output.is_symlink():
         raise FileExistsError(output)
-    with _lease(Path(folder)):
+    with _lease(Path(folder)), ExitStack() as leases:
+        for job in expected_plan["jobs"]:
+            leases.enter_context(_lease(Path(folder) / "jobs" / job["job_id"]))
         collected = collect_pool(folder, expected_plan)
         records = [
             {"path": key, "data": raw}

@@ -13,6 +13,34 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "pool-snapshot-known-lease",
+        "training/evaluation_pool_archive.py",
+        "names -= locks",
+        "pass",
+        "test_evaluation_pool_archive.py",
+    ),
+    (
+        "pool-snapshot-lease-empty",
+        "training/evaluation_pool_archive.py",
+        "or item.stat().st_size != 0",
+        "or False",
+        "test_evaluation_pool_archive.py",
+    ),
+    (
+        "pool-snapshot-lease-symlink",
+        "training/evaluation_pool_archive.py",
+        "if item.is_symlink() or not item.is_file()",
+        "if False or not item.is_file()",
+        "test_evaluation_pool_archive.py",
+    ),
+    (
+        "pool-snapshot-acquire-case-leases",
+        "training/evaluation_pool_archive.py",
+        '            leases.enter_context(_lease(Path(folder) / "jobs" / job["job_id"]))\n',
+        "            pass\n",
+        "test_evaluation_pool_archive.py",
+    ),
+    (
         "pool-snapshot-plan",
         "training/evaluation_pool_archive.py",
         'if json.loads(files["plan.json"]) != expected_plan:',

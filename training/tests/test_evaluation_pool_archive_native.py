@@ -18,8 +18,11 @@ RELEASE = {
 
 
 def partial(tmp_path):
+    import json
+
     from training.checkpoint import atomic_json
     from training.evaluation_jobs import plan_case_jobs, run_case_assignment
+    from training.feature_cache import file_hash
     from training.tests.test_evaluation_v2_native import native_protocol
 
     spec = native_protocol()
@@ -38,6 +41,12 @@ def partial(tmp_path):
         run_case_assignment(
             spec, {}, target, case_id=job["case_id"], stop_requested=first.exists
         )
+    # Independent whitespace makes rerunning/re-encoding this color detectable
+    # without relying on a new measured elapsed time being different.
+    first.write_text(json.dumps(json.loads(first.read_text()), indent=2) + "\n")
+    saved = json.loads((target / "job.json").read_text())
+    saved["files"][0].update(bytes=first.stat().st_size, sha256=file_hash(first))
+    atomic_json(target / "job.json", saved)
     return folder, plan, first
 
 
@@ -184,3 +193,14 @@ def test_snapshot_refuses_a_running_pool_lease(tmp_path):
     source, plan, _ = partial(tmp_path)
     with _lease(source), pytest.raises(ValueError, match="running owner"):
         pack_pool(source, tmp_path / "archive", expected_plan=plan, owner=OLD)
+
+
+def test_snapshot_also_refuses_a_case_lease_without_a_coordinator(tmp_path):
+    from training.evaluation_jobs import _lease
+    from training.evaluation_pool_archive import pack_pool
+
+    source, plan, _ = partial(tmp_path)
+    active = source / "jobs" / plan["jobs"][1]["job_id"]
+    with _lease(active), pytest.raises(ValueError, match="running owner"):
+        pack_pool(source, tmp_path / "archive", expected_plan=plan, owner=OLD)
+    assert not (tmp_path / "archive").exists()
