@@ -8,6 +8,16 @@
 
 比較候補は同じ所有4GPUホスト上の1／2／4台の使用である。GPUの種類・個体とホスト構成を固定し、CPU割当・接続・driverも記録する。この方法では使っていないGPUにも料金がかかる。実際の4GPU全体の借用時間・単価を費用へ計上し、使用GPU数×学習時間から求める計算量と分ける。在庫・価格とP5-3の実測から見積もりを固定し、controller・ledger・独立期限監視が対応するまで借りない。
 
+## 4GPUの借用条件
+
+[専用controller](../training/vast_distributed_control.py)はRTX5090×4・80GBディスク・verified・信頼性0.99以上・CUDA13対応・driver580以上を扱う。GPUごとに約32GB VRAM、ホスト合計でCPU RAM 98,304 MB以上（API値）と24以上のeffective CPU coreを要求する。旧1GPUの上限US$1/時・転送無料の契約は維持する。
+
+[読み取り在庫記録](experiments/p54-four-gpu-quotes-2026-11-04.json)では、verifiedなRTX5090×4がディスク込み約US$2.26222/時、転送は各方向US$0.00390625/GBだった。これは2026-11-04 01:41 UTC時点の候補であり、起動予約や在庫保証ではない。[公式API仕様](https://docs.vast.ai/api-reference/search/search-offers)の転送料単位を確認した。
+
+専用planの計算・ディスク単価上限は全4GPUでUS$3/時、各方向の転送単価上限はUS$0.01/GB。依存導入も含むdown 40GB・up 10GBの保守的な見積もりを別に記録し、転送用にUS$1を追加予約する。したがって1時間なら予約上限4、2時間なら7である。共有ディスクをGPUごとに4重計上せず、クレジットと共通／Phase別ledgerには転送枠も含める。これは固定workloadの費用見積もり・予約であり、providerが強制する転送量や請求の上限ではない。
+
+既存の用途配分や基本総枠をこの実装だけで増やさない。8局の時間試行と最新quoteから時間・費用を固定し、コードとledgerの一致・同じprofileの予備guard・protected mainの独立監視を確認してから実機を作る。観測失敗後の作成再送や、未知の既存実機がある状態での追加起動を拒否する。
+
 ## 同じ条件で比較する
 
 - 同じTransformer-Sの開始重み、検証済み自己対局入力、保護集合を使う。source・HF固定revision・全hashと実学習sampleのhashを固定する。評価holdoutを学習へ混ぜない。

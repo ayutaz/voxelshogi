@@ -56,6 +56,10 @@ def _source_check(commit):
 class ResearchRental(Rental):
     PLAN_SCHEMA = "voxelshogi-research-rental-plan-v1"
     HARDWARE_FIELDS = {"sku", "datacenter", "with_public_ip"}
+    MAXIMUM_HOURLY_USD = 1
+
+    def cost_cap(self, plan):
+        return plan["maximum_seconds"] * self.MAXIMUM_HOURLY_USD / 3600
 
     def __init__(
         self,
@@ -116,9 +120,9 @@ class ResearchRental(Rental):
             or type(plan["maximum_seconds"]) is not int
             or not 1800 <= plan["maximum_seconds"] <= 14400
             or type(plan["maximum_hourly_usd"]) not in (int, float)
-            or plan["maximum_hourly_usd"] != 1
+            or plan["maximum_hourly_usd"] != self.MAXIMUM_HOURLY_USD
             or type(plan["maximum_usd"]) not in (int, float)
-            or plan["maximum_usd"] != plan["maximum_seconds"] / 3600
+            or plan["maximum_usd"] != self.cost_cap(plan)
             or type(plan["estimated_seconds"]) is not int
             or not 0 < plan["estimated_seconds"] <= plan["maximum_seconds"] - 900
         ):

@@ -1,0 +1,20 @@
+{
+  "schema": "voxelshogi-generation-evaluation-prefix-evidence-v1",
+  "source_commit": "f72c35f175050cb137c017bfaf3b5a4f9c1fc8e7",
+  "completed_games_in_snapshot": 6,
+  "expected_timing_games": 8,
+  "pipeline_complete": false,
+  "input_overlap_audit_complete": false,
+  "resource_release_confirmed": false,
+  "actual_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "f6ee1d9a9f5ffa68fe93f8e943009f2f36061989",
+    "release_sha256": "3ec0560cac269bda60608fc68d87c93fc90223c25c862f5897ff08953d881f30",
+    "repo_id": "voxelshogi/voxelshogi-generation-evaluation-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "verification_location": "owned external Linux; no dataset/model payload passed through Mac",
+  "scope": "verified HF snapshot of six committed Rust-replayed games only; not8/150game or DDP completion"
+}
