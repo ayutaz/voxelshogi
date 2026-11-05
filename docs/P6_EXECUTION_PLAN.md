@@ -113,3 +113,9 @@ CI待ちには独立した次の実装・文書を進め、CIの追加最適化�
 
 [分割・保護・データreadiness](P6_CORPUS_ADMISSION.md)を使い、既存保護と最終評価12 rootを維持する。
 開始family単位の分割、全入力重複・Value由来・実件数を確認し、件数screenだけを教師品質や学習完了と扱わない。
+
+## 学習と保存の実装契約
+
+[4構造の教師あり学習と専用state](P6_TRAINING_STATE.md)を使う。
+モデルの全寸法・seed・共通教師cache・FP32 optimizerをbindingに含め、専用profileで保存再開する。
+数値結合はLinux CI、実Mの教師学習・CUDA再開・公開の証拠は外部Linuxで別々にそろえる。

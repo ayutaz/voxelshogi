@@ -103,3 +103,10 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 通常modelへの混入を拒否し、M6／自己対局から引き継いだ同じ累積1GiB upload ledgerを使う。過去の予約を減らしたり初期化したりせず、実bytesを予約してから外部Linuxで公開・全hash照合する。このprofileの準備やCPUテストだけでは、実repo公開・GPU保存再開が完了したことにはならない。
 
 **2026-11-05 00:13 UTCの実公開**：[P5-4の全3構成と各GPU保存再開](P5_4_RESULTS.md)で中間／最終の計6 stateと3行の測定datasetを公開し、固定revisionの全bytes・hash・Card・public/manual・Community OFFを照合した。共通ledgerの過去予約は保持し、実機解放も確認済み。先行する1GPU部分結果は別の固定revisionとして残す。
+
+## P6の研究用学習state
+
+[4構造の学習・再開契約](P6_TRAINING_STATE.md)の`profile="research"`／`artifact_role="research-training-state"`を使う。
+専用先は`voxelshogi/voxelshogi-research-training-state-v1`（model、Apache-2.0）。全モデル寸法・seed・cache・source・環境を結び付け、latestとval選択bestをtyped archiveとして保存する。
+通常モデル／旧Sのstate repoへ代替公開しない。M用artifact上限はこのroleだけに適用し、共通の累積upload ledgerは継承する。
+現時点はコード準備であり、実MのGPU保存再開・実repoへの公開を完了した記録ではない。
