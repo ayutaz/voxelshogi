@@ -1,0 +1,13 @@
+# M規模モデルを固定条件の評価対局へ接続する
+
+2026-11-05。4構造の学習結果を、既存のRust評価対局・合法手argmax／PUCT32で比較するための実装契約。実データ採用・GPU学習・比較対局の実行完了や棋力改善の記録ではない。
+
+`training.research_weights`はFull／Axial／Geometry／3D-CNNの固定M構造だけを扱う。safetensorsのヘッダーへ、構造寸法、seed、学習source、学習bindingのhash、選んだbest／latestと更新数を埋め込む。既存の対局protocolが持つファイルSHA-256で、この来歴と実際の重みをまとめて固定する。metadataの読み取りは上限付きのヘッダーだけを読み、Torchやモデルを初期化しない。
+
+実ファイルの作成・ロード・推論は外部Linux専用。writerは有限のFP32 tensor、構造に対応するparameter数、未使用の出力先を要求する。loaderはファイル形式・SHA・metadata、実tensorのdtype・有限性、全state keyとshape、ロード終了後の再hashを確認する。CUDAを指定したときは実CUDAと事前の決定的workspace設定を要求する。CPUへの暗黙の切替や半精度重みの自動採用はしない。
+
+呼び出し側は、検証済みの学習checkpointから選択したstateとprogressを読み、metadataの`source_commit`・`architecture`・`seed`・`training_binding_sha256`をそのrun bindingから作る。`step`と`checkpoint_role`は実際に選んだ保存点から取る。このAPIのmetadata作成だけでは、教師品質や保存点の採用を証明しない。学習sourceと、後で評価するエンジンsourceは別々に記録する。
+
+評価runnerは明示的なresearch tagがある重みをこのloaderへ渡す。tagのない従来Sモデルは既存経路を使い、不正なresearch tagをSとして読み替えない。どちらのモデルでも同じ開始局面・先後・M1上限・停止条件・Rust再生と入力監査を使う。argmaxは合法手の同点を最小action IDで選び、PUCT32は既存の32 simulations／深さ64／cpuct1・noiseなし・木の再利用なしを維持する。観測callbackを全NN参照へ渡し、探索枝の監査を省かない。
+
+軽量テストは手書きの4構造metadata、壊れた来歴やtoy寸法、旧S経路との区別、Mac境界、fake playerによるpolicy／停止／観測の受け渡しを確認する。Linux結合試験では実M4構造の重みを保存し、constructorとは異なる値を含むstateの復元、実Rust特徴量での合法手選択、PUCT evaluatorへの接続を検証する。実GPUでの学習・保存再開・対局とHF公開は、[全体の実行計画](P6_EXECUTION_PLAN.md)の後続実行で証拠をそろえる。

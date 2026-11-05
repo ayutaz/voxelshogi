@@ -130,3 +130,8 @@ CI待ちには独立した次の実装・文書を進め、CIの追加最適化�
 [4構造の教師あり学習と専用state](P6_TRAINING_STATE.md)を使う。
 モデルの全寸法・seed・共通教師cache・FP32 optimizerをbindingに含め、専用profileで保存再開する。
 数値結合はLinux CI、実Mの教師学習・CUDA再開・公開の証拠は外部Linuxで別々にそろえる。
+
+## 学習したM規模モデルの評価対局
+
+[構造と来歴を重みhashへ結び付ける評価経路](P6_MODEL_EVALUATION.md)で、4構造の実重みを既存のargmax／PUCT32・Rust対局へ接続する。
+学習source・保存点・評価sourceを記録し、全NN参照の観測を維持する。実対局・全入力監査・棋力の証拠は別途実行する。

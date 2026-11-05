@@ -149,7 +149,23 @@ def _prepare_players(
         ):
             raise ValueError("evaluation model artifact hash differs")
         if participant["backend"] not in ("torch-cpu", "torch-cuda"):
-            raise ValueError("this runner supports selected M6 Torch weights only")
+            raise ValueError("this runner supports selected FP32 Torch weights only")
+        from training.research_weights import load_research_player, research_metadata
+
+        if research_metadata(path) is not None:
+            players[role] = load_research_player(
+                path,
+                expected_sha256=participant["artifact_sha256"],
+                device="cuda" if participant["backend"] == "torch-cuda" else "cpu",
+                policy=participant["policy"],
+                stop_requested=stop_requested,
+                observe_input=(
+                    None
+                    if observe_input is None
+                    else (lambda game, role=role: observe_input(role, game))
+                ),
+            )
+            continue
         if participant["policy"] == "puct32-v1":
             from training.evaluation_puct import load_puct_player
 
