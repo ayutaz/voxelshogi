@@ -1,0 +1,55 @@
+{
+  "schema": "voxelshogi-phase6-allocation-application-proof-v1",
+  "receipt": {
+    "schema": "voxelshogi-phase6-budget-transition-receipt-v1",
+    "at": 1793851493.5027359,
+    "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+    "before_sha256": "9060ee8ca0f7cb1309aa58a1126642940462a22e2ab41dd2aa218ae0d297c301",
+    "after_sha256": "30345b4c85ef599f3217f1325cd3550aaa9d90b552fdcf870dde65315a723fcd",
+    "reservations": 34,
+    "reserved_usd": 156.0,
+    "allocations_before": {
+      "phase5": 138,
+      "phase6": 1
+    },
+    "allocations_after": {
+      "phase5": 95,
+      "phase6": 44
+    },
+    "evidence": {
+      "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+      "purpose": "phase6-execution",
+      "estimate_maximum_usd": 2,
+      "reference": "Standing USD200 research approval, docs/P6_EXECUTION_PLAN.md stages1-6 and docs/P6_RESOURCE_BUDGET.md. Next real4M GPU/ONNX feasibility unit: one5090, maximum7200s at USD0.75/h plus USD0.50 transfer reserve = USD2. Preserve all34 prior reservations; no additional credit purchase or paid storage.12 main-run whole-job estimate remains pending real-M measurement."
+    },
+    "applied": true,
+    "applied_at": 1793853015.1032598,
+    "ci_proof": {
+      "verified": true,
+      "verified_at": 1793852220.477521,
+      "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+      "all_required_success": true,
+      "ci_run": 41960496644,
+      "ci_conclusion": "success",
+      "security_run": 41960496561,
+      "security_conclusion": "success",
+      "native_full_executed": true,
+      "native_job": 127027179677,
+      "native_summary": "2026-11-05T03:44:13.8058598Z 1291 passed, 21 warnings in 113.40s (0:01:53)",
+      "native_log_sha256": "469abeb25dcc3acec5b2937577813bb86508241700997e31285102fc6277e2d7",
+      "training_mutation_shards_success": 4,
+      "scope": "Full integrated Linux source proof for4 actual-M operator/ONNX probe. No claim of teacher training, browser, strength or Phase7 completion."
+    },
+    "vast_owned_resources": 0,
+    "cloudrift_owned_resources": 0,
+    "new_reservations": 0,
+    "total_limit_usd": 200,
+    "unreserved_usd": 44
+  },
+  "reservations_preserved": 34,
+  "reservation_prefix_sha256": "5728fc9a690531b1267bcda67887ab503fecb0d5febb7f82dfa7b1ef494e94b6",
+  "source_approval_marker_preserved": true,
+  "new_reservations": 0,
+  "resource_reservation_not_an_invoice": true,
+  "scope": "allocation only inside existing approved USD200; actual M measurements,pilot/main training,HF state capacity migration and Phase7 remain separate"
+}

@@ -1,5 +1,15 @@
 # CLAUDE.md — VoxelShogi
 
+**2026-11-05・Mのweights評価を統合**：[PR #154](https://github.com/ayutaz/voxelshogi/pull/154)は最新main統合後の必須8チェックと関連PR検証を確認し、main `f3d2d66`へ統合した。4構造の実M weights往復・Rust局面での合法着手・全変異の[Linux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987703130)も成功している。[専用metadataと全NN参照監査](docs/P6_MODEL_EVALUATION.md)で、実学習後のargmax／PUCT32評価へつなげる。実M学習・開発用対局・12 run比較は未実行。次は実ブラウザとデータ監査、その結果をレビューして2 runを事前固定する。以下は日時付き履歴。
+
+**2026-11-05・実ブラウザ測定コードを統合**：[PR #152](https://github.com/ayutaz/voxelshogi/pull/152)は必須8チェック・[修正後のLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987246949)・CodeQL指摘0件を確認し、main `b2c7c09`へ統合した。実Chromiumの専用Worker通信確認は成功したが、4構造×WASM／WebGPUの実測は未実行。統合mainの深いCI後、外部Linuxで実ブラウザと同じホストでのデータ監査を進める。Mモデル評価のPR #154は既存HEADの全検証成功後に最新mainを統合し、再検証中。新規課金資源は作成せず、累積予約158／承認200・未予約42を保持する。以下は日時付き履歴。
+
+**2026-11-05・採用前監査と訪問分布学習を統合**：[PR #153](https://github.com/ayutaz/voxelshogi/pull/153)を必須8チェック・[最新HEADのLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41977701532)成功後にmain `40ba00b`へ統合した。[データ監査](docs/P6_CORPUS_ADMISSION.md)→[train／val特徴量](docs/P6_VISIT_DATA.md)→[固定更新数・保存再開](docs/P6_VISIT_TRAINING.md)が接続済み。重複PR #150／#151は統合済みとして閉じた。実候補データの採用・Mの2 run学習・12 run比較は未実行であり、次は修正したブラウザ検証と実データ監査を外部Linuxで実行する。以下は日時付き履歴。
+
+**2026-11-05 05:06 UTC・4構造の実M GPU／ONNX検証完了**：[実測と固定HF版](docs/P6_OPERATOR_RESULTS.md)で、全4構造の数値照合・batch1／4／8／16の全16組、公開後の全hash・実機解放を確認した。現在は所有課金資源0、累積35予約158／200・未予約42。速度は合成負荷の結果で、実教師学習や総FLOPsとは区別する。次は実ブラウザ、データ監査と訪問分布の2 run試行→12 run基本案→実モデル配布→Phase7。以下は日時付き履歴。 [stateの自主上限32GiBへの移行](docs/P6_STATE_CAPACITY.md)も過去履歴保持・追加購入なしで適用した。
+
+**2026-11-05・評価補強48局完了**：[実行結果と固定HF版](docs/P6_SCREEN_RESULTS.md)で、48局・実NN参照24,579件のRust再生、全入力監査の重複0、別の最終評価12 root、HF全8ファイルの固定revision照合と所有課金資源0を確認した。PUCTの詰み課題改善と中盤の多数打切りを分け、一般棋力・重み改善は未確認。48局完了時点の台帳は34予約156／200、未予約44。4構造・実M計測コードは統合済みで、次は実GPU・ブラウザ検証。学習／保存はPR #147の全1,322件・関連CI後に統合済み、容量移行はPR #148で最新main上のCI検証中。少量2 run→12 run基本案→実モデル配布→Phase7まで継続し、以下の古い数量・停止・「現在」は日時付き履歴として読む。
+
 **2026-11-05・「6まで」着手**：[評価補強から正式公開までの新計画](docs/P6_EXECUTION_PLAN.md)の1〜6（48局→4構造検証→2 run試行→複数seed比較→実モデル配布→Phase7）を今回の対象とする。最初の変更は48局の条件・別の最終評価12 root・family集計の実装と検証であり、実対局・本学習・実機公開の完了ではない。予算は33予約152.50／承認200、未予約47.50。以下の「今回」「次」は各日時の旧範囲を示す。
 
 **2026-11-05 00:13 UTC・P5-4完了**：[同じホストの実1／2／4GPUと各HF保存再開](docs/P5_4_RESULTS.md)を、全3構成・6 state archive・結果datasetの固定版全hashと最後の資源解放まで確認した。今回の「5まで」（評価準備→8局→150局→12局診断→GPU比較）は実行完了。150局の保護入力重複4件と一般棋力改善の未確認は保持し、Phase6の構造比較・新モデルWeb採用は開始していない。以下の日時付き進捗は履歴である。

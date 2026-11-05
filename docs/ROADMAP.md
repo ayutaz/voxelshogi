@@ -1,5 +1,15 @@
 # ROADMAP / 進捗
 
+**2026-11-05・Mのweights評価を統合**：[PR #154](https://github.com/ayutaz/voxelshogi/pull/154)は最新main統合後の必須8チェックと関連PR検証を確認し、main `f3d2d66`へ統合した。4構造の実M weights往復・Rust局面での合法着手・全変異の[Linux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987703130)も成功している。[専用metadataと全NN参照監査](P6_MODEL_EVALUATION.md)で、実学習後のargmax／PUCT32評価へつなげる。実M学習・開発用対局・12 run比較は未実行。次は実ブラウザとデータ監査、その結果をレビューして2 runを事前固定する。以下は日時付き履歴。
+
+**2026-11-05・実ブラウザ測定コードを統合**：[PR #152](https://github.com/ayutaz/voxelshogi/pull/152)は必須8チェック・[修正後のLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987246949)・CodeQL指摘0件を確認し、main `b2c7c09`へ統合した。実Chromiumの専用Worker通信確認は成功したが、4構造×WASM／WebGPUの実測は未実行。統合mainの深いCI後、外部Linuxで実ブラウザと同じホストでのデータ監査を進める。Mモデル評価のPR #154は既存HEADの全検証成功後に最新mainを統合し、再検証中。新規課金資源は作成せず、累積予約158／承認200・未予約42を保持する。以下は日時付き履歴。
+
+**2026-11-05・採用前監査と訪問分布学習を統合**：[PR #153](https://github.com/ayutaz/voxelshogi/pull/153)を必須8チェック・[最新HEADのLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41977701532)成功後にmain `40ba00b`へ統合した。[データ監査](P6_CORPUS_ADMISSION.md)→[train／val特徴量](P6_VISIT_DATA.md)→[固定更新数・保存再開](P6_VISIT_TRAINING.md)が接続済み。重複PR #150／#151は統合済みとして閉じた。実候補データの採用・Mの2 run学習・12 run比較は未実行であり、次は修正したブラウザ検証と実データ監査を外部Linuxで実行する。以下は日時付き履歴。
+
+**2026-11-05 05:06 UTC・4構造の実M GPU／ONNX検証完了**：[実測と固定HF版](P6_OPERATOR_RESULTS.md)で、全4構造の数値照合・batch1／4／8／16の全16組、公開後の全hash・実機解放を確認した。現在は所有課金資源0、累積35予約158／200・未予約42。速度は合成負荷の結果で、実教師学習や総FLOPsとは区別する。次は実ブラウザ、データ監査と訪問分布の2 run試行→12 run基本案→実モデル配布→Phase7。以下は日時付き履歴。 [stateの自主上限32GiBへの移行](P6_STATE_CAPACITY.md)も過去履歴保持・追加購入なしで適用した。
+
+**2026-11-05・評価補強48局完了**：[実行結果と固定HF版](P6_SCREEN_RESULTS.md)で、48局・実NN参照24,579件のRust再生、全入力監査の重複0、別の最終評価12 root、HF全8ファイルの固定revision照合と所有課金資源0を確認した。PUCTの詰み課題改善と中盤の多数打切りを分け、一般棋力・重み改善は未確認。48局完了時点の台帳は34予約156／200、未予約44。4構造・実M計測コードは統合済みで、次は実GPU・ブラウザ検証。学習／保存はPR #147の全1,322件・関連CI後に統合済み、容量移行はPR #148で最新main上のCI検証中。少量2 run→12 run基本案→実モデル配布→Phase7まで継続し、以下の古い数量・停止・「現在」は日時付き履歴として読む。
+
 **2026-11-05・新しい実行範囲**：ユーザーの「6まで」により、[新計画](P6_EXECUTION_PLAN.md)の1〜6を進める。48局の評価補強と別の最終評価12 rootの固定→4構造の正しさ・変換・実測→2 run試行→複数seedの構造比較→HF／Web配布→Phase7。現在は最初の条件・family集計の実装と検証で、実48局以降は未完了。総枠200、累積予約152.50、未予約47.50。以下の日時付き進捗と予算は当時の履歴。
 
 **2026-11-05 00:13 UTC・P5-4完了**：[同じホストの実1／2／4GPUと各HF保存再開](P5_4_RESULTS.md)を、全3構成・6 state archive・結果datasetの固定版全hashと最後の資源解放まで確認した。今回の「5まで」（評価準備→8局→150局→12局診断→GPU比較）は実行完了。150局の保護入力重複4件と一般棋力改善の未確認は保持し、Phase6の構造比較・新モデルWeb採用は開始していない。以下の日時付き進捗は履歴である。
@@ -258,9 +268,9 @@ Phase0〜4各節の当時のテスト件数・性能・配信SHAは、取得日�
 
 ---
 
-## Phase 6: Transformer-M と研究比較 — ⬜
+## Phase 6: Transformer-M と研究比較 — 🔄
 
-[比較条件・少量試行・学習・実機配布の順](POST_M6_PLAN.md#phase6)に進む。Phase5の評価基盤と各構造の実測見積もりを開始条件にする。
+4構造の演算・小規模ONNX検証と実M計測コードは統合済み。実GPU・M規模ブラウザ・本学習・新モデル配布は未完了。[比較条件・少量試行・学習・実機配布の順](POST_M6_PLAN.md#phase6)に進む。Phase5の評価基盤と各構造の実測見積もりを開始条件にする。
 
 **目的**: 本プロジェクトの研究上の中心。729トークンの三次元空間に対し、3D-CNN、Full Attention、Axial Attention、Geometry-Aware Attention を同じ計算予算（FLOPs）で比べ、どの構造が三次元のボードゲームに向くかを示す。良いモデルをブラウザで使える形にする。
 

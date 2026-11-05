@@ -1,0 +1,818 @@
+{
+  "schema": "voxelshogi-research-screen-completion-proof-v1",
+  "scope": "stage1 of6; no new training, structure adoption, new Web model or Phase7 completion",
+  "source_commit": "763e1ce451cab2499c168309b9719d790018a421",
+  "frozen_conditions_sha256": "771407a1e8a7ecf468840448d81fb9dc136ad2a09ed93e75f5e6d1ee85413446",
+  "source_admission": {
+    "verified": true,
+    "verified_at": 1793844984.6414862,
+    "source_commit": "763e1ce451cab2499c168309b9719d790018a421",
+    "all_required_success": true,
+    "ci_run": 41950883589,
+    "ci_conclusion": "success",
+    "security_run": 41950883597,
+    "security_conclusion": "success",
+    "native_full_executed": true,
+    "native_job": 126994337890,
+    "native_summary": "2026-11-05T01:50:12.5660936Z 1202 passed, 21 warnings in 102.44s (0:01:42)",
+    "native_log_sha256": "9c67e987d59e01e877f67d1bc769979cd1d8d4db6ea085652c81c863fc36d4b8",
+    "training_mutation_shards_success": 4,
+    "training_mutation_catalog": 503,
+    "scope": "immutable main ancestor with executed full Linux CI; no claim of newer architecture or observer integration results"
+  },
+  "games": 48,
+  "queries": 24579,
+  "query_counts_by_arm": {
+    "legal-argmax-v1": 720,
+    "puct32-v1": 23859
+  },
+  "root_input_audit": {
+    "cases_with_overlap": [],
+    "corpus_counts": {
+      "model_input": {
+        "existing-protected": 116008,
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "selfplay-all-published": 11254
+      },
+      "physical": {
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "selfplay-all-published": 11254
+      }
+    },
+    "evaluation_counts": {
+      "inputs": 24,
+      "positions": 24
+    },
+    "frozen_conditions_sha256": "771407a1e8a7ecf468840448d81fb9dc136ad2a09ed93e75f5e6d1ee85413446",
+    "m4_counts": {
+      "rows": 116921,
+      "rows_by_split": {
+        "test": 11631,
+        "train": 93544,
+        "val": 11746
+      },
+      "unique_inputs": 113321,
+      "unique_physical": 113321
+    },
+    "overlaps_by_source": {
+      "model_input": {
+        "existing-protected": 0,
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "selfplay-all-published": 0
+      },
+      "physical": {
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "selfplay-all-published": 0
+      }
+    },
+    "passed": true,
+    "protected_file_sha256": "364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944",
+    "scope": "all24 frozen roots against full M4 splits, all3 published selfplay generations and existing protection; no neural model queried",
+    "selfplay_protocol_sha256": "f4cc205d29a86ab02db9533e39f0001a0e2cdcfe414f14724a8123b7fab589ce",
+    "selfplay_raw_samples": 11534
+  },
+  "input_audit": {
+    "cases_with_overlap": [],
+    "corpus_contract": {
+      "config": "production-64",
+      "evaluation": {
+        "cutoff_is_draw": false,
+        "interval": "95% paired bootstrap over opening seeds; 10000 resamples; seed 314159",
+        "max_plies": 256,
+        "opening_plies": 8,
+        "opening_seeds": {
+          "random": [
+            7000,
+            7001,
+            7002,
+            7003,
+            7004,
+            7005,
+            7006,
+            7007,
+            7008,
+            7009,
+            7010,
+            7011,
+            7012,
+            7013,
+            7014,
+            7015,
+            7016,
+            7017,
+            7018,
+            7019
+          ],
+          "search": [
+            8000,
+            8001,
+            8002,
+            8003,
+            8004,
+            8005,
+            8006,
+            8007,
+            8008,
+            8009
+          ]
+        },
+        "opponent_seed": "100000 + opening seed",
+        "policy": "argmax engine-legal logits; ties smallest canonical action ID",
+        "primary_win_rate": "wins / games_started",
+        "schema": "voxelshogi-evaluation-v1",
+        "search_limits": {
+          "max_depth": 2,
+          "max_nodes": 10000,
+          "table_capacity": 4096
+        },
+        "swap_model_colors": true
+      },
+      "features": "voxelshogi-standard-features-v1",
+      "loss_policy": "mean cross entropy over engine-supplied legal actions",
+      "loss_value": "mean squared error",
+      "loss_value_weight": 1,
+      "mate_score": 1000000,
+      "policy_actions": 1067985,
+      "policy_teacher": "teacher.best_move; legal; depth >= 1; nonduplicate",
+      "repo_id": "voxelshogi/voxelshogi-synthetic-v1",
+      "revision": "6e7fb29d2469b56a895042fbb089d86e7b4d074f",
+      "ruleset_id": "voxelshogi-standard-v1",
+      "schema": "voxelshogi-supervision-v1",
+      "selection_split": "val",
+      "test_role": "final selected checkpoint and predeclared conversion comparison only",
+      "training_seed": 314159,
+      "value_scale": 1000,
+      "value_teacher": "tanh(teacher.score / value_scale); already side-to-move"
+    },
+    "corpus_counts": {
+      "rows": 116921,
+      "rows_by_split": {
+        "test": 11631,
+        "train": 93544,
+        "val": 11746
+      },
+      "unique_inputs": 113321,
+      "unique_physical": 113321
+    },
+    "corpus_inventory_sha256": "6dbcea9e7f1a52c52c869623fec849443fe13885dc39f1bf19191292e7aeef98",
+    "evaluation_counts": {
+      "inputs": 18121,
+      "positions": 18121
+    },
+    "final_root_audit": {
+      "input_overlaps": 0,
+      "passed": true,
+      "physical_overlaps": 0,
+      "protected_final_roots": 12,
+      "scope": "all scored continuations and actual neural queries against12 frozen final roots; book prefixes excluded"
+    },
+    "identity_set_sha256": {
+      "model_input": {
+        "m4-test": "6d38e8f6d7530fa202a0b635438a71139886545c56ace6a418470f01f1b13066",
+        "m4-train": "f0b01bd832d45bf988a8ce22a3d4a30d2afa8de3958e51fd447c82eb13fd9be0",
+        "m4-val": "486b60b893faef49fedc231113ceddc7e00062319d9da411e3adb6568ac84b70",
+        "protected": "8874850f0c4814d652ddddd4c4d18fa24a0073ee0d67b23423be0aa7b2f855d9",
+        "selfplay-all-published-samples": "d6a1915d6e85ad5f826b37f9ede8297c873b251a802ef3a30e522be8aa0deed9"
+      },
+      "physical": {
+        "m4-test": "6ec956af0cd450d4091ef7199d44fd4c05ad16995e92edc7af1df885e5373981",
+        "m4-train": "dfb66b05c085e744184be8ece512c45183c59ab2877a60bee412ef7252fa835d",
+        "m4-val": "45f2100d54b7c01762f3015557391e90002aa4eb1f72909030f65c86d4774abd",
+        "selfplay-all-published-samples": "c592894a24fff552e8fc512b0be549539b0e3496072d679ef2a403661f85faab"
+      }
+    },
+    "observed_input_counts": {
+      "neural-query/legal-argmax-v1/model": {
+        "inputs": 583,
+        "positions": 583
+      },
+      "neural-query/puct32-v1/model": {
+        "inputs": 17262,
+        "positions": 17262
+      }
+    },
+    "overlaps_by_source": {
+      "model_input": {
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "protected": 0,
+        "selfplay-all-published-samples": 0
+      },
+      "physical": {
+        "m4-test": 0,
+        "m4-train": 0,
+        "m4-val": 0,
+        "selfplay-all-published-samples": 0
+      }
+    },
+    "passed": true,
+    "protected_file_sha256": "364ee551512b1c98871308aafc939059f4a26743340b2aa904555c92d4a39944",
+    "runs": {
+      "legal-argmax-v1": {
+        "games": 24,
+        "protocol_sha256": "fd05ef4de58102f0733403296e8ee1a830fbb1bca6c23f12a8cec86311d726ff",
+        "run_sha256": "a59c454266dffcf65604a3bb41ff2c5b5335522be1adef362cdd2df723c85f92"
+      },
+      "puct32-v1": {
+        "games": 24,
+        "protocol_sha256": "18e22381ca75e939494d15092d65e24d01c98ebe0d381f0786039f2c1542c1cc",
+        "run_sha256": "6d06f8d3fa8da9294821fa56ac263c95efd50eeb9cd727545abf88b792821bf7"
+      }
+    },
+    "schema": "voxelshogi-generation-input-audit-v1",
+    "scope": "all supplied scored continuation and terminal positions and side-canonical inputs; shared book prefix excluded; producer enumeration must be independently verified",
+    "selfplay_episodes": 48,
+    "selfplay_exclusion_scope": "all published raw samples across all generations; conservative superset if any training window/eligibility excluded rows",
+    "selfplay_generations": 3,
+    "selfplay_manifest_sha256": "44b0462cab00e072c25ecc027d81e1019b96c7843a68ffd50d66a7521726ac3b",
+    "selfplay_protocol_sha256": "f4cc205d29a86ab02db9533e39f0001a0e2cdcfe414f14724a8123b7fab589ce",
+    "selfplay_raw_samples_checked": 11534,
+    "source_identity_counts": {
+      "model_input": {
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "protected": 116008,
+        "selfplay-all-published-samples": 11254
+      },
+      "physical": {
+        "m4-test": 11403,
+        "m4-train": 90737,
+        "m4-val": 11483,
+        "selfplay-all-published-samples": 11254
+      }
+    }
+  },
+  "method_comparison": {
+    "comparisons": {
+      "legal-argmax-v1": {
+        "by_side": {
+          "b": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 60.583333333333336,
+              "min": 1
+            },
+            "completed_score_rate": 0.16666666666666666,
+            "cutoffs": 9,
+            "draws": 1,
+            "elapsed_seconds": {
+              "mean": 28.706918885388102,
+              "total": 344.4830266246572
+            },
+            "games": 12,
+            "losses": 2,
+            "score_bounds": [
+              0.041666666666666664,
+              0.7916666666666666
+            ],
+            "termination_rate": 0.25,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "w": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 59.333333333333336,
+              "min": 1
+            },
+            "completed_score_rate": 0.25,
+            "cutoffs": 8,
+            "draws": 2,
+            "elapsed_seconds": {
+              "mean": 24.97520970972255,
+              "total": 299.7025165166706
+            },
+            "games": 12,
+            "losses": 2,
+            "score_bounds": [
+              0.08333333333333333,
+              0.75
+            ],
+            "termination_rate": 0.3333333333333333,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        },
+        "by_stratum": {
+          "endgame": {
+            "additional_plies": {
+              "max": 64,
+              "mean": 50.875,
+              "min": 19
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 5,
+            "draws": 3,
+            "elapsed_seconds": {
+              "mean": 2.866685424291063,
+              "total": 22.933483394328505
+            },
+            "games": 8,
+            "losses": 0,
+            "score_bounds": [
+              0.1875,
+              0.8125
+            ],
+            "termination_rate": 0.375,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "middlegame": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 128.0,
+              "min": 128
+            },
+            "completed_score_rate": null,
+            "cutoffs": 8,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 77.61396306013921,
+              "total": 620.9117044811137
+            },
+            "games": 8,
+            "losses": 0,
+            "score_bounds": [
+              0.0,
+              1.0
+            ],
+            "termination_rate": 0.0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "tactical": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.0,
+            "cutoffs": 4,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.04254440823569894,
+              "total": 0.3403552658855915
+            },
+            "games": 8,
+            "losses": 4,
+            "score_bounds": [
+              0.0,
+              0.5
+            ],
+            "termination_rate": 0.5,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        },
+        "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+        "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+        "model_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+        "opponent_sha256": "a538d9e44644ff42a0cb0341428b4babbd63dd04466d10a7deab1d44a89603fc",
+        "overall": {
+          "additional_plies": {
+            "max": 128,
+            "mean": 59.958333333333336,
+            "min": 1
+          },
+          "completed_score_rate": 0.21428571428571427,
+          "cutoffs": 17,
+          "draws": 3,
+          "elapsed_seconds": {
+            "mean": 26.841064297555324,
+            "total": 644.1855431413278
+          },
+          "games": 24,
+          "losses": 4,
+          "paired_win_rate95": [
+            0.0,
+            0.0
+          ],
+          "pairs": 12,
+          "score_bounds": [
+            0.0625,
+            0.7708333333333334
+          ],
+          "termination_rate": 0.2916666666666667,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "protocol_sha256": "fd05ef4de58102f0733403296e8ee1a830fbb1bca6c23f12a8cec86311d726ff",
+        "schema": "voxelshogi-evaluation-v2",
+        "sensitivity": {
+          "criteria": {
+            "minimum_pairs": 12,
+            "minimum_termination_rate": 0.25
+          },
+          "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+          "sufficient": true
+        },
+        "verification_scope": "metadata only; requires separate Rust replay and full-corpus leakage audit"
+      },
+      "puct32-v1": {
+        "by_side": {
+          "b": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 60.333333333333336,
+              "min": 1
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 7,
+            "draws": 1,
+            "elapsed_seconds": {
+              "mean": 38.22427954225956,
+              "total": 458.69135450711474
+            },
+            "games": 12,
+            "losses": 2,
+            "score_bounds": [
+              0.20833333333333334,
+              0.7916666666666666
+            ],
+            "termination_rate": 0.4166666666666667,
+            "win_rate": 0.16666666666666666,
+            "wins": 2
+          },
+          "w": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 60.833333333333336,
+              "min": 1
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 6,
+            "draws": 2,
+            "elapsed_seconds": {
+              "mean": 31.99380649610733,
+              "total": 383.92567795328796
+            },
+            "games": 12,
+            "losses": 2,
+            "score_bounds": [
+              0.25,
+              0.75
+            ],
+            "termination_rate": 0.5,
+            "win_rate": 0.16666666666666666,
+            "wins": 2
+          }
+        },
+        "by_stratum": {
+          "endgame": {
+            "additional_plies": {
+              "max": 64,
+              "mean": 52.75,
+              "min": 16
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 5,
+            "draws": 3,
+            "elapsed_seconds": {
+              "mean": 7.147065256722271,
+              "total": 57.17652205377817
+            },
+            "games": 8,
+            "losses": 0,
+            "score_bounds": [
+              0.1875,
+              0.8125
+            ],
+            "termination_rate": 0.375,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "middlegame": {
+            "additional_plies": {
+              "max": 128,
+              "mean": 128.0,
+              "min": 128
+            },
+            "completed_score_rate": null,
+            "cutoffs": 8,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 98.13317280588672,
+              "total": 785.0653824470937
+            },
+            "games": 8,
+            "losses": 0,
+            "score_bounds": [
+              0.0,
+              1.0
+            ],
+            "termination_rate": 0.0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "tactical": {
+            "additional_plies": {
+              "max": 1,
+              "mean": 1.0,
+              "min": 1
+            },
+            "completed_score_rate": 0.5,
+            "cutoffs": 0,
+            "draws": 0,
+            "elapsed_seconds": {
+              "mean": 0.04689099494135007,
+              "total": 0.3751279595308006
+            },
+            "games": 8,
+            "losses": 4,
+            "score_bounds": [
+              0.5,
+              0.5
+            ],
+            "termination_rate": 1.0,
+            "win_rate": 0.5,
+            "wins": 4
+          }
+        },
+        "interval_limitations": "observed opening pairs only; a degenerate interval is not a population guarantee; repeated or related positions can remain correlated",
+        "interval_method": "opening-pair bootstrap; 10000 resamples; order statistics 250/9750",
+        "model_sha256": "bf4fba2699d9d8578a821766b0fcaf861d56aab3effc296d87ec3a4e9408c8a4",
+        "opponent_sha256": "a538d9e44644ff42a0cb0341428b4babbd63dd04466d10a7deab1d44a89603fc",
+        "overall": {
+          "additional_plies": {
+            "max": 128,
+            "mean": 60.583333333333336,
+            "min": 1
+          },
+          "completed_score_rate": 0.5,
+          "cutoffs": 13,
+          "draws": 3,
+          "elapsed_seconds": {
+            "mean": 35.109043019183446,
+            "total": 842.6170324604027
+          },
+          "games": 24,
+          "losses": 4,
+          "paired_win_rate95": [
+            0.041666666666666664,
+            0.2916666666666667
+          ],
+          "pairs": 12,
+          "score_bounds": [
+            0.22916666666666666,
+            0.7708333333333334
+          ],
+          "termination_rate": 0.4583333333333333,
+          "win_rate": 0.16666666666666666,
+          "wins": 4
+        },
+        "protocol_sha256": "18e22381ca75e939494d15092d65e24d01c98ebe0d381f0786039f2c1542c1cc",
+        "schema": "voxelshogi-evaluation-v2",
+        "sensitivity": {
+          "criteria": {
+            "minimum_pairs": 12,
+            "minimum_termination_rate": 0.25
+          },
+          "meaning": "cohort size/termination screening only; not proof of strength or rating precision",
+          "sufficient": true
+        },
+        "verification_scope": "metadata only; requires separate Rust replay and full-corpus leakage audit"
+      }
+    },
+    "decision": "additional-measurement",
+    "families": 6,
+    "family_cases": {
+      "exposed-rook-gold-mate": [
+        "dev-mate-black-6",
+        "dev-mate-black-7",
+        "dev-mate-white-2",
+        "dev-mate-white-3"
+      ],
+      "material-offset": [
+        "dev-material-6-b",
+        "dev-material-6-w",
+        "dev-material-7-b",
+        "dev-material-7-w"
+      ],
+      "seeded-standard-64020": [
+        "dev-seed-64020"
+      ],
+      "seeded-standard-64021": [
+        "dev-seed-64021"
+      ],
+      "seeded-standard-64022": [
+        "dev-seed-64022"
+      ],
+      "seeded-standard-64023": [
+        "dev-seed-64023"
+      ]
+    },
+    "games": 48,
+    "input_audit_passed": true,
+    "interval_method": "equal-family paired win differences; whole-family bootstrap; 10000 resamples; order statistics 250/9750",
+    "limitations": "development screen, not a population guarantee; exposed static families and seeded starts are not representative strength tests; cutoffs have unknown scores; PUCT uses more inference than argmax; no automatic adoption or strength claim",
+    "opening_pairs_per_method": 12,
+    "puct_minus_argmax": {
+      "case_weighted_score_difference_bounds": [
+        -0.5416666666666667,
+        0.7083333333333334
+      ],
+      "case_weighted_win_difference": 0.16666666666666666,
+      "family_balanced_score_difference_bounds": [
+        -0.7708333333333334,
+        0.8541666666666666
+      ],
+      "family_balanced_win_difference": 0.08333333333333333,
+      "family_balanced_win_difference95": [
+        0.0,
+        0.25
+      ]
+    },
+    "reason": "Development screen only; final strength and structure decisions await preregistered training and independent final evaluation.",
+    "root_input_audit_passed": true,
+    "schema": "voxelshogi-research-screen-comparison-v1",
+    "verification_scope": "metadata only; requires Linux Rust replay, actual neural-query inventories, full-corpus/holdout leakage audit, timings and inference counts"
+  },
+  "publication": {
+    "plan": {
+      "files": [
+        {
+          "bytes": 18657,
+          "path": "LICENSE",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        },
+        {
+          "bytes": 3421,
+          "path": "README.md",
+          "sha256": "40f40344c1af377751a3a209005e2d67a81ccfb2fb09396dfab431c47d83ce70"
+        },
+        {
+          "bytes": 43729,
+          "path": "config.json",
+          "sha256": "a35eab4708e2227fe5a4c20d9fca1d6ae78f7f3cc504adee693f8dd1e86068e2"
+        },
+        {
+          "bytes": 375051,
+          "path": "manifest.json",
+          "sha256": "7e8d146a3f7e436b3c3188d03066f7c62012689ac5068f9c8e4ae523eb6000c1"
+        },
+        {
+          "bytes": 20234,
+          "path": "matches.parquet",
+          "sha256": "8a22d0d5f486c12b1d7de545dcf4c6050a09389d34fcac5849786f154ea47aec"
+        },
+        {
+          "bytes": 1964053,
+          "path": "queries.parquet",
+          "sha256": "5aec641e3713d8482d1f7cdbf329b2ec1344a4d54e2a94c5bb667ae6ce54b63a"
+        },
+        {
+          "bytes": 11880,
+          "path": "roots.parquet",
+          "sha256": "9769cee119e0d56b6c183346db5be15bb7054894ef77a0600ad215cf1f3e1bf1"
+        },
+        {
+          "bytes": 619,
+          "path": "validation.json",
+          "sha256": "3c2d736f2d3892bd1fb4ad0e3a2768a312d583d9935cfe1369dc41b1108c28ee"
+        }
+      ],
+      "gated": "manual",
+      "license": "cc-by-4.0",
+      "license_approved": true,
+      "private": false,
+      "repo_id": "voxelshogi/voxelshogi-research-screen-v1",
+      "repo_type": "dataset",
+      "schema": 1,
+      "source_commit": "763e1ce451cab2499c168309b9719d790018a421"
+    },
+    "receipt": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "fa3728cc6d362ce6b278ec974bfb2dee13b1c363",
+      "release_sha256": "e900b3b33133a7455b95fe537b21cc26c27a3a872202a6cefbabf5eea4a22245",
+      "repo_id": "voxelshogi/voxelshogi-research-screen-v1",
+      "repo_type": "dataset",
+      "verified": true
+    },
+    "reviewed_local_metadata_files": 4,
+    "data_payloads_relayed_to_mac": 0
+  },
+  "publication_recovery": {
+    "at": 1793850379.902531,
+    "deadline_extended": false,
+    "failed_worker_record": {
+      "complete": false,
+      "elapsed_seconds": 1457.6012411830015,
+      "error_type": "TypeError",
+      "stage": "fixed-HF-publication-and-full-hash-verification",
+      "timings_seconds": {
+        "fixed-HF-inputs": 2.3651832747273147,
+        "freeze-development-and-final-root-protocols-before-queries": 1.792157112620771,
+        "full-played-queried-corpus-and-final-root-audit": 185.91621852107346,
+        "full-pre-query-root-membership-audit": 180.89314749836922,
+        "paired-case-and-family-summary": 0.03309812396764755,
+        "replay-all-neural-query-histories": 41.96618327405304,
+        "restore-three-published-generations": 153.06330990279093,
+        "two-fixed-24-game-arms": 845.189256799873
+      }
+    },
+    "failed_worker_terminal": true,
+    "old_worker": {
+      "at": 1793847866.3210173,
+      "create_time": 1793847865.41,
+      "pid": 18070,
+      "source_commit": "763e1ce451cab2499c168309b9719d790018a421"
+    },
+    "operation": "Pass keyword-only plan_release arguments; publish verified existing48-game payloads without new games, queries, training or source changes",
+    "original_payload_manifest_sha256": "543253643fcefb372c9031a138359a3ba0d6d42b32e0826af3da609999b79aae",
+    "partial_publication_failure": {
+      "error_type": "TypeError"
+    },
+    "reservation_added": false,
+    "schema": "voxelshogi-publication-only-recovery-v1"
+  },
+  "failed_initial_unit": {
+    "complete": false,
+    "elapsed_seconds": 1177.451639152132,
+    "error_type": "TypeError",
+    "stage": "restore-three-published-generations",
+    "timings_seconds": {
+      "fixed-HF-inputs": 1172.8282742500305
+    }
+  },
+  "failed_first_publication_repair": {
+    "pid": 18632,
+    "terminal": true,
+    "error_type": "ModuleNotFoundError",
+    "phase": "imports before any HF attempt",
+    "fix": "explicit PYTHONPATH=/root/voxelshogi, same immutable script, new launch receipt; no scientific recomputation"
+  },
+  "publication_completion": {
+    "complete": true,
+    "final_holdout_model_queries": 0,
+    "final_root_audit": {
+      "input_overlaps": 0,
+      "passed": true,
+      "physical_overlaps": 0,
+      "protected_final_roots": 12,
+      "scope": "all scored continuations and actual neural queries against12 frozen final roots; book prefixes excluded"
+    },
+    "games": 48,
+    "input_audit_passed": true,
+    "publication_only_recovery": true,
+    "publication_receipt": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "fa3728cc6d362ce6b278ec974bfb2dee13b1c363",
+      "release_sha256": "e900b3b33133a7455b95fe537b21cc26c27a3a872202a6cefbabf5eea4a22245",
+      "repo_id": "voxelshogi/voxelshogi-research-screen-v1",
+      "repo_type": "dataset",
+      "verified": true
+    },
+    "publication_recovery_seconds": 13.483027344103903,
+    "queries": 24579,
+    "resource_release_pending_controller": true,
+    "root_input_audit_passed": true,
+    "source_commit": "763e1ce451cab2499c168309b9719d790018a421",
+    "timings_before_publication": {
+      "fixed-HF-inputs": 2.3651832747273147,
+      "freeze-development-and-final-root-protocols-before-queries": 1.792157112620771,
+      "full-played-queried-corpus-and-final-root-audit": 185.91621852107346,
+      "full-pre-query-root-membership-audit": 180.89314749836922,
+      "paired-case-and-family-summary": 0.03309812396764755,
+      "replay-all-neural-query-histories": 41.96618327405304,
+      "restore-three-published-generations": 153.06330990279093,
+      "two-fixed-24-game-arms": 845.189256799873
+    },
+    "training_performed": false
+  },
+  "resource_release": {
+    "schema": "voxelshogi-research-screen-resource-release-v1",
+    "checked_at": 1793850563.253008,
+    "instance_id": 59194137,
+    "destruction_acknowledged": true,
+    "full_vast_project_inventory": [],
+    "cloudrift_project_resources": 0,
+    "resources_released": true,
+    "maximum_end_at": 1793859751.508457,
+    "requested_to_delete_seconds": 4982.299029111862,
+    "compute_disk_quote_usd": 0.7670280110249991,
+    "reservation_is_not_invoice": true,
+    "reservations": 34,
+    "reserved_usd": 156.0,
+    "approved_total_usd": 200,
+    "new_reservations_after_screen": 0
+  },
+  "workload_sha256": "c1c55e7040e4a5b4edb7d77a96286b366d474148c56cdff02aff8b6e9cf54f0e",
+  "owner_workload_sha256": "1c53896b406a7a90dd2b6792c7dfd2e25c7c0f083bfbce434d597d60132fb82c",
+  "operator_source_sha256": "aafbe5be488557d539564c549ff0c824b829f218936e33714062ceb24703e3c0",
+  "repair_source_sha256": "b95cd727beec16198c3caccfd1cb69258358db9ceb61d31dd9c82e6f3768405c",
+  "resource_samples_before_snapshot": 144,
+  "new_training_performed": false,
+  "final_holdout_model_queries": 0
+}
