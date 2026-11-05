@@ -5,7 +5,7 @@
 P5-2は既存の729 token／FP32 Transformer-S・Rust履歴を使い、合法手の確率正規化だけをFP64へ修正した。[実GPUでの数値検証](P5_PRIOR_NORMALIZATION.md)と[実行・HF復旧](P5_2_COMPLETION.md)を参照。以下の市場価格・外部ライブラリ調査・当時の測定は取得日を固定し、現在の速度や新しい発注条件へ流用しない。DDP・別構造・Mモデルは未実施。
 
 - 初回の外部技術調査: **2026-10-25**（JST）。実装・配信・計画の照合更新: **2026-10-30**（公式料金の最終照合は2026-10-26）
-- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorch単GPU学習と将来のDDP（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
+- 対象: Rust コアルールエンジン → WASM（ブラウザ）/ Python（PyO3 + maturin）、Web（TypeScript + Vite + React + three.js / React Three Fiber）、ブラウザ内NN推論（ORT Web: WebGPU／明示選択のWASM、専用Worker）、Cloudflare Workers Static Assets（R2は将来候補）、PyTorchの単GPU／実1・2・4GPU DDP学習（Vast.ai／CloudRift）、Hugging Face（モデル・データセット）
 - 調査方法: crates.io API（`https://crates.io/api/v1/crates/<name>`）、`npm view`、PyPI JSON API、GitHub API / リリースタグのソース、Cloudflare 公式ドキュメント（`*.md` 版）。各数値の出典は末尾「出典」に記載。
 - 凡例: **[確認済]** = 各節の取得日に一次情報で確認 / **[記憶ベース]** = 取得日に一次情報で未検証 / **[未確認]** = 確認できなかった・実測が必要
 
@@ -39,7 +39,7 @@ M3は未学習モデル3形式を [公開ラボ](https://voxelshogi.yousan-apps.
 
 ## M6で確認した現在の構成
 
-M6はPython3.14.9／torch2.14.1+cu130／CUDA13.0／RTX5090の単GPU・FP32学習を実測した。推論配布はFP32・FP16重み／FP32計算・INT8重み／FP32計算で、ORT Web1.31.1のWASM／WebGPUと公開3D観戦を検証済み。モデルはHFのmanual gateから取得した端末内ファイルを使い、Cloudflareはcatalog・アプリ・ORTを配信する。DDP・別構造・未測定端末は対応済みにしない。詳細は[M6完了記録](M6_COMPLETION.md)。以下の外部バージョン候補・価格・記憶ベースの項目は取得日当時の調査であり、今回すべてを再調査したものではない。
+M6はPython3.14.9／torch2.14.1+cu130／CUDA13.0／RTX5090の単GPU・FP32学習を実測した。推論配布はFP32・FP16重み／FP32計算・INT8重み／FP32計算で、ORT Web1.31.1のWASM／WebGPUと公開3D観戦を検証済み。モデルはHFのmanual gateから取得した端末内ファイルを使い、Cloudflareはcatalog・アプリ・ORTを配信する。その後、[P5-4の実1／2／4GPUと各HF保存再開](P5_4_RESULTS.md)も確認した。別構造・未測定端末は対応済みにしない。詳細は[M6完了記録](M6_COMPLETION.md)。以下の外部バージョン候補・価格・記憶ベースの項目は取得日当時の調査であり、今回すべてを再調査したものではない。
 
 ## 0. 結論サマリ
 

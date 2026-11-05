@@ -1,0 +1,2585 @@
+{
+  "schema": "voxelshogi-p54-completion-v1",
+  "verified": true,
+  "at": 1793837625.089282,
+  "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+  "instance_id": 59172937,
+  "workload": {
+    "schema": "voxelshogi-p54-frozen-benchmark-workload-v1",
+    "admitted": true,
+    "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+    "comparison150_and_diagnosis_verified": true,
+    "run_label": "voxelshogi-phase5-distributed-benchmark6-control",
+    "control_operator_sha256": "547ff89fb271dbe2cfac6ccbb8e3aeaadc17c4b6bfd632b89add85d241a6a9c1",
+    "world_sizes": [
+      1,
+      2,
+      4
+    ],
+    "expected_state_publications": 6,
+    "maximum_state_archive_bytes": 67108864,
+    "approved_maximum_state_upload_bytes": 2147483648,
+    "expected_samples_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+    "gradient_reduction": "rank-ordered-float32-v1",
+    "lossless_host_feature_cache": true,
+    "parent_cpu_threads": 2,
+    "minimum_driver_major": 595,
+    "excluded_machine_ids": [
+      49042,
+      99796
+    ],
+    "minimum_effective_cpus": 16,
+    "minimum_memory_bytes": 85899345920,
+    "nccl_environment": {},
+    "startup_download_transport": {
+      "curl_http": "1.1",
+      "connect_timeout_seconds": 20,
+      "max_time_per_request_seconds": 180,
+      "retries": 1
+    },
+    "previous_negative_three_worlds_preserved": true,
+    "startup_estimate_basis": {
+      "prior_container_minutes": 42,
+      "prior_dependency_minutes_at_least": 30,
+      "prior_trial_terminated_before_science": true,
+      "next_selection_preference": "higher provider-reported ingress/egress; verify actual transfers, not a throughput guarantee"
+    },
+    "maximum_seconds": 10800,
+    "maximum_hourly_usd": 3.5,
+    "maximum_transfer_usd": 1,
+    "maximum_usd": 11.5,
+    "estimated_seconds": 8100,
+    "config": {
+      "seed": 63001,
+      "global_batch": 16,
+      "updates": 128,
+      "warmup_updates": 16,
+      "resume_at": 64,
+      "learning_rate": 0.0001,
+      "weight_decay": 0.01,
+      "threads": 2,
+      "device": "cuda"
+    },
+    "resume_model_tolerance": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "resume_optimizer_tolerance": {
+      "atol": 1e-07,
+      "rtol": 1e-05
+    },
+    "resume_rng_exact_required": true,
+    "files": {
+      "model-plan.json": "58af0c728ba5774b0919b0f0bb1044f90f5e6c023e1296a7a33e995032076a4e",
+      "model-receipt.json": "6a7dbc6dbddcb5e567ed54b0881c1f3b6d4a9725c725f406a2104bcb8abc5d30",
+      "protection-plan.json": "6a9a5cec6ec25af1a0a57e92c0e0eedc9d5e04360eaedf468f8526ec7ba988a9",
+      "protection-receipt.json": "75552958f3a65f4341e5ee572175397b79e64b173294a1902075adb50788551d",
+      "selfplay-protocol.json": "abfb8e57dcb54d08004c869c16797822503bb36774e5b6abd36420a4548e07cf",
+      "recovery-releases.json": "c1719313be20a93794f9cfb6d1d1da3848c9d551bf7d44be42e5e65759af8260",
+      "market-quote.json": "782b86efe0cbb4f7e3b852829224804b79c6de0c97998e1ccd5e1986a710fe7b",
+      "state-upload-budget.json": "82e052841f600f7a55a84787dddf6d14606d42fa895f855fc56ba4ad89fc70fb",
+      "worker.py": "adaa065529fbf698a84cb325590e7db4263355126bec02f168b549376ed3ab53",
+      "rank-worker.py": "8444d36c05ba188742fe69b130466f09aadd1663d23fd48d7c4819730c47c135",
+      "state-comparison.py": "b015d0cac952695db1f36e0687fc3cdf2ba5dd4a9a9654592a7b9b42348bae05",
+      "source-proof.json": "3def3ef52f22a91518df97eae8429cb0ca0ec23e4c0069de7f0f70e27f7d2302",
+      "owned-vm-recovery.json": "070a2a15a86bd92e1be666e0348243cd2ac0c6cd33ebb0629080e1160df9bea3"
+    },
+    "success": "actual1/2/4GPU same-global-work measurements, each mid fixed-HF fresh restore,6 state archives and result dataset verified; owned resources released separately",
+    "scope": "bounded performance and continuation measurement; no Phase6 or new Web model adoption",
+    "owned_vm_recovery": {
+      "at": 1793836767.569525,
+      "existing_instance_id": 59172937,
+      "existing_guard_run": 41928049683,
+      "original_control": "distributed-benchmark6-control",
+      "original_source": "1b7e3a8bec52a44cf0b7661f0d7885bf74ef94b7",
+      "new_source": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+      "prior_worker_terminal": true,
+      "prior_worlds_finished": 0,
+      "prior_states_verified": 0,
+      "provider_create_requests": 0,
+      "new_gpu_budget_reservations": 0,
+      "original_deadline_unchanged": true,
+      "reason": "correct single-rank preflight before any update; rerun all1/2/4 from same initial weights in a new output directory after full new-source CI"
+    }
+  },
+  "actual_host_admission": {
+    "checked_at": 1793836836.3161683,
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+    "effective_cpus": 30.71999,
+    "memory_limit_bytes": 183351902208,
+    "affinity_count": 64,
+    "cgroup": {
+      "cpu.max": "3071999 100000",
+      "memory.max": "183351902208"
+    },
+    "gpu_query": "GPU-fd0a2cfb-ef7b-cfc4-aa30-75bb049aaa8e, NVIDIA GeForce RTX 5090, 610.57.04, 32607\nGPU-39882cf8-059d-3c1e-2d5b-149935ba015b, NVIDIA GeForce RTX 5090, 610.57.04, 32607\nGPU-d18f8c79-7c86-c1cd-fb67-85ca9dd28ba9, NVIDIA GeForce RTX 5090, 610.57.04, 32607\nGPU-9d110b48-cdc4-4c51-55c8-70a083d9c1ec, NVIDIA GeForce RTX 5090, 610.57.04, 32607",
+    "four_gpu_preflight": {
+      "devices": [
+        {
+          "facts": {
+            "capability": [
+              12,
+              0
+            ],
+            "compiled_arches": [
+              "sm_75",
+              "sm_80",
+              "sm_86",
+              "sm_90",
+              "sm_100",
+              "sm_120"
+            ],
+            "cuda": "13.0",
+            "cuda_available": true,
+            "driver": "610.57.04",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "gpu_count": 1,
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "system": "Linux",
+            "torch": "2.14.1+cu130",
+            "vram_mib": 32607
+          },
+          "kernel": {
+            "device": "cuda",
+            "left_gradient": [
+              [
+                11.0,
+                15.0
+              ],
+              [
+                11.0,
+                15.0
+              ]
+            ],
+            "product": [
+              [
+                19.0,
+                22.0
+              ],
+              [
+                43.0,
+                50.0
+              ]
+            ],
+            "right_gradient": [
+              [
+                4.0,
+                4.0
+              ],
+              [
+                6.0,
+                6.0
+              ]
+            ]
+          },
+          "uuid": "GPU-fd0a2cfb-ef7b-cfc4-aa30-75bb049aaa8e"
+        },
+        {
+          "facts": {
+            "capability": [
+              12,
+              0
+            ],
+            "compiled_arches": [
+              "sm_75",
+              "sm_80",
+              "sm_86",
+              "sm_90",
+              "sm_100",
+              "sm_120"
+            ],
+            "cuda": "13.0",
+            "cuda_available": true,
+            "driver": "610.57.04",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "gpu_count": 1,
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "system": "Linux",
+            "torch": "2.14.1+cu130",
+            "vram_mib": 32607
+          },
+          "kernel": {
+            "device": "cuda",
+            "left_gradient": [
+              [
+                11.0,
+                15.0
+              ],
+              [
+                11.0,
+                15.0
+              ]
+            ],
+            "product": [
+              [
+                19.0,
+                22.0
+              ],
+              [
+                43.0,
+                50.0
+              ]
+            ],
+            "right_gradient": [
+              [
+                4.0,
+                4.0
+              ],
+              [
+                6.0,
+                6.0
+              ]
+            ]
+          },
+          "uuid": "GPU-39882cf8-059d-3c1e-2d5b-149935ba015b"
+        },
+        {
+          "facts": {
+            "capability": [
+              12,
+              0
+            ],
+            "compiled_arches": [
+              "sm_75",
+              "sm_80",
+              "sm_86",
+              "sm_90",
+              "sm_100",
+              "sm_120"
+            ],
+            "cuda": "13.0",
+            "cuda_available": true,
+            "driver": "610.57.04",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "gpu_count": 1,
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "system": "Linux",
+            "torch": "2.14.1+cu130",
+            "vram_mib": 32607
+          },
+          "kernel": {
+            "device": "cuda",
+            "left_gradient": [
+              [
+                11.0,
+                15.0
+              ],
+              [
+                11.0,
+                15.0
+              ]
+            ],
+            "product": [
+              [
+                19.0,
+                22.0
+              ],
+              [
+                43.0,
+                50.0
+              ]
+            ],
+            "right_gradient": [
+              [
+                4.0,
+                4.0
+              ],
+              [
+                6.0,
+                6.0
+              ]
+            ]
+          },
+          "uuid": "GPU-d18f8c79-7c86-c1cd-fb67-85ca9dd28ba9"
+        },
+        {
+          "facts": {
+            "capability": [
+              12,
+              0
+            ],
+            "compiled_arches": [
+              "sm_75",
+              "sm_80",
+              "sm_86",
+              "sm_90",
+              "sm_100",
+              "sm_120"
+            ],
+            "cuda": "13.0",
+            "cuda_available": true,
+            "driver": "610.57.04",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "gpu_count": 1,
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "system": "Linux",
+            "torch": "2.14.1+cu130",
+            "vram_mib": 32607
+          },
+          "kernel": {
+            "device": "cuda",
+            "left_gradient": [
+              [
+                11.0,
+                15.0
+              ],
+              [
+                11.0,
+                15.0
+              ]
+            ],
+            "product": [
+              [
+                19.0,
+                22.0
+              ],
+              [
+                43.0,
+                50.0
+              ]
+            ],
+            "right_gradient": [
+              [
+                4.0,
+                4.0
+              ],
+              [
+                6.0,
+                6.0
+              ]
+            ]
+          },
+          "uuid": "GPU-9d110b48-cdc4-4c51-55c8-70a083d9c1ec"
+        }
+      ],
+      "environment": {
+        "cuda": "13.0",
+        "lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+        "python": "3.14.9",
+        "setuptools": "84.1.0",
+        "torch": "2.14.1+cu130"
+      },
+      "physical_gpu_count": 4,
+      "schema": "voxelshogi-four-gpu-preflight-v1",
+      "scope": "four physical UUIDs, each probed in its own one-visible-device process",
+      "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+      "verified": true
+    },
+    "instance_id": 59172937,
+    "verified": true,
+    "workload_sha256": "83b5cb95b0dd4d39b4e6a4d0b35b9b21fe718db54219189a40b941ef70fd59d7",
+    "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+    "minimum_effective_cpus": 16,
+    "scope": "container affinity/cgroup and GPU facts; not a performance measurement or exclusive CPU guarantee"
+  },
+  "world_reports": [
+    {
+      "communication": {
+        "collective": "none-single-rank",
+        "max_rank_mean_seconds": null,
+        "repeats": 20,
+        "scope": "isolated synchronous FP32 all-reduce with model-gradient byte count; excludes fill/check/barrier/measurement-reduction; not end-to-end DDP communication fraction",
+        "tensor_bytes": 20084256,
+        "timings_seconds": [],
+        "verified_sum": 1,
+        "warmup": 5,
+        "world_size": 1
+      },
+      "continuation": {
+        "global_schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+        "model": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 87,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "optimizer": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 261,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "passed": true,
+        "predeclared_model_tolerance": {
+          "atol": 1e-06,
+          "rtol": 1e-05
+        },
+        "predeclared_optimizer_tolerance": {
+          "atol": 1e-07,
+          "rtol": 1e-05
+        },
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_rng": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 2,
+          "floating_tensors": 0,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "rng_exact_required": true,
+        "samples_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+        "schema": "voxelshogi-distributed-continuation-audit-v1",
+        "scope": "same world size128 continuous versus64 plus fixed-HF restore into fresh model/optimizer plus64; validation throughput excluded; no cross-world exact-weight or strength claim",
+        "world_size": 1
+      },
+      "primary": {
+        "attempt_wall_seconds": 13.656479605997447,
+        "binding": {
+          "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+          "config": {
+            "device": "cuda",
+            "global_batch": 16,
+            "learning_rate": 0.0001,
+            "optimizer": {
+              "betas": [
+                0.9,
+                0.999
+              ],
+              "eps": 1e-08,
+              "foreach": false,
+              "fused": false,
+              "name": "AdamW"
+            },
+            "precision": "float32",
+            "resume_at": 64,
+            "seed": 63001,
+            "tf32": false,
+            "threads": 2,
+            "updates": 128,
+            "warmup_updates": 16,
+            "weight_decay": 0.01
+          },
+          "contract": {
+            "architecture": "transformer-s-full-v1",
+            "gradient_reduction": "rank-ordered-float32-v1",
+            "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+            "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+            "schema": "voxelshogi-distributed-training-v2",
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+            "world_size": 1
+          },
+          "environment": {
+            "capability": [
+              12,
+              0
+            ],
+            "cuda": "13.0",
+            "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+            "cudnn": 92400,
+            "deterministic": true,
+            "device": "cuda",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "tf32": false,
+            "torch": "2.14.1+cu130"
+          },
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+        },
+        "continuous_primary_eligible": true,
+        "examples_per_second": 164.1574061305218,
+        "measured_examples": 1792,
+        "measured_seconds": 9.97876188904047,
+        "measured_updates": 112,
+        "measured_window_seconds": 10.916351824998856,
+        "memory_scope": "per-rank Torch peak allocation/reservation for this attempt, reset after warmup when crossed; not whole-device VRAM",
+        "new_steps": 128,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_memory": [
+          {
+            "device": "cuda:0",
+            "peak_allocated_bytes": 3688706560,
+            "peak_reserved_bytes": 4133486592,
+            "rank": 0
+          }
+        ],
+        "reason": "complete",
+        "timing_scope": "max-rank synchronized update intervals separately from the post-warmup wall window; wall includes interior checkpoint and event IO, excludes final checkpoint; resume-check attempts are not primary throughput",
+        "update_examples_per_second": 179.5813969634978
+      },
+      "same_uuid_prefix": [
+        "GPU-fd0a2cfb-ef7b-cfc4-aa30-75bb049aaa8e"
+      ],
+      "used_gpu_hours_primary": 0.003793466557221513,
+      "world_size": 1
+    },
+    {
+      "communication": {
+        "collective": "all-reduce-sum",
+        "max_rank_mean_seconds": 0.004574389004847035,
+        "repeats": 20,
+        "scope": "isolated synchronous FP32 all-reduce with model-gradient byte count; excludes fill/check/barrier/measurement-reduction; not end-to-end DDP communication fraction",
+        "tensor_bytes": 20084256,
+        "timings_seconds": [
+          0.004599366016918793,
+          0.004438138013938442,
+          0.004454596986761317,
+          0.004555637016892433,
+          0.004582766006933525,
+          0.004445377009687945,
+          0.004576906998408958,
+          0.004665425978600979,
+          0.004635696008335799,
+          0.004583406000165269,
+          0.004574427002808079,
+          0.004862703994149342,
+          0.004635015997337177,
+          0.004576706007355824,
+          0.00453357701189816,
+          0.004557945998385549,
+          0.004455757996765897,
+          0.0046203370147850364,
+          0.0045075770176481456,
+          0.004626416019164026
+        ],
+        "verified_sum": 2,
+        "warmup": 5,
+        "world_size": 2
+      },
+      "continuation": {
+        "global_schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+        "model": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 87,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "optimizer": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 261,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "passed": true,
+        "predeclared_model_tolerance": {
+          "atol": 1e-06,
+          "rtol": 1e-05
+        },
+        "predeclared_optimizer_tolerance": {
+          "atol": 1e-07,
+          "rtol": 1e-05
+        },
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_rng": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 4,
+          "floating_tensors": 0,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "rng_exact_required": true,
+        "samples_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+        "schema": "voxelshogi-distributed-continuation-audit-v1",
+        "scope": "same world size128 continuous versus64 plus fixed-HF restore into fresh model/optimizer plus64; validation throughput excluded; no cross-world exact-weight or strength claim",
+        "world_size": 2
+      },
+      "primary": {
+        "attempt_wall_seconds": 11.031249530991772,
+        "binding": {
+          "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+          "config": {
+            "device": "cuda",
+            "global_batch": 16,
+            "learning_rate": 0.0001,
+            "optimizer": {
+              "betas": [
+                0.9,
+                0.999
+              ],
+              "eps": 1e-08,
+              "foreach": false,
+              "fused": false,
+              "name": "AdamW"
+            },
+            "precision": "float32",
+            "resume_at": 64,
+            "seed": 63001,
+            "tf32": false,
+            "threads": 2,
+            "updates": 128,
+            "warmup_updates": 16,
+            "weight_decay": 0.01
+          },
+          "contract": {
+            "architecture": "transformer-s-full-v1",
+            "gradient_reduction": "rank-ordered-float32-v1",
+            "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+            "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+            "schema": "voxelshogi-distributed-training-v2",
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+            "world_size": 2
+          },
+          "environment": {
+            "capability": [
+              12,
+              0
+            ],
+            "cuda": "13.0",
+            "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+            "cudnn": 92400,
+            "deterministic": true,
+            "device": "cuda",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "tf32": false,
+            "torch": "2.14.1+cu130"
+          },
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+        },
+        "continuous_primary_eligible": true,
+        "examples_per_second": 206.90757436241532,
+        "measured_examples": 1792,
+        "measured_seconds": 7.6306684048322495,
+        "measured_updates": 112,
+        "measured_window_seconds": 8.660871915984899,
+        "memory_scope": "per-rank Torch peak allocation/reservation for this attempt, reset after warmup when crossed; not whole-device VRAM",
+        "new_steps": 128,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_memory": [
+          {
+            "device": "cuda:0",
+            "peak_allocated_bytes": 1949422080,
+            "peak_reserved_bytes": 2151677952,
+            "rank": 0
+          },
+          {
+            "device": "cuda:1",
+            "peak_allocated_bytes": 1949422080,
+            "peak_reserved_bytes": 2151677952,
+            "rank": 1
+          }
+        ],
+        "reason": "complete",
+        "timing_scope": "max-rank synchronized update intervals separately from the post-warmup wall window; wall includes interior checkpoint and event IO, excludes final checkpoint; resume-check attempts are not primary throughput",
+        "update_examples_per_second": 234.8418126602364
+      },
+      "same_uuid_prefix": [
+        "GPU-fd0a2cfb-ef7b-cfc4-aa30-75bb049aaa8e",
+        "GPU-39882cf8-059d-3c1e-2d5b-149935ba015b"
+      ],
+      "used_gpu_hours_primary": 0.006128471961662095,
+      "world_size": 2
+    },
+    {
+      "communication": {
+        "collective": "all-reduce-sum",
+        "max_rank_mean_seconds": 0.0054231090005487205,
+        "repeats": 20,
+        "scope": "isolated synchronous FP32 all-reduce with model-gradient byte count; excludes fill/check/barrier/measurement-reduction; not end-to-end DDP communication fraction",
+        "tensor_bytes": 20084256,
+        "timings_seconds": [
+          0.005395100015448406,
+          0.005393261002609506,
+          0.005451439996249974,
+          0.005309411004418507,
+          0.005453760008094832,
+          0.005460100015625358,
+          0.005493080010637641,
+          0.005548958986764774,
+          0.005486619978910312,
+          0.0054018410155549645,
+          0.005484870984219015,
+          0.0053877109894528985,
+          0.005358641006750986,
+          0.005372800980694592,
+          0.005475259997183457,
+          0.005339791998267174,
+          0.005374000989831984,
+          0.005419530003564432,
+          0.005529070011107251,
+          0.005326931015588343
+        ],
+        "verified_sum": 4,
+        "warmup": 5,
+        "world_size": 4
+      },
+      "continuation": {
+        "global_schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+        "model": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 87,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "optimizer": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 0,
+          "floating_tensors": 261,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "passed": true,
+        "predeclared_model_tolerance": {
+          "atol": 1e-06,
+          "rtol": 1e-05
+        },
+        "predeclared_optimizer_tolerance": {
+          "atol": 1e-07,
+          "rtol": 1e-05
+        },
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_rng": {
+          "all_exact": true,
+          "all_within_predeclared_tolerance": true,
+          "exact_tensors": 8,
+          "floating_tensors": 0,
+          "max_absolute_delta": 0.0,
+          "max_relative_delta": 0.0
+        },
+        "rng_exact_required": true,
+        "samples_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+        "schema": "voxelshogi-distributed-continuation-audit-v1",
+        "scope": "same world size128 continuous versus64 plus fixed-HF restore into fresh model/optimizer plus64; validation throughput excluded; no cross-world exact-weight or strength claim",
+        "world_size": 4
+      },
+      "primary": {
+        "attempt_wall_seconds": 10.29222965601366,
+        "binding": {
+          "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+          "config": {
+            "device": "cuda",
+            "global_batch": 16,
+            "learning_rate": 0.0001,
+            "optimizer": {
+              "betas": [
+                0.9,
+                0.999
+              ],
+              "eps": 1e-08,
+              "foreach": false,
+              "fused": false,
+              "name": "AdamW"
+            },
+            "precision": "float32",
+            "resume_at": 64,
+            "seed": 63001,
+            "tf32": false,
+            "threads": 2,
+            "updates": 128,
+            "warmup_updates": 16,
+            "weight_decay": 0.01
+          },
+          "contract": {
+            "architecture": "transformer-s-full-v1",
+            "gradient_reduction": "rank-ordered-float32-v1",
+            "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+            "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+            "schema": "voxelshogi-distributed-training-v2",
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+            "world_size": 4
+          },
+          "environment": {
+            "capability": [
+              12,
+              0
+            ],
+            "cuda": "13.0",
+            "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+            "cudnn": 92400,
+            "deterministic": true,
+            "device": "cuda",
+            "gpu": "NVIDIA GeForce RTX 5090",
+            "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+            "machine": "x86_64",
+            "python": "3.14.9",
+            "tf32": false,
+            "torch": "2.14.1+cu130"
+          },
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+        },
+        "continuous_primary_eligible": true,
+        "examples_per_second": 222.77217744362224,
+        "measured_examples": 1792,
+        "measured_seconds": 7.013337435841095,
+        "measured_updates": 112,
+        "measured_window_seconds": 8.044092491996707,
+        "memory_scope": "per-rank Torch peak allocation/reservation for this attempt, reset after warmup when crossed; not whole-device VRAM",
+        "new_steps": 128,
+        "progress": {
+          "best_val_loss": null,
+          "epoch": 0,
+          "examples": 2048,
+          "next_batch": 128,
+          "step": 128
+        },
+        "rank_memory": [
+          {
+            "device": "cuda:0",
+            "peak_allocated_bytes": 1061129728,
+            "peak_reserved_bytes": 1233125376,
+            "rank": 0
+          },
+          {
+            "device": "cuda:1",
+            "peak_allocated_bytes": 1061129728,
+            "peak_reserved_bytes": 1233125376,
+            "rank": 1
+          },
+          {
+            "device": "cuda:2",
+            "peak_allocated_bytes": 1061129728,
+            "peak_reserved_bytes": 1233125376,
+            "rank": 2
+          },
+          {
+            "device": "cuda:3",
+            "peak_allocated_bytes": 1061129728,
+            "peak_reserved_bytes": 1233125376,
+            "rank": 3
+          }
+        ],
+        "reason": "complete",
+        "timing_scope": "max-rank synchronized update intervals separately from the post-warmup wall window; wall includes interior checkpoint and event IO, excludes final checkpoint; resume-check attempts are not primary throughput",
+        "update_examples_per_second": 255.51315852024013
+      },
+      "same_uuid_prefix": [
+        "GPU-fd0a2cfb-ef7b-cfc4-aa30-75bb049aaa8e",
+        "GPU-39882cf8-059d-3c1e-2d5b-149935ba015b",
+        "GPU-d18f8c79-7c86-c1cd-fb67-85ca9dd28ba9",
+        "GPU-9d110b48-cdc4-4c51-55c8-70a083d9c1ec"
+      ],
+      "used_gpu_hours_primary": 0.011435810728904067,
+      "world_size": 4
+    }
+  ],
+  "timings_seconds": {
+    "four-physical-GPU-attestation": 16.127180271985708,
+    "restore-fixed-selfplay-inputs": 299.5686726940039,
+    "world1-continuous-primary128": 30.034745751996525,
+    "world1-final-HF-publish-verify": 4.10554669398698,
+    "world1-fresh-validation-last64": 32.54737423398183,
+    "world1-mid-HF-publish-verify-restore": 19.279273797001224,
+    "world1-validation-first64": 30.028125295997597,
+    "world2-continuous-primary128": 30.029164467996452,
+    "world2-final-HF-publish-verify": 29.03379343499546,
+    "world2-fresh-validation-last64": 32.497912944993004,
+    "world2-mid-HF-publish-verify-restore": 4.094722288980847,
+    "world2-validation-first64": 30.029033103986876,
+    "world4-continuous-primary128": 30.02688152799965,
+    "world4-final-HF-publish-verify": 9.27507790600066,
+    "world4-fresh-validation-last64": 32.64713036798639,
+    "world4-mid-HF-publish-verify-restore": 12.349260276998393,
+    "world4-validation-first64": 30.02888269899995
+  },
+  "worker_elapsed_seconds": 676.0376537090051,
+  "scientific_audit": {
+    "verified": true,
+    "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+    "actual_worlds": [
+      1,
+      2,
+      4
+    ],
+    "fresh_fixed_hf_gpu_continuations": 3,
+    "state_publications": [
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 1
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "67dd0e68e0f94fa250cb3584eadc2a0eeab9b3a73ba74f7dd6ce3bc867db43d6"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "b80763211c26cc808771e2810e5ec07574d8494ee26ac66a286ddb3acf977cf0"
+            },
+            {
+              "bytes": 21019,
+              "path": "history.json",
+              "sha256": "cf4415d685e2d08d07c601d5b2b5f7748b3bff10c14149f135a98140319591cb"
+            },
+            {
+              "bytes": 89689,
+              "path": "latest/config.json",
+              "sha256": "d57572c40cbe018b1570481c0d0e3151702a7f695742247064ad0ba33447eead"
+            },
+            {
+              "bytes": 60284492,
+              "path": "latest/state.safetensors",
+              "sha256": "4041941010a402d0bbbf5cfcea5408efa031995849811db17c3d7a168a9b7d46"
+            },
+            {
+              "bytes": 2248,
+              "path": "manifest.json",
+              "sha256": "9dd5dca046f930f91dbe8d0ef8f20eae03b4c8f88428130e205354a348abfd0f"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "5c6250fe7b9abca35d5bcb7ef0af5ab9778e0837",
+          "release_sha256": "97078286322bdeb527b866918fbbed5e3c852bcbd9e854c148c8adf5c04dd3ab",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 1
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 1
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "386e9a43e6d2a47394beb9e703ae42257c73370cc5de70a527f2b2a74585f448"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "b80763211c26cc808771e2810e5ec07574d8494ee26ac66a286ddb3acf977cf0"
+            },
+            {
+              "bytes": 42091,
+              "path": "history.json",
+              "sha256": "895bdf0fcad287133a90ac022764122828a38a296f8a33da54d61cbc508dc5e7"
+            },
+            {
+              "bytes": 89691,
+              "path": "latest/config.json",
+              "sha256": "9c9498a3e326b8a0189ad5ab55c12702247fa2a73d9de0f78d0e07889d710d55"
+            },
+            {
+              "bytes": 60284492,
+              "path": "latest/state.safetensors",
+              "sha256": "66a8ce4df907751599d98d55c156102664f7d7d97bc27f80e858852fddcfb4dc"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "cbd7a22d88beede93055568c6b9b62d8bbb7a70768f566341bfaa30bb11c87db"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "8e6a722e69d261bb9b730b2942f69f6c3afef045",
+          "release_sha256": "e928f5c4196159270c1c4f929cbf6db08e6680930e2ff82ad7e0e14e7e872207",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 1
+      },
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 2
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "de9adc09d2fa64fc60aff93deb798c53b2d55aa01775917d12c391e7c86eaacc"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "d0f1129c967e3b6d70ceb4d8af163a5f3a30c605ccef747bc852460a2fad806f"
+            },
+            {
+              "bytes": 21026,
+              "path": "history.json",
+              "sha256": "3d7b4fd6afc9c9219b36daf4bb00ec2942d71495fc7a69d99accf5cc6ab22609"
+            },
+            {
+              "bytes": 132312,
+              "path": "latest/config.json",
+              "sha256": "9ee580588a758195e506e63371ab57f3274dfb25a19951c7a0e4d8639b28b47a"
+            },
+            {
+              "bytes": 60289708,
+              "path": "latest/state.safetensors",
+              "sha256": "0a1ce7caaacd22fac6c0026ffad6de180bf96d5c70c5ab8c61234d70e99ddd3b"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "d2bd4b691e05938445005e9a6ed47cb1b96e48d852601fcd5ac67e7b7756aff6"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "cbd7f7dc42ac822508e92d4663e4bfdd4ce84933",
+          "release_sha256": "8a45ef9b8ac6aa3dafc806114a78f884d93f8adf09f42d74f6bf401898e52e76",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 2
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 2
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "a7d4a73d6fe560f95a125ef301baa4cf445507074c525717a44beb52e981365f"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "d0f1129c967e3b6d70ceb4d8af163a5f3a30c605ccef747bc852460a2fad806f"
+            },
+            {
+              "bytes": 42076,
+              "path": "history.json",
+              "sha256": "82252575ac0fa34a70ca6940e80bb071e586c8ba37dbf6303f150a6917df2f9e"
+            },
+            {
+              "bytes": 132314,
+              "path": "latest/config.json",
+              "sha256": "f8255849232f0631e12cf3d6f79d9af8bbe8775f2d0536084097b2df23de3659"
+            },
+            {
+              "bytes": 60289708,
+              "path": "latest/state.safetensors",
+              "sha256": "159a63edfd4298a9b3b2a364a7530bd74c1b5655d746bf7b63d0655f1a514ad7"
+            },
+            {
+              "bytes": 2252,
+              "path": "manifest.json",
+              "sha256": "f11f7c255b8aaaf174a9c2c14af19e8d3e8af4abfd6976445eb814c389b86b08"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "3e06459b6b8c2ee078024fed53d99e2db9ec2b4d",
+          "release_sha256": "3c3a0350f57c8b29ca99d96bc80cea44dd1070f5c1e1252456bc1ad29cbe00c6",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 2
+      },
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 4
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "501df0a7f851ba3a63471a9e69f5cb3775c3aba3af6b2dbc2c2353552ff96117"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "02e6c2b2deec6453d3598f655c0aac4b061b41b74814993823dd6cefb8c8f409"
+            },
+            {
+              "bytes": 21020,
+              "path": "history.json",
+              "sha256": "00fd37b6ce4d31741dc558b060b347998b85ed4571af09539dcb11f2c7147703"
+            },
+            {
+              "bytes": 217606,
+              "path": "latest/config.json",
+              "sha256": "c5fd9bea4e10b7bdfa2c85e6c1c2dadfce0a57bc800bbf07f8a12c6e60e4a94d"
+            },
+            {
+              "bytes": 60300148,
+              "path": "latest/state.safetensors",
+              "sha256": "c626482c8378e1d27a00cebe54d43366661bd93f3fa098f1149c449068c96e8b"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "3f93afe727ef1528e01e9c475f594807899407a98baf35ce243ff14193d57002"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "73f3eb972a9ef94808634e0010cd4ca2c5333d9c",
+          "release_sha256": "c4b97a2da4c3ecadeed0b8b8e6a45b8ceda8f369ffc0a18e3a9f05ab023b6d9a",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 4
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 4
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "54f0d600cdc48973d3fee4459e5922198ab64c9850088ee16e97f2890862e451"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "02e6c2b2deec6453d3598f655c0aac4b061b41b74814993823dd6cefb8c8f409"
+            },
+            {
+              "bytes": 42072,
+              "path": "history.json",
+              "sha256": "82032f5f4cdad6a8aeffa3f323589994f177d35d8197a41722058777c001952d"
+            },
+            {
+              "bytes": 217608,
+              "path": "latest/config.json",
+              "sha256": "fc22134a2b56dae82a5587b3cd8d54836545634e5a3877ef52526383351648f5"
+            },
+            {
+              "bytes": 60300148,
+              "path": "latest/state.safetensors",
+              "sha256": "98578e737b37e8d46e659f9355e39c07e4450ae51e402ffe340fb5ede210a889"
+            },
+            {
+              "bytes": 2252,
+              "path": "manifest.json",
+              "sha256": "3511b031b46984cc01435bd693b2c3313dad6434fbf8ee94de348f4d985edf5a"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "669866cd055601178440ac13a646f2af72d1b0af",
+          "release_sha256": "a744934644c7f49ad8a660a4bfa17c9c359675d656d8f3586abd61be522d75ec",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 4
+      }
+    ],
+    "results_publication": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "05759b1de6dbb4f15a2b9f017902cdb7bf10d55e",
+      "release_sha256": "fb630f2d11e5adf463d688e25fa035cb65c40a87bfdbb89be7a971ab9cf601da",
+      "repo_id": "voxelshogi/voxelshogi-distributed-benchmark-v1",
+      "repo_type": "dataset",
+      "verified": true
+    },
+    "global_schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+    "complete_record_sha256": "c7e8003dd5370f6d2320c6272f6e8ad07aa5950e4102c499ba5cc00562706696",
+    "data_plan": {
+      "files": [
+        {
+          "bytes": 18657,
+          "path": "LICENSE",
+          "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+        },
+        {
+          "bytes": 3370,
+          "path": "README.md",
+          "sha256": "de3c4c069f8c03c01559356b6b57332c2a75d21ec9bc6df13e291c94b0f5d88d"
+        },
+        {
+          "bytes": 157423,
+          "path": "manifest.json",
+          "sha256": "4c11dc7177b065005d906f9b787ab1479fb87c4f2e29c130c1d361fcab32373d"
+        },
+        {
+          "bytes": 21322,
+          "path": "results.parquet",
+          "sha256": "82767a239f0bc281109a9680ad86f30c1fc660276a17a38b428987aa968fd156"
+        },
+        {
+          "bytes": 260,
+          "path": "validation.json",
+          "sha256": "6e50551f5ea1a2b5cf299312ee7c47947aa85926d0f805742ecd31e8c7333c59"
+        }
+      ],
+      "gated": "manual",
+      "license": "cc-by-4.0",
+      "license_approved": true,
+      "private": false,
+      "repo_id": "voxelshogi/voxelshogi-distributed-benchmark-v1",
+      "repo_type": "dataset",
+      "schema": 1,
+      "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+    },
+    "resources_released": false
+  },
+  "release": {
+    "verified": true,
+    "checked_at": 1793837625.089282,
+    "instance_id": 59172937,
+    "actual_worlds": [
+      1,
+      2,
+      4
+    ],
+    "fresh_fixed_hf_gpu_continuations": 3,
+    "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+    "resources_released": true,
+    "vast_project_instances": [],
+    "cloudrift_project_idle": true,
+    "destruction_acknowledged": true,
+    "inventory_absent": true,
+    "reservation_retained_usd": 11.5,
+    "prior_reservations_retained": true,
+    "state_publications": [
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 1
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "67dd0e68e0f94fa250cb3584eadc2a0eeab9b3a73ba74f7dd6ce3bc867db43d6"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "b80763211c26cc808771e2810e5ec07574d8494ee26ac66a286ddb3acf977cf0"
+            },
+            {
+              "bytes": 21019,
+              "path": "history.json",
+              "sha256": "cf4415d685e2d08d07c601d5b2b5f7748b3bff10c14149f135a98140319591cb"
+            },
+            {
+              "bytes": 89689,
+              "path": "latest/config.json",
+              "sha256": "d57572c40cbe018b1570481c0d0e3151702a7f695742247064ad0ba33447eead"
+            },
+            {
+              "bytes": 60284492,
+              "path": "latest/state.safetensors",
+              "sha256": "4041941010a402d0bbbf5cfcea5408efa031995849811db17c3d7a168a9b7d46"
+            },
+            {
+              "bytes": 2248,
+              "path": "manifest.json",
+              "sha256": "9dd5dca046f930f91dbe8d0ef8f20eae03b4c8f88428130e205354a348abfd0f"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "5c6250fe7b9abca35d5bcb7ef0af5ab9778e0837",
+          "release_sha256": "97078286322bdeb527b866918fbbed5e3c852bcbd9e854c148c8adf5c04dd3ab",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 1
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 1
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "386e9a43e6d2a47394beb9e703ae42257c73370cc5de70a527f2b2a74585f448"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "b80763211c26cc808771e2810e5ec07574d8494ee26ac66a286ddb3acf977cf0"
+            },
+            {
+              "bytes": 42091,
+              "path": "history.json",
+              "sha256": "895bdf0fcad287133a90ac022764122828a38a296f8a33da54d61cbc508dc5e7"
+            },
+            {
+              "bytes": 89691,
+              "path": "latest/config.json",
+              "sha256": "9c9498a3e326b8a0189ad5ab55c12702247fa2a73d9de0f78d0e07889d710d55"
+            },
+            {
+              "bytes": 60284492,
+              "path": "latest/state.safetensors",
+              "sha256": "66a8ce4df907751599d98d55c156102664f7d7d97bc27f80e858852fddcfb4dc"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "cbd7a22d88beede93055568c6b9b62d8bbb7a70768f566341bfaa30bb11c87db"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "8e6a722e69d261bb9b730b2942f69f6c3afef045",
+          "release_sha256": "e928f5c4196159270c1c4f929cbf6db08e6680930e2ff82ad7e0e14e7e872207",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 1
+      },
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 2
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "de9adc09d2fa64fc60aff93deb798c53b2d55aa01775917d12c391e7c86eaacc"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "d0f1129c967e3b6d70ceb4d8af163a5f3a30c605ccef747bc852460a2fad806f"
+            },
+            {
+              "bytes": 21026,
+              "path": "history.json",
+              "sha256": "3d7b4fd6afc9c9219b36daf4bb00ec2942d71495fc7a69d99accf5cc6ab22609"
+            },
+            {
+              "bytes": 132312,
+              "path": "latest/config.json",
+              "sha256": "9ee580588a758195e506e63371ab57f3274dfb25a19951c7a0e4d8639b28b47a"
+            },
+            {
+              "bytes": 60289708,
+              "path": "latest/state.safetensors",
+              "sha256": "0a1ce7caaacd22fac6c0026ffad6de180bf96d5c70c5ab8c61234d70e99ddd3b"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "d2bd4b691e05938445005e9a6ed47cb1b96e48d852601fcd5ac67e7b7756aff6"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "cbd7f7dc42ac822508e92d4663e4bfdd4ce84933",
+          "release_sha256": "8a45ef9b8ac6aa3dafc806114a78f884d93f8adf09f42d74f6bf401898e52e76",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 2
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 2
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "a7d4a73d6fe560f95a125ef301baa4cf445507074c525717a44beb52e981365f"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "d0f1129c967e3b6d70ceb4d8af163a5f3a30c605ccef747bc852460a2fad806f"
+            },
+            {
+              "bytes": 42076,
+              "path": "history.json",
+              "sha256": "82252575ac0fa34a70ca6940e80bb071e586c8ba37dbf6303f150a6917df2f9e"
+            },
+            {
+              "bytes": 132314,
+              "path": "latest/config.json",
+              "sha256": "f8255849232f0631e12cf3d6f79d9af8bbe8775f2d0536084097b2df23de3659"
+            },
+            {
+              "bytes": 60289708,
+              "path": "latest/state.safetensors",
+              "sha256": "159a63edfd4298a9b3b2a364a7530bd74c1b5655d746bf7b63d0655f1a514ad7"
+            },
+            {
+              "bytes": 2252,
+              "path": "manifest.json",
+              "sha256": "f11f7c255b8aaaf174a9c2c14af19e8d3e8af4abfd6976445eb814c389b86b08"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "3e06459b6b8c2ee078024fed53d99e2db9ec2b4d",
+          "release_sha256": "3c3a0350f57c8b29ca99d96bc80cea44dd1070f5c1e1252456bc1ad29cbe00c6",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 2
+      },
+      {
+        "phase": "mid",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 4
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2188,
+              "path": "README.md",
+              "sha256": "501df0a7f851ba3a63471a9e69f5cb3775c3aba3af6b2dbc2c2353552ff96117"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "02e6c2b2deec6453d3598f655c0aac4b061b41b74814993823dd6cefb8c8f409"
+            },
+            {
+              "bytes": 21020,
+              "path": "history.json",
+              "sha256": "00fd37b6ce4d31741dc558b060b347998b85ed4571af09539dcb11f2c7147703"
+            },
+            {
+              "bytes": 217606,
+              "path": "latest/config.json",
+              "sha256": "c5fd9bea4e10b7bdfa2c85e6c1c2dadfce0a57bc800bbf07f8a12c6e60e4a94d"
+            },
+            {
+              "bytes": 60300148,
+              "path": "latest/state.safetensors",
+              "sha256": "c626482c8378e1d27a00cebe54d43366661bd93f3fa098f1149c449068c96e8b"
+            },
+            {
+              "bytes": 2250,
+              "path": "manifest.json",
+              "sha256": "3f93afe727ef1528e01e9c475f594807899407a98baf35ce243ff14193d57002"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "73f3eb972a9ef94808634e0010cd4ca2c5333d9c",
+          "release_sha256": "c4b97a2da4c3ecadeed0b8b8e6a45b8ceda8f369ffc0a18e3a9f05ab023b6d9a",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 4
+      },
+      {
+        "phase": "final",
+        "plan": {
+          "artifact_role": "distributed-training-state",
+          "expected_binding": {
+            "cache_sha256": "e1cc5be4b7d53270631706e3577f9ef4e2376b2ebbd24e4857ddabbf9a45d132",
+            "config": {
+              "device": "cuda",
+              "global_batch": 16,
+              "learning_rate": 0.0001,
+              "optimizer": {
+                "betas": [
+                  0.9,
+                  0.999
+                ],
+                "eps": 1e-08,
+                "foreach": false,
+                "fused": false,
+                "name": "AdamW"
+              },
+              "precision": "float32",
+              "resume_at": 64,
+              "seed": 63001,
+              "tf32": false,
+              "threads": 2,
+              "updates": 128,
+              "warmup_updates": 16,
+              "weight_decay": 0.01
+            },
+            "contract": {
+              "architecture": "transformer-s-full-v1",
+              "gradient_reduction": "rank-ordered-float32-v1",
+              "initial_model_sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85",
+              "schedule_sha256": "901ede2099be79b6a331c19ea9ab2eae3f3c4b51a35bf0d14bf19a8cd1ec5d7b",
+              "schema": "voxelshogi-distributed-training-v2",
+              "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+              "world_size": 4
+            },
+            "environment": {
+              "capability": [
+                12,
+                0
+              ],
+              "cuda": "13.0",
+              "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+              "cudnn": 92400,
+              "deterministic": true,
+              "device": "cuda",
+              "gpu": "NVIDIA GeForce RTX 5090",
+              "lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+              "machine": "x86_64",
+              "python": "3.14.9",
+              "tf32": false,
+              "torch": "2.14.1+cu130"
+            },
+            "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f"
+          },
+          "files": [
+            {
+              "bytes": 11358,
+              "path": "LICENSE",
+              "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+            },
+            {
+              "bytes": 2191,
+              "path": "README.md",
+              "sha256": "54f0d600cdc48973d3fee4459e5922198ab64c9850088ee16e97f2890862e451"
+            },
+            {
+              "bytes": 1248,
+              "path": "config.json",
+              "sha256": "02e6c2b2deec6453d3598f655c0aac4b061b41b74814993823dd6cefb8c8f409"
+            },
+            {
+              "bytes": 42072,
+              "path": "history.json",
+              "sha256": "82032f5f4cdad6a8aeffa3f323589994f177d35d8197a41722058777c001952d"
+            },
+            {
+              "bytes": 217608,
+              "path": "latest/config.json",
+              "sha256": "fc22134a2b56dae82a5587b3cd8d54836545634e5a3877ef52526383351648f5"
+            },
+            {
+              "bytes": 60300148,
+              "path": "latest/state.safetensors",
+              "sha256": "98578e737b37e8d46e659f9355e39c07e4450ae51e402ffe340fb5ede210a889"
+            },
+            {
+              "bytes": 2252,
+              "path": "manifest.json",
+              "sha256": "3511b031b46984cc01435bd693b2c3313dad6434fbf8ee94de348f4d985edf5a"
+            }
+          ],
+          "gated": "manual",
+          "license": "apache-2.0",
+          "license_approved": true,
+          "private": false,
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "schema": 1,
+          "source_commit": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+          "state_publication_approved": true
+        },
+        "receipt": {
+          "community_disabled": true,
+          "dry_run": false,
+          "hub_commit": "669866cd055601178440ac13a646f2af72d1b0af",
+          "release_sha256": "a744934644c7f49ad8a660a4bfa17c9c359675d656d8f3586abd61be522d75ec",
+          "repo_id": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+          "repo_type": "model",
+          "verified": true
+        },
+        "world_size": 4
+      }
+    ],
+    "results_publication": {
+      "community_disabled": true,
+      "dry_run": false,
+      "hub_commit": "05759b1de6dbb4f15a2b9f017902cdb7bf10d55e",
+      "release_sha256": "fb630f2d11e5adf463d688e25fa035cb65c40a87bfdbb89be7a971ab9cf601da",
+      "repo_id": "voxelshogi/voxelshogi-distributed-benchmark-v1",
+      "repo_type": "dataset",
+      "verified": true
+    },
+    "scientific_comparison_complete": true,
+    "hf_review_complete": true,
+    "no_phase6_or_browser_adoption": true
+  },
+  "termination_request": {
+    "at": 1793837619.326216,
+    "instance_ids": [
+      59172937
+    ],
+    "destruction_acknowledged": true
+  },
+  "deadline": {
+    "requested_at": 1793832514.521981,
+    "stop_at": 1793842172.521981,
+    "maximum_end_at": 1793843072.521981,
+    "hourly_usd": 3.222222222222222,
+    "consumption_cap_usd": 11.5
+  },
+  "quote": {
+    "provider": "vast.ai",
+    "offer_id": 59027917,
+    "gpu": "RTX 5090",
+    "num_gpus": 4,
+    "disk_gb": 80,
+    "hourly_usd": 3.222222222222222,
+    "inet_up_usd_per_gb": 0.00390625,
+    "inet_down_usd_per_gb": 0.0026041666666666665,
+    "estimated_download_gb": 40,
+    "estimated_upload_gb": 10,
+    "estimated_transfer_usd": 0.14322916666666666,
+    "transfer_reserve_usd": 1,
+    "bandwidth": "metered; fixed-workload estimate plus conservative reserve",
+    "maximum_seconds": 10558,
+    "maximum_usd": 11.5,
+    "checked_at": 1793832514.521981
+  },
+  "rental_request_to_delete_seconds": 5104.804234981537,
+  "quoted_compute_disk_estimate_usd": 4.569114901681005,
+  "all_four_allocated_gpu_hours_request_to_delete": 5.672004705535041,
+  "actual_final_invoice_recovered": false,
+  "cost_reservations": 33,
+  "cost_reserved_usd": 152.5,
+  "state_upload_budget_final": {
+    "approved_maximum_new_bytes": 2147483648,
+    "extension": {
+      "approval_reference": "2026-11-05 JST user approval of cumulative HF state uploads 1GiB to 2GiB, followed by public capacity clarification",
+      "previous_maximum_new_bytes": 1073741824,
+      "prior_reservation_count": 15,
+      "prior_reservations_sha256": "999dbd7afe6898b25b3e1b5d25f5698c377d066a939d1c4221c5b6c2fd45a5f2",
+      "schema": "voxelshogi-state-upload-extension-v1"
+    },
+    "reservations": [
+      {
+        "maximum_bytes": 60417110,
+        "release_sha256": "fdaecd5ae848e1682718a7da8b612a4bf0443da7a888118107cc8a5136f5edac"
+      },
+      {
+        "maximum_bytes": 127929925,
+        "release_sha256": "0fbfb70b29479668d9b640306c3673870a866ec3d3277f43a4fa005ebc7ab808"
+      },
+      {
+        "maximum_bytes": 127944556,
+        "release_sha256": "23f7ef85dbab0be946209fa87e5a40f10d4e0e34c576fa801f4aa380f0eea6d9"
+      },
+      {
+        "maximum_bytes": 60393960,
+        "release_sha256": "f3aac560f724c405c5927f4882d81a88f12eb5ed3e2d7ca5b1276994d87fa23f"
+      },
+      {
+        "maximum_bytes": 60861158,
+        "release_sha256": "245978da0fe3614fb5af2e3dbac6504387725763d180de9d9b3b923a2372c7c5"
+      },
+      {
+        "maximum_bytes": 60861154,
+        "release_sha256": "cf6c09b36df839ebc3049ef4b49988cfcb693cff3af0f9cbace42e890be6207a"
+      },
+      {
+        "maximum_bytes": 61361681,
+        "release_sha256": "0496bc11ca42d5a9b95bca9a0002c6b5fbad23d357c5b90c38af4c0928edd61c"
+      },
+      {
+        "maximum_bytes": 61373050,
+        "release_sha256": "f1e7d40dfef04c2da270a07dcac2660fcb5c6d016e3685bd77be75afed32a965"
+      },
+      {
+        "maximum_bytes": 60433110,
+        "release_sha256": "a45e282716bf1a755e96f7ca3a8fabc75d21daa42035982a9a25163d94afc868"
+      },
+      {
+        "maximum_bytes": 60411943,
+        "release_sha256": "91d4ad64f57bc1374ac6085a6f359bc20b9016e7b1f45c052ba1a82784791a25"
+      },
+      {
+        "maximum_bytes": 60433032,
+        "release_sha256": "fd6583909dba15c5c512b8e92d42a17ba4d04101452dcec85ad22a6f9bdc7257"
+      },
+      {
+        "maximum_bytes": 60459813,
+        "release_sha256": "a704ab63f176a240c0b170c88db6267bda2bf9a7a4d766238defd33b7c4d7922"
+      },
+      {
+        "maximum_bytes": 60480896,
+        "release_sha256": "53bbbd89e6110b453b3d401bb8eea0fd427398a521ed73d797104ad35784ca28"
+      },
+      {
+        "maximum_bytes": 60555546,
+        "release_sha256": "7eadeb4e276fb4b41080d32a546618a5cf910444b03ad79dc38acbd11572e6f0"
+      },
+      {
+        "maximum_bytes": 60578203,
+        "release_sha256": "062e471114a11f2f4651237fa5bc9d2d94d2994e920f1a9c5eec35a69037230f"
+      },
+      {
+        "maximum_bytes": 60412242,
+        "release_sha256": "97078286322bdeb527b866918fbbed5e3c852bcbd9e854c148c8adf5c04dd3ab"
+      },
+      {
+        "maximum_bytes": 60433321,
+        "release_sha256": "e928f5c4196159270c1c4f929cbf6db08e6680930e2ff82ad7e0e14e7e872207"
+      },
+      {
+        "maximum_bytes": 60460090,
+        "release_sha256": "8a45ef9b8ac6aa3dafc806114a78f884d93f8adf09f42d74f6bf401898e52e76"
+      },
+      {
+        "maximum_bytes": 60481147,
+        "release_sha256": "3c3a0350f57c8b29ca99d96bc80cea44dd1070f5c1e1252456bc1ad29cbe00c6"
+      },
+      {
+        "maximum_bytes": 60555818,
+        "release_sha256": "c4b97a2da4c3ecadeed0b8b8e6a45b8ceda8f369ffc0a18e3a9f05ab023b6d9a"
+      },
+      {
+        "maximum_bytes": 60576877,
+        "release_sha256": "a744934644c7f49ad8a660a4bfa17c9c359675d656d8f3586abd61be522d75ec"
+      }
+    ],
+    "schema": "voxelshogi-state-upload-budget-v2"
+  },
+  "prior_failure_history": [
+    "p54-startup-2026-11-04.json",
+    "P5_4_PARITY_FAILURE.md"
+  ],
+  "startup_only_previous_unit": {
+    "at": 1793832255.25538,
+    "resources_released": true,
+    "instance_id": 59164053,
+    "destruction_acknowledged": true,
+    "vast_project_instances": [],
+    "cloudrift_project_idle": true,
+    "primary_worlds": [],
+    "gpu_continuations": [],
+    "state_publications": 0,
+    "new_state_uploads": 0,
+    "science_worker_launched": false,
+    "full_benchmark_complete": false,
+    "reservation_retained_usd": 8,
+    "reason": "startup container plus fixed CUDA dependency preparation consumed predeclared compute window; no unmeasured performance result asserted"
+  },
+  "prior_single_rank_preflight_failure": {
+    "complete": false,
+    "elapsed_seconds": 408.45900096802507,
+    "error_type": "RuntimeError",
+    "stage": "world1-continuous-primary128",
+    "states_verified": 0,
+    "worlds_finished": 0
+  },
+  "owned_vm_execution_recovery": {
+    "at": 1793836767.569525,
+    "existing_instance_id": 59172937,
+    "existing_guard_run": 41928049683,
+    "original_control": "distributed-benchmark6-control",
+    "original_source": "1b7e3a8bec52a44cf0b7661f0d7885bf74ef94b7",
+    "new_source": "0171a6b7113bc16ed2a0d8b72cebac2ccd96420f",
+    "prior_worker_terminal": true,
+    "prior_worlds_finished": 0,
+    "prior_states_verified": 0,
+    "provider_create_requests": 0,
+    "new_gpu_budget_reservations": 0,
+    "original_deadline_unchanged": true,
+    "reason": "correct single-rank preflight before any update; rerun all1/2/4 from same initial weights in a new output directory after full new-source CI"
+  },
+  "state_capacity_migration": {
+    "verified": true,
+    "at": 1793825835.90537,
+    "source_commit": "3b0df4e96d36e1e12edcb0cb85b841709378de45",
+    "approval_reference": "2026-11-05 JST user approval of cumulative HF state uploads 1GiB to 2GiB, followed by public capacity clarification",
+    "prior_ledger_sha256": "ef772e74fdfa049928234546b31d5c7a2f410671c10c9c2e6316a7ddb2589334",
+    "migrated_ledger_sha256": "a3808bc348bd610f19f9bd762d91bb2ef46da641e60f5761e845890ac162111e",
+    "old_maximum_new_bytes": 1073741824,
+    "new_maximum_new_bytes": 2147483648,
+    "reservations_preserved": 15,
+    "reserved_bytes_unchanged": 1044495137,
+    "all_prior_reservations_exact": true,
+    "new_uploads": 0,
+    "gpu_resources_zero_before_migration": true,
+    "paid_storage_added": false,
+    "existing_hf_history_changed": false
+  },
+  "scope": "Actual1/2/4GPU same-global-work performance and all three fixed-HF continuations with release; not general strength improvement, Phase6 or new browser adoption."
+}

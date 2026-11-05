@@ -67,7 +67,7 @@ uv run --locked python -m training.hub_release runs/release/model runs/release-p
 
 M6の学習済みモデルと全3形式の参照値は、[専用の推論パッケージprofile](M6_INFERENCE_RELEASE.md)を使う。`artifact_role="inference-package"`でmanifestが列挙した固定入力・全出力だけを追加対象とし、通常profileで任意の`.f32`を許可しない。実学習とライセンス確定・実モデル検証の後、既存の公開／全hash照合を行い、検証済みreceiptから固定revisionのWeb catalog項目を作る。
 
-再開状態は[別承認・専用repoを要求するtraining-state profile](M6_STATE_RELEASE.md)で準備する。通常modelへの混入を許可せず、実送信時には累積1 GiBの共通ledgerをAPI操作前に予約する。M6のoptimizer・乱数を含む承認済みarchiveは[公開・復旧まで完了](M6_COMPLETION.md)。自己対局は別の承認対象・専用repo・selfplay profileを使い、同じ累積ledgerを引き継ぐ。新たな未確定licenseへ許可を拡張しない。
+再開状態は[別承認・専用repoを要求するtraining-state profile](M6_STATE_RELEASE.md)で準備する。通常modelへの混入を許可せず、実送信時には共通ledgerをAPI操作前に予約する。移行前v1は累積1GiB、ユーザー承認後の現行v2は累積2GiBで、旧予約prefixを維持する。M6のoptimizer・乱数を含む承認済みarchiveは[公開・復旧まで完了](M6_COMPLETION.md)。自己対局は別の承認対象・専用repo・selfplay profileを使い、同じ累積ledgerを引き継ぐ。新たな未確定licenseへ許可を拡張しない。
 
 純粋テストは、送信先違い、private/auto、未承認ライセンス、変更されたファイル、Macでの公開、秘密ファイル・symlink・optimizer、未確認のHub gateを拒否し、API変更前に止まることを検証する。記録用fakeで新規repoのpublic設定、manual設定確認後の送信、親commit固定と転送後のhash不一致も確認する。これらを通常Linux CIと既知変異の回帰へ含める。実repoの作成・公開・実権限・実転送の確認は別の実行記録を必要とする。
 
@@ -101,3 +101,5 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 [1／2／4GPU比較](P5_4_PLAN.md)の保存は`profile="distributed"`・`artifact_role="distributed-training-state"`を使う。候補repoは`voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1`（model、Apache-2.0）。public/manual・Community OFFとState Cardの4節を維持する。共有model／optimizerと全rankの乱数・共通進捗をtyped archiveへ入れ、source・入力・global schedule・world size・FP32設定を照合する。
 
 通常modelへの混入を拒否し、M6／自己対局から引き継いだ同じ累積1GiB upload ledgerを使う。過去の予約を減らしたり初期化したりせず、実bytesを予約してから外部Linuxで公開・全hash照合する。このprofileの準備やCPUテストだけでは、実repo公開・GPU保存再開が完了したことにはならない。
+
+**2026-11-05 00:13 UTCの実公開**：[P5-4の全3構成と各GPU保存再開](P5_4_RESULTS.md)で中間／最終の計6 stateと3行の測定datasetを公開し、固定revisionの全bytes・hash・Card・public/manual・Community OFFを照合した。共通ledgerの過去予約は保持し、実機解放も確認済み。先行する1GPU部分結果は別の固定revisionとして残す。
