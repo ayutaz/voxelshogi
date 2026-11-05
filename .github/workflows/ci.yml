@@ -370,6 +370,9 @@ jobs:
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: pnpm --dir apps/web exec playwright install chromium
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
+      - name: Verify research Worker private channel without loading models
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
+        run: node scripts/research-worker-channel-smoke.mjs
       - name: Verify all formats and real Worker interaction
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: pnpm exec playwright test -c model-playwright.config.ts

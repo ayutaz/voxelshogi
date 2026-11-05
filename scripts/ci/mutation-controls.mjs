@@ -7,6 +7,16 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'research-browser-request-encoding', file: 'scripts/research-browser-contract.mjs', before: 'encodeURIComponent(descriptor.path)', after: 'descriptor.path', test: 'research-browser-probe' },
+  { name: 'research-browser-runtime-origin', file: 'scripts/research-browser-contract.mjs', before: 'value?.assetBase === assetBase', after: 'true', test: 'research-browser-probe' },
+  { name: 'research-browser-runtime-known-path', file: 'scripts/research-browser-contract.mjs', before: 'entry?.path === path', after: 'true', test: 'research-browser-probe' },
+  { name: 'research-browser-worker-owner-origin', file: 'scripts/research-browser-worker.mjs', before: "event.origin !== ''", after: 'false', test: 'research-browser-probe' },
+  { name: 'research-browser-worker-private-scope', file: 'scripts/research-browser-worker.mjs', before: '!(self instanceof DedicatedWorkerGlobalScope)', after: 'false', test: 'research-browser-probe' },
+  { name: 'research-browser-vector-tolerance', file: 'scripts/research-browser-contract.mjs', before: 'delta > atol + rtol * Math.abs(expected[i])', after: 'delta < atol + rtol * Math.abs(expected[i])', test: 'research-browser-probe' },
+  { name: 'research-browser-body-hash', file: 'scripts/research-browser-contract.mjs', before: 'digest === descriptor.sha256', after: 'true', test: 'research-browser-probe' },
+  { name: 'research-browser-no-provider-fallback', file: 'scripts/research-browser-contract.mjs', before: 'entries.length === 1', after: 'entries.length >= 1', test: 'research-browser-probe' },
+  { name: 'research-browser-full-architecture-matrix', file: 'scripts/research-browser-contract.mjs', before: 'value.models.length === 4', after: 'value.models.length === 3', test: 'research-browser-probe' },
+  { name: 'research-browser-linux-only', file: 'scripts/research-browser-contract.mjs', before: "platform === 'linux'", after: 'true', test: 'research-browser-probe' },
   { name: 'security-scope-must-succeed', file: 'scripts/ci/security-scope.mjs', before: "scope?.result !== 'success'", after: 'false', test: 'security-scope' },
   { name: 'security-scope-typed-outputs', file: 'scripts/ci/security-scope.mjs', before: "outputKeys.every(key => ['true', 'false'].includes(scope.outputs?.[key]))", after: 'true', test: 'security-scope' },
   { name: 'security-any-affected-language', file: 'scripts/ci/security-scope.mjs', before: "impactKeys.some(key => scope.outputs[key] === 'true')", after: 'false', test: 'security-scope' },
@@ -82,6 +92,9 @@ try {
     cpSync(join(root, test), join(copy, test)); writeFileSync(source, original);
     cpSync(join(root, 'LICENSE'), join(copy, 'LICENSE'));
     cpSync(join(root, 'scripts/browser-memory.mjs'), join(copy, 'scripts/browser-memory.mjs'));
+    if (mutation.test === 'research-browser-probe') for (const file of ['scripts/research-browser-contract.mjs', 'scripts/research-browser-worker.mjs']) {
+      if (file !== mutation.file) cpSync(join(root, file), join(copy, file));
+    }
     if (mutation.test === 'model-distribution') for (const file of ['scripts/inference-build.mjs', 'scripts/verify-model-distribution.mjs']) {
       if (file !== mutation.file) cpSync(join(root, file), join(copy, file));
     }
