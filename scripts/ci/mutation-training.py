@@ -13,6 +13,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-visit-data-audit-hash",
+        "training/research_visit_data.py",
+        "fingerprint(audit) != expected_sha256",
+        "False",
+        "test_research_visit_data.py",
+    ),
+    (
+        "research-visit-data-feature-byte-boundary",
+        "training/research_visit_data.py",
+        "> maximum_feature_bytes:",
+        ">= maximum_feature_bytes:",
+        "test_research_visit_data.py",
+    ),
+    (
+        "research-visit-data-no-test-consumer",
+        "training/research_visit_data.py",
+        'if split != "test":',
+        "if True:",
+        "test_research_visit_data.py",
+    ),
+    (
+        "research-visit-data-cross-split-inputs",
+        "training/research_visit_data.py",
+        'or r["input"] in seen',
+        "or False",
+        "test_research_visit_data.py",
+    ),
+    (
+        "research-visit-data-linux-boundary",
+        "training/research_visit_data.py",
+        'if sys.platform != "linux":',
+        "if False:",
+        "test_research_visit_data.py",
+    ),
+    (
+        "research-visit-data-full-policy-target",
+        "training/research_visit_data.py",
+        'deepcopy(sample["policy"])',
+        '{"flattened": True}',
+        "test_research_visit_data_native.py::test_actual_rust_features_match_selected_ids_and_preserve_soft_targets",
+    ),
+    (
+        "research-visit-data-source-immutability",
+        "training/research_visit_data.py",
+        '        not unchanged()\n        or file_hash(folder / "episodes.parquet")',
+        '        False\n        or file_hash(folder / "episodes.parquet")',
+        "test_research_visit_data_native.py::test_source_change_during_feature_pass_never_returns_an_admitted_corpus",
+    ),
+    (
         "research-visit-update-limit-type",
         "training/research_visit_fit.py",
         "type(n) is not int or not 1 <= n <= 1_000_000",

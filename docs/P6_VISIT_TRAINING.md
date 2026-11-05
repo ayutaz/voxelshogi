@@ -45,5 +45,5 @@ model／optimizer／RNG／進捗の完全一致を確認する。最大手が同
 ゼロlogit／ゼロValueの検証期待値はPolicy CE=`ln(2)`、Value MSE=`0.04`の手計算を使う。
 変異は総更新数・optimizer更新・分割・監査binding・val履歴を対象とする。
 
-実データの採用と特徴量cache作成、外部GPUの2 run試行、FLOPs算定、HFへの実state公開、
+[監査済みvisitの特徴量への接続](P6_VISIT_DATA.md)を用意した。実データの採用、外部GPUの2 run試行、FLOPs算定、HFへの実state公開、
 実際の棋力比較は後続の実行項目であり、この学習コードの追加で完了とはしない。
