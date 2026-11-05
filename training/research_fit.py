@@ -59,6 +59,15 @@ class ResearchRunConfig(RunConfig):
 
 def validate_research_binding(binding):
     if (
+        type(binding) is dict
+        and type(binding.get("config")) is dict
+        and binding["config"].get("schema")
+        == "voxelshogi-research-visit-training-config-v1"
+    ):
+        from training.research_visit_fit import validate_binding
+
+        return validate_binding(binding)
+    if (
         type(binding) is not dict
         or set(binding)
         != {"source_commit", "cache_sha256", "config", "contract", "environment"}

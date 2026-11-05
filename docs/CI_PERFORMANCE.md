@@ -25,7 +25,7 @@ PR #101でもWebが5分13秒、学習系変異の最長jobが5分45秒だった�
 | 変更範囲／Gateの契約・静的検査 | 影響する分を実行 | 影響する分を実行 |
 | Rust fmt/clippy/core通常テスト、WASM／Web単体・型・build | 影響する分を実行 | 影響する分を実行 |
 | Python通常テスト | 実モデル自己対局等の`training/tests/*_native.py`を除いて実行 | Native結合試験を含め全件 |
-| MSRV・coverage・既知変異 | 深い検証へ延期 | 実行。Python学習系は4シャード並列 |
+| MSRV・coverage・既知変異 | 深い検証へ延期 | 実行。Python学習系は8分割・最大4ジョブ並列 |
 | モデル3形式の生成・実ブラウザ推論・全E2E・カメラ反復 | 深い検証へ延期 | 実行 |
 | CodeQL 4言語 | 文書だけでも実解析。code scanning保護に必要 | mainはコード影響時に実行。文書だけの重複解析は省略。週次・手動は全解析 |
 | core全変異の調査 | 延期 | 独立Qualityの週次、または手動指定 |
@@ -48,5 +48,7 @@ Securityも同じ変更判定を使う。文書だけと確認したmain pushで
 [GitHubのcode scanning保護](https://docs.github.com/en/code-security/concepts/code-scanning/merge-protection)は必須status checkと独立している。保護を維持してPRで正規の解析結果を作り、文書だけのmain更新で二重実行を省く。架空のSARIFや過去の解析の付け替えは行わない。修正は独立テストのRED→GREEN、7出力の型検証、PRの実結果必須を外す変異の検出で確認する。文書PR全体1〜2分の目標は、CodeQLを含む現在の保護条件では未達として残す。
 
 学習系変異は全catalogをちょうど1シャードへ割り当て、担当テスト集合の隔離baselineを先に通す。通常の全pytestは深い検証で継続する。JUnitのskip・collection error・timeoutを変異検出と数えない。
+
+2026-11-05の[学習系手動CI](https://github.com/ayutaz/voxelshogi/actions/runs/41970899917/job/127064604903)は、4分割のshard 2が10分のjob上限で中断し、Gateも未成功となった。検証の省略や上限延長ではなく8分割へ変更し、同時実行は4ジョブのままにする。全catalogの重複・欠落がないことは4／8分割それぞれで検証する。これは1ジョブの負荷を減らす変更であり、キュー待ちを含む全体時間の短縮実績は後続の実runで判断する。
 
 文書だけのmain更新は再ビルド・再デプロイを省く。公開SHAは最後に配信したアプリcommitで、文書更新後のmain HEADと異なる場合がある。[配信手順](DEPLOYMENT.md)。
