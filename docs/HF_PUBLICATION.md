@@ -1,5 +1,7 @@
 # Hugging Faceの公開・保存ルール
 
+**2026-11-05・P6の保存上限を適用**：[無料public枠内の32GiBへの移行](P6_STATE_CAPACITY.md)で、過去21予約と承認を保持した。新予約・upload・有料保存購入は0。後続の2 run＋12 runの実stateは検証済みbyteを同じ共通ledgerへ予約する。以下の1GiB／2GiBは対象日時の履歴。
+
 **2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
 
 2026-10-28ユーザー指定。作成したデータセット・モデルの公開先は[voxelshogi組織](https://huggingface.co/voxelshogi)。Macには必要な検証用モデルだけを残し、データセット・学習checkpointを保存しない。小さいmanifest・hash・集計は実行記録として保持する。

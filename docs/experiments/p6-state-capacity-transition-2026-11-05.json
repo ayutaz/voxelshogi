@@ -1,0 +1,41 @@
+{
+  "schema": "voxelshogi-state-capacity-transition-v1",
+  "source_commit": "2d91b27f128dd8cdbe1b5828b2aa3f9c68fd4a66",
+  "validated_pr_head": "98e285aaf1cfef58ba06e08c7d4305a1bff97f55",
+  "source_tree": "d0415e98ee4d043f8d3b3c99dd266b5ca52425c3",
+  "pr": 148,
+  "required_and_executed_checks_success": true,
+  "checks_observed": 27,
+  "before_sha256": "ba7b11da7b5eb34061532593a3637c9452f640cf8dca7f2703fbf9b8d66b5712",
+  "after_sha256": "8676e84d28f425cd2740868358b3bf195b4d6938f932ee2fec57cc62af078d01",
+  "prior_reservations": 21,
+  "reserved_bytes": 1407414632,
+  "old_self_limit_bytes": 2147483648,
+  "new_self_limit_bytes": 34359738368,
+  "capacity_estimate": {
+    "schema": "voxelshogi-research-state-capacity-plan-v1",
+    "parameter_counts": {
+      "full": 25783688,
+      "axial": 25783688,
+      "geometry": 26098120,
+      "cnn": 28606344
+    },
+    "planned_runs": 14,
+    "archives_per_run": 3,
+    "tensor_bytes_per_parameter": 24,
+    "overhead_bytes_per_archive": 67108864,
+    "maximum_bytes_per_archive": 753661120,
+    "historical_reserved_bytes": 1407414632,
+    "estimated_total_bytes": 33061181672,
+    "self_limit_bytes": 34359738368
+  },
+  "paid_storage_purchase": false,
+  "uploads": 0,
+  "new_reservations": 0,
+  "applied_at": 1793857445.404768,
+  "applied": true,
+  "vast_owned_resources": 0,
+  "cloudrift_owned_resources": 0,
+  "all_prior_reservations_and_approval_preserved": true,
+  "gpu_budget_unchanged_usd": 200
+}

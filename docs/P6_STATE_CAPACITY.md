@@ -1,5 +1,7 @@
 # P6の無料public保存枠と累積stateの自主上限
 
+**2026-11-05・実台帳へ適用済み**：[固定した移行証跡](experiments/p6-state-capacity-transition-2026-11-05.json)のとおり、PR #148の全27チェック成功と通常merge、同一source tree、両provider所有資源0、排他lockと前後bytesを確認した。全21予約1,407,414,632 bytesと過去承認を保持し、自主上限を2GiBから32GiBへ移した。新予約・実upload・有料storage購入は0、GPU総枠200も変更していない。以下の未適用の記述は実装準備時点の履歴。
+
 2026-11-05。ユーザーのHF公開・state保存・無料public容量の継続承認と、[1〜6の研究計画](P6_EXECUTION_PLAN.md)を対象とする。
 これは版付き移行のコードと見積もりであり、実台帳の移行や実uploadを完了した記録ではない。
 追加の有料storageを購入せず、GPU予算US$200も変更しない。
