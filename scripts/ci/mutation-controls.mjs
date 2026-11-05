@@ -7,6 +7,11 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'research-browser-vector-tolerance', file: 'scripts/research-browser-contract.mjs', before: 'delta > atol + rtol * Math.abs(expected[i])', after: 'delta < atol + rtol * Math.abs(expected[i])', test: 'research-browser-probe' },
+  { name: 'research-browser-body-hash', file: 'scripts/research-browser-contract.mjs', before: 'digest === descriptor.sha256', after: 'true', test: 'research-browser-probe' },
+  { name: 'research-browser-no-provider-fallback', file: 'scripts/research-browser-contract.mjs', before: 'entries.length === 1', after: 'entries.length >= 1', test: 'research-browser-probe' },
+  { name: 'research-browser-full-architecture-matrix', file: 'scripts/research-browser-contract.mjs', before: 'value.models.length === 4', after: 'value.models.length === 3', test: 'research-browser-probe' },
+  { name: 'research-browser-linux-only', file: 'scripts/research-browser-contract.mjs', before: "platform === 'linux'", after: 'true', test: 'research-browser-probe' },
   { name: 'security-scope-must-succeed', file: 'scripts/ci/security-scope.mjs', before: "scope?.result !== 'success'", after: 'false', test: 'security-scope' },
   { name: 'security-scope-typed-outputs', file: 'scripts/ci/security-scope.mjs', before: "outputKeys.every(key => ['true', 'false'].includes(scope.outputs?.[key]))", after: 'true', test: 'security-scope' },
   { name: 'security-any-affected-language', file: 'scripts/ci/security-scope.mjs', before: "impactKeys.some(key => scope.outputs[key] === 'true')", after: 'false', test: 'security-scope' },

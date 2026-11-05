@@ -1,0 +1,53 @@
+# 実Mのブラウザ演算検証
+
+2026-11-05。[実行計画](P6_EXECUTION_PLAN.md)の2で使う計測手順。
+実M・ONNXと単GPUの計測済みファイルを使い、ブラウザ対応は別に検証する。
+この手順の追加は実ブラウザ測定の完了記録ではない。
+
+## 目的と固定条件
+
+Full／Axial／Geometry／3D-CNNの未学習seed66001、20〜35M規模の実ONNXを対象とする。
+4構造×WASM／WebGPUの8組、各組で凍結fixture 0／3、各8 warmup＋32測定を行う。
+全Policy 1,067,985要素とValue 1要素を、公開した同じCUDA FP32の参照値と比較する。
+Policy atol／rtolは1e-4、Valueは両方1e-5。合法手内argmaxも一致を要求する。
+
+研究用の512MiB以下のファイルを別契約で扱い、既存M3／M6の64MiB上限やモデルID・承認を緩めない。
+通常のWeb配信には組み込まず、外部Linuxのloopbackに限定した一時HTTPサーバーを使う。
+モデルと全参照、ORT runtimeの実bytesとSHA-256をブラウザでも確認する。
+公開HFのmanual取得ゲートを別の公開配布で迂回しない。
+
+## 外部Linuxでの手順
+
+前提は、指定したHF固定revisionの全ファイルhash・public/manual・Community OFFの再確認、
+関連CIを通ったclean source、固定Node／pnpmと依存lock、Playwrightブラウザの導入である。
+データ・モデル・大きなstagingは外部Linuxに置き、Macへ中継しない。
+`PUBLICATION`は検証済みのoperator公開folder、plan／receiptはその実公開のものを指定する。
+
+```bash
+uv run --project infrastructure/cuda --locked python -m training.research_browser_inputs \
+  PUBLICATION FRESH_BROWSER_INPUTS --plan PUBLICATION_PLAN.json --receipt VERIFIED_RECEIPT.json
+node scripts/research-browser-probe.mjs FRESH_BROWSER_INPUTS FRESH_RUN/result.json
+```
+
+準備処理は全公開ファイルを再hashし、receiptのrelease hash・固定revisionを照合する。
+元ONNXをbyte一致でコピーし、safetensorsの全参照をlittle-endian float32へ抽出する。
+参照入力は凍結したRust局面と一致を要求し、準備後にも元の全公開物を再hashする。
+
+実行処理は既存Webの`openBackend`を使うWorkerだけを一時bundleする。
+HTTPサーバーは127.0.0.1へbindし、列挙したpayload・runtime・Workerだけを返す。
+1組ごとに新しいcontextとWorkerを作り、推論時間はCPUへの出力読戻し・GPU完了を含める。
+operator profileで実際のproviderを確認し、WebGPUのCPU fallback・software adapterを成功にしない。
+OS／driver cacheは制御していない。RSSは前後の観測値でありpeakとは表記しない。
+
+## 判断と残る作業
+
+`matrix_complete`は全8組の結果が得られたこと、`complete`は全8組成功を表す。
+WASMで4構造すべて成功しない場合はコマンドを失敗にする。
+WebGPUの失敗もメッセージ・段階・provider情報を残し、WASM成功へ混ぜない。
+成功した構造とbackendの一覧を対応候補とし、失敗や未測定を対応済みと表記しない。
+ネットワーク失敗を自動的に「演算未対応」と分類しない。
+
+軽量テストは手計算の全要素誤差・既知のSHA-256・matrix・providerの不正を検出する。
+Linuxのstagingテストは不透明なfake ONNXを使う入出力検証で、実M推論の証拠ではない。
+実測結果の固定HF保存・資源解放、学習済みMの変換版、観戦表示・操作・実スマートフォン、
+各対応端末60分と公開E2Eは別途実行して記録する。
