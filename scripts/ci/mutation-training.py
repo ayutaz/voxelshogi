@@ -13,6 +13,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-screen-exact-twelve-pairs",
+        "training/research_screen.py",
+        'or len(protocol["cases"]) != 12',
+        'or len(protocol["cases"]) != 11',
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-same-weights",
+        "training/research_screen.py",
+        'del value["participants"]["model"]["policy"]',
+        'del value["participants"]["model"]["policy"]\n    del value["participants"]["model"]["artifact_sha256"]',
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-method-label",
+        "training/research_screen.py",
+        'or protocol["participants"]["model"]["policy"] != name',
+        "or False",
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-family-grouping",
+        "training/research_screen.py",
+        "grouped[families[case]].append(case)",
+        "grouped[case].append(case)",
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-family-censoring",
+        "training/research_screen.py",
+        'hi += points[candidate] + int(candidate == "cutoff") - points[baseline]',
+        "hi += points[candidate] - points[baseline]",
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-holdout-purpose",
+        "training/research_screen.py",
+        'protocol["purpose"] != "development"',
+        "False",
+        "test_research_screen.py",
+    ),
+    (
+        "research-screen-root-uniqueness",
+        "training/research_screen.py",
+        "if identity in seen:",
+        "if False:",
+        "test_research_screen_native.py",
+    ),
+    (
+        "research-screen-handwritten-oracle",
+        "training/research_screen.py",
+        'or game.snapshot()["result"] != oracle["result"]',
+        "or False",
+        "test_research_screen_native.py",
+    ),
+    (
         "distributed-single-rank-group-hook",
         "training/distributed_training.py",
         "    _raw_model(model, world_size)\n    if world_size == 1:\n        return\n",
