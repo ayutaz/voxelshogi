@@ -1,5 +1,7 @@
 # 現在の状態と文書の案内
 
+**2026-11-05・Mのweights評価を統合**：[PR #154](https://github.com/ayutaz/voxelshogi/pull/154)は最新main統合後の必須8チェックと関連PR検証を確認し、main `f3d2d66`へ統合した。4構造の実M weights往復・Rust局面での合法着手・全変異の[Linux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987703130)も成功している。[専用metadataと全NN参照監査](P6_MODEL_EVALUATION.md)で、実学習後のargmax／PUCT32評価へつなげる。実M学習・開発用対局・12 run比較は未実行。次は実ブラウザとデータ監査、その結果をレビューして2 runを事前固定する。以下は日時付き履歴。
+
 **2026-11-05・実ブラウザ測定コードを統合**：[PR #152](https://github.com/ayutaz/voxelshogi/pull/152)は必須8チェック・[修正後のLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987246949)・CodeQL指摘0件を確認し、main `b2c7c09`へ統合した。実Chromiumの専用Worker通信確認は成功したが、4構造×WASM／WebGPUの実測は未実行。統合mainの深いCI後、外部Linuxで実ブラウザと同じホストでのデータ監査を進める。Mモデル評価のPR #154は既存HEADの全検証成功後に最新mainを統合し、再検証中。新規課金資源は作成せず、累積予約158／承認200・未予約42を保持する。以下は日時付き履歴。
 
 **2026-11-05・採用前監査と訪問分布学習を統合**：[PR #153](https://github.com/ayutaz/voxelshogi/pull/153)を必須8チェック・[最新HEADのLinux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41977701532)成功後にmain `40ba00b`へ統合した。[データ監査](P6_CORPUS_ADMISSION.md)→[train／val特徴量](P6_VISIT_DATA.md)→[固定更新数・保存再開](P6_VISIT_TRAINING.md)が接続済み。重複PR #150／#151は統合済みとして閉じた。実候補データの採用・Mの2 run学習・12 run比較は未実行であり、次は修正したブラウザ検証と実データ監査を外部Linuxで実行する。以下は日時付き履歴。
