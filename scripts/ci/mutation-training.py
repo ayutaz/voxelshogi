@@ -13,6 +13,20 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-browser-input-linux-boundary",
+        "training/research_browser_inputs.py",
+        'if sys.platform != "linux":',
+        "if False:",
+        "test_research_browser_inputs.py",
+    ),
+    (
+        "research-browser-input-verified-receipt",
+        "training/research_browser_inputs.py",
+        'receipt.get("verified") is not True',
+        "False",
+        "test_research_browser_inputs_native.py::test_unverified_or_changed_source_never_creates_browser_staging[unverified]",
+    ),
+    (
         "research-visit-data-audit-hash",
         "training/research_visit_data.py",
         "fingerprint(audit) != expected_sha256",
