@@ -13,6 +13,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-training-canonical-config",
+        "training/research_fit.py",
+        "if config.value() != value:",
+        "if config.value() == value:",
+        "test_research_fit.py",
+    ),
+    (
+        "research-training-architecture-dimensions",
+        "training/research_fit.py",
+        'architecture=ResearchConfig(**value["architecture"]),',
+        'architecture=architecture_config("full"),',
+        "test_research_fit.py",
+    ),
+    (
+        "research-training-resume-request",
+        "training/research_fit.py",
+        "        resume=resume,",
+        "        resume=False,",
+        "test_research_fit.py",
+    ),
+    (
+        "research-training-safe-profile",
+        "training/resume_archive.py",
+        "return RESEARCH_SCHEMA",
+        "return SCHEMA",
+        "test_research_state_release.py",
+    ),
+    (
+        "research-training-archive-config-validation",
+        "training/resume_archive.py",
+        "        validate_research_binding(binding)",
+        "        pass",
+        "test_research_state_release.py",
+    ),
+    (
+        "research-training-publication-capacity-profile",
+        "training/hub_release.py",
+        "folder, repo_type, expected=expected, artifact_role=artifact_role",
+        'folder, repo_type, expected=expected, artifact_role="artifacts"',
+        "test_research_state_release.py",
+    ),
+    (
+        "research-training-model-seed",
+        "training/research_fit.py",
+        "make_research_model(config.architecture, seed=config.seed)",
+        "make_research_model(config.architecture, seed=314159)",
+        "test_research_fit_native.py::test_selected_seed_initializes_the_requested_model_and_stop_preserves_it",
+    ),
+    (
         "research-architecture-parameter-count",
         "export/research_contract.py",
         "return stem + heads + config.layers * block",

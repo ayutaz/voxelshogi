@@ -62,6 +62,7 @@ def state_inventory(folder, plan, card):
             "training-state": "m6",
             "selfplay-training-state": "selfplay",
             "distributed-training-state": "distributed",
+            "research-training-state": "research",
         }[plan["artifact_role"]],
     )
     expected = {name: None for name in ("manifest.json", "README.md", "LICENSE")}

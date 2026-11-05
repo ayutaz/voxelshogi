@@ -108,3 +108,9 @@ AI対AIの観戦を中心にし、人間対AIは補助機能とする。対人�
 [ci-checks](../.agents/skills/ci-checks/SKILL.md)に従い、取得は最短10分間隔。
 CI待ちには独立した次の実装・文書を進め、CIの追加最適化を研究の無期限な先行作業にしない。
 日程は2の実測後に更新し、純学習時間と実装・起動・準備・評価・CI待ちを区別する。
+
+## 学習と保存の実装契約
+
+[4構造の教師あり学習と専用state](P6_TRAINING_STATE.md)を使う。
+モデルの全寸法・seed・共通教師cache・FP32 optimizerをbindingに含め、専用profileで保存再開する。
+数値結合はLinux CI、実Mの教師学習・CUDA再開・公開の証拠は外部Linuxで別々にそろえる。
