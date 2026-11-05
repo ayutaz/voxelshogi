@@ -52,6 +52,7 @@ STATE_REPOS = {
     "training-state": "voxelshogi/voxelshogi-transformer-s-training-state",
     "selfplay-training-state": "voxelshogi/voxelshogi-transformer-s-selfplay-training-state-v1",
     "distributed-training-state": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
+    "research-training-state": "voxelshogi/voxelshogi-research-training-state-v1",
 }
 
 
@@ -86,7 +87,15 @@ def _policy(plan):
         raise ValueError("release requires an immutable source commit")
 
 
-def _inventory(folder, repo_type, *, expected=None):
+def artifact_limits(role, path):
+    """Larger typed P6 state tensors do not relax inference or legacy profiles."""
+    if role == "research-training-state":
+        maximum = 512 * 1024**2 if path.endswith("/state.safetensors") else 64 * 1024**2
+        return maximum, 2 * 1024**3
+    return (16 if path == "evaluation.json" else 64) * 1024**2, 512 * 1024**2
+
+
+def _inventory(folder, repo_type, *, expected=None, artifact_role="artifacts"):
     folder = Path(folder)
     if folder.is_symlink() or not folder.is_dir():
         raise ValueError("release folder must be a real directory")
@@ -124,11 +133,7 @@ def _inventory(folder, repo_type, *, expected=None):
             raise ValueError(f"unexpected release artifact: {relative}")
         if expected is not None:
             descriptor = expected[relative.as_posix()]
-            maximum = (
-                16 * 1024 * 1024
-                if relative.as_posix() == "evaluation.json"
-                else 64 * 1024 * 1024
-            )
+            maximum, _ = artifact_limits(artifact_role, relative.as_posix())
             if path.stat().st_size > maximum or (
                 descriptor is not None
                 and "bytes" in descriptor
@@ -148,7 +153,7 @@ def _inventory(folder, repo_type, *, expected=None):
         )
     names = {f["path"] for f in files}
     if expected is not None:
-        if sum(file["bytes"] for file in files) > 512 * 1024 * 1024:
+        if sum(file["bytes"] for file in files) > artifact_limits(artifact_role, "")[1]:
             raise ValueError("inference package exceeds browser folder limit")
         if names != set(expected):
             raise ValueError("incomplete inference package inventory")
@@ -221,6 +226,7 @@ def plan_release(
                 "voxelshogi-resume-archive-v1",
                 "voxelshogi-selfplay-resume-archive-v1",
                 "voxelshogi-distributed-resume-archive-v1",
+                "voxelshogi-research-resume-archive-v1",
             )
             and artifact_role not in STATE_REPOS
         ):
@@ -258,7 +264,9 @@ def plan_release(
         from training.state_release import state_inventory
 
         expected = state_inventory(folder, plan, card)
-    plan["files"] = _inventory(folder, repo_type, expected=expected)
+    plan["files"] = _inventory(
+        folder, repo_type, expected=expected, artifact_role=artifact_role
+    )
     return plan
 
 

@@ -21,6 +21,7 @@ from training.supervision import ROOT, label_contract
 SCHEMA = "voxelshogi-resume-archive-v1"
 SELFPLAY_SCHEMA = "voxelshogi-selfplay-resume-archive-v1"
 DISTRIBUTED_SCHEMA = "voxelshogi-distributed-resume-archive-v1"
+RESEARCH_SCHEMA = "voxelshogi-research-resume-archive-v1"
 PAYLOAD_FIELDS = {"model", "optimizer", "rng", "progress", "binding"}
 
 
@@ -179,8 +180,10 @@ def decode_tree(tree, tensors):
 
 
 def _schema(profile):
-    if profile not in ("m6", "selfplay", "distributed"):
+    if profile not in ("m6", "selfplay", "distributed", "research"):
         raise ValueError("unknown resume archive profile")
+    if profile == "research":
+        return RESEARCH_SCHEMA
     if profile == "distributed":
         return DISTRIBUTED_SCHEMA
     return SCHEMA if profile == "m6" else SELFPLAY_SCHEMA
@@ -197,6 +200,11 @@ def _binding(binding, *, profile="m6"):
     }:
         raise ValueError("resume run binding fields differ")
     config = binding["config"]
+    if profile == "research":
+        from training.research_fit import validate_research_binding
+
+        validate_research_binding(binding)
+        return
     if profile == "distributed":
         from training.distributed_training import validate_distributed_binding
 
@@ -560,7 +568,7 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--expected-run", type=Path)
     parser.add_argument(
-        "--profile", choices=("m6", "selfplay", "distributed"), default="m6"
+        "--profile", choices=("m6", "selfplay", "distributed", "research"), default="m6"
     )
     args = parser.parse_args()
     if not args.output.resolve().is_relative_to(ROOT / "runs"):
