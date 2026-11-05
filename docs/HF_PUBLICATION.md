@@ -103,3 +103,9 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 通常modelへの混入を拒否し、M6／自己対局から引き継いだ同じ累積1GiB upload ledgerを使う。過去の予約を減らしたり初期化したりせず、実bytesを予約してから外部Linuxで公開・全hash照合する。このprofileの準備やCPUテストだけでは、実repo公開・GPU保存再開が完了したことにはならない。
 
 **2026-11-05 00:13 UTCの実公開**：[P5-4の全3構成と各GPU保存再開](P5_4_RESULTS.md)で中間／最終の計6 stateと3行の測定datasetを公開し、固定revisionの全bytes・hash・Card・public/manual・Community OFFを照合した。共通ledgerの過去予約は保持し、実機解放も確認済み。先行する1GPU部分結果は別の固定revisionとして残す。
+
+## P6の累積state容量の版付き移行
+
+[実M寸法と全保存点数からの見積もり](P6_STATE_CAPACITY.md)に基づき、無料public枠内の自主上限を2GiBから32GiBへ移すv3を用意する。
+旧v1／v2の証拠・全予約・移行前ledger全体のhashを保持し、通常の実送信は従来どおり実bytesを予約してから行う。
+これは実適用前のコード契約で、有料storageの購入、GPU予算の追加、容量一杯のuploadを意味しない。
