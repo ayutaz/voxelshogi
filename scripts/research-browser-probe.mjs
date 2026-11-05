@@ -72,7 +72,9 @@ export async function measureResearch(inputDirectory, outputFile) {
     await new Promise((resolve, reject) => { server.once('error', reject);server.listen(0, '127.0.0.1', resolve); });
     const base = `http://127.0.0.1:${server.address().port}`;
     const { chromium } = await import(pathToFileURL(resolve(dirname(require.resolve('@playwright/test')), 'index.mjs')).href);
-    browser = await chromium.launch({ channel: process.env.PW_CHANNEL || undefined, headless: true, args: ['--no-sandbox', '--enable-unsafe-webgpu', '--enable-precise-memory-info'] });
+    const launchOptions = { channel: process.env.PW_CHANNEL || undefined, headless: true, args: ['--no-sandbox', '--enable-gpu', '--use-angle=vulkan', '--enable-features=Vulkan', '--disable-vulkan-surface', '--enable-unsafe-webgpu', '--enable-precise-memory-info'] };
+    report.launch_options = launchOptions;
+    browser = await chromium.launch(launchOptions);
     report.browser = browser.version();
     const cdp = await browser.newBrowserCDPSession();
     for (const testCase of researchBrowserCases()) {
