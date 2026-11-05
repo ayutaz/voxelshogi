@@ -41,9 +41,9 @@ test('the real runner refuses the editing Mac', () => {
 test('research download verifies exact bytes and rejects corrupt or oversized bodies', async () => {
   const descriptor = { path: 'fixture.bin', bytes: 3, sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' };
   const fetcher = body => async () => new Response(body);
-  assert.deepEqual([...await readResearch('http://127.0.0.1/fixture.bin', descriptor, fetcher('abc'))], [97, 98, 99]);
-  await assert.rejects(() => readResearch('http://127.0.0.1/fixture.bin', descriptor, fetcher('abd')), /hash/);
-  await assert.rejects(() => readResearch('http://127.0.0.1/fixture.bin', descriptor, fetcher('abcd')), /size/);
+  assert.deepEqual([...await readResearch(descriptor, fetcher('abc'))], [97, 98, 99]);
+  await assert.rejects(() => readResearch(descriptor, fetcher('abd')), /hash/);
+  await assert.rejects(() => readResearch(descriptor, fetcher('abcd')), /size/);
 });
 test('backend placement requires actual operator profile and hardware identity', () => {
   const row = { backend: 'webgpu', information: { backend: 'webgpu', adapter: { vendor: 'NVIDIA', architecture: 'blackwell' } }, profile: { providers: { WebGpuExecutionProvider: 5 }, operators: { MatMul: 5 } } };
@@ -52,4 +52,50 @@ test('backend placement requires actual operator profile and hardware identity',
     const bad = structuredClone(row);change(bad);assert.throws(() => validateProvider(bad));
   }
   validateProvider({ backend: 'wasm', information: { backend: 'wasm', adapter: null }, profile: { providers: { CPUExecutionProvider: 2 }, operators: { MatMul: 2 } } });
+});
+
+test('research payload URLs stay on the fixed same-origin route with encoded filenames', async () => {
+  const descriptor = { path: 'full/fixture.bin', bytes: 3, sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' };
+  const seen = [];
+  await readResearch(descriptor, async (url, options) => { seen.push({ url, options });return new Response('abc'); });
+  assert.deepEqual(seen, [{ url: '/payload/full%2Ffixture.bin', options: { cache: 'no-store', credentials: 'omit', redirect: 'error' } }]);
+});
+
+test('runtime origin and paths are pinned to this loopback measurement server', async () => {
+  const { researchRuntime } = await import('../research-browser-contract.mjs');
+  const origin = 'http://127.0.0.1:43819';
+  const fixture = () => ({ assetBase: origin + '/payload/', index: { runtime: { version: '1.31.1',
+    bundle: file('runtime/ort.webgpu.bundle.min.mjs', 1), bootstrap: file('runtime/ort-wasm-simd-threaded.asyncify.mjs', 1),
+    wasm: { ...file('runtime/ort-wasm-simd-threaded.asyncify.wasm', 1), parts: [file('runtime/ort-wasm-simd-threaded.asyncify.wasm', 1)] },
+    notices: [file('runtime/LICENSE', 1), file('runtime/ThirdPartyNotices.txt', 1)] } } });
+  assert.deepEqual(researchRuntime(fixture(), origin), fixture());
+  for (const change of [v => v.assetBase = 'https://elsewhere.invalid/payload/', v => v.index.runtime.bundle.path = 'runtime/other.mjs', v => v.index.runtime.wasm.parts[0].path = '../other.wasm', v => v.index.runtime.version = 'dev']) {
+    const bad = fixture();change(bad);assert.throws(() => researchRuntime(bad, origin));
+  }
+  assert.throws(() => researchRuntime(fixture(), 'https://elsewhere.invalid'));
+});
+
+test('Worker accepts only its dedicated implicit-port message before parsing payloads', async () => {
+  const { readFileSync } = await import('node:fs');
+  const vm = await import('node:vm');
+  const source = readFileSync(new URL('../research-browser-worker.mjs', import.meta.url), 'utf8').replace(/^import .*;$/gm, '');
+  for (const { dedicated, origin, sender, parses } of [
+    { dedicated: true, origin: '', sender: null, parses: 1 },
+    { dedicated: true, origin: 'https://elsewhere.invalid', sender: null, parses: 0 },
+    { dedicated: true, origin: '', sender: {}, parses: 0 },
+    { dedicated: false, origin: '', sender: null, parses: 0 },
+  ]) {
+    class DedicatedWorkerGlobalScope {}
+    const messages = [], seen = [];
+    const self = dedicated ? new DedicatedWorkerGlobalScope() : {};
+    self.location = { origin: 'http://127.0.0.1:43819' };
+    self.postMessage = value => messages.push(value);
+    const context = { self, DedicatedWorkerGlobalScope, validateBrowserInputs: value => { seen.push(value);throw new Error('fake input boundary; no runtime/model'); } };
+    vm.runInNewContext(source, context);
+    await self.onmessage({ origin, source: sender, data: { name: 'full', backend: 'wasm', plan: {} } });
+    assert.equal(seen.length, parses);
+    assert.equal(messages.length, 1);
+    assert.equal(messages[0].status, 'failed');
+    assert.equal(messages[0].stage, parses ? 'input' : 'message-origin');
+  }
 });

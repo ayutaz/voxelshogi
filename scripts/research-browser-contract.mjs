@@ -40,9 +40,26 @@ export function compareVector(expected, actual, elements, atol, rtol) {
   }
   return { elements, exceeded, max_abs };
 }
-export async function readResearch(url, descriptor, fetcher = fetch) {
+export function researchRuntime(value, origin) {
+  const root = new URL(origin);
+  check(root.protocol === 'http:' && root.hostname === '127.0.0.1' && root.origin === origin, 'loopback Worker origin required');
+  const assetBase = root.origin + '/payload/', runtime = value?.index?.runtime;
+  check(value?.assetBase === assetBase && runtime?.version === '1.31.1', 'research runtime origin/version differs');
+  const pin = (entry, path) => {
+    check(entry?.path === path && Number.isSafeInteger(entry.bytes) && entry.bytes > 0 && entry.bytes <= 64 * 1024 * 1024 && sha(entry.sha256), 'research runtime file differs');
+    return { path, bytes: entry.bytes, sha256: entry.sha256 };
+  };
+  check(runtime.wasm?.parts?.length === 1 && runtime.notices?.length === 2, 'research runtime inventory differs');
+  return { assetBase, index: { runtime: {
+    version: '1.31.1', bundle: pin(runtime.bundle, 'runtime/ort.webgpu.bundle.min.mjs'),
+    bootstrap: pin(runtime.bootstrap, 'runtime/ort-wasm-simd-threaded.asyncify.mjs'),
+    wasm: { ...pin(runtime.wasm, 'runtime/ort-wasm-simd-threaded.asyncify.wasm'), parts: [pin(runtime.wasm.parts[0], 'runtime/ort-wasm-simd-threaded.asyncify.wasm')] },
+    notices: [pin(runtime.notices[0], 'runtime/LICENSE'), pin(runtime.notices[1], 'runtime/ThirdPartyNotices.txt')],
+  } } };
+}
+export async function readResearch(descriptor, fetcher = fetch) {
   file(descriptor);
-  const response = await fetcher(url, { cache: 'no-store' });
+  const response = await fetcher('/payload/' + encodeURIComponent(descriptor.path), { cache: 'no-store', credentials: 'omit', redirect: 'error' });
   check(response.ok && response.body, 'research download failed');
   const reader = response.body.getReader(), chunks = [];
   let count = 0;

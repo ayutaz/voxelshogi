@@ -51,3 +51,11 @@ WebGPUの失敗もメッセージ・段階・provider情報を残し、WASM成�
 Linuxのstagingテストは不透明なfake ONNXを使う入出力検証で、実M推論の証拠ではない。
 実測結果の固定HF保存・資源解放、学習済みMの変換版、観戦表示・操作・実スマートフォン、
 各対応端末60分と公開E2Eは別途実行して記録する。
+
+## 取得先とWorkerの境界
+
+初回PRのCodeQLで、message由来のURLを取得する経路（`js/client-side-request-forgery`）とorigin検証の欠落が指摘された。必須jobが成功していても、errorを含むため保護ルールが取り込みを拒否した。この結果を残し、再解析で修正を確認する。
+
+研究payloadの取得APIはURLを受け取らず、同一originの`/payload/`とURL componentとしてエンコードしたファイル名だけを使う。Cookieを送らずredirectも拒否する。HTTP側も同じエンコード済み経路を登録する。ORT runtimeはWorker自身の127.0.0.1 origin、固定version・既知のファイル名へ限定し、messageに別originや別pathがある場合は拒否する。
+
+WorkerはDedicatedWorkerGlobalScopeの所有者用implicit MessagePortだけを受理し、そのmessageの空origin・null sourceをpayloadの読み取り前に確認する。Window向けのcross-document messageとは区別する（[HTMLのWorker定義](https://html.spec.whatwg.org/multipage/workers.html#dom-dedicatedworkerglobalscope-postmessage)、[MessageEventの定義](https://html.spec.whatwg.org/multipage/comms.html#the-messageevent-interface)）。軽量VMテストで、異なるorigin・送信元・Window相当のscopeがモデル処理へ到達しないことを確認する。これは実ブラウザ測定の代わりではない。

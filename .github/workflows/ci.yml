@@ -269,7 +269,7 @@ jobs:
       - run: uv run --locked python scripts/ci/mutation-python.py
 
   python-training-mutations:
-    name: Python training mutations (${{ matrix.shard }}/4)
+    name: Python training mutations (${{ matrix.shard }}/8)
     needs: [scope]
     if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.python == 'true')
     runs-on: ubuntu-24.04
@@ -278,7 +278,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: rustup show
@@ -292,7 +292,7 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
       - name: Verify this shard's baseline and mutations
-        run: uv run --locked python scripts/ci/mutation-training.py --shard "$SHARD" --shards 4
+        run: uv run --locked python scripts/ci/mutation-training.py --shard "$SHARD" --shards 8
         env:
           SHARD: ${{ matrix.shard }}
 
@@ -370,6 +370,9 @@ jobs:
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
       - run: pnpm --dir apps/web exec playwright install chromium
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
+      - name: Verify research Worker private channel without loading models
+        if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
+        run: node scripts/research-worker-channel-smoke.mjs
       - name: Verify all formats and real Worker interaction
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.models == 'true'
         run: pnpm exec playwright test -c model-playwright.config.ts

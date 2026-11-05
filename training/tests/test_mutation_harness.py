@@ -62,12 +62,13 @@ def test_shards_keep_the_manual_partition_and_cover_the_real_catalog_once():
     ]
     assert select(catalog) == catalog
     actual = module["MUTATIONS"]
-    parts = [select(actual, shard=i, shards=4) for i in range(4)]
-    names = [m[0] for group in parts for m in group]
-    assert len(names) == len(actual) == len(set(names))
-    assert set(names) == {m[0] for m in actual}
-    assert all(parts)
-    assert max(map(len, parts)) - min(map(len, parts)) <= 1
+    for shards in (4, 8):
+        parts = [select(actual, shard=i, shards=shards) for i in range(shards)]
+        names = [m[0] for group in parts for m in group]
+        assert len(names) == len(actual) == len(set(names))
+        assert set(names) == {m[0] for m in actual}
+        assert all(parts)
+        assert max(map(len, parts)) - min(map(len, parts)) <= 1
 
 
 def test_invalid_partial_empty_or_duplicate_partition_is_rejected():

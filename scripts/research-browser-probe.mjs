@@ -17,6 +17,15 @@ async function digest(file) {
   for await (const chunk of createReadStream(file)) hash.update(chunk);
   return hash.digest('hex');
 }
+export async function buildResearchWorker(bundles) {
+  requireLinux(process.platform);
+  assert.equal(process.versions.node, readFileSync(resolve(root, '.node-version'), 'utf8').trim(), 'use pinned Node version');
+  assert.ok(!existsSync(bundles), 'use a fresh worker build directory');
+  const require = createRequire(resolve(root, 'apps/web/package.json'));
+  const { build } = await import(pathToFileURL(require.resolve('vite')).href);
+  await build({ configFile: false, root, logLevel: 'warn', build: { outDir: bundles, emptyOutDir: false, minify: false, lib: { entry: resolve(root, 'scripts/research-browser-worker.mjs'), formats: ['es'], fileName: () => 'worker.mjs' } } });
+  return resolve(bundles, 'worker.mjs');
+}
 export async function measureResearch(inputDirectory, outputFile) {
   requireLinux(process.platform);
   assert.equal(process.versions.node, readFileSync(resolve(root, '.node-version'), 'utf8').trim(), 'use pinned Node version');
@@ -32,7 +41,7 @@ export async function measureResearch(inputDirectory, outputFile) {
     assert.ok(!relative(input, file).startsWith('..'), 'research payload escapes staging');
     assert.equal(await digest(file), descriptor.sha256, 'research payload hash changed');
     assert.equal(readFileSync(file).byteLength, descriptor.bytes, 'research payload size changed');
-    files.set('/payload/' + descriptor.path, { file, type: 'application/octet-stream' });
+    files.set('/payload/' + encodeURIComponent(descriptor.path), { file, type: 'application/octet-stream' });
   }
   const runtimeDirectory = resolve(root, 'apps/web/node_modules/onnxruntime-web');
   assert.equal(JSON.parse(readFileSync(resolve(runtimeDirectory, 'package.json'))).version, '1.31.1');
@@ -49,11 +58,8 @@ export async function measureResearch(inputDirectory, outputFile) {
   const notices = existsSync(resolve(runtimeDirectory, 'LICENSE')) ? runtimeDirectory : resolve(root, 'third_party/onnxruntime-1.31.1');
   runtime.notices = ['LICENSE', 'ThirdPartyNotices.txt'].map(n => runtimeFile(n, resolve(notices, n)));
   const require = createRequire(resolve(root, 'apps/web/package.json'));
-  const { build } = await import(pathToFileURL(require.resolve('vite')).href);
   const bundles = resolve(dirname(output), 'worker-' + source.slice(0, 12));
-  assert.ok(!existsSync(bundles), 'use a fresh worker build directory');
-  await build({ configFile: false, root, logLevel: 'warn', build: { outDir: bundles, emptyOutDir: false, minify: false, lib: { entry: resolve(root, 'scripts/research-browser-worker.mjs'), formats: ['es'], fileName: () => 'worker.mjs' } } });
-  files.set('/worker.mjs', { file: resolve(bundles, 'worker.mjs'), type: 'text/javascript' });
+  files.set('/worker.mjs', { file: await buildResearchWorker(bundles), type: 'text/javascript' });
   const server = createServer((request, response) => {
     const item = files.get(new URL(request.url, 'http://127.0.0.1').pathname);
     response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');

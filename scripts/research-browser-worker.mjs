@@ -1,24 +1,31 @@
 // Development-only Worker, served on loopback by the Linux measurement runner.
 import { openBackend } from '../apps/web/src/inference/backend.ts';
-import { compareVector, readResearch, validateBrowserInputs } from './research-browser-contract.mjs';
+import { compareVector, readResearch, researchRuntime, validateBrowserInputs } from './research-browser-contract.mjs';
 
-self.onmessage = async ({ data }) => {
+self.onmessage = async event => {
+  // Dedicated workers receive their owner's implicit MessagePort events; those
+  // events have the default empty origin and null source, unlike Window messages.
+  if (!(self instanceof DedicatedWorkerGlobalScope) || event.origin !== '' || event.source !== null) {
+    self.postMessage({ status: 'failed', stage: 'message-origin', error_type: 'OriginError', error_message: 'dedicated owner channel required' });
+    return;
+  }
+  const data = event.data;
   let port, session, stage = 'input';
   try {
     validateBrowserInputs(data.plan);
     const model = data.plan.models.find(m => m.name === data.name);
     if (!model || !['wasm', 'webgpu'].includes(data.backend)) throw new Error('unknown research case');
-    const base = data.runtime.assetBase;
+    const runtime = researchRuntime(data.runtime, self.location.origin);
     stage = 'runtime';
-    port = await openBackend(data.runtime, data.backend, 'fp32');
+    port = await openBackend(runtime, data.backend, 'fp32');
     stage = 'model';
-    const bytes = await readResearch(new URL(model.model.path, base).href, model.model);
+    const bytes = await readResearch(model.model);
     const begin = performance.now();
     session = await port.createSession(bytes, 'fp32');
     const init_ms = performance.now() - begin, fixtures = [];
     for (const fixture of model.fixtures) {
       stage = `fixture${fixture.id}`;
-      const refs = await Promise.all([fixture.features, fixture.policy, fixture.value].map(f => readResearch(new URL(f.path, base).href, f)));
+      const refs = await Promise.all([fixture.features, fixture.policy, fixture.value].map(f => readResearch(f)));
       const [features, policy, value] = refs.map(b => new Float32Array(b.buffer, b.byteOffset, b.byteLength / 4));
       if (features.length !== 729 * 43 || features.some(x => !Number.isFinite(x))) throw new Error('invalid frozen features');
       const times = [], comparisons = { policy: null, value: null };
