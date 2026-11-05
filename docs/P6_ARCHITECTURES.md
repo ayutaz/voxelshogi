@@ -58,3 +58,21 @@ Nativeテストでは、scalar Pythonの独立Attention、明示的なx／y／z 
 学習loader・checkpoint binding・配布catalogへは、構造と設定を明示して接続する。
 既存M6 loaderで新構造を黙って読み込ませない。
 本学習・複数seed・評価・HF公開・正式な端末対応は未完了として残す。
+
+## 次の外部GPU演算試行
+
+`training.research_probe.probe_protocol(source_commit)`で条件を固定し、
+`uv run --project infrastructure/cuda --locked python -m training.research_probe --protocol <固定JSON> --output <新しい出力先>`を外部Linuxの実単GPUで実行する。
+4構造の実M形状について、既存fixture0／3をRustで再生し、CUDA／CPU／ONNX Runtimeの全出力と合法手argmaxを照合する。
+ONNX・初期重み・入力と参照出力のsafetensorsをLinuxへ保存し、後続の実ブラウザ検証に使う。
+このCLIだけではブラウザ対応・HF公開を完了しない。
+
+各構造のbatch1／4／8／16を、FP32・TF32 OFF・seed66001、準備8更新＋測定32更新で測る。
+準備後と測定後のCUDA同期を挟んだwall時間、実測例数、Torch peak allocated／reserved bytes、準備を含む外側の時間を区別する。
+計測の負荷は「最初の合法手へのdense cross-entropy＋Valueの0へのMSE＋AdamW」であり、教師あり学習の速度・棋力・教師品質を表さない。
+初期モデルの変換・参照値を先に固定し、計測には別の破棄するモデルを使う。合成負荷で更新した重みを未学習の配布物へ混ぜない。
+
+試行内部の上限は30分。OOMのbatchも負の結果として記録し、batchを黙って小さくして成功へ置換しない。
+全4構造の数値検証と各構造の少なくとも1 batchの測定がそろったか、全batchが収まったかを別のflagで記録する。
+実機の起動・入力取得・ブラウザ・HF照合・削除を含むレンタル全体は、別の見積もり・用途別配分・期限ガードで管理する。
+CPUの極小Nativeテストを、実M・CUDA速度・VRAMやブラウザ性能の証拠に読み替えない。
