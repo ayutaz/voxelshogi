@@ -13,6 +13,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-corpus-fixed-family-counts",
+        "training/research_corpus.py",
+        "train_end = len(ranked) - 4",
+        "train_end = len(ranked) - 2",
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-partition-seed",
+        "training/research_corpus.py",
+        'f"p6-family-split-v1:{seed}:{x}"',
+        'f"p6-family-split-v1:67011:{x}"',
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-retain-final-root-protection",
+        "training/research_corpus.py",
+        "blocked = set.union(*roles.values())",
+        "blocked = protected_inputs",
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-holdout-priority",
+        "training/research_corpus.py",
+        'PRIORITY = {"train": 0, "val": 1, "test": 2}',
+        'PRIORITY = {"train": 2, "val": 1, "test": 0}',
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-stable-sample-selection",
+        "training/research_corpus.py",
+        'sorted(eligible, key=lambda item: item[1]["id"])',
+        'sorted(eligible, key=lambda item: item[1]["id"], reverse=True)',
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-no-source-rebinding",
+        "training/research_corpus.py",
+        'file_hash(folder / "manifest.json") != manifest_sha256',
+        "False",
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-enumerate-every-position",
+        "training/research_corpus.py",
+        'game.play(sample["move"])',
+        "pass",
+        "test_research_corpus.py",
+    ),
+    (
+        "research-corpus-rust-root-comparison",
+        "training/research_corpus.py",
+        'actual != bundle["roots"][case["id"]]',
+        "False",
+        "test_research_corpus_native.py",
+    ),
+    (
         "research-architecture-parameter-count",
         "export/research_contract.py",
         "return stem + heads + config.layers * block",
