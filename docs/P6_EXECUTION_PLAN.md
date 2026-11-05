@@ -113,3 +113,9 @@ CI待ちには独立した次の実装・文書を進め、CIの追加最適化�
 
 [無料public保存枠内の版付き容量移行](P6_STATE_CAPACITY.md)で、14 runの中間・最終・失敗退避と過去履歴をまとめて見積もる。
 実送信前に検証済みbytesを共通ledgerへ予約し、無料HF枠とGPUの有料予約を混同しない。
+
+## 学習と保存の実装契約
+
+[4構造の教師あり学習と専用state](P6_TRAINING_STATE.md)を使う。
+モデルの全寸法・seed・共通教師cache・FP32 optimizerをbindingに含め、専用profileで保存再開する。
+数値結合はLinux CI、実Mの教師学習・CUDA再開・公開の証拠は外部Linuxで別々にそろえる。

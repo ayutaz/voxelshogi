@@ -109,3 +109,10 @@ Community設定はSDK未対応のため`PublicationApi`から公式Hubのsetting
 [実M寸法と全保存点数からの見積もり](P6_STATE_CAPACITY.md)に基づき、無料public枠内の自主上限を2GiBから32GiBへ移すv3を用意する。
 旧v1／v2の証拠・全予約・移行前ledger全体のhashを保持し、通常の実送信は従来どおり実bytesを予約してから行う。
 これは実適用前のコード契約で、有料storageの購入、GPU予算の追加、容量一杯のuploadを意味しない。
+
+## P6の研究用学習state
+
+[4構造の学習・再開契約](P6_TRAINING_STATE.md)の`profile="research"`／`artifact_role="research-training-state"`を使う。
+専用先は`voxelshogi/voxelshogi-research-training-state-v1`（model、Apache-2.0）。全モデル寸法・seed・cache・source・環境を結び付け、latestとval選択bestをtyped archiveとして保存する。
+通常モデル／旧Sのstate repoへ代替公開しない。M用artifact上限はこのroleだけに適用し、共通の累積upload ledgerは継承する。
+現時点はコード準備であり、実MのGPU保存再開・実repoへの公開を完了した記録ではない。
