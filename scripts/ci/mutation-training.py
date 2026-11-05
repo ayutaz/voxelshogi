@@ -118,6 +118,20 @@ MUTATIONS = [
         "test_distributed_loop_native.py",
     ),
     (
+        "evaluation-case-query-context-forwarding",
+        "training/evaluation_jobs.py",
+        "protocol, artifacts, stop_requested=stop_requested, observe_input=observe_input",
+        "protocol, artifacts, stop_requested=stop_requested, observe_input=None",
+        "test_case_query_observer.py",
+    ),
+    (
+        "evaluation-case-query-assignment-forwarding",
+        "training/evaluation_jobs.py",
+        "            stop_requested=stop_requested,\n            observe_input=observe_input,",
+        "            stop_requested=stop_requested,\n            observe_input=None,",
+        "test_case_query_observer.py",
+    ),
+    (
         "evaluation-query-puct-observer",
         "training/evaluation_puct.py",
         "                self.observe_input(position)",
@@ -281,8 +295,8 @@ MUTATIONS = [
     (
         "evaluation-puct-assigned-stop-forwarding",
         "training/evaluation_jobs.py",
-        "players = _prepare_players(protocol, artifacts, stop_requested=stop_requested)",
-        "players = _prepare_players(protocol, artifacts)",
+        "protocol, artifacts, stop_requested=stop_requested, observe_input=observe_input",
+        "protocol, artifacts, observe_input=observe_input",
         "test_evaluation_puct.py",
     ),
     (
