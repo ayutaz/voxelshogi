@@ -163,8 +163,9 @@ def test_assigned_case_context_forwards_the_same_stop_port(monkeypatch):
         module, "checked_execution", lambda *a: ("fake-game", {"model"}, "d" * 40)
     )
 
-    def prepare(p, artifacts, *, stop_requested):
+    def prepare(p, artifacts, *, stop_requested, observe_input):
         assert p is spec and artifacts == {"model": "opaque"} and stop_requested is stop
+        assert observe_input is None
         calls.append(1)
         return {"model": "fake-player"}
 
