@@ -13,6 +13,48 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-state-capacity-two-full-checkpoints",
+        "training/state_upload_budget.py",
+        "archive_bytes = 24 * max(counts.values())",
+        "archive_bytes = 16 * max(counts.values())",
+        "test_research_state_capacity.py",
+    ),
+    (
+        "research-state-capacity-retry-allowance",
+        "training/state_upload_budget.py",
+        "estimate = historical + 14 * 3 * archive_bytes",
+        "estimate = historical + 14 * 2 * archive_bytes",
+        "test_research_state_capacity.py",
+    ),
+    (
+        "research-state-capacity-v3-validation",
+        "training/state_upload_budget.py",
+        "        _validate_research_extension(value)",
+        "        pass",
+        "test_research_state_capacity.py",
+    ),
+    (
+        "research-state-capacity-historical-ledger-hash",
+        "training/state_upload_budget.py",
+        '_prefix_hash(previous) != record["previous_ledger_sha256"]',
+        '_prefix_hash(previous) == record["previous_ledger_sha256"]',
+        "test_research_state_capacity.py",
+    ),
+    (
+        "research-state-capacity-preserved-prefix",
+        "training/state_upload_budget.py",
+        'reservations=previous["reservations"][: record["prior_reservation_count"]]',
+        'reservations=previous["reservations"][:]',
+        "test_research_state_capacity.py",
+    ),
+    (
+        "research-state-capacity-existing-scope",
+        "training/state_upload_budget.py",
+        'or not _approval_reference(record["scope_reference"])',
+        "or False",
+        "test_research_state_capacity.py",
+    ),
+    (
         "research-training-canonical-config",
         "training/research_fit.py",
         "if config.value() != value:",
@@ -253,8 +295,8 @@ MUTATIONS = [
     (
         "state-capacity-preserve-reservations",
         "training/state_upload_budget.py",
-        "result = deepcopy(value)",
-        'result = deepcopy(value)\n    result["reservations"] = []',
+        'result = deepcopy(value)\n    result.update(\n        schema="voxelshogi-state-upload-budget-v2",',
+        'result = deepcopy(value)\n    result["reservations"] = []\n    result.update(\n        schema="voxelshogi-state-upload-budget-v2",',
         "test_state_upload_extension.py",
     ),
     (
