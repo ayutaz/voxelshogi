@@ -323,6 +323,22 @@ def _distributed_history_event(event, config, previous):
 
 def _history(path, *, profile="m6", config=None, progress=None):
     _schema(profile)
+    if (
+        profile == "research"
+        and config is not None
+        and config.get("schema") == "voxelshogi-research-visit-training-config-v1"
+    ):
+        from training.research_visit_fit import validate_history
+
+        if path.is_symlink():
+            raise ValueError("history must be a regular file")
+        events = (
+            [json.loads(line) for line in path.read_text().splitlines()]
+            if path.exists()
+            else []
+        )
+        validate_history(events, config, progress)
+        return {"schema": "voxelshogi-training-history-v1", "events": events}
     allowed = {
         "event",
         "attempt",
@@ -492,6 +508,24 @@ def verify_archive(folder, *, expected_binding, profile="m6"):
     run = json.loads((folder / "config.json").read_text())
     if run != {"schema": "voxelshogi-training-run-v1", "binding": expected_binding}:
         raise ValueError("archived run binding differs")
+    if (
+        profile == "research"
+        and expected_binding["config"].get("schema")
+        == "voxelshogi-research-visit-training-config-v1"
+    ):
+        from training.research_visit_fit import validate_history
+
+        history = json.loads((folder / "history.json").read_text())
+        if (
+            set(history) != {"schema", "events"}
+            or history["schema"] != "voxelshogi-training-history-v1"
+        ):
+            raise ValueError("visit archive history schema differs")
+        validate_history(
+            history["events"],
+            expected_binding["config"],
+            manifest["roles"]["latest"]["progress"],
+        )
     for role, descriptor in manifest["roles"].items():
         _progress(descriptor["progress"])
         if role == "best" and descriptor["progress"]["best_val_loss"] is None:

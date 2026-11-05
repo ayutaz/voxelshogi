@@ -13,6 +13,62 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "research-visit-update-limit-type",
+        "training/research_visit_fit.py",
+        "type(n) is not int or not 1 <= n <= 1_000_000",
+        "not isinstance(n, int) or not 1 <= n <= 1_000_000",
+        "test_research_visit_fit.py",
+    ),
+    (
+        "research-visit-admission-binding",
+        "training/research_visit_fit.py",
+        'or not _sha(binding["contract"]["admission_sha256"])',
+        "or False",
+        "test_research_visit_fit.py",
+    ),
+    (
+        "research-visit-example-cursor",
+        "training/research_visit_fit.py",
+        'or progress["examples"] != expected',
+        "or False",
+        "test_research_visit_fit.py",
+    ),
+    (
+        "research-visit-required-validation-history",
+        "training/research_visit_fit.py",
+        'if validations != expected or progress is not None and progress["step"] != step:',
+        'if progress is not None and progress["step"] != step:',
+        "test_research_visit_fit.py",
+    ),
+    (
+        "research-visit-resume-schema-routing",
+        "training/research_fit.py",
+        '== "voxelshogi-research-visit-training-config-v1"',
+        '== "voxelshogi-research-visit-training-config-v0"',
+        "test_research_visit_fit.py",
+    ),
+    (
+        "research-visit-fixed-total-updates",
+        "training/research_visit_fit.py",
+        'while progress["step"] < config.total_updates:',
+        'while progress["step"] < config.total_updates + 1:',
+        "test_research_visit_fit_native.py::test_fixed_updates_mid_epoch_resume_and_validation_are_exact[full]",
+    ),
+    (
+        "research-visit-actual-optimizer-update",
+        "training/research_visit_fit.py",
+        "        optimizer.step()",
+        "        pass  # optimizer deliberately disabled",
+        "test_research_visit_fit_native.py::test_fixed_updates_mid_epoch_resume_and_validation_are_exact[full]",
+    ),
+    (
+        "research-visit-cross-family-isolation",
+        "training/research_visit_fit.py",
+        'or row["family"] in families',
+        "or False",
+        "test_research_visit_fit_native.py::test_admitted_data_binding_rejects_cross_split_inputs_and_families",
+    ),
+    (
         "research-corpus-fixed-family-counts",
         "training/research_corpus.py",
         "train_end = len(ranked) - 4",
