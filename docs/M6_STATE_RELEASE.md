@@ -1,5 +1,7 @@
 # 再開状態の公開profileとアップロード上限
 
+**2026-11-05 00:13 UTCの最終値**：[P5-4の6 archiveと各HF復旧](P5_4_RESULTS.md)を完了し、共通v2 ledgerは全21予約・1,407,414,632 bytes／累積2GiB。旧15予約をそのまま保持した。1GiBは移行前の上限で、HFの有料プラン変更・追加購入は行っていない。
+
 **2026-11-05 JST・容量変更承認済み**：ユーザーの承認とpublic枠を使う指定を受け、プロジェクトの累積upload上限を1GiBから2GiBへ移行した。既存15予約・1,044,495,137 bytesを同じ順・値で保持し、旧ledger hashと旧予約prefixを固定した。HFのプラン変更・有料storage追加は行っていない。以下の1GiBと承認待ちは移行前の履歴である。
 
 `artifact_role="training-state"`による再開状態の公開は完了。承認済みのApache-2.0・public/manual・Community OFFを維持し、本学習のlatest／bestを固定HF revisionから新runへ復旧してmodel・optimizer・RNGの最大絶対差0を確認した（[完了記録](M6_COMPLETION.md)）。以下は公開範囲・送信上限の仕様と初期実装時の検証記録。

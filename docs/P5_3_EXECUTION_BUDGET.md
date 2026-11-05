@@ -1,5 +1,7 @@
 # P5-3後半からP5-4までの費用配分
 
+**2026-11-05 00:13 UTC・1〜5完了時点**：[実1／2／4GPUと各HF保存再開](P5_4_RESULTS.md)まで完了し、両providerの課金資源0。全33予約152.5／承認総額200を保持した。Phase5配分138、Phase6配分1を維持し、予約は実請求ではない。以下は当時の見積もりと追加枠適用の履歴である。
+
 2026-11-04 UTC。最初の8局試行は7局を確定して時間上限に達したが、その7局を復元して残り1局・全入力監査・固定HF全hash・実機解放を完了した。[8局の実績](P5_3_TRIAL.md)と[旧7局の固定HF版](https://huggingface.co/datasets/voxelshogi/voxelshogi-generation-evaluation-v1/tree/2041939e2399ebaffe9df7005cccedc393f2d6c6)を両方残す。150局・診断・実1／2／4GPUは未完了であり、引き続き「5まで進めて」の範囲で進める。
 
 **05:42:52 UTC・追加枠適用済み**：PR129の手動全CI・必須8チェックと、統合main `8d1922c`の[CI](https://github.com/ayutaz/voxelshogi/actions/runs/41779584359)・[Security](https://github.com/ayutaz/voxelshogi/actions/runs/41779584218)を確認した。実Native1,032件と全430変異の4 shardが成功し、所有Vast実機0・CloudRiftのプロジェクトidleも再確認した。総枠は**100→200**、Phase5／6配分は**38／1→138／1**。既存22予約・92.5をすべて保持し、未予約107.5。新しい課金要求は0である。[元ledgerのhash・根拠hash・適用証跡](experiments/p53-budget-activated-2026-11-04.json)を残す。
