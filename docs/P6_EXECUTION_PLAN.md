@@ -117,6 +117,11 @@ CI待ちには独立した次の実装・文書を進め、CIの追加最適化�
 [分割・保護・データreadiness](P6_CORPUS_ADMISSION.md)を使い、既存保護と最終評価12 rootを維持する。
 開始family単位の分割、全入力重複・Value由来・実件数を確認し、件数screenだけを教師品質や学習完了と扱わない。
 
+## M規模stateの保存点数と自主上限
+
+[無料public保存枠内の版付き容量移行](P6_STATE_CAPACITY.md)で、14 runの中間・最終・失敗退避と過去履歴をまとめて見積もる。
+実送信前に検証済みbytesを共通ledgerへ予約し、無料HF枠とGPUの有料予約を混同しない。
+
 ## 学習と保存の実装契約
 
 [4構造の教師あり学習と専用state](P6_TRAINING_STATE.md)を使う。
