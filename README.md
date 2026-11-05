@@ -55,7 +55,7 @@ CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging Fac
 
 先行する150局比較には保護入力との重複4件があり、その制約を保持しています。実1／2／4 GPUでの学習と、各構成のHF保存・復元・続行も確認しました。[GPU比較の結果と制約](docs/P5_4_RESULTS.md)を次の規模・費用の見積もりに使います。
 
-次は4種類の構造を実測し、少量学習から本比較、変換済みモデルのWeb配布、観戦体験と端末検証へ進みます。[目的と数量ゴール](docs/P6_EXECUTION_PLAN.md)、[既存モデルの固定HF revision](docs/P5_2_COMPLETION.md)、[残る課題](docs/OVERALL_PLAN.md)を参照してください。
+4種類の構造について[実MのGPU計測・ONNX数値照合とHF保存](docs/P6_OPERATOR_RESULTS.md)を完了しました。次は同じファイルのブラウザ検証、少量学習と本比較、変換済みモデルのWeb配布、観戦体験と端末検証へ進みます。[目的と数量ゴール](docs/P6_EXECUTION_PLAN.md)、[既存モデルの固定HF revision](docs/P5_2_COMPLETION.md)、[残る課題](docs/OVERALL_PLAN.md)を参照してください。
 
 ### ルールについて
 

@@ -1,0 +1,826 @@
+{
+  "schema": "voxelshogi-research-operator-completion-v1",
+  "recorded_at": 1793855704.2618911,
+  "scope": "Stage2 GPU/ONNX unit complete; actual browsers, teacher training,12 main runs and stages5-6 incomplete",
+  "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+  "source_admission": {
+    "verified": true,
+    "verified_at": 1793852220.477521,
+    "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+    "all_required_success": true,
+    "ci_run": 41960496644,
+    "ci_conclusion": "success",
+    "security_run": 41960496561,
+    "security_conclusion": "success",
+    "native_full_executed": true,
+    "native_job": 127027179677,
+    "native_summary": "2026-11-05T03:44:13.8058598Z 1291 passed, 21 warnings in 113.40s (0:01:53)",
+    "native_log_sha256": "469abeb25dcc3acec5b2937577813bb86508241700997e31285102fc6277e2d7",
+    "training_mutation_shards_success": 4,
+    "scope": "Full integrated Linux source proof for4 actual-M operator/ONNX probe. No claim of teacher training, browser, strength or Phase7 completion."
+  },
+  "protocol": {
+    "schema": "voxelshogi-research-operator-probe-v1",
+    "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+    "architectures": {
+      "full": {
+        "architecture": "full",
+        "side": 9,
+        "width": 512,
+        "layers": 8,
+        "heads": 8,
+        "ffn": 2048,
+        "policy_rank": 64
+      },
+      "axial": {
+        "architecture": "axial",
+        "side": 9,
+        "width": 512,
+        "layers": 8,
+        "heads": 8,
+        "ffn": 2048,
+        "policy_rank": 64
+      },
+      "geometry": {
+        "architecture": "geometry",
+        "side": 9,
+        "width": 512,
+        "layers": 8,
+        "heads": 8,
+        "ffn": 2048,
+        "policy_rank": 64
+      },
+      "cnn": {
+        "architecture": "cnn",
+        "side": 9,
+        "width": 256,
+        "layers": 8,
+        "heads": 8,
+        "ffn": 2048,
+        "policy_rank": 64
+      }
+    },
+    "model_seed": 66001,
+    "batch_sizes": [
+      1,
+      4,
+      8,
+      16
+    ],
+    "warmup_steps": 8,
+    "measured_steps": 32,
+    "precision": "float32",
+    "tf32": false,
+    "fixture_indices": [
+      0,
+      3
+    ],
+    "fixtures_sha256": "8308b5a26e22bc0c730fbefd3b8c4edac589e6fc14c3895595fa3b6cd8702897",
+    "numeric": {
+      "policy_atol": 0.0001,
+      "policy_rtol": 0.0001,
+      "value_atol": 1e-05,
+      "value_rtol": 1e-05
+    },
+    "maximum_seconds": 1800,
+    "measurement_scope": "synthetic operator load: first legal action dense cross-entropy plus zero-value MSE and AdamW; discarded optimizer copies; not teacher training throughput, strength or total training FLOPs"
+  },
+  "host_admission": {
+    "checked_at": 1793854802.8597438,
+    "platform": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39",
+    "effective_cpus": 15.36,
+    "memory_limit_bytes": 64403537920,
+    "affinity_count": 16,
+    "cgroup": {
+      "cpu.max": "1536000 100000",
+      "memory.max": "64403537920"
+    },
+    "gpu_query": "GPU-40e1d11d-3e1f-7462-5f20-81dc9dee2d43, NVIDIA GeForce RTX 5090, 595.99.02, 32607",
+    "cuda_preflight": {
+      "checked_at": "2026-11-05T04:59:05.186393+00:00",
+      "cpu_lock_sha256": "7a01ef9cba3655bd3702c92b5f45307c400432c77578c0e32ed4f70dc2ae088b",
+      "cuda_lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+      "environment": {
+        "cuda": "13.0",
+        "lock_sha256": "91369246e0149de5126585f62455bee6477654c2d8bcddb3f4cc2965bdd436e1",
+        "python": "3.14.9",
+        "setuptools": "84.1.0",
+        "torch": "2.14.1+cu130"
+      },
+      "facts": {
+        "capability": [
+          12,
+          0
+        ],
+        "compiled_arches": [
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_90",
+          "sm_100",
+          "sm_120"
+        ],
+        "cuda": "13.0",
+        "cuda_available": true,
+        "driver": "595.99.02",
+        "gpu": "NVIDIA GeForce RTX 5090",
+        "gpu_count": 1,
+        "machine": "x86_64",
+        "python": "3.14.9",
+        "system": "Linux",
+        "torch": "2.14.1+cu130",
+        "vram_mib": 32607
+      },
+      "kernel": {
+        "device": "cuda",
+        "left_gradient": [
+          [
+            11.0,
+            15.0
+          ],
+          [
+            11.0,
+            15.0
+          ]
+        ],
+        "product": [
+          [
+            19.0,
+            22.0
+          ],
+          [
+            43.0,
+            50.0
+          ]
+        ],
+        "right_gradient": [
+          [
+            4.0,
+            4.0
+          ],
+          [
+            6.0,
+            6.0
+          ]
+        ]
+      },
+      "model_learning_tested": false,
+      "schema": "voxelshogi-cuda-preflight-v1"
+    },
+    "instance_id": 59207472,
+    "verified": true,
+    "workload_sha256": "014e327d27c691e3ce785dcba15cd4515d9e6d311e3e659705df86b384c5d676",
+    "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+    "maximum_workers": 1,
+    "scope": "container affinity/cgroup and GPU facts; not a performance measurement or exclusive CPU guarantee"
+  },
+  "report": {
+    "all_batches_fit": true,
+    "architectures": {
+      "axial": {
+        "config": {
+          "architecture": "axial",
+          "ffn": 2048,
+          "heads": 8,
+          "layers": 8,
+          "policy_rank": 64,
+          "side": 9,
+          "width": 512
+        },
+        "export": {
+          "files": [
+            {
+              "bytes": 103145208,
+              "path": "model.safetensors",
+              "sha256": "a832043d7d8a10481c8c024ee722ac137379fe4f87cd1e10a17800afff7360a0"
+            },
+            {
+              "bytes": 104250530,
+              "path": "fp32.onnx",
+              "sha256": "2bb073758721917d3264c25948e609dc71adbfdfd5026fc812f45522809ea6fd"
+            },
+            {
+              "bytes": 8795176,
+              "path": "references.safetensors",
+              "sha256": "1639941cb33c654d0e82212e02352e873ac09bb5d2c270338f947c7912d080f8"
+            }
+          ],
+          "forward_dense_matmul_flops_per_example": 61839980928,
+          "numeric": [
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 3.337860107421875e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 7.450580596923828e-09,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 3.3080577850341797e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 7.543712854385376e-08,
+              "output": "value"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 3.2186508178710938e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 4.470348358154297e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 3.337860107421875e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 1.4901161193847656e-08,
+              "output": "value"
+            }
+          ],
+          "parameter_count": 25783688,
+          "passed": true,
+          "reference_backend": "torch-cuda",
+          "weight_scope": "untrained seed66001 weights; synthetic benchmark updates occur only in separate discarded models"
+        },
+        "export_check_seconds": 5.684349813964218,
+        "measurements": [
+          {
+            "batch_size": 1,
+            "elapsed_seconds": 0.439549480099231,
+            "examples_per_second": 72.80181515122212,
+            "measured_examples": 32,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 728143872,
+            "peak_reserved_bytes": 765460480,
+            "preparation_and_measurement_seconds": 0.63278848817572,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 4,
+            "elapsed_seconds": 0.8512823339551687,
+            "examples_per_second": 150.36139585476337,
+            "measured_examples": 128,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 1734736384,
+            "peak_reserved_bytes": 2009071616,
+            "preparation_and_measurement_seconds": 1.262627684045583,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 8,
+            "elapsed_seconds": 1.553834866732359,
+            "examples_per_second": 164.75367201558288,
+            "measured_examples": 256,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 3153331200,
+            "peak_reserved_bytes": 3370123264,
+            "preparation_and_measurement_seconds": 2.0022789919748902,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 16,
+            "elapsed_seconds": 3.1182538513094187,
+            "examples_per_second": 164.19445767220031,
+            "measured_examples": 512,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 5789762048,
+            "peak_reserved_bytes": 6335496192,
+            "preparation_and_measurement_seconds": 3.949689035769552,
+            "status": "success",
+            "warmup_steps": 8
+          }
+        ]
+      },
+      "cnn": {
+        "config": {
+          "architecture": "cnn",
+          "ffn": 2048,
+          "heads": 8,
+          "layers": 8,
+          "policy_rank": 64,
+          "side": 9,
+          "width": 256
+        },
+        "export": {
+          "files": [
+            {
+              "bytes": 114432608,
+              "path": "model.safetensors",
+              "sha256": "9e3f81cc0f282aec1235d7a6fc47686849a185ccd146a32b3c321b4ff03840ca"
+            },
+            {
+              "bytes": 114689164,
+              "path": "fp32.onnx",
+              "sha256": "8d06765655786c6dbb8f43da6ac7e8ec982a1973fa5e905cffe7b59741eb0aa9"
+            },
+            {
+              "bytes": 8795176,
+              "path": "references.safetensors",
+              "sha256": "73bf31c43e18de4e50686279cc3c1d114f885b954d2a4a81274006c4ff11d421"
+            }
+          ],
+          "forward_dense_matmul_flops_per_example": 41528538496,
+          "numeric": [
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 9.238719940185547e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 0.0,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 1.0520219802856445e-05,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 5.960464477539063e-08,
+              "output": "value"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 9.745359420776367e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 2.9802322387695312e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 9.47713851928711e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 0.0,
+              "output": "value"
+            }
+          ],
+          "parameter_count": 28606344,
+          "passed": true,
+          "reference_backend": "torch-cuda",
+          "weight_scope": "untrained seed66001 weights; synthetic benchmark updates occur only in separate discarded models"
+        },
+        "export_check_seconds": 3.1758594112470746,
+        "measurements": [
+          {
+            "batch_size": 1,
+            "elapsed_seconds": 1.089621176943183,
+            "examples_per_second": 29.368004841620845,
+            "measured_examples": 32,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 643642368,
+            "peak_reserved_bytes": 956301312,
+            "preparation_and_measurement_seconds": 1.4760941546410322,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 4,
+            "elapsed_seconds": 1.2690741191618145,
+            "examples_per_second": 100.86093323259966,
+            "measured_examples": 128,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 658726912,
+            "peak_reserved_bytes": 916455424,
+            "preparation_and_measurement_seconds": 1.6975676259025931,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 8,
+            "elapsed_seconds": 2.2534180297516286,
+            "examples_per_second": 113.60519735799588,
+            "measured_examples": 256,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 820133376,
+            "peak_reserved_bytes": 1017118720,
+            "preparation_and_measurement_seconds": 2.9140391713008285,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 16,
+            "elapsed_seconds": 2.4780129049904644,
+            "examples_per_second": 206.6171644905014,
+            "measured_examples": 512,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 1220822016,
+            "peak_reserved_bytes": 1455423488,
+            "preparation_and_measurement_seconds": 3.197416095994413,
+            "status": "success",
+            "warmup_steps": 8
+          }
+        ]
+      },
+      "full": {
+        "config": {
+          "architecture": "full",
+          "ffn": 2048,
+          "heads": 8,
+          "layers": 8,
+          "policy_rank": 64,
+          "side": 9,
+          "width": 512
+        },
+        "export": {
+          "files": [
+            {
+              "bytes": 103144888,
+              "path": "model.safetensors",
+              "sha256": "e64f47472021175bc072b3af848789b13f7b7c02644a76a24c79d8b2945be3d1"
+            },
+            {
+              "bytes": 103544727,
+              "path": "fp32.onnx",
+              "sha256": "0d9eb5f493155d45bc751de57e4e27da971f741e52c556affa0720c3081f9597"
+            },
+            {
+              "bytes": 8795176,
+              "path": "references.safetensors",
+              "sha256": "27e6e08d92be7e5dee75e3553e173554458970c09b649e1688f889c0771e1279"
+            }
+          ],
+          "forward_dense_matmul_flops_per_example": 45763443072,
+          "numeric": [
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 1.7881393432617188e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 4.470348358154297e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 1.9669532775878906e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 2.7567148208618164e-07,
+              "output": "value"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 2.0265579223632812e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 8.195638656616211e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 2.175569534301758e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 1.341104507446289e-07,
+              "output": "value"
+            }
+          ],
+          "parameter_count": 25783688,
+          "passed": true,
+          "reference_backend": "torch-cuda",
+          "weight_scope": "untrained seed66001 weights; synthetic benchmark updates occur only in separate discarded models"
+        },
+        "export_check_seconds": 5.552903953008354,
+        "measurements": [
+          {
+            "batch_size": 1,
+            "elapsed_seconds": 0.27988832304254174,
+            "examples_per_second": 114.3313149049671,
+            "measured_examples": 32,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 773976576,
+            "peak_reserved_bytes": 834666496,
+            "preparation_and_measurement_seconds": 0.5401604129001498,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 4,
+            "elapsed_seconds": 0.7242489042691886,
+            "examples_per_second": 176.73482037112615,
+            "measured_examples": 128,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 1864663040,
+            "peak_reserved_bytes": 2048917504,
+            "preparation_and_measurement_seconds": 0.9996021627448499,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 8,
+            "elapsed_seconds": 1.3890400496311486,
+            "examples_per_second": 184.29994158050323,
+            "measured_examples": 256,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 3354348544,
+            "peak_reserved_bytes": 3640655872,
+            "preparation_and_measurement_seconds": 1.8249498372897506,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 16,
+            "elapsed_seconds": 2.759796854108572,
+            "examples_per_second": 185.52090138003237,
+            "measured_examples": 512,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 6282083840,
+            "peak_reserved_bytes": 6994001920,
+            "preparation_and_measurement_seconds": 3.5251979008316994,
+            "status": "success",
+            "warmup_steps": 8
+          }
+        ]
+      },
+      "geometry": {
+        "config": {
+          "architecture": "geometry",
+          "ffn": 2048,
+          "heads": 8,
+          "layers": 8,
+          "policy_rank": 64,
+          "side": 9,
+          "width": 512
+        },
+        "export": {
+          "files": [
+            {
+              "bytes": 104403368,
+              "path": "model.safetensors",
+              "sha256": "549c2bfd6e1f501c93a459585791d339e93c4243acecb7e3643ee389bc9e29dd"
+            },
+            {
+              "bytes": 138883036,
+              "path": "fp32.onnx",
+              "sha256": "57c05ce14d90d947fa7092aae383e876108889f3833a808a7522c003ce50e3e1"
+            },
+            {
+              "bytes": 8795176,
+              "path": "references.safetensors",
+              "sha256": "27e6e08d92be7e5dee75e3553e173554458970c09b649e1688f889c0771e1279"
+            }
+          ],
+          "forward_dense_matmul_flops_per_example": 45763443072,
+          "numeric": [
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 1.7881393432617188e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 4.470348358154297e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 0,
+              "max_abs": 1.9669532775878906e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 0,
+              "max_abs": 2.7567148208618164e-07,
+              "output": "value"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 2.0265579223632812e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "torch-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 8.195638656616211e-08,
+              "output": "value"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1067985,
+              "fixture": 3,
+              "max_abs": 2.175569534301758e-06,
+              "output": "policy"
+            },
+            {
+              "backend": "ort-cpu",
+              "elements": 1,
+              "fixture": 3,
+              "max_abs": 1.341104507446289e-07,
+              "output": "value"
+            }
+          ],
+          "parameter_count": 26098120,
+          "passed": true,
+          "reference_backend": "torch-cuda",
+          "weight_scope": "untrained seed66001 weights; synthetic benchmark updates occur only in separate discarded models"
+        },
+        "export_check_seconds": 4.207055396400392,
+        "measurements": [
+          {
+            "batch_size": 1,
+            "elapsed_seconds": 0.438088018912822,
+            "examples_per_second": 73.04468193266862,
+            "measured_examples": 32,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 814688768,
+            "peak_reserved_bytes": 872415232,
+            "preparation_and_measurement_seconds": 0.7502266597002745,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 4,
+            "elapsed_seconds": 0.9164530192501843,
+            "examples_per_second": 139.66891625795063,
+            "measured_examples": 128,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 1906892800,
+            "peak_reserved_bytes": 2057306112,
+            "preparation_and_measurement_seconds": 1.267395124770701,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 8,
+            "elapsed_seconds": 1.5910677840001881,
+            "examples_per_second": 160.89823612440748,
+            "measured_examples": 256,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 3382383104,
+            "peak_reserved_bytes": 3684696064,
+            "preparation_and_measurement_seconds": 2.1093726470135152,
+            "status": "success",
+            "warmup_steps": 8
+          },
+          {
+            "batch_size": 16,
+            "elapsed_seconds": 3.0281239841133356,
+            "examples_per_second": 169.0815840719014,
+            "measured_examples": 512,
+            "measured_steps": 32,
+            "peak_allocated_bytes": 6321946112,
+            "peak_reserved_bytes": 7010779136,
+            "preparation_and_measurement_seconds": 3.8939104080200195,
+            "status": "success",
+            "warmup_steps": 8
+          }
+        ]
+      }
+    },
+    "complete": true,
+    "cuda": "13.0",
+    "driver": "595.99.02",
+    "elapsed_seconds": 52.19511735625565,
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "measurement_scope": "synthetic operator load: first legal action dense cross-entropy plus zero-value MSE and AdamW; discarded optimizer copies; not teacher training throughput, strength or total training FLOPs",
+    "protocol_sha256": "f646f33ad118fbf0f69db214458d00fe1b5c7d212560bbe26fffafb6d8700a3d",
+    "python": "3.14.9",
+    "schema": "voxelshogi-research-operator-results-v1",
+    "source_commit": "80eb3b1a0456cbde73cbaa150232a51eb84ead13",
+    "torch": "2.14.1+cu130"
+  },
+  "publication_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "3874eae8754d94fc991873587c065ebaeee35451",
+    "release_sha256": "025abf923857ffac3c3ff6f6a1e456dae0008d80032cbc13d33a4bbf05c3758e",
+    "repo_id": "voxelshogi/voxelshogi-research-operator-probe-v1",
+    "repo_type": "model",
+    "verified": true
+  },
+  "metadata_reviewed": {
+    "README.md": {
+      "bytes": 2341,
+      "sha256": "4009d645f4571cc136cfdb7d79170d6b3ae79e3ad8bf034f4d6f0f7e91ca6c8b"
+    },
+    "LICENSE": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "manifest.json": {
+      "bytes": 35370,
+      "sha256": "7315facbfe5d337faa9f3210100d854a7c558b65b576665eb24c6fe4befbe569"
+    },
+    "validation.json": {
+      "bytes": 7348,
+      "sha256": "141f3465575b3f7c2a08b0155c2aeabf2bae03d863be82a602a074a03b89a94d"
+    },
+    "config.json": {
+      "bytes": 1091,
+      "sha256": "c7fbdbd134971ff72c7953e41334758f8fe71f2970561cf0f9c67a3d8283e371"
+    }
+  },
+  "timings_seconds": {
+    "publish-and-fixed-revision-all-hash": 137.7353899483569,
+    "real-M-CUDA-ONNX-and-operators": 52.19673592830077
+  },
+  "worker_seconds": 192.1031142929569,
+  "resources": {
+    "schema": "voxelshogi-research-operator-resource-release-v1",
+    "checked_at": 1793855202.51877,
+    "instance_id": 59207472,
+    "destruction_acknowledged": true,
+    "full_vast_project_inventory": [],
+    "cloudrift_project_resources": 0,
+    "resources_released": true,
+    "requested_to_delete_seconds": 1252.32941198349,
+    "compute_disk_quote_usd": 0.20253722588868792,
+    "reservation_is_not_invoice": true,
+    "reservation_maximum_usd": 2,
+    "reserved_total_usd": 158,
+    "remaining_unreserved_usd": 42
+  },
+  "process_resource_summary": {
+    "elapsed_seconds": 192.10589335300028,
+    "peak_summed_owned_rss_bytes": 3931799552,
+    "samples": 20
+  },
+  "mac_model_or_dataset_relay_bytes": 0
+}

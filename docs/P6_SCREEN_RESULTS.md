@@ -62,6 +62,6 @@ Vast VM `59194137`の削除応答と全ページinventoryからの不在、Vast�
 
 ## 次の段階
 
-4構造と実Mの計測コードはPR #143／#145で統合済み。統合main `80eb3b1`の全関連CIと所有資源0を確認して[予算配分](P6_RESOURCE_BUDGET.md)を95／44へ実適用した。次は単GPUの実M・ONNX・ブラウザ検証へ進む。
+4構造と実Mの計測コードはPR #143／#145で統合済み。統合main `80eb3b1`の全関連CIと所有資源0を確認して[予算配分](P6_RESOURCE_BUDGET.md)を95／44へ実適用した。[単GPUの実M・ONNX部分](P6_OPERATOR_RESULTS.md)はその後に完了し、実ブラウザ・実教師の少量学習へ進む。
 学習・再開対応の[PR #147](https://github.com/ayutaz/voxelshogi/pull/147)は全1,322 Native・単体と全7新変異を含む深いCI、必須8件と関連チェック後に通常mergeした。実MのGPU学習成功とは区別する。容量移行の[PR #148](https://github.com/ayutaz/voxelshogi/pull/148)は最新mainを統合して再検証中で、必須チェックと実行された関連CIがそろうまで取り込まない。
 少量2 run、4構造×3 seedの本比較、FP32／FP16／INT8の実モデル配布、対応端末各60分のPhase7を残す。
