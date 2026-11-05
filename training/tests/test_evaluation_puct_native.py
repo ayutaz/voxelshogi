@@ -105,3 +105,28 @@ def test_real_puct_assigned_case_resume_preserves_committed_color_bytes(
     assert verify_run(combined) == result
     assert result["overall"]["wins"] == result["overall"]["losses"] == 1
     assert file_hash(combined / "hand-mate-b.json") == original
+
+
+def test_assigned_pair_observes_actual_puct_queries_and_argmax_inputs(
+    tmp_path, monkeypatch
+):
+    from copy import deepcopy
+
+    from training.evaluation_jobs import read_case_rows, run_case_assignment
+
+    spec, artifacts = weighted_mate(tmp_path, monkeypatch)
+    for policy in ("puct32-v1", "legal-argmax-v1"):
+        current = deepcopy(spec)
+        current["participants"]["model"]["policy"] = policy
+        observed = []
+        folder = tmp_path / policy
+        receipt = run_case_assignment(
+            current,
+            artifacts,
+            folder,
+            case_id="hand-mate",
+            observe_input=lambda role, game: observed.append((role, game.record())),
+        )
+        rows, verified = read_case_rows(folder, current, case_id="hand-mate")
+        assert receipt == verified and receipt["complete"] and len(rows) == 2
+        assert observed == [("model", current["cases"][0]["opening"])]

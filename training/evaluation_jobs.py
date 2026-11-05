@@ -174,14 +174,23 @@ def _lease(folder):
         yield
 
 
-def _context(protocol, artifacts, *, stop_requested=lambda: False):
+def _context(protocol, artifacts, *, stop_requested=lambda: False, observe_input=None):
     game, required, commit = checked_execution(protocol, artifacts)
-    players = _prepare_players(protocol, artifacts, stop_requested=stop_requested)
+    players = _prepare_players(
+        protocol, artifacts, stop_requested=stop_requested, observe_input=observe_input
+    )
     return game, players, execution_runtime(protocol, required, commit)
 
 
 def run_case_assignment(
-    protocol, artifacts, folder, *, case_id, stop_requested=lambda: False, resume=False
+    protocol,
+    artifacts,
+    folder,
+    *,
+    case_id,
+    stop_requested=lambda: False,
+    resume=False,
+    observe_input=None,
 ):
     """Execute just one assigned pair, retaining the full cohort binding."""
     _linux()
@@ -201,7 +210,10 @@ def run_case_assignment(
         elif folder.exists():
             raise FileExistsError(folder)
         game, players, runtime = _context(
-            protocol, artifacts, stop_requested=stop_requested
+            protocol,
+            artifacts,
+            stop_requested=stop_requested,
+            observe_input=observe_input,
         )
         if saved and saved["runtime"] != runtime:
             raise ValueError("resumed case runtime differs from saved environment")
