@@ -54,7 +54,7 @@ def fixture(tmp_path):
     (folder / "config.json").write_text(json.dumps(protocol))
     (folder / "manifest.json").write_text(json.dumps(manifest))
     (folder / "README.md").write_text(
-        "# Synthetic fixture\n\n## Model and provenance\nOpaque fixture; no real model or Hub publication.\n\n## Usage and schema\nStaging test only.\n\n## Verification and limitations\nNo actual inference.\n\n## Access and license\nApache-2.0 fixture.\n"
+        "---\nlicense: apache-2.0\n---\n# Synthetic fixture\n\n## Model and provenance\nOpaque fixture; no real model or Hub publication.\n\n## Usage and schema\nStaging test only.\n\n## Verification and limitations\nNo actual inference.\n\n## Access and license\nApache-2.0 fixture.\n"
     )
     (folder / "LICENSE").write_text("Apache-2.0 test fixture")
     plan = plan_release(
