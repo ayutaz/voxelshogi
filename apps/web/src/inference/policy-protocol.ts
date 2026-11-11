@@ -35,7 +35,7 @@ function parseFiles(value: unknown): ModelFile[] {
     if (Object.keys(entry).length !== 2 || typeof entry.path !== 'string' || !(entry.file instanceof File) || entry.file.name !== entry.path.split('/').at(-1)) throw new Error('invalid transferred model file/path');
     return { path: entry.path, file: entry.file };
   });
-  indexLocalFolder(files.map(localFile)); // Metadata only; no arrayBuffer calls.
+  indexLocalFolder(files.map(localFile), 'transfer'); // Bounded handles only; catalog approval precedes reads.
   return files;
 }
 /** Explicit relative paths survive even where File's nonstandard path property is not cloned. */

@@ -15,6 +15,26 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'research-manifest-role', file: 'inference/research-manifest.ts', before: "identity.profile !== 'research-m-v1'", after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-parameters', file: 'inference/research-manifest.ts', before: 'm.parameters !== COUNTS[identity.architecture]', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-source', file: 'inference/research-manifest.ts', before: 'm.sourceCommit !== identity.sourceCommit', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-architecture', file: 'inference/research-manifest.ts', before: 'Object.entries(expected).some(([key, v]) => a[key] !== v)', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-cursor', file: 'inference/research-manifest.ts', before: '!integer(r.selectedUpdate, 1, r.totalUpdates)', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-protocol', file: 'inference/research-manifest.ts', before: '!hash(r.evaluationProtocolSha256)', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-final-roots', file: 'inference/research-manifest.ts', before: '!hash(r.finalRootsSha256)', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-compute', file: 'inference/research-manifest.ts', before: "c.compute !== 'float32'", after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-converted-elements', file: 'inference/research-manifest.ts', before: '!integer(elements, 1, Number(m.parameters))', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-evaluation-scope', file: 'inference/research-manifest.ts', before: "evaluation.scope !== 'final-holdout-v1'", after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-evaluation-count', file: 'inference/research-manifest.ts', before: 'evaluation.gameCount !== 24', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-evaluation-model', file: 'inference/research-manifest.ts', before: 'evaluation.modelSha256 !== model.sha256', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-evaluation-weights', file: 'inference/research-manifest.ts', before: 'evaluation.weightsSha256 !== checkpoint.sha256', after: 'false', test: 'research-manifest' },
+  { name: 'research-manifest-snapshot', file: 'inference/research-manifest.ts', before: 'return structuredClone(m) as unknown as ResearchManifest;', after: 'return m as unknown as ResearchManifest;', test: 'research-manifest' },
+  { name: 'research-folder-evidence', file: 'inference/local-model.ts', before: 'await Promise.all(evidence.map(file => folder.read(file, signal)));', after: '', test: 'research-local-model' },
+  { name: 'research-folder-s-isolation', file: 'inference/local-model.ts', before: "const research = release.profile === 'research-m-v1';", after: 'const research = true;', test: 'local-model' },
+  { name: 'research-folder-transfer-read', file: 'inference/local-model.ts', before: "if (profile === 'transfer') throw new Error('transferred folder metadata cannot read bodies before catalog approval');", after: '', test: 'research-local-model' },
+  { name: 'research-catalog-profile', file: 'inference/local-model.ts', before: "if (release.profile !== 'research-m-v1' || !isResearchArchitecture(release.architecture) || release.license !== 'Apache-2.0')", after: 'if (false)', test: 'research-local-model' },
+  { name: 'research-model-size-limit', file: 'inference/research-manifest.ts', before: 'export const RESEARCH_MODEL_BYTES = 512 * 1024 * 1024;', after: 'export const RESEARCH_MODEL_BYTES = 1024 * 1024 * 1024;', test: 'research-local-model' },
+  { name: 'research-folder-large-verify', file: 'inference/local-model.ts', before: "profile === 'research-m-v1' ? verifyResearchBytes(bytes, file) : verifyBytes(bytes, file)", after: 'verifyBytes(bytes, file)', test: 'research-local-model' },
   {"name": "portable-export-role", "file": "inference/manifest.ts", "before": "p.export_source_commit !== identity.sourceCommit", "after": "false", "test": "portable-fp16"},
   {"name": "portable-protocol-expected-mode", "file": "inference/policy-protocol.ts", "before": "(result.fp16WeightOnly ?? false) !== expectedWeightOnly", "after": "false", "test": "portable-fp16"},
   {"name": "portable-protocol-compute", "file": "inference/policy-protocol.ts", "before": "info.computePrecision !== 'float32'", "after": "false", "test": "portable-fp16"},
@@ -76,7 +96,7 @@ const mutations = [
   { name: 'policy-worker-origin', file: 'inference/policy.worker.ts', before: "if (event.origin !== '') return;", after: '', test: 'policy-worker' },
   { name: 'policy-host-late-initialization', file: 'inference/policy-host.ts', before: "if (this.closed) { await prepared.session.dispose(); throw new DOMException('policy initialization cancelled', 'AbortError'); }", after: '', test: 'policy-host' },
   { name: 'policy-protocol-action-identity', file: 'inference/policy-protocol.ts', before: 'choice.action !== policyAction(choice.move, request.root.side)', after: 'false', test: 'policy-protocol' },
-  { name: 'policy-protocol-main-file-read', file: 'inference/policy-protocol.ts', before: 'indexLocalFolder(files.map(localFile));', after: 'files.forEach(entry => { void entry.file.arrayBuffer(); }); indexLocalFolder(files.map(localFile));', test: 'policy-protocol' },
+  { name: 'policy-protocol-main-file-read', file: 'inference/policy-protocol.ts', before: "indexLocalFolder(files.map(localFile), 'transfer');", after: "files.forEach(entry => { void entry.file.arrayBuffer(); }); indexLocalFolder(files.map(localFile), 'transfer');", test: 'policy-protocol' },
   { name: 'policy-session-input-reference', file: 'inference/policy-session.ts', before: 'input.some((byte, index) => byte !== encoded[index])', after: 'false', test: 'policy-session' },
   { name: 'policy-session-all-fixtures', file: 'inference/policy-session.ts', before: 'for (const fixture of model.fixtures)', after: 'for (const fixture of model.fixtures.slice(0, 1))', test: 'policy-session' },
   { name: 'policy-session-precision', file: 'inference/policy-session.ts', before: 'this.port.createSession(bytes, selection.precision)', after: "this.port.createSession(bytes, 'fp32')", test: 'policy-session' },
@@ -102,7 +122,7 @@ const mutations = [
   { name: 'local-model-descriptor-snapshot', file: 'inference/local-model.ts', before: 'known.set(file.path, { ...file });', after: 'known.set(file.path, file);', test: 'local-model' },
   { name: 'local-model-unlisted-file', file: 'inference/local-model.ts', before: 'const expected = known.get(file.path);', after: 'const expected = file;', test: 'local-model' },
   { name: 'local-model-notice-hash', file: 'inference/local-model.ts', before: 'await Promise.all(release.notices.map(file => folder.read(file, signal)));', after: '', test: 'local-model' },
-  { name: 'local-model-directory-limit', file: 'inference/local-model.ts', before: 'if (total > MAX_FOLDER)', after: 'if (false)', test: 'local-model' },
+  { name: 'local-model-directory-limit', file: 'inference/local-model.ts', before: 'if (total > folderMaximum)', after: 'if (false)', test: 'local-model' },
   { name: 'local-model-abort-before-read', file: 'inference/local-model.ts', before: 'signal?.throwIfAborted();\n    has(file);', after: 'has(file);', test: 'local-model' },
   { name: 'trained-model-cohort', file: 'inference/manifest.ts', before: 'training.evaluation_game_count !== 60', after: 'false', test: 'trained-manifest' },
   { name: 'trained-model-selected-epoch', file: 'inference/manifest.ts', before: 'progress.epoch < 1', after: 'false', test: 'trained-manifest' },
@@ -202,7 +222,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 142);
+    assert.equal(results.length, 162);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
