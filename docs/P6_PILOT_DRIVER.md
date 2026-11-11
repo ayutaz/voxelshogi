@@ -155,5 +155,52 @@ CPUへの暗黙の切替を行わない。選んだ同じ重みで出所別の�
 中断・不一致・test指標の混入は失敗として保存し、既存の出力先を再使用しない。
 
 この段階もGPUの起動・HF結果公開・台帳回収・解放は行わない。
-外部supervisorで、2 runの学習→両診断→開発48局→結果の固定HF版照合→小さい台帳の回収→所有実機の解放をつなぐ。
+次のworkflowが学習・両診断・開発48局・結果の固定HF版照合をつなぐ。
+小さい台帳の回収・所有確認・実機解放は、引き続き外部supervisorで接続する。
 データ・checkpoint・NN参照履歴はLinuxとHFに保持し、Macへ移すのは小さい進捗・hash・集計だけとする。
+
+## 全工程のworkerと結果データセット
+
+`infrastructure.research.pilot.workflow`が、Full／Geometryの学習、同じbest重みの診断、
+開発48局と全NN参照監査、結果datasetの公開・固定版照合を順番に実行する。
+これも外部Linux専用で、provider APIや課金要求・実機削除は含まない。
+
+凍結するworkflow JSONはschema `voxelshogi-research-pilot-workflow-v1`と、既存の`job`、
+`m4_bundle`、`development`、`development_sha256`の5項目である。
+M4 bundleは元のproduction公開証跡のplan／receiptと完全一致させる。
+4学習入力に加えM4をLinuxへ直接取得し、実際のscreen releaseの開発条件が学習前の凍結値と一致するまでfitへ進まない。
+途中で条件や更新数を小さくして成功させる経路は設けない。
+
+controllerが新しいowner／絶対期限・検証済みsource・独立停止監視と初期ledgerを用意した後、次を実行する。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m infrastructure.research.pilot.workflow \
+  runs/p6/research-pilot/workflow.json
+```
+
+全computeは既存jobの`compute_deadline`、HF転送・検証は`transfer_deadline`を使い、実行中に延長しない。
+CLIはHF認証をメモリへ取り込み、providerキーを拒否する。
+childを含む所有RSS／CPUとdevice全体のGPU使用観測を、学習・診断・開発評価・公開の間も続ける。
+公開直前のsnapshotと、最後のworker終了観測を区別し、観測していないpeakを主張しない。
+初期state ledgerの設定・過去予約prefixを維持して、最終ledgerと小さいworker終了markerを保存する。
+
+結果公開先は`voxelshogi/voxelshogi-research-pilot-results-v1`のdataset、CC-BY-4.0、public/manual、Community OFF。
+既存公開ハーネスでplanを作り、一度だけ送信し、返された固定Hub revisionの全ファイルをLinuxで照合する。
+uploadの応答不明、期限超過、既存control directoryは再送・再起動せず、元のmarkerとreceiptから照合する。
+LICENSEは検証済みM4 releaseの元のCC-BY-4.0全bytesとhashを確認して使う。
+入力取得がそのLICENSEの取得前に失敗した場合など、結果公開も失敗し得る。公開できたものとして終了せず、controllerへ残存記録と未達を渡す。
+
+公開する`records.parquet`の列は`path`、`line`、`content`、`sha256`。
+JSON文書はline=-1、JSONLは0からの行番号と改行を含む元のUTF-8内容を保存する。
+manifestのファイルbytes／hashから復元でき、Linuxの実PyArrowでschemaを含む往復一致を確認する。
+対象は明示した学習・診断・保存再開・対局・監査の記録だけで、raw corpus、checkpoint、推論重み、環境ファイルや任意logは含めない。
+rootのDataset Cardに実件数、固定入力・source、列と読込方法、由来別指標・小標本・打切りの制約、検証・再構成、取得条件と帰属を記載する。
+
+成功時は、2 cycleのCUDA再開proofと各中間／最終HF roundtrip、両best診断、48局のcohortを再照合する。
+NN参照traceと入力監査のhash、固定protocol、24局ずつの全棋譜とsummary、選択重みを公開直前にも確認し、
+変更・欠落・重複・部分成功を完了へ読み替えない。失敗結果も公開可能な証拠を保ち、`pipeline_complete=false`のまま残す。
+公開後の停止要求や期限超過もworkerの成功markerを作らない。
+
+軽量／fake検証と既知変異は、実CUDA・実48局・実HF公開の完了証拠ではない。
+次は関連Linux CIと統合sourceの全検証、外部supervisorの所有プロセス確認・台帳回収・退避証跡確認・実機解放を接続する。
+`workflow-complete.json`でも`host_retirement_authorized=false`を維持し、controllerの回収・所有確認を省かない。

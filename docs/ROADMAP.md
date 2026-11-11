@@ -1,5 +1,7 @@
 # ROADMAP / 進捗
 
+**2026-11-12 JST・少量学習workerの全工程を接続**：[workflowと結果dataset](P6_PILOT_DRIVER.md#全工程のworkerと結果データセット)を追加。M4と開発条件の事前照合→2 run→同じbestの診断→開発48局・NN監査→HF結果の固定版照合まで接続した。失敗結果の保持、二重送信拒否、公開前の証拠再hashと最終state ledgerを要求する。外部controllerの回収・所有確認・実機解放、関連Linux CIと実2 runは未完了。新規課金0。以下は日時付き履歴。
+
 **2026-11-12 JST・学習後診断の実行経路を追加**：[固定valの再構成とbestモデルのロード](P6_PILOT_DRIVER.md#固定valの再構成と選択モデルの診断実行)を、学習と同じデータ準備・保護／教師判断binding・CUDA環境へ接続した。出所別val後の再hashと停止・不一致の失敗記録を要求する。実M学習・診断・48局の実行証拠ではなく、外部supervisorの結果公開／台帳回収／解放とLinux全検証を残す。新規課金は行っていない。
 
 **2026-11-12 JST・少量学習後の検証APIを実装**：[出所別valと開発48局の接続](P6_PILOT_DRIVER.md#学習後の出所別検証と開発48局)を追加。固定12開始局面×先後×Full／Geometry、選択重みと共通学習binding、全NN参照履歴のRust再生・M4全splitを含む監査を要求する。実2 run・48局・公開退避は未実行で、外部supervisorへの接続と関連Linux CIを残す。新規課金は行っていない。
