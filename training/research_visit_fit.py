@@ -301,7 +301,7 @@ def _terms(model, data, indices, config):
     )
 
 
-def evaluate_visits(model, data, config):
+def evaluate_visits(model, data, config, *, stop_requested=lambda: False):
     _linux()
     import torch
 
@@ -309,7 +309,11 @@ def evaluate_visits(model, data, config):
     model.eval()
     with torch.no_grad():
         for indices in epoch_indices(data.kinds, config.batch_size, seed=0, epoch=0):
+            if stop_requested():
+                raise InterruptedError("visit validation interrupted")
             terms = _terms(model, data, indices, config)
+            if stop_requested():
+                raise InterruptedError("visit validation interrupted")
             for name, key in (
                 ("policy_ce", "policy"),
                 ("value_mse", "value"),

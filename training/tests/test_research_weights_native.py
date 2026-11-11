@@ -21,6 +21,7 @@ def test_actual_M_weight_roundtrip_and_legal_player_use_the_declared_structure(
     from export.research_model import make_research_model
     from training.evaluation_puct import PuctPlayer
     from training.research_weights import (
+        load_research_network,
         load_research_player,
         research_metadata,
         write_research_weights,
@@ -35,6 +36,14 @@ def test_actual_M_weight_roundtrip_and_legal_player_use_the_declared_structure(
     path = tmp_path / "M.safetensors"
     receipt = write_research_weights(model.state_dict(), path, metadata=value)
     assert research_metadata(path) == value
+    network, loaded_metadata = load_research_network(
+        path, expected_sha256=receipt["sha256"], device="cpu"
+    )
+    assert loaded_metadata == value
+    assert network.config == architecture_config(architecture) and not network.training
+    for key, tensor in model.state_dict().items():
+        assert torch.equal(tensor, network.state_dict()[key])
+    del network
     fixture = json.loads((ROOT / "export/fixtures/positions.json").read_text())[2]
     game = Game.from_record(fixture["record"])
     features = torch.from_numpy(game.features()).unsqueeze(0)

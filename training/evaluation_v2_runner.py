@@ -148,6 +148,24 @@ def _prepare_players(
             or file_hash(path) != participant["artifact_sha256"]
         ):
             raise ValueError("evaluation model artifact hash differs")
+        if participant["backend"] == "ort-cpu":
+            if participant["policy"] != "legal-argmax-v1":
+                raise ValueError("M ONNX supports explicit legal argmax evaluation")
+            from training.research_onnx import load_research_onnx_player
+
+            observe = observe_input
+            observer = (
+                (lambda game, role=role, observe=observe: observe(role, game))
+                if observe is not None
+                else None
+            )
+            players[role] = load_research_onnx_player(
+                path,
+                expected_sha256=participant["artifact_sha256"],
+                stop_requested=stop_requested,
+                observe_input=observer,
+            )
+            continue
         if participant["backend"] not in ("torch-cpu", "torch-cuda"):
             raise ValueError("this runner supports selected FP32 Torch weights only")
         from training.research_weights import load_research_player, research_metadata
@@ -364,6 +382,10 @@ def execution_runtime(protocol, required, commit):
         import torch
 
         runtime["torch"] = str(torch.__version__)
+        if any(p["backend"] == "ort-cpu" for p in protocol["participants"].values()):
+            import onnxruntime as ort
+
+            runtime["onnxruntime"] = str(ort.__version__)
         if any(p["backend"] == "torch-cuda" for p in protocol["participants"].values()):
             runtime.update(
                 cuda=torch.version.cuda,

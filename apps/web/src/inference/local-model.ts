@@ -1,8 +1,10 @@
-import { assetUrl, verifyBytes, type FileRef } from './assets';
+import { assetUrl, verifyBytes, verifyResearchBytes, type FileRef } from './assets';
 import { parseTrainedModel, type ModelManifest, type TrainedIdentity } from './manifest';
+import { isResearchArchitecture, parseResearchModel, RESEARCH_MODEL_BYTES, type ResearchArchitecture, type ResearchIdentity, type ResearchManifest } from './research-manifest';
 
 export interface TrainedRelease extends TrainedIdentity {
   approved: true; repo: string; revision: string; manifest: FileRef; notices: FileRef[];
+  profile?: 'research-m-v1'; architecture?: ResearchArchitecture;
 }
 export interface LocalFile {
   name: string; webkitRelativePath: string; size: number; arrayBuffer: () => Promise<ArrayBuffer>;
@@ -22,9 +24,9 @@ function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid catalog object');
   return value as Record<string, unknown>;
 }
-function descriptor(value: unknown): FileRef {
+function descriptor(value: unknown, maximum = MAX_FILE): FileRef {
   const file = record(value);
-  if (typeof file.path !== 'string' || typeof file.bytes !== 'number' || !Number.isSafeInteger(file.bytes) || file.bytes <= 0 || file.bytes > MAX_FILE || typeof file.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(file.sha256)) throw new Error('invalid local file descriptor');
+  if (typeof file.path !== 'string' || typeof file.bytes !== 'number' || !Number.isSafeInteger(file.bytes) || file.bytes <= 0 || file.bytes > maximum || typeof file.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(file.sha256)) throw new Error('invalid local file descriptor');
   assetUrl('https://local.invalid/', file.path);
   return file as unknown as FileRef;
 }
@@ -36,12 +38,15 @@ export function parseTrainedCatalog(value: unknown): TrainedRelease[] {
   const releases = catalog.releases.map(item => {
     const release = record(item);
     if (release.approved !== true) throw new Error('trained release approval is pending');
+    if (Object.hasOwn(release, 'profile') || Object.hasOwn(release, 'architecture')) {
+      if (release.profile !== 'research-m-v1' || !isResearchArchitecture(release.architecture) || release.license !== 'Apache-2.0') throw new Error('invalid research catalog profile');
+    }
     if (typeof release.id !== 'string' || !/^[a-zA-Z0-9._-]{1,128}$/.test(release.id) || typeof release.license !== 'string' || !/^[A-Za-z0-9.-]{1,64}$/.test(release.license) || typeof release.sourceCommit !== 'string' || !/^[0-9a-f]{40}$/.test(release.sourceCommit) ||
       typeof release.repo !== 'string' || !/^voxelshogi\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(release.repo) || typeof release.revision !== 'string' || !/^[0-9a-f]{40}$/.test(release.revision)) throw new Error('invalid trained release identity');
     const manifest = descriptor(release.manifest);
     if (manifest.path !== 'manifest.json' || manifest.bytes > 1024 * 1024) throw new Error('invalid trained manifest descriptor');
     if (!Array.isArray(release.notices) || release.notices.length < 2 || release.notices.length > 3) throw new Error('trained release requires card/license notices');
-    const notices = release.notices.map(descriptor), paths = notices.map(file => file.path);
+    const notices = release.notices.map(value => descriptor(value)), paths = notices.map(file => file.path);
     if (!paths.includes('README.md') || !paths.includes('LICENSE') || new Set(paths).size !== paths.length || notices.some(file => !['README.md', 'LICENSE', 'NOTICE'].includes(file.path) || file.bytes > 1024 * 1024)) throw new Error('invalid trained card/license notice descriptors');
     return structuredClone({ ...release, manifest, notices }) as unknown as TrainedRelease;
   });
@@ -59,8 +64,11 @@ export async function readTrainedCatalog(url: string, fetcher: typeof fetch = fe
 }
 
 /** Indexes only metadata. Model bytes are read lazily by the dedicated Worker. */
-export function indexLocalFolder(files: readonly LocalFile[]): LocalFolder {
+export function indexLocalFolder(files: readonly LocalFile[], profile: 's' | 'research-m-v1' | 'transfer' = 's'): LocalFolder {
   if (files.length < 1 || files.length > 512) throw new Error('invalid model folder file count');
+  if (!['s', 'research-m-v1', 'transfer'].includes(profile)) throw new Error('invalid model folder profile');
+  const maximum = profile === 's' ? MAX_FILE : RESEARCH_MODEL_BYTES;
+  const folderMaximum = profile === 's' ? MAX_FOLDER : 1536 * 1024 * 1024;
   const entries = new Map<string, LocalFile>();
   let root: string | undefined, total = 0;
   for (const file of files) {
@@ -69,22 +77,23 @@ export function indexLocalFolder(files: readonly LocalFile[]): LocalFolder {
     root = folder;
     assetUrl('https://local.invalid/', path);
     if (entries.has(path)) throw new Error('duplicate local file path');
-    if (!Number.isSafeInteger(file.size) || file.size < 0 || file.size > MAX_FILE) throw new Error('local file size exceeds limit');
+    if (!Number.isSafeInteger(file.size) || file.size < 0 || file.size > maximum) throw new Error('local file size exceeds limit');
     total += file.size;
-    if (total > MAX_FOLDER) throw new Error('model folder exceeds size limit');
+    if (total > folderMaximum) throw new Error('model folder exceeds size limit');
     entries.set(path, file);
   }
   function has(value: FileRef) {
-    const expected = descriptor(value), file = entries.get(expected.path);
+    const expected = descriptor(value, maximum), file = entries.get(expected.path);
     if (!file) throw new Error(`missing local model file: ${expected.path}`);
     if (file.size !== expected.bytes) throw new Error('local file size mismatch');
   }
   return { has, read: async (file, signal) => {
+    if (profile === 'transfer') throw new Error('transferred folder metadata cannot read bodies before catalog approval');
     signal?.throwIfAborted();
     has(file);
     const bytes = new Uint8Array(await entries.get(file.path)!.arrayBuffer());
     signal?.throwIfAborted();
-    const verified = await verifyBytes(bytes, file);
+    const verified = await (profile === 'research-m-v1' ? verifyResearchBytes(bytes, file) : verifyBytes(bytes, file));
     signal?.throwIfAborted();
     return verified;
   } };
@@ -92,9 +101,11 @@ export function indexLocalFolder(files: readonly LocalFile[]): LocalFolder {
 
 export async function loadLocalModel(files: readonly LocalFile[], releaseValue: unknown, signal?: AbortSignal): Promise<LocalModel> {
   const release = parseTrainedCatalog({ schema: 1, releases: [releaseValue] })[0]!;
-  const folder = indexLocalFolder(files);
+  const research = release.profile === 'research-m-v1';
+  const folder = indexLocalFolder(files, research ? 'research-m-v1' : 's');
   const bytes = await folder.read(release.manifest, signal);
-  const model = parseTrainedModel(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)), release);
+  const manifest: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+  const model = research ? parseResearchModel(manifest, release as ResearchIdentity) : parseTrainedModel(manifest, release);
   const known = new Map<string, FileRef>();
   function list(file: FileRef) {
     const existing = known.get(file.path);
@@ -108,7 +119,14 @@ export async function loadLocalModel(files: readonly LocalFile[], releaseValue: 
     list(variant.model);
     for (const reference of Object.values(variant.references)) { list(reference.policy); list(reference.value); }
   }
+  const evidence: FileRef[] = [];
+  if (research) {
+    const reviewed = model as ResearchManifest;
+    evidence.push(reviewed.research.selection, ...reviewed.variants.map(variant => variant.evaluation.report));
+    evidence.forEach(list);
+  }
   await Promise.all(release.notices.map(file => folder.read(file, signal)));
+  await Promise.all(evidence.map(file => folder.read(file, signal)));
   return { release, model, packageHash: release.manifest.sha256, read: async (file, readSignal) => {
     const expected = known.get(file.path);
     if (!expected || expected.sha256 !== file.sha256 || expected.bytes !== file.bytes) throw new Error('unknown or unlisted local asset');
