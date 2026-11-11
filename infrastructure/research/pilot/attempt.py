@@ -133,6 +133,63 @@ def reviewed_audit(manifest, inputs, source_hashes):
     return audit
 
 
+def prepare_corpus(inputs, *, stop_requested=lambda: False):
+    """Repeat source/admission/teacher checks and bind the same train/val bytes."""
+    if sys.platform != "linux":
+        raise ValueError("pilot preparation requires external Linux")
+    if stop_requested():
+        raise InterruptedError("fixed pilot preparation deadline")
+    from training.evaluation_v2 import fingerprint
+    from training.feature_cache import file_hash
+    from training.research_visit_data import encode_corpus
+
+    config, decision_sha = validate_inputs(inputs)
+    if subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], text=True
+    ).strip() != inputs["source_commit"] or subprocess.check_output(
+        ["git", "status", "--porcelain"], text=True
+    ):
+        raise ValueError("pilot preparation source must be its clean frozen commit")
+    paths = {name: Path(path) for name, path in inputs["paths"].items()}
+    manifest = json.loads(paths["diagnosis_manifest"].read_text())
+    audit = reviewed_audit(
+        manifest,
+        inputs,
+        {
+            "selfplay_manifest": file_hash(paths["selfplay"] / "manifest.json"),
+            "protocol_fingerprint": fingerprint(
+                json.loads(paths["protocol"].read_text())
+            ),
+            "protection": file_hash(paths["protection"]),
+            "screen_config": file_hash(paths["screen"]),
+            "screen_manifest": file_hash(paths["screen"].parent / "manifest.json"),
+        },
+    )
+    if stop_requested():
+        raise InterruptedError("fixed pilot preparation deadline")
+    corpus, encoding = encode_corpus(
+        paths["selfplay"],
+        json.loads(paths["protocol"].read_text()),
+        paths["protection"],
+        paths["screen"],
+        screen_sha256=audit["screen_config_sha256"],
+        expected_audit_sha256=inputs["admission_sha256"],
+        maximum_feature_bytes=inputs["maximum_feature_bytes"],
+    )
+    # Full development-input protection and the measured teacher decision enter
+    # the actual feature digest and thus the fitter's resume binding.
+    for split in (corpus.train, corpus.val):
+        split.provenance.update(
+            full_development_protection_sha256=inputs["development_protection_sha256"],
+            teacher_decision_sha256=decision_sha,
+        )
+    encoding["feature_content_sha256"] = corpus.digest(config)
+    encoding["teacher_decision_sha256"] = decision_sha
+    if stop_requested():
+        raise InterruptedError("fixed pilot preparation deadline")
+    return config, decision_sha, corpus, encoding
+
+
 def run(inputs, output, *, deadline, resume=False, max_new_steps=None):
     if sys.platform != "linux":
         raise ValueError("pilot fitting requires external Linux")
@@ -153,31 +210,8 @@ def run(inputs, output, *, deadline, resume=False, max_new_steps=None):
     )
     from training.checkpoint import atomic_json
     from training.evaluation_v2 import fingerprint
-    from training.feature_cache import file_hash
-    from training.research_visit_data import encode_corpus
     from training.research_visit_fit import fit_visits
 
-    config, decision_sha = validate_inputs(inputs)
-    assert (
-        subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-        == inputs["source_commit"]
-    )
-    assert not subprocess.check_output(["git", "status", "--porcelain"], text=True)
-    paths = {name: Path(path) for name, path in inputs["paths"].items()}
-    manifest = json.loads(paths["diagnosis_manifest"].read_text())
-    audit = reviewed_audit(
-        manifest,
-        inputs,
-        {
-            "selfplay_manifest": file_hash(paths["selfplay"] / "manifest.json"),
-            "protocol_fingerprint": fingerprint(
-                json.loads(paths["protocol"].read_text())
-            ),
-            "protection": file_hash(paths["protection"]),
-            "screen_config": file_hash(paths["screen"]),
-            "screen_manifest": file_hash(paths["screen"].parent / "manifest.json"),
-        },
-    )
     stop = threading.Event()
     signal.signal(signal.SIGTERM, lambda *_: stop.set())
     signal.signal(signal.SIGINT, lambda *_: stop.set())
@@ -188,24 +222,9 @@ def run(inputs, output, *, deadline, resume=False, max_new_steps=None):
     if stopping():
         raise InterruptedError("fixed pilot preparation deadline")
     started = time.monotonic()
-    corpus, encoding = encode_corpus(
-        paths["selfplay"],
-        json.loads(paths["protocol"].read_text()),
-        paths["protection"],
-        paths["screen"],
-        screen_sha256=audit["screen_config_sha256"],
-        expected_audit_sha256=inputs["admission_sha256"],
-        maximum_feature_bytes=inputs["maximum_feature_bytes"],
+    config, decision_sha, corpus, encoding = prepare_corpus(
+        inputs, stop_requested=stopping
     )
-    # Full development-input protection and the measured teacher decision enter
-    # the actual feature digest and thus the fitter's resume binding.
-    for split in (corpus.train, corpus.val):
-        split.provenance.update(
-            full_development_protection_sha256=inputs["development_protection_sha256"],
-            teacher_decision_sha256=decision_sha,
-        )
-    encoding["feature_content_sha256"] = corpus.digest(config)
-    encoding["teacher_decision_sha256"] = decision_sha
     prepared = time.monotonic()
     result = fit_visits(
         corpus,

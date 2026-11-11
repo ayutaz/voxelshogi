@@ -122,3 +122,38 @@ MacへM4コーパスやNN参照履歴を回収しない。
 実行前に、固定valの再構成・同じbestモデルのロード、全検証のdeadlineと資源監視、
 結果dataset公開、更新ledger回収、所有ホスト解放を外部supervisorへ接続する必要がある。
 純粋／fake portの検証を、実CUDA・実48局・全入力監査の実行証拠へ読み替えない。
+
+## 固定valの再構成と選択モデルの診断実行
+
+`attempt.prepare_corpus`を学習と診断で共有する。cleanな凍結source、元の全入力hash、
+採用前監査・全開発入力の保護・教師判断を再検証し、同じtrain／valとprovenanceを作る。
+教師判断と保護のhashを加えた後に、特徴量全体のdigestを再計算する。
+診断側だけ異なる分割や保護条件を使って、その差を無視する経路は作らない。
+
+`pilot.post`はこの再構成結果を実run binding・全設定・CUDA環境と照合し、
+完了したrunのbestを[選択・書き出し](P6_MODEL_EVALUATION.md#完了したvisit学習から評価用bestを取り出す)して、
+`research_weights.load_research_network`からロードする。
+このnetwork loaderを合法argmax／PUCT32とも共有し、全重みのhash・metadata・FP32・有限性・
+全state key／shapeのstrict loadとCPU／CUDAの明示的な配置を維持する。
+
+外部Linuxで、学習を終えた同じsource・CUDA環境から次を実行する。
+`pilot_compute_deadline`には凍結した`job.json`の`compute_deadline`を渡し、実行時に延長しない。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m infrastructure.research.pilot.post \
+  runs/p6/research-pilot/full/inputs.json \
+  runs/p6/research-pilot/full/continuous \
+  runs/p6/research-pilot/full/diagnostics \
+  --compute-deadline "$pilot_compute_deadline"
+```
+
+Geometryも同じ条件で実行する。`CUBLAS_WORKSPACE_CONFIG=:4096:8`をTorchの初期化前に設定し、
+CPUへの暗黙の切替を行わない。選んだ同じ重みで出所別の固定valを評価し、
+その後も重み・特徴量・run bindingが変わっていないことを確認する。
+`complete.json`へ入力／binding／特徴量／選択重みのhash、選択step、由来別指標と経過時間を保存する。
+この経過時間は再構成・hash・保存・ロードも含み、純粋なGPU性能とは扱わない。
+中断・不一致・test指標の混入は失敗として保存し、既存の出力先を再使用しない。
+
+この段階もGPUの起動・HF結果公開・台帳回収・解放は行わない。
+外部supervisorで、2 runの学習→両診断→開発48局→結果の固定HF版照合→小さい台帳の回収→所有実機の解放をつなぐ。
+データ・checkpoint・NN参照履歴はLinuxとHFに保持し、Macへ移すのは小さい進捗・hash・集計だけとする。
