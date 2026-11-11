@@ -20,6 +20,26 @@ GPUの起動・学習条件の採用・最終評価は、この変更では実�
 
 ## 1試行と同一軌跡の再開検証
 
+`infrastructure.research.pilot.job`が2構造の実行をまとめる。
+元のselfplay・protection・開発評価screenと採用前diagnosisの4つの固定HF releaseを、
+外部Linuxで各revision・全bytes／SHA-256・public/manual・Community OFFまで再確認してから学習へ進む。
+最初の構造はFull対照、2つ目は別の実M構造とし、データ・教師判断・seed・batch・全更新数は共通にする。
+同じ更新数が同じFLOPsになるとは主張せず、本比較の計算量は実測後に固定する。
+
+凍結済みjob JSONと、元のhashに一致する累積state ledgerを所定のowned directoryへ配置し、
+controllerのsource／owner／独立期限／実機確認後に次を実行する。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m infrastructure.research.pilot.job runs/p6/research-pilot/job.json
+```
+
+CLIはHF認証を環境からメモリへ取り込み、providerキーを拒否する。
+clean source・HFのアカウントと組織・実CUDA環境を確認し、起動済みmarkerがあるjobを再送しない。
+childを含む所有RSS・CPUとdevice全体のGPU利用を観測する。RSS超過は学習停止を要求し、
+観測値を実測区間外のpeakやGPU専有量へ拡張しない。
+成功・失敗の両方で、追記されたstate ledgerの過去履歴・容量上限を検証して小さい記録を保存する。
+このjobの`learning_complete`は2 runの学習部分だけを示し、開発用対局・HF結果dataset・棋力判断・Phase6完了とは区別する。
+
 `cycle.run_cycle`へ凍結済みinputs、途中停止step、別々の固定compute_deadlineとdeadline（転送終了）、公開API、
 固定revisionの取得port、累積state upload ledgerを渡す。順序は次のとおり。
 
@@ -58,7 +78,7 @@ uploadの応答不明を理由に盲目的に再送せず、publication-attempt�
 手書きのfake tensor・SDK・process・archive portを使う軽量テストで、実行順序、
 入力binding、全更新数と途中停止の区別、資格情報を含まないchild環境、
 全履歴とlatest／bestの検証、公開未検証時の拒否、二重送信拒否を確認する。
-意図的な28種類のバグを関連テストで検出し、既知変異カタログへ登録する。
+意図的な37種類のバグを関連テストで検出し、既知変異カタログへ登録する。
 Macで実Torch、GPU、コーパス生成、HF uploadは実行しない。
 このfake検証は実CUDA再開の証拠ではなく、Linuxの関連CI成功も実2 runの成功とは扱わない。
 
