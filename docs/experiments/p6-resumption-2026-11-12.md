@@ -601,3 +601,71 @@ CIは06:32:48 JSTの取得済み結果を再利用し、10分以内の再取得�
   ]
 }
 ```
+
+## 08:10 JST 初回pilot失敗・保存・解放
+
+子ログ全文が残っていない制約と、クリーンfixtureでの再現を区別する。
+
+```json
+{
+  "schema": "voxelshogi-research-pilot-first-attempt-audit-v1",
+  "source_commit": "1a4c4a00798d2ad62a9de5d4269eaefdb51bf55e",
+  "workflow_sha256": "39ff141b08d535d0d20cec575719b2faef363f32c9ad9347eaefceb2d949f081",
+  "instance_id": 60271691,
+  "completed_scientific_pilots": 0,
+  "saved_checkpoint_runs": 0,
+  "failures": {
+    "job-failure.json": {
+      "completed_scientific_pilots": 0,
+      "error_type": "RuntimeError",
+      "host_retirement_authorized": false,
+      "learning_complete": false,
+      "stage": "fit-full"
+    },
+    "workflow-failure.json": {
+      "error_type": "RuntimeError",
+      "host_retirement_authorized": false,
+      "pipeline_complete": false,
+      "stage": "learning"
+    }
+  },
+  "result_publication": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "ae09a4efc7341b0ed103b8fcf36b9baa074047f9",
+    "release_sha256": "81d5a199a56d96e7cf8cfc336b3bfffaa7a9e632215f8d99cc0f5b7380231281",
+    "repo_id": "voxelshogi/voxelshogi-research-pilot-results-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "collection_review": {
+    "collection_sha256": "7157ad4b6b560e51a279b35b0fcdc4aaa2883ee02cb329401a65ef649ee6a7ea",
+    "covered_runs": [],
+    "job_complete": false,
+    "phase6_complete": false,
+    "state_budget_sha256": "2b1937f66e27239b91dec291e8c05a2cf722daea3d2d6800bfad40879c193dae"
+  },
+  "retirement": {
+    "event": "retirement-result",
+    "job_complete": false,
+    "resources_released": true,
+    "retirement": {
+      "checked_at": 1794438051.97673,
+      "complete": true,
+      "instances": [],
+      "provider": "vast.ai"
+    }
+  },
+  "provider_idle_observation_at": 1794438428.830837,
+  "vast_owned": [],
+  "cloudrift_idle": true,
+  "budget_reservations": 38,
+  "reserved_usd": 167,
+  "approved_usd": 200,
+  "remaining_unreserved_usd": 33,
+  "full_child_log_preserved": false,
+  "clean_fixture_old_entrypoint_import_failure_reproduced": true,
+  "real_exception_type_not_established_from_retained_records": true,
+  "new_gpu_rental_after_failure": false
+}
+```
