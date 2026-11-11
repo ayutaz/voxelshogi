@@ -90,3 +90,35 @@ Macで実Torch、GPU、コーパス生成、HF uploadは実行しない。
 全工程見積もりと所有資源・独立期限、state救出・ledger回収を含む外部supervisorを接続する。
 実行後の開発用対局と全NN参照監査・費用・HF結果退避も別に必要。
 最終holdoutを調整に使わず、12 run本比較とWeb配布の完了条件を維持する。
+
+## 学習後の出所別検証と開発48局
+
+`infrastructure.research.pilot.validation`を後続の検証APIとして追加した。
+`origin_metrics`は固定valだけを受け取り、同じ選択済み重みでterminal／bootstrapのPolicy CE・Value MSE・合計損失を別々に計算する。
+集計は実行数で重み付けし、存在しない由来は`available=false`として残す。
+bootstrapへの一致を、実際の勝敗予測精度と呼ばない。検証batchの前後にも停止要求を確認する。
+
+`development_protocol`へ渡す凍結スライスは、検証済みscreenの
+`protocols["legal-argmax-v1"]`を`protocol`、`families`を同名のキーに持つオブジェクトである。
+そのcanonical fingerprintを学習前の実行条件へ固定する。
+12開始局面のid／seed／層／追加手数、6 family、M1深さ3／20,000 nodes／TT4,096を維持し、
+実装source・実M重みSHA・CUDA合法argmaxと、そのsourceに対応するM1の識別子だけを差し替える。
+最終holdoutを渡したり、結果を見て開始局面を差し替えたりしない。
+
+`run_development_pair`はFull／Geometryの2つの選択済みフォルダと各`selection.json`の固定SHAを受け取る。
+実重みのSHA・research header、best／latestの更新数、来歴、同じseed・共通学習bindingを確認する。
+学習・重みexport・対局評価のsourceを別々に記録し、後続の評価修正だけを理由に既存の学習重みを作り直さない。
+各12局面×先後の24局を実行し、Rustで全棋譜を再検証する。
+実際のmodel callbackから全NN参照履歴を保存し、その場でRust再生と物理／手番正規化入力を確認する。
+最後にM4全split・公開自己対局全sample・保護集合・対局経路・実NN参照を監査する。
+24局の部分成功、NN参照の欠落、重複、実行中に変わった重み、期限超過は`complete.json`を作らず、失敗と部分結果を残す。
+6 familyの等重み得点上下限と、開始局面ごとの既存bootstrap集計を併記し、相関と打切りの制約を維持する。
+
+この全入力監査には**学習用4 releaseに加えてM4 production-64の実ファイル**も必要である。
+元の固定HF releaseから外部Linuxへ直接取得し、起動見積もりに取得・全件検証の時間と転送を含める。
+MacへM4コーパスやNN参照履歴を回収しない。
+
+これらは実行APIであり、現在の`pilot.job`の`learning_complete`を48局完了へ拡張するものではない。
+実行前に、固定valの再構成・同じbestモデルのロード、全検証のdeadlineと資源監視、
+結果dataset公開、更新ledger回収、所有ホスト解放を外部supervisorへ接続する必要がある。
+純粋／fake portの検証を、実CUDA・実48局・全入力監査の実行証拠へ読み替えない。
