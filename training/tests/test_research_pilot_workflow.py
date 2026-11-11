@@ -141,7 +141,12 @@ def setup(tmp_path, monkeypatch, mode="complete"):
         }
         return {"pipeline_complete": pipeline_complete, "receipt": receipt}
 
+    def repositories(*args, **kwargs):
+        calls.append("repositories")
+        return {"verified": True, "public_manual_community_off": True}
+
     ports = {
+        "repositories": repositories,
         "source": lambda source: calls.append("source"),
         "acquire": acquire,
         "learn": learn,
@@ -186,6 +191,7 @@ def test_workflow_orders_real_stages_and_publishes_failures_without_claiming_com
             assert calls == [
                 "source",
                 "m4",
+                "repositories",
                 "learn",
                 "post-full",
                 "post-geometry",
@@ -341,3 +347,101 @@ def test_completed_transfer_does_not_hide_late_stop_or_expired_deadline(
     assert not (base / "workflow-complete.json").exists()
     assert (base / "workflow-publication.json").exists()
     assert calls[-1] == "publish-complete"
+
+
+@pytest.mark.parametrize("mode", ["admission-failure", "complete", "duplicate"])
+def test_worker_persists_startup_failure_and_ledger_without_overwriting_prior_job(
+    tmp_path, monkeypatch, mode
+):
+    from infrastructure.research.pilot import workflow
+
+    value, _, _, _ = setup(tmp_path, monkeypatch)
+    base = Path(value["job"]["base"])
+    calls = []
+
+    def monitor(maximum, stop, done, rows):
+        calls.append("observe")
+        rows.append({"summed_owned_rss_bytes": 123})
+
+    def pipeline(*args, **kwargs):
+        calls.append("pipeline")
+        if mode == "admission-failure":
+            raise ValueError("sensitive exception details must not be stored")
+        return {
+            "source_commit": value["job"]["source_commit"],
+            "pipeline_complete": True,
+        }
+
+    monkeypatch.setattr(workflow, "run_workflow", pipeline)
+    if mode == "duplicate":
+        atomic_json(base / "workflow-request.json", {"original": True})
+        atomic_json(base / "workflow-worker-finished.json", {"original": True})
+    with patch("sys.platform", "linux"):
+        if mode == "complete":
+            result = workflow.run_worker(
+                value, api=None, fetch=None, monitor=monitor, clock=lambda: 100
+            )
+            assert result["pipeline_complete"] is True
+        else:
+            with pytest.raises(ValueError):
+                workflow.run_worker(
+                    value, api=None, fetch=None, monitor=monitor, clock=lambda: 100
+                )
+    if mode == "duplicate":
+        assert calls == []
+        assert json.loads((base / "workflow-worker-finished.json").read_text()) == {
+            "original": True
+        }
+    else:
+        marker = json.loads((base / "workflow-worker-finished.json").read_text())
+        assert marker["observer_stopped"] is True
+        assert marker["pipeline_complete"] is (mode == "complete")
+        assert json.loads((base / "state-budget-final.json").read_text()) == json.loads(
+            (base / "state-upload-budget.json").read_text()
+        )
+        if mode == "admission-failure":
+            failure = (base / "workflow-failure.json").read_text()
+            assert "ValueError" in failure and "sensitive exception" not in failure
+
+
+def test_output_repository_preflight_is_required_before_fitting(tmp_path, monkeypatch):
+    from infrastructure.research.pilot.workflow import run_workflow
+
+    value, ports, calls, _ = setup(tmp_path, monkeypatch)
+
+    def repositories(*args, **kwargs):
+        calls.append("repositories")
+        raise PermissionError("output repo preparation failed")
+
+    ports["repositories"] = repositories
+    with patch("sys.platform", "linux"), pytest.raises(PermissionError):
+        run_workflow(value, api=Hub(), fetch=None, ports=ports, clock=lambda: 100)
+    assert "learn" not in calls and "repositories" in calls
+    assert calls[-1] == "publish-partial"
+
+
+def test_repo_preflight_uses_public_manual_community_off_for_both_outputs():
+    from infrastructure.research.pilot.workflow import prepare_repositories
+    from training.tests.test_hub_release import Hub as PublicationHub
+
+    api = PublicationHub()
+    with patch("sys.platform", "linux"):
+        result = prepare_repositories(
+            {"job": {"source_commit": "a" * 40}},
+            api=api,
+            deadline=200,
+            clock=lambda: 100,
+        )
+    expected = {
+        ("voxelshogi/voxelshogi-research-training-state-v1", "model"),
+        ("voxelshogi/voxelshogi-research-pilot-results-v1", "dataset"),
+    }
+    assert result["verified"] is True
+    assert {
+        (row["repo_id"], row["repo_type"])
+        for name, row in api.calls
+        if name == "community"
+    } == expected
+    assert all(
+        row["gated"] == "manual" for name, row in api.calls if name == "settings"
+    )

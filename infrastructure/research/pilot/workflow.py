@@ -54,6 +54,42 @@ def validate_workflow(value, *, now):
     return configs
 
 
+def prepare_repositories(value, *, api, deadline, clock=time.time):
+    """Prepare both authorized destinations before generating trained outputs."""
+    if sys.platform != "linux":
+        raise ValueError("repository preparation requires external Linux")
+    from training.hub_release import create_release_repository
+
+    rows = []
+    for repo, kind, license_id in (
+        ("voxelshogi/voxelshogi-research-training-state-v1", "model", "apache-2.0"),
+        (RESULTS_REPO, "dataset", "cc-by-4.0"),
+    ):
+        if clock() >= deadline:
+            raise InterruptedError("fixed repository preparation deadline")
+        plan = {
+            "schema": 1,
+            "repo_id": repo,
+            "repo_type": kind,
+            "private": False,
+            "gated": "manual",
+            "license": license_id,
+            "license_approved": True,
+            "source_commit": value["job"]["source_commit"],
+        }
+        if kind == "model":
+            plan.update(
+                artifact_role="research-training-state",
+                state_publication_approved=True,
+                expected_binding={"source_commit": value["job"]["source_commit"]},
+            )
+        create_release_repository(plan, api, execute=True, system="linux")
+        rows.append({"repo_id": repo, "repo_type": kind})
+    if clock() >= deadline:
+        raise InterruptedError("repository preparation exceeded compute boundary")
+    return {"verified": True, "repositories": rows, "public_manual_community_off": True}
+
+
 def load_ports():
     from infrastructure.research.pilot.cycle import run_cycle
     from infrastructure.research.pilot.post import run_post
@@ -81,6 +117,7 @@ def load_ports():
     return {
         "source": job.check_source,
         "acquire": job.acquire_release,
+        "repositories": prepare_repositories,
         "learn": learn,
         "post": run_post,
         "develop": run_development_pair,
@@ -115,7 +152,15 @@ def run_workflow(
         raise ValueError("pilot workflow requires external Linux")
     configs = validate_workflow(value, now=clock())
     ports = load_ports() if ports is None else ports
-    if set(ports) != {"source", "acquire", "learn", "post", "develop", "publish"}:
+    if set(ports) != {
+        "source",
+        "acquire",
+        "repositories",
+        "learn",
+        "post",
+        "develop",
+        "publish",
+    }:
         raise ValueError("complete workflow ports required")
     frozen_job, frozen = value["job"], value["development"]
     base = Path(frozen_job["base"])
@@ -187,6 +232,17 @@ def run_workflow(
         if m4_receipt.get("verified") is not True:
             raise ValueError("full M4 immutable input verification required")
         atomic_json(base / "m4-input-receipt.json", m4_receipt)
+        stage = "output-repositories"
+        boundary(stage)
+        repository_proof = ports["repositories"](
+            value, api=api, deadline=frozen_job["compute_deadline"], clock=clock
+        )
+        if (
+            repository_proof.get("verified") is not True
+            or repository_proof.get("public_manual_community_off") is not True
+        ):
+            raise ValueError("output repository settings not confirmed before learning")
+        atomic_json(base / "output-repositories.json", repository_proof)
         stage = "learning"
         boundary(stage)
         learning = ports["learn"](
@@ -352,6 +408,94 @@ def run_workflow(
     return result
 
 
+def run_worker(
+    value, *, api, fetch, monitor=job.observe_resources, stop=None, clock=time.time
+):
+    """Retain typed startup failures/final ledger; never overwrite a prior job."""
+    if sys.platform != "linux":
+        raise ValueError("pilot worker requires external Linux")
+    validate_workflow(value, now=clock())
+    base = Path(value["job"]["base"])
+    if base.is_symlink() or any(
+        (base / name).exists() for name in ("workflow-request.json", "job-request.json")
+    ):
+        raise ValueError("existing worker requires reconciliation")
+    ledger = base / "state-upload-budget.json"
+    if (
+        ledger.is_symlink()
+        or not ledger.is_file()
+        or ledger.stat().st_size > 1024**2
+        or file_hash(ledger) != value["job"]["state_upload_budget_sha256"]
+    ):
+        raise ValueError("frozen initial worker ledger differs")
+    initial = json.loads(ledger.read_text())
+    upload_budget_limit(initial)
+    stop = threading.Event() if stop is None else stop
+    done, rows = threading.Event(), []
+    base = Path(value["job"]["base"])
+    observer = threading.Thread(
+        target=monitor,
+        args=(value["job"]["maximum_owned_rss_bytes"], stop, done, rows),
+        daemon=True,
+    )
+    observer.start()
+    result = None
+    try:
+        result = run_workflow(
+            value,
+            api=api,
+            fetch=fetch,
+            clock=clock,
+            stop_requested=stop.is_set,
+            before_publication=lambda: atomic_json(
+                base / "resource-samples.json", list(rows)
+            ),
+        )
+    except BaseException as error:
+        if not (base / "workflow-failure.json").exists():
+            atomic_json(
+                base / "workflow-failure.json",
+                {
+                    "stage": "workflow-admission",
+                    "error_type": type(error).__name__,
+                    "pipeline_complete": False,
+                    "host_retirement_authorized": False,
+                },
+            )
+        raise
+    finally:
+        done.set()
+        observer.join(timeout=12)
+        ledger_ok = False
+        try:
+            verify_ledger(base, initial)
+            ledger_ok = True
+        except BaseException as error:
+            atomic_json(
+                base / "workflow-failure.json",
+                {
+                    "stage": "worker-final-ledger",
+                    "error_type": type(error).__name__,
+                    "pipeline_complete": False,
+                    "host_retirement_authorized": False,
+                },
+            )
+        atomic_json(base / "resource-samples-final.json", rows)
+        atomic_json(
+            base / "workflow-worker-finished.json",
+            {
+                "pipeline_complete": result is not None and ledger_ok,
+                "source_commit": value["job"]["source_commit"],
+                "observer_stopped": not observer.is_alive(),
+                "controller_ledger_collection_required": True,
+                "host_retirement_authorized": False,
+            },
+        )
+    if not ledger_ok:
+        raise ValueError("worker ledger preservation failed")
+    return result
+
+
 def main():
     if sys.platform != "linux":
         raise ValueError("pilot workflow requires external Linux")
@@ -371,7 +515,7 @@ def main():
     from training.hub_recovery import RecoveryApi
     from training.hub_release import PublicationApi
 
-    stop, done, rows = threading.Event(), threading.Event(), []
+    stop = threading.Event()
     signal.signal(signal.SIGTERM, lambda *_: stop.set())
     signal.signal(signal.SIGINT, lambda *_: stop.set())
     api = RecoveryApi(
@@ -387,38 +531,7 @@ def main():
     def fetch(**kwargs):
         return hf_hub_download(**kwargs, token=token)
 
-    base = Path(value["job"]["base"])
-    observer = threading.Thread(
-        target=job.observe_resources,
-        args=(value["job"]["maximum_owned_rss_bytes"], stop, done, rows),
-        daemon=True,
-    )
-    observer.start()
-    result = None
-    try:
-        result = run_workflow(
-            value,
-            api=api,
-            fetch=fetch,
-            stop_requested=stop.is_set,
-            before_publication=lambda: atomic_json(
-                base / "resource-samples.json", list(rows)
-            ),
-        )
-    finally:
-        done.set()
-        observer.join(timeout=12)
-        atomic_json(base / "resource-samples-final.json", rows)
-        atomic_json(
-            base / "workflow-worker-finished.json",
-            {
-                "pipeline_complete": result is not None,
-                "source_commit": value["job"]["source_commit"],
-                "observer_stopped": not observer.is_alive(),
-                "controller_ledger_collection_required": True,
-                "host_retirement_authorized": False,
-            },
-        )
+    result = run_worker(value, api=api, fetch=fetch, stop=stop)
     print(
         json.dumps(
             {

@@ -54,6 +54,7 @@ def declared_paths(value):
         "training-complete.json",
         "cuda-preflight.json",
         "m4-input-receipt.json",
+        "output-repositories.json",
         "resource-samples.json",
     ]
     names += [

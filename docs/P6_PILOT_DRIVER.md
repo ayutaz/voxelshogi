@@ -204,3 +204,65 @@ NN参照traceと入力監査のhash、固定protocol、24局ずつの全棋譜�
 軽量／fake検証と既知変異は、実CUDA・実48局・実HF公開の完了証拠ではない。
 次は関連Linux CIと統合sourceの全検証、外部supervisorの所有プロセス確認・台帳回収・退避証跡確認・実機解放を接続する。
 `workflow-complete.json`でも`host_retirement_authorized=false`を維持し、controllerの回収・所有確認を省かない。
+
+## 所有ホストの起動・回収・終了
+
+`pilot.control`と`pilot.remote`が所有確認済みのVastホストへ接続する。
+これらはレンタルや費用予約を行わない。実行前に、統合mainの全検証・教師条件・全工程の見積もり・
+新しいowner tag・絶対期限・独立停止監視を既存のPhase6レンタルハーネスで確定する。
+旧ブラウザ用sourceの実行許可をM学習に流用しない。
+
+control directoryは`runs/p6/research-pilot<N>-control`。
+凍結した`workflow.json`、`workload.json`、`plan.json`、`deadline.json`、専用SSH鍵、providerのaccount／instance記録、
+実際の所有先と一致する`owner.json`、共通台帳から元bytesのままコピーした`state-upload-budget-initial.json`を用意する。
+`workload.json`のstageは`research-pilot`、sourceはworkflowと同じ、`workflow_sha256`はcanonical fingerprint、
+run labelは`voxelshogi-phase6-<control名>`とする。実行可能なbootstrapはGit管理の
+`infrastructure/research/pilot/bootstrap.sh`からsource placeholderだけを置換し、そのhashをworkloadへ固定する。
+
+```bash
+# Mac側の既存control環境を使い、rootの数値計算依存を同期しない例。
+pilot_control() {
+  PYTHONDONTWRITEBYTECODE=1 \
+  PYTHONPATH="$PWD:$PWD/.venv/lib/python3.14/site-packages" \
+  UV_CACHE_DIR="${TMPDIR:-/tmp}/voxelshogi-control-uv-cache" \
+  uv run --no-project --python 3.14.0 python -m infrastructure.research.pilot.control "$@"
+}
+pilot_control research-pilot1-control start-bootstrap
+pilot_control research-pilot1-control bootstrap-status
+pilot_control research-pilot1-control start-worker
+pilot_control research-pilot1-control observe
+pilot_control research-pilot1-control retirement-status
+```
+
+Macではこのcontrol側の軽い通信・metadata処理だけを行い、CUDA環境の構築・データ検証・checkpoint検査はLinux上で行う。
+上の番号は新規control directoryの例であり、既存directoryを使い直さない。
+bootstrapはPython3.14.9・固定uv／Rust・CUDA lockを使い、研究学習に不要なNode／ブラウザの導入は行わない。
+HF認証はログイン済みCLIからメモリへ読み、SSHの標準入力からLinux launcherへ渡す。
+tokenをコマンド引数・ファイル・起動markerへ記録せず、workerの環境も明示したruntime項目とHF認証だけにする。
+
+起動前に両出力repoをpublic/manual・Community OFFで準備する。
+学習前の認証／権限失敗も、classだけの失敗記録・最終ledger・worker終了markerを保存し、既存の実行記録を上書きしない。
+起動要求後にSSH応答が不明になった場合は、local／remoteの起動markerと同じPID・生成時刻・sourceを照合する。
+再送して別workerを作らない。正常に起動を確認した後は、独立したcontrol側watcherが60秒間隔で終了を確認する。
+これはGPU jobの終了監視であり、GitHub CIの取得間隔は引き続き最短10分とする。
+
+`pilot.collection`は外部Linuxで最新／best checkpointの実receiptと全bytesのhash、予定train／val履歴、
+型付きarchiveの全inventoryを既存validatorで検査する。Macへ返すのは4MiB以下のsource・進捗・hash・receipt・集計だけ。
+重み、checkpoint、元corpus、ParquetやNN参照履歴そのものを返さない。
+所有workerだけでなく同じ出力先を使う残存computeも確認し、PID再利用・不明なrun・未解決のstate転送は早期終了を拒否する。
+
+`pilot.retirement`は、現在残るcontinuous／interrupted／restoredのlatest／bestを、
+検証済みHF archiveの元checkpoint hashとprogressへ照合する。
+restoredを連続実行の保存点で代用できるのは、両者のbinding・model／optimizer／RNG・全履歴・両receiptの
+完全一致proofが現在の保存点に対応する場合だけ。古いarchiveがあることだけで、新しい未保存状態を破棄しない。
+NN参照traceが存在する場合は、その現在のbytes／hashを含む検証済み結果datasetも必要とする。
+学習開始前の失敗でcheckpointもtraceもなければ、保持した失敗metadataと変更のないledgerを確認して早期終了できる。
+
+回収後は、Macの`runs/m6/state-upload-budget.json`を同じfileの排他lockで更新し、過去予約prefix・設定・上限を保持する。
+無関係な追記を上書きせず、fileのfsync・読戻しと回収receiptの永続化を終えてから、所有確認付きの削除portへ一度だけ進む。
+既に同じ最終台帳を回収済みなら照合で再開できるが、削除要求markerがある場合は削除を再送しない。
+providerの破棄応答と所有一覧からの消失の両方がそろうまで、資源解放成功とはしない。
+確認できない状態は記録して既存の独立期限へ戻し、期限を延長したり未保存状態を成功扱いしたりしない。
+
+この実装・fake検証は、実GPUでの2 run、開発48局、HFへの実公開、実機解放の完了証拠ではない。
+次は現在の実装を統合mainでLinux全検証し、ブラウザ8ケースの結果、最新offer／価格／account／guardを照合して実行する。
