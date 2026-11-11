@@ -302,6 +302,7 @@ Phase0〜4各節の当時のテスト件数・性能・配信SHAは、取得日�
 - Full / Axial / Geometry-Aware Attention（ヘッドごとの3D相対バイアスか、軸ごとの分解）、3D-CNN のベースライン
 - 同じ計算予算での比較実験、推論性能の最適化、ONNX の量子化、モデル公開
 - [実MのWeb読込契約](P6_MODEL_DISTRIBUTION.md)：M専用profile・構造と選択／形式別評価のhashを検査し、取得済みフォルダーを既存Workerへ接続する。Sの上限は維持する。読込コードの検証は、実Mの変換・HF公開・実ブラウザ・端末観戦の完了とは区別する。
+- [選択済みMの3形式変換と実ONNX評価](P6_MODEL_CONVERSION.md)：Linuxの実行経路を追加し、変換完了と形式別評価・HF公開を分ける。Macのfake検証を実M変換・対局・実機の証拠にしない。
 
 ---
 
