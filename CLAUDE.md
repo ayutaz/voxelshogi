@@ -1,5 +1,7 @@
 # CLAUDE.md — VoxelShogi
 
+**2026-11-12 JST・再開調査の更新**：[現況と次の順序](docs/P6_RESUMPTION_PLAN.md)を更新した。#160のブラウザ復旧、#161の少量学習driver・診断・開発48局API、#162のbest選択はmain未統合。#162は通常mergeで#161へ取り込み済み。次は復旧sourceのCI・統合→実ブラウザ8ケースと並行して学習全工程の接続→実2 run・開発48局→12 run→実Mの3形式配布→実機観戦・正式公開。実M学習・実ブラウザ測定は0件で、部品実装を実行完了と扱わない。未予約39.25／承認200、新規課金0。以下は日時付き履歴。
+
 **2026-11-11・再開調査**：[現況と再開計画](docs/P6_RESUMPTION_PLAN.md)を追加した。両providerの所有課金資源0、最新mainの定期CI／Quality／Security成功を確認。前回の実データ監査は11,254件・固定HF全hashまで完了したが、ブラウザ測定はHF前処理のReadTimeoutで0件。M実学習・12 run・新モデルWeb採用・実端末観戦は未完了。累積36予約160.75／承認200、未予約39.25を保持し、今回は新規課金を行っていない。次は前処理修正と実行driverのGit管理→8ケース実ブラウザ→少量2 run→12 run基本案→実モデル配布→正式公開。以下は日時付き履歴。
 
 **2026-11-05・Mのweights評価を統合**：[PR #154](https://github.com/ayutaz/voxelshogi/pull/154)は最新main統合後の必須8チェックと関連PR検証を確認し、main `f3d2d66`へ統合した。4構造の実M weights往復・Rust局面での合法着手・全変異の[Linux全検証](https://github.com/ayutaz/voxelshogi/actions/runs/41987703130)も成功している。[専用metadataと全NN参照監査](docs/P6_MODEL_EVALUATION.md)で、実学習後のargmax／PUCT32評価へつなげる。実M学習・開発用対局・12 run比較は未実行。次は実ブラウザとデータ監査、その結果をレビューして2 runを事前固定する。以下は日時付き履歴。
