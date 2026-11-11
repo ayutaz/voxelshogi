@@ -157,15 +157,8 @@ def write_research_weights(state, path, *, metadata):
     }
 
 
-def load_research_player(
-    path,
-    *,
-    expected_sha256,
-    device,
-    policy,
-    stop_requested=lambda: False,
-    observe_input=None,
-):
+def load_research_network(path, *, expected_sha256, device):
+    """The same checked fixed-M model for val diagnostics and move adapters."""
     require_linux()
     path = Path(path)
     if (
@@ -177,8 +170,8 @@ def load_research_player(
         or file_hash(path) != expected_sha256
     ):
         raise ValueError("research model artifact hash/format differs")
-    if device not in ("cpu", "cuda") or policy not in ("legal-argmax-v1", "puct32-v1"):
-        raise ValueError("unsupported research backend/policy")
+    if device not in ("cpu", "cuda"):
+        raise ValueError("unsupported research backend")
     if device == "cuda" and os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
         raise ValueError("CUDA deterministic workspace must be set before loading")
     metadata = research_metadata(path)
@@ -189,9 +182,6 @@ def load_research_player(
 
     from export.research_model import make_research_model
     from training.checkpoint import seed_all
-    from training.evaluation_puct import PuctPlayer
-    from training.policy_value import TorchPolicyValue
-    from training.students import TorchStudent
 
     if device == "cuda" and not torch.cuda.is_available():
         raise ValueError("CUDA unavailable; no hidden CPU fallback")
@@ -210,6 +200,28 @@ def load_research_player(
         raise ValueError("research architecture and stored weights differ") from error
     if file_hash(path) != expected_sha256 or research_metadata(path) != metadata:
         raise ValueError("research model artifact changed while loading")
+    return model.to(device).eval(), metadata
+
+
+def load_research_player(
+    path,
+    *,
+    expected_sha256,
+    device,
+    policy,
+    stop_requested=lambda: False,
+    observe_input=None,
+):
+    require_linux()
+    if policy not in ("legal-argmax-v1", "puct32-v1"):
+        raise ValueError("unsupported research policy")
+    model, metadata = load_research_network(
+        path, expected_sha256=expected_sha256, device=device
+    )
+    from training.evaluation_puct import PuctPlayer
+    from training.policy_value import TorchPolicyValue
+    from training.students import TorchStudent
+
     if policy == "puct32-v1":
         evaluate = TorchPolicyValue(model, device=device)
         evaluate._binding = {

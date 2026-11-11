@@ -158,3 +158,69 @@ def test_existing_cohort_runner_routes_bound_M_weights_without_S_constructor(
     with pytest.raises(ValueError, match="hash"):
         _prepare_players(spec, {"model": path})
     assert len(called) == 1
+
+
+def test_network_loader_refuses_Mac_before_decoding(monkeypatch, tmp_path):
+    import training.research_weights as module
+
+    monkeypatch.setattr(module.sys, "platform", "darwin")
+    monkeypatch.setitem(module.sys.modules, "torch", None)
+    with pytest.raises(ValueError, match="external Linux"):
+        module.load_research_network(
+            tmp_path / "unused", expected_sha256="c" * 64, device="cpu"
+        )
+
+
+@pytest.mark.parametrize("policy", ["legal-argmax-v1", "puct32-v1"])
+def test_players_share_the_checked_network_without_loading_again(monkeypatch, policy):
+    from types import SimpleNamespace
+
+    import training.research_weights as module
+
+    monkeypatch.setattr(module.sys, "platform", "linux")
+    seen, observed = [], []
+    net, value = object(), metadata()
+
+    def load(path, **kwargs):
+        assert path == "opaque-weights" and kwargs == {
+            "expected_sha256": "c" * 64,
+            "device": "cuda",
+        }
+        seen.append("load")
+        return net, value
+
+    def student(model, *, device):
+        assert model is net and device == "cuda"
+        seen.append("student")
+        return lambda game: "opaque-legal-action"
+
+    def policy_value(model, *, device):
+        assert model is net and device == "cuda"
+        seen.append("policy-value")
+        return SimpleNamespace()
+
+    from training import evaluation_puct, students
+    from training import policy_value as policy_module
+
+    monkeypatch.setattr(module, "load_research_network", load)
+    monkeypatch.setattr(students, "TorchStudent", student)
+    monkeypatch.setattr(policy_module, "TorchPolicyValue", policy_value)
+    monkeypatch.setattr(
+        evaluation_puct,
+        "PuctPlayer",
+        lambda evaluate, **kwargs: SimpleNamespace(evaluate=evaluate, **kwargs),
+    )
+    player = module.load_research_player(
+        "opaque-weights",
+        expected_sha256="c" * 64,
+        device="cuda",
+        policy=policy,
+        observe_input=observed.append,
+    )
+    if policy == "legal-argmax-v1":
+        assert player("opaque-Rust-game") == "opaque-legal-action"
+        assert observed == ["opaque-Rust-game"] and seen == ["load", "student"]
+    else:
+        assert player.evaluate._binding["artifact_sha256"] == "c" * 64
+        assert player.evaluate._binding["architecture"] == value["architecture"]
+        assert seen == ["load", "policy-value"]

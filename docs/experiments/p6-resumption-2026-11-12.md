@@ -337,3 +337,113 @@ CIは06:32:48 JSTの取得済み結果を再利用し、10分以内の再取得�
   "new_hf_publications": 0
 }
 ```
+
+
+## 2026-11-12 07:12 JST追補：実ブラウザ起動と少量学習sourceの許可
+
+統合mainの完了済み検証と、稼働中の実測の部分観測を区別する。新しい課金予約はブラウザ3回目のUS$2.75だけ。元の失敗・旧PRの検証履歴を消さず、包含が確認できたPRは重複として閉じた。
+
+```json
+{
+  "schema": "voxelshogi-resumption-running-supplement-v4",
+  "recorded_at_utc": "2026-11-11T22:12:17.714014+00:00",
+  "pilot_source_admission": {
+    "verified": true,
+    "source_commit": "1a4c4a00798d2ad62a9de5d4269eaefdb51bf55e",
+    "source_tree": "ccab3372631de36348b17f1103c72a992782f525",
+    "allowed_stages": [
+      "research-pilot"
+    ],
+    "checked_at": 1794434685.067681,
+    "evidence": "runs/p6/restart-implementation/integrated-pilot-ci-1794434685",
+    "ci_run": 43105576755,
+    "security_run": 43105576599,
+    "reason": "Exact integrated main1a4 tree includes pilot driver, M reader and3format converter; actual canonical full/native/8shard/worker/Security/public checks succeeded. Actual M pilots remain0; guard/quote/owner/deadlines must be newly frozen.",
+    "integrated_main_ancestor": true,
+    "all_required_success": true,
+    "native_full_executed": true,
+    "native_job": 130808091590,
+    "required_validation_conclusion": "success",
+    "ci_conclusion": "success",
+    "security_conclusion": "success",
+    "training_mutation_shards_success": 8,
+    "research_worker_channel_success": true,
+    "main_blocking_codeql_alerts": 0,
+    "public_deployment_success": true
+  },
+  "merged_implementation_pr": 165,
+  "included_prs_closed": [
+    161,
+    162,
+    164
+  ],
+  "publication_role_pr": 166,
+  "publication_role_source": "68a766cea6a0c13668c6e93e7b85fb1fd4eae16f",
+  "publication_role_light_tests": 106,
+  "publication_role_new_mutants_caught": 31,
+  "browser": {
+    "attempt": 3,
+    "instance_id": 60266373,
+    "source_commit": "8b4289ff0b3354633d271627580480de8170bfcd",
+    "collection_observed_at_utc": "2026-11-11T22:12:08.457810+00:00",
+    "matrix_complete": false,
+    "rows": [
+      {
+        "name": "full",
+        "backend": "wasm",
+        "status": "success",
+        "error_message": null
+      },
+      {
+        "name": "full",
+        "backend": "webgpu",
+        "status": "failed",
+        "error_message": "page.evaluate: Error: research case timed out\n    at eval (eval at evaluate (:370:30), <anonymous>:3:70)"
+      },
+      {
+        "name": "axial",
+        "backend": "wasm",
+        "status": "failed",
+        "error_message": "page.evaluate: Error: research case timed out\n    at eval (eval at evaluate (:370:30), <anonymous>:3:70)"
+      },
+      {
+        "name": "axial",
+        "backend": "webgpu",
+        "status": "failed",
+        "error_message": "page.evaluate: Error: research case timed out\n    at eval (eval at evaluate (:370:30), <anonymous>:3:70)"
+      },
+      {
+        "name": "geometry",
+        "backend": "wasm",
+        "status": "success",
+        "error_message": null
+      },
+      {
+        "name": "geometry",
+        "backend": "webgpu",
+        "status": "failed",
+        "error_message": "page.evaluate: Error: research case timed out\n    at eval (eval at evaluate (:370:30), <anonymous>:3:70)"
+      },
+      {
+        "name": "cnn",
+        "backend": "wasm",
+        "status": "running",
+        "error_message": null
+      }
+    ],
+    "scope": "Partial running observations, not a validated/published result or learned-M inference"
+  },
+  "budget": {
+    "approved_total_usd": 200,
+    "reservations": 37,
+    "reserved_usd": 163.5,
+    "remaining_unreserved_usd": 36.5,
+    "new_reservation_browser3_usd": 2.75,
+    "not_actual_invoice_or_provider_credit": true
+  },
+  "actual_M_pilot_runs": 0,
+  "actual_post_training_games": 0,
+  "actual_main12_runs": 0,
+  "actual_M_inference_publications": 0
+}
+```
