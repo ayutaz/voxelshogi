@@ -24,6 +24,10 @@ GPUの起動・学習条件の採用・最終評価は、この変更では実�
 元のselfplay・protection・開発評価screenと採用前diagnosisの4つの固定HF releaseを、
 外部Linuxで各revision・全bytes／SHA-256・public/manual・Community OFFまで再確認してから学習へ進む。
 最初の構造はFull対照、2つ目は別の実M構造とし、データ・教師判断・seed・batch・全更新数は共通にする。
+以前のdiagnosisは検証済みreceiptだけがcontrollerへ回収され、全ファイルplanが残っていない。
+その場合だけ、元の7ファイルを固定revisionで外部Linuxへ取得してplanを再構成し、
+元のreceiptのrelease SHAと完全一致してから再検証する。Macへmanifestの全IDやParquetを中継しない。
+単なる再計算hashを正解とせず、元の保存済みrelease hashとの不一致や欠けたファイルは拒否する。
 同じ更新数が同じFLOPsになるとは主張せず、本比較の計算量は実測後に固定する。
 
 凍結済みjob JSONと、元のhashに一致する累積state ledgerを所定のowned directoryへ配置し、
@@ -78,7 +82,7 @@ uploadの応答不明を理由に盲目的に再送せず、publication-attempt�
 手書きのfake tensor・SDK・process・archive portを使う軽量テストで、実行順序、
 入力binding、全更新数と途中停止の区別、資格情報を含まないchild環境、
 全履歴とlatest／bestの検証、公開未検証時の拒否、二重送信拒否を確認する。
-意図的な37種類のバグを関連テストで検出し、既知変異カタログへ登録する。
+意図的な38種類のバグを関連テストで検出し、既知変異カタログへ登録する。
 Macで実Torch、GPU、コーパス生成、HF uploadは実行しない。
 このfake検証は実CUDA再開の証拠ではなく、Linuxの関連CI成功も実2 runの成功とは扱わない。
 

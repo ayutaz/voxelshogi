@@ -358,3 +358,115 @@ def test_actual_source_checker_requires_exact_clean_head(monkeypatch, mode):
     else:
         with pytest.raises(ValueError):
             job.check_source("a" * 40)
+
+
+@pytest.mark.parametrize("changed", [False, True])
+def test_diagnosis_plan_reconstruction_matches_original_release_hash_before_admission(
+    tmp_path, changed
+):
+    from infrastructure.research.pilot.job import acquire_release
+
+    source = tmp_path / "hub"
+    source.mkdir()
+    contents = {
+        "LICENSE": b"opaque license",
+        "NOTICE": b"opaque notice",
+        "README.md": b"---\nlicense: cc-by-4.0\n---\n# Opaque\n\n## Generation and provenance\nHand fixture\n## Usage and schema\nOpaque bytes\n## Verification\nFixed hash\n## Access and license\nManual gate\n",
+        "admission.parquet": b"opaque small bytes, not real parquet",
+        "config.json": b"{}",
+        "manifest.json": b'{"schema":"opaque"}',
+        "validation.json": b"{}",
+    }
+    expected = {
+        "schema": 1,
+        "repo_id": "voxelshogi/voxelshogi-research-pilot-admission-v1",
+        "repo_type": "dataset",
+        "private": False,
+        "gated": "manual",
+        "license": "cc-by-4.0",
+        "license_approved": True,
+        "source_commit": "a" * 40,
+        "files": [
+            {"path": name, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+            for name, raw in sorted(contents.items())
+        ],
+    }
+    for name, raw in contents.items():
+        (source / name).write_bytes(raw)
+    if changed:
+        (source / "manifest.json").write_text('{"changed":true}')
+    receipt = {
+        "repo_id": expected["repo_id"],
+        "repo_type": "dataset",
+        "hub_commit": "c" * 40,
+        "release_sha256": fingerprint(expected),
+        "verified": True,
+        "community_disabled": True,
+        "dry_run": False,
+    }
+    bundle = {
+        "receipt": receipt,
+        "reconstruct": {
+            "source_commit": "a" * 40,
+            "license": "cc-by-4.0",
+            "files": sorted(contents),
+        },
+    }
+    calls = []
+
+    def fetch(**kwargs):
+        calls.append(kwargs)
+        assert (
+            kwargs["repo_id"] == receipt["repo_id"] and kwargs["revision"] == "c" * 40
+        )
+        return source / kwargs["filename"]
+
+    with patch("sys.platform", "linux"):
+        if changed:
+            with pytest.raises(ValueError, match="release hash"):
+                acquire_release(
+                    bundle,
+                    tmp_path / "verified",
+                    api=Hub(),
+                    fetch=fetch,
+                    deadline=200,
+                    clock=lambda: 100,
+                )
+        else:
+            proof = acquire_release(
+                bundle,
+                tmp_path / "verified",
+                api=Hub(),
+                fetch=fetch,
+                deadline=200,
+                clock=lambda: 100,
+            )
+            assert proof["verified"] and len(calls) == 7
+            assert (
+                json.loads((tmp_path / "verified-release-plan.json").read_text())
+                == expected
+            )
+
+
+@pytest.mark.parametrize("missing", ["NOTICE", "validation.json"])
+def test_diagnosis_reconstruction_requires_the_full_original_file_list(missing):
+    from infrastructure.research.pilot.job import DIAGNOSIS_FILES, validate_bundle
+
+    bundle = {
+        "receipt": {
+            "repo_id": "voxelshogi/voxelshogi-research-pilot-admission-v1",
+            "repo_type": "dataset",
+            "hub_commit": "c" * 40,
+            "release_sha256": "d" * 64,
+            "verified": True,
+            "community_disabled": True,
+            "dry_run": False,
+        },
+        "reconstruct": {
+            "source_commit": "a" * 40,
+            "license": "cc-by-4.0",
+            "files": [p for p in DIAGNOSIS_FILES if p != missing],
+        },
+    }
+    with pytest.raises(ValueError):
+        validate_bundle(bundle)

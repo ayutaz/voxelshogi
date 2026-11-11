@@ -22,11 +22,20 @@ from infrastructure.research.pilot.attempt import validate_inputs
 from training.checkpoint import atomic_json
 from training.evaluation_v2 import fingerprint
 from training.feature_cache import file_hash
-from training.hub_release import _policy, verify_release
+from training.hub_release import _policy, plan_release, verify_release
 from training.state_upload_budget import upload_budget_limit
 
 LABELS = ("selfplay", "protection", "screen", "diagnosis")
 BASE = "runs/p6/research-pilot"
+DIAGNOSIS_FILES = [
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "admission.parquet",
+    "config.json",
+    "manifest.json",
+    "validation.json",
+]
 
 
 def require_linux():
@@ -35,6 +44,36 @@ def require_linux():
 
 
 def validate_bundle(bundle):
+    if "plan" not in bundle:
+        receipt, recipe = bundle["receipt"], bundle["reconstruct"]
+        policy = {
+            "schema": 1,
+            "repo_id": "voxelshogi/voxelshogi-research-pilot-admission-v1",
+            "repo_type": "dataset",
+            "private": False,
+            "gated": "manual",
+            "license": "cc-by-4.0",
+            "license_approved": True,
+            "source_commit": recipe["source_commit"],
+        }
+        _policy(policy)
+        if (
+            set(bundle) != {"receipt", "reconstruct"}
+            or set(recipe) != {"source_commit", "license", "files"}
+            or recipe["files"] != DIAGNOSIS_FILES
+            or recipe["license"] != "cc-by-4.0"
+            or receipt["repo_id"] != policy["repo_id"]
+            or receipt["repo_type"] != "dataset"
+            or re.fullmatch(r"[0-9a-f]{40}", str(receipt["hub_commit"])) is None
+            or re.fullmatch(r"[0-9a-f]{64}", str(receipt["release_sha256"])) is None
+            or receipt.get("verified") is not True
+            or receipt.get("community_disabled") is not True
+            or receipt.get("dry_run") is not False
+        ):
+            raise ValueError(
+                "fixed diagnosis receipt and complete reconstruction recipe required"
+            )
+        return
     plan, receipt = bundle["plan"], bundle["receipt"]
     _policy(plan)
     if (
@@ -142,6 +181,52 @@ def acquire_release(bundle, destination, *, api, fetch, deadline, clock=time.tim
         raise InterruptedError("fixed input acquisition deadline")
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=False)
+    if "plan" not in bundle:
+        # The old diagnosis controller retained its verified receipt but not
+        # its plan. Reconstruct on Linux from the original seven fixed files;
+        # the trusted original whole-plan SHA must match before using data.
+        receipt = bundle["receipt"]
+        address = {
+            "repo_id": receipt["repo_id"],
+            "repo_type": "dataset",
+            "revision": receipt["hub_commit"],
+        }
+        info = api.repo_info(**address)
+        if (
+            info.private
+            or info.gated != "manual"
+            or info.sha != receipt["hub_commit"]
+            or api.community_disabled(repo_id=receipt["repo_id"], repo_type="dataset")
+            is not True
+        ):
+            raise ValueError("diagnosis settings/revision differ")
+        for name in DIAGNOSIS_FILES:
+            if clock() >= deadline:
+                raise InterruptedError("fixed diagnosis reconstruction deadline")
+            origin = Path(fetch(**address, filename=name))
+            if not origin.is_file() or origin.stat().st_size > 64 * 1024**2:
+                raise ValueError("invalid diagnosis reconstruction file")
+            shutil.copyfile(origin, destination / name)
+        plan = plan_release(
+            destination,
+            repo_id=receipt["repo_id"],
+            repo_type="dataset",
+            license_id="cc-by-4.0",
+            license_approved=True,
+            source_commit=bundle["reconstruct"]["source_commit"],
+        )
+        if fingerprint(plan) != receipt["release_sha256"]:
+            raise ValueError("reconstructed diagnosis release hash differs")
+        atomic_json(
+            destination.parent / (destination.name + "-release-plan.json"), plan
+        )
+        return verify_release(
+            plan,
+            receipt,
+            api,
+            lambda **kw: destination / kw["filename"],
+            system="linux",
+        )
     entries = {entry["path"]: entry for entry in bundle["plan"]["files"]}
 
     def owned_fetch(**kwargs):
@@ -383,8 +468,8 @@ def main():
     from httpx2 import TransportError
     from huggingface_hub import HfApi, hf_hub_download
     from huggingface_hub.utils import build_hf_headers, get_session
-    from training.hub_recovery import RecoveryApi
 
+    from training.hub_recovery import RecoveryApi
     from training.hub_release import PublicationApi
 
     stop = threading.Event()

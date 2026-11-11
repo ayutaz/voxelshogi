@@ -13,6 +13,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "pilot-job-complete-diagnosis-reconstruction",
+        "infrastructure/research/pilot/job.py",
+        'recipe["files"] != DIAGNOSIS_FILES',
+        "False",
+        "test_research_pilot_job.py",
+    ),
+    (
         "pilot-job-common-data-schedule",
         "infrastructure/research/pilot/job.py",
         "if common[0] != common[1]:",
@@ -64,8 +71,8 @@ MUTATIONS = [
     (
         "pilot-job-HF-cache-file-layout",
         "infrastructure/research/pilot/job.py",
-        "not origin.is_file()",
-        "origin.is_symlink() or not origin.is_file()",
+        'not origin.is_file()\n            or origin.stat().st_size != entry["bytes"]',
+        'origin.is_symlink() or not origin.is_file()\n            or origin.stat().st_size != entry["bytes"]',
         "test_research_pilot_job.py",
     ),
     (
