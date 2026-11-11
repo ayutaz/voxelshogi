@@ -77,3 +77,6 @@ Macで大きいモデルを生成・読み取り・実行して確認せず、�
 Mの来歴・構造・選択・各形式の評価・全hashと、Sの上限維持、Worker転送前の本体未読を確認する。
 検査を意図的に外した新規20変異と、変更した既存2変異も隔離copyで実行し、
 import失敗やtimeoutを検出成功にせず、実際に失敗したassertionで検出する。
+
+
+[M専用HF公開契約](P6_MODEL_PUBLICATION.md)は、元選択履歴・各実ONNXの最終24局・全入力監査と配布hashを結び付ける。公開roleとcatalog生成APIを実装した段階で、実M公開・最終manifestの組立・実catalog登録は未完了。

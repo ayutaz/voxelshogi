@@ -52,8 +52,8 @@ uv run --project infrastructure/cuda --locked --no-sync python -m export.researc
 
 後続で固定した最終12 root×先後の24局を**各実ONNXで**評価し、全手のRust再生と全NN参照の監査を行う。
 完成した形式別report、共通protocol・最終root集合のSHA、Model Card・license・実配布物のhashを結び付けてから、
-HF公開ハーネスのM専用roleと最終manifestを組み立てる。
-この最終組立・専用role・固定HF全hash・Webへのcatalog登録は、まだ後続作業である。
+[M専用公開role](P6_MODEL_PUBLICATION.md)に渡す最終manifestを組み立てる。
+M専用roleと検証済みreceiptからのcatalog生成APIは実装済み。Linux最終評価・全入力監査・最終組立・固定HF全hash・実catalog登録は後続作業である。
 public/manual・Community OFFを維持し、送信と全ファイル再確認はLinuxから行う。
 
 ## 実ONNXを使う対局評価
