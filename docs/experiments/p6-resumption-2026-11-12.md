@@ -447,3 +447,157 @@ CIは06:32:48 JSTの取得済み結果を再利用し、10分以内の再取得�
   "actual_M_inference_publications": 0
 }
 ```
+
+## 2026-11-12 07:42 JST 実測終了・所有資源・再計画
+
+読取調査。予約額を実請求や残高と区別し、停止中の所有実機を0と数えない。
+
+```json
+{
+  "schema": "voxelshogi-resumption-planning-audit-v3",
+  "checked_at_jst": "2026-11-12 07:42 JST",
+  "main": {
+    "date": "2026-11-11T22:28:36Z",
+    "sha": "09f88baecd9e0eeb8b15707ded102418db2a817a"
+  },
+  "main_ci": {
+    "run_id": 43112081865,
+    "observed_status": "in_progress"
+  },
+  "main_security": {
+    "run_id": 43112081773,
+    "observed_conclusion": "success"
+  },
+  "admitted_pilot_source": "1a4c4a00798d2ad62a9de5d4269eaefdb51bf55e",
+  "resources": {
+    "checked_at": 1794436920.249237,
+    "owned_instances": [
+      {
+        "id": 60271691,
+        "label": "voxelshogi-phase6-research-pilot1-control",
+        "actual_status": "created",
+        "cur_state": "stopped",
+        "intended_status": "stopped",
+        "status_msg": "Successfully loaded nvidia/cuda@sha256:e3fd439288969c0c78d52768cda4a10ab20f408180d6fa2933f94f7af7810cb0",
+        "start_date": 1794436108.554334
+      }
+    ],
+    "cloudrift": "idle-confirmed",
+    "reservation_count": 38,
+    "reserved_total_usd": 167.0,
+    "remaining_unreserved_usd": 33.0,
+    "approved_total_usd": 200,
+    "mutations_performed": false
+  },
+  "browser_validation": {
+    "all_backends_passed": false,
+    "matrix_complete": true,
+    "wasm_verified": 3,
+    "webgpu_verified": 0
+  },
+  "browser_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "82597bb0a16c6e8d5cacaecdc58d29bc27816d09",
+    "release_sha256": "53c43d684630617991042da8e4af8ed60d3eb93595a9cd0a4063c095df47f8ca",
+    "repo_id": "voxelshogi/voxelshogi-research-browser-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "browser_retirement": {
+    "event": "retirement-result",
+    "job_complete": false,
+    "resources_released": true,
+    "retirement": {
+      "provider": "vast.ai",
+      "checked_at": 1794435849.2278569,
+      "instances": [],
+      "complete": true
+    }
+  },
+  "browser_deadline_workflow": {
+    "conclusion": "cancelled",
+    "html_url": "https://github.com/ayutaz/voxelshogi/actions/runs/43105127281",
+    "id": 43105127281,
+    "status": "completed"
+  },
+  "pilot_deadline_workflow": {
+    "conclusion": null,
+    "html_url": "https://github.com/ayutaz/voxelshogi/actions/runs/43110135579",
+    "id": 43110135579,
+    "status": "in_progress"
+  },
+  "actual_M_pilot_runs": 0,
+  "actual_post_training_games": 0,
+  "actual_main12_runs": 0,
+  "actual_M_inference_publications": 0,
+  "read_only_audit_new_rentals_or_training": false,
+  "open_prs": [
+    {
+      "baseRefOid": "1a4c4a00798d2ad62a9de5d4269eaefdb51bf55e",
+      "headRefOid": "41ec26f214b25f72fce8de9b4a10fe4fd3e45939",
+      "number": 163,
+      "title": "docs: refresh P6 status and measurable execution plan",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/163",
+      "missing_required": [],
+      "pending": [],
+      "failed": []
+    },
+    {
+      "baseRefOid": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+      "headRefOid": "a8e36c587a2647c6ea62840c7be9a1b47e1b175b",
+      "number": 158,
+      "title": "chore(deps-dev): bump jsdom from 30.1.3 to 31.0.0 in /apps/web",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/158",
+      "missing_required": [],
+      "pending": [],
+      "failed": []
+    },
+    {
+      "baseRefOid": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+      "headRefOid": "af5e17ba88e74cf3137e40ab6e0fc0fe725cd9c2",
+      "number": 157,
+      "title": "chore(deps): bump the web-compatible group in /apps/web with 8 updates",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/157",
+      "missing_required": [],
+      "pending": [],
+      "failed": []
+    },
+    {
+      "baseRefOid": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+      "headRefOid": "86fb5f5fc3040cbef3d1ac7af2cd76a16818f73f",
+      "number": 156,
+      "title": "chore(deps): bump the actions-compatible group with 4 updates",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/156",
+      "missing_required": [],
+      "pending": [],
+      "failed": []
+    },
+    {
+      "baseRefOid": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+      "headRefOid": "a310d420746efb2c924a841b351d909b4d99465b",
+      "number": 155,
+      "title": "chore(deps): bump wasm-bindgen from 0.2.129 to 0.2.130 in the rust-compatible group",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/155",
+      "missing_required": [
+        "CI Gate"
+      ],
+      "pending": [],
+      "failed": [
+        "Web (wasm, unit, build, e2e)",
+        "CI Gate"
+      ]
+    },
+    {
+      "baseRefOid": "327c8e346cf35b5419eb8a197e5d21e270eda879",
+      "headRefOid": "37e90b93111f909a2a8559cda91f52f2d1f2c2cf",
+      "number": 95,
+      "title": "chore(deps-dev): bump @types/node from 24.19.2 to 26.6.6 in /apps/web",
+      "url": "https://github.com/ayutaz/voxelshogi/pull/95",
+      "missing_required": [],
+      "pending": [],
+      "failed": []
+    }
+  ]
+}
+```
