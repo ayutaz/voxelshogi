@@ -20,7 +20,7 @@ GPUの起動・学習条件の採用・最終評価は、この変更では実�
 
 ## 1試行と同一軌跡の再開検証
 
-`cycle.run_cycle`へ凍結済みinputs、途中停止step、固定deadline、公開API、
+`cycle.run_cycle`へ凍結済みinputs、途中停止step、別々の固定compute_deadlineとdeadline（転送終了）、公開API、
 固定revisionの取得port、累積state upload ledgerを渡す。順序は次のとおり。
 
 1. 連続実行で全更新数を学習する。
@@ -45,7 +45,12 @@ State Card・全ファイルhashを要求する。これは推論用モデル配
 一度でも公開を試みたcontrol directoryは再使用しない。
 uploadの応答不明を理由に盲目的に再送せず、publication-attempt・receipt・固定HF版を照合する。
 更新されたupload ledgerと必要成果を回収する前に、学習ホストを終了しない。
-このmodule群はレンタル、独立停止監視、失敗時の未完了state救出やhostの解放を行わない。
+失敗時も、停止したchildのcontinuous／interrupted／restoredにあるcheckpointを検証して
+残りの転送時間内に型付きarchiveの公開・全hash照合・復元を試みる。
+不正なcheckpoint、空のdirectory、期限超過を退避成功には数えない。
+以前のuploadや今回の救出の応答が不明な場合は追加の送信を止め、既存markerとreceiptの照合へ戻す。
+救出できても元の試行は失敗のままで、controllerのledger回収と所有確認がそろうまで終了を許可しない。
+このmodule群はレンタル、独立停止監視やhostの解放を行わない。
 ブラウザoperator専用の自動解放を、未退避checkpointのある学習へ流用しない。
 
 ## 検証範囲と次の作業
@@ -53,7 +58,7 @@ uploadの応答不明を理由に盲目的に再送せず、publication-attempt�
 手書きのfake tensor・SDK・process・archive portを使う軽量テストで、実行順序、
 入力binding、全更新数と途中停止の区別、資格情報を含まないchild環境、
 全履歴とlatest／bestの検証、公開未検証時の拒否、二重送信拒否を確認する。
-意図的な21種類のバグを関連テストで検出し、既知変異カタログへ登録する。
+意図的な28種類のバグを関連テストで検出し、既知変異カタログへ登録する。
 Macで実Torch、GPU、コーパス生成、HF uploadは実行しない。
 このfake検証は実CUDA再開の証拠ではなく、Linuxの関連CI成功も実2 runの成功とは扱わない。
 

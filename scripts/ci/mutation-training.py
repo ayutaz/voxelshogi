@@ -13,6 +13,55 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "pilot-recovery-ambiguous-upload",
+        "infrastructure/research/pilot/cycle.py",
+        'for attempt in base.glob("*-transfer/publication-attempt.json"):',
+        "for attempt in ():",
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-recovery-duplicate-request",
+        "infrastructure/research/pilot/cycle.py",
+        'with marker.open("x") as stream:',
+        'with marker.open("w") as stream:',
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-recovery-all-state-roles",
+        "infrastructure/research/pilot/cycle.py",
+        '("continuous", "interrupted", "restored")',
+        '("continuous", "interrupted")',
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-recovery-no-false-preservation",
+        "infrastructure/research/pilot/cycle.py",
+        'result["states_preserved"] = not result["unpreserved_runs"]',
+        'result["states_preserved"] = True',
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-recovery-requires-verified-transfer",
+        "infrastructure/research/pilot/cycle.py",
+        'transfer["receipt"]["verified"] is not True',
+        "False",
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-cycle-reserved-transfer-time",
+        "infrastructure/research/pilot/cycle.py",
+        "deadline=compute_deadline,",
+        "deadline=deadline,",
+        "test_research_pilot_recovery.py",
+    ),
+    (
+        "pilot-cycle-executes-failure-recovery",
+        "infrastructure/research/pilot/cycle.py",
+        'failure["recovery"] = recover_cycle(',
+        'failure["recovery"] = dict(',
+        "test_research_pilot_recovery.py",
+    ),
+    (
         "pilot-resume-history-equality",
         "infrastructure/research/pilot/resume_proof.py",
         "if events[0] != events[1]:",

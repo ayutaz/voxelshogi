@@ -16,7 +16,7 @@ for failure in (None, "partial-primary", "unverified-transfer", "parity"):
 
         def launch(script, input_path, output, **kw):
             assert json.loads(Path(input_path).read_text()) == inputs
-            assert kw["deadline"] == deadline
+            assert kw["deadline"] == deadline - 20
             calls.append(("launch", output.name, kw["resume"], kw["max_new_steps"]))
             output.mkdir(exist_ok=kw["resume"])
             reason = "complete" if kw["max_new_steps"] is None else "max_new_steps"
@@ -51,6 +51,7 @@ for failure in (None, "partial-primary", "unverified-transfer", "parity"):
                     root / "cycle",
                     split_step=3,
                     deadline=deadline,
+                    compute_deadline=deadline - 20,
                     api=None,
                     fetch=None,
                     upload_budget=None,
@@ -81,7 +82,14 @@ for failure in (None, "partial-primary", "unverified-transfer", "parity"):
                 assert result["final_holdout_evaluated"] is False
 try:
     module["run_cycle"](
-        {}, "opaque", split_step=3, deadline=1, api=None, fetch=None, upload_budget=None
+        {},
+        "opaque",
+        split_step=3,
+        deadline=1,
+        compute_deadline=0,
+        api=None,
+        fetch=None,
+        upload_budget=None,
     )
 except ValueError as error:
     assert "external Linux" in str(error)
