@@ -546,3 +546,6 @@ M1 の探索ノード/秒は CPU の指標で、GPU の学習速度を表すも�
 | 任意 | リポジトリのトピックを設定する | ⬜ |
 
 main 保護・Dependabot・`SECURITY.md`・production Secrets は設定済み。現在のドキュメント更新と PR 検証のために、ユーザー側で追加の準備をする必要はない。
+
+
+- [M専用HF公開roleとcatalog契約](P6_MODEL_PUBLICATION.md)：元選択履歴、各実ONNXの最終24局、全NN入力監査、配布hashを照合するAPI。実M学習・最終評価・公開・Web登録の完了とは区別する。
