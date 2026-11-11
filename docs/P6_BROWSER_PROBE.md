@@ -3,6 +3,12 @@
 再試行時のGit管理worker、HFの応答照合と早期解放は[復旧手順](P6_EXECUTION_RECOVERY.md)を使う。
 通信失敗の旧0ケース記録を残し、復旧コードの検証を実ブラウザ測定の完了と混同しない。
 
+Workerはruntime初期化、モデル取得、session作成、fixture読込、各warmup／測定、releaseの進行を送る。
+controllerは進行ごとに結果JSONへ保存し、時間上限・Workerエラーでも最後の段階とfixture／stepを残す。
+進行通知は完了として扱わず、1ケース180秒の固定期限を更新しない。
+全8ケース・fixture 0／3・各8 warmup＋32測定・全出力数値基準は維持する。
+この実装だけで旧timeoutの原因が判明した、または全構造／WebGPUが成功したとは扱わない。
+
 2026-11-05。[実行計画](P6_EXECUTION_PLAN.md)の2で使う計測手順。
 実M・ONNXと単GPUの計測済みファイルを使い、ブラウザ対応は別に検証する。
 この手順の追加は実ブラウザ測定の完了記録ではない。

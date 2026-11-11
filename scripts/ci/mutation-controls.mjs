@@ -7,6 +7,16 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'research-channel-progress-not-terminal', file: 'scripts/research-browser-channel.mjs', before: "message.status === 'progress'", after: 'false', test: 'research-browser-channel' },
+  { name: 'research-channel-timeout-stage', file: 'scripts/research-browser-channel.mjs', before: "progress.at(-1)?.stage ?? 'worker-start'", after: "'worker-start'", test: 'research-browser-channel' },
+  { name: 'research-channel-worker-release', file: 'scripts/research-browser-channel.mjs', before: 'cancel(timer);worker.terminate();', after: 'cancel(timer);', test: 'research-browser-channel' },
+  { name: 'research-channel-progress-bound', file: 'scripts/research-browser-channel.mjs', before: 'progress.length >= 128', after: 'false', test: 'research-browser-channel' },
+  { name: 'research-channel-case-identity', file: 'scripts/research-browser-channel.mjs', before: 'message?.name !== data.name', after: 'false', test: 'research-browser-channel' },
+  { name: 'research-channel-fixed-deadline', file: 'scripts/research-browser-channel.mjs', before: "fail('TimeoutError', 'research case timed out'), 180000", after: "fail('TimeoutError', 'research case timed out'), 180001", test: 'research-browser-channel' },
+  { name: 'research-channel-progress-preserves-timer', file: 'scripts/research-browser-channel.mjs', before: 'progress.push(update);', after: 'progress.push(update);cancel(timer);', test: 'research-browser-channel' },
+  { name: 'research-browser-session-progress', file: 'scripts/research-browser-worker.mjs', before: "stage = 'session';", after: "stage = 'model-download';", test: 'research-browser-probe' },
+  { name: 'research-browser-warmup-progress', file: 'scripts/research-browser-worker.mjs', before: "stage = i < data.plan.warmup_steps ? 'warmup' : 'measurement';", after: "stage = 'measurement';", test: 'research-browser-probe' },
+  { name: 'research-browser-progress-envelope', file: 'scripts/research-browser-worker.mjs', before: "status: 'progress', name: data.name", after: "status: 'success', name: data.name", test: 'research-browser-probe' },
   { name: 'research-browser-request-encoding', file: 'scripts/research-browser-contract.mjs', before: 'encodeURIComponent(descriptor.path)', after: 'descriptor.path', test: 'research-browser-probe' },
   { name: 'research-browser-runtime-origin', file: 'scripts/research-browser-contract.mjs', before: 'value?.assetBase === assetBase', after: 'true', test: 'research-browser-probe' },
   { name: 'research-browser-runtime-known-path', file: 'scripts/research-browser-contract.mjs', before: 'entry?.path === path', after: 'true', test: 'research-browser-probe' },

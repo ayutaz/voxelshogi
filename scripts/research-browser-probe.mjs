@@ -9,6 +9,7 @@ import os from 'node:os';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { browserMemory } from './browser-memory.mjs';
+import { runResearchCase } from './research-browser-channel.mjs';
 import { researchBrowserCases, requireLinux, validateBrowserInputs, validateProvider } from './research-browser-contract.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -87,15 +88,13 @@ export async function measureResearch(inputDirectory, outputFile) {
       const context = await browser.newContext(), page = await context.newPage();
       const row = { ...testCase, status: 'running' };report.rows.push(row);save();
       try {
+        await page.exposeFunction('__researchProgress', update => {
+          row.progress ??= [];row.progress[update.sequence - 1] = update;
+          row.last_progress = row.progress.at(-1);save();
+        });
         await page.goto(base);
         row.before = await browserMemory(cdp, page);
-        const result = await page.evaluate(data => new Promise((resolve, reject) => {
-          const worker = new Worker('/worker.mjs', { type: 'module' });
-          const timer = setTimeout(() => { worker.terminate();reject(new Error('research case timed out')); }, 180000);
-          worker.onmessage = ({ data }) => { clearTimeout(timer);worker.terminate();resolve(data); };
-          worker.onerror = error => { clearTimeout(timer);worker.terminate();reject(new Error(error.message)); };
-          worker.postMessage(data);
-        }), { ...testCase, plan, runtime: { assetBase: base + '/payload/', index: { runtime } } });
+        const result = await page.evaluate(runResearchCase, { ...testCase, plan, runtime: { assetBase: base + '/payload/', index: { runtime } } });
         Object.assign(row, result);
         if (row.status === 'success') {
           validateProvider(row);
