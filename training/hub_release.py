@@ -58,10 +58,24 @@ STATE_REPOS = {
 
 def _policy(plan):
     role = plan.get("artifact_role", "artifacts")
-    if role not in ("artifacts", "inference-package", *STATE_REPOS) or (
-        role in ("inference-package", *STATE_REPOS) and plan["repo_type"] != "model"
+    if role not in (
+        "artifacts",
+        "inference-package",
+        "research-inference-package",
+        *STATE_REPOS,
+    ) or (
+        role in ("inference-package", "research-inference-package", *STATE_REPOS)
+        and plan["repo_type"] != "model"
     ):
         raise ValueError("unsupported artifact publication role")
+    if role == "research-inference-package" and (
+        not re.fullmatch(
+            r"voxelshogi/voxelshogi-research-m-(?:full|axial|geometry|cnn)-v1",
+            plan["repo_id"],
+        )
+        or plan["license"] != "apache-2.0"
+    ):
+        raise ValueError("typed M inference destination/license required")
     if role in STATE_REPOS and (
         plan.get("state_publication_approved") is not True
         or plan["repo_id"] != STATE_REPOS[role]
@@ -89,6 +103,13 @@ def _policy(plan):
 
 def artifact_limits(role, path):
     """Larger typed P6 state tensors do not relax inference or legacy profiles."""
+    if role == "research-inference-package":
+        maximum = (
+            512 * 1024**2
+            if path.endswith(".onnx") or path == "model.safetensors"
+            else 64 * 1024**2
+        )
+        return maximum, 1536 * 1024**2
     if role == "research-training-state":
         maximum = 512 * 1024**2 if path.endswith("/state.safetensors") else 64 * 1024**2
         return maximum, 2 * 1024**3
@@ -210,15 +231,25 @@ def plan_release(
     manifest_path = Path(folder) / "manifest.json"
     if manifest_path.is_symlink():
         raise ValueError("publication manifest must not be a symlink")
-    if artifact_role in ("inference-package", *STATE_REPOS) and (
-        not manifest_path.is_file() or manifest_path.stat().st_size > 1024 * 1024
-    ):
+    if artifact_role in (
+        "inference-package",
+        "research-inference-package",
+        *STATE_REPOS,
+    ) and (not manifest_path.is_file() or manifest_path.stat().st_size > 1024 * 1024):
         raise ValueError("invalid inference manifest size")
     if manifest_path.is_file():
         try:
             manifest = json.loads(manifest_path.read_text())
         except json.JSONDecodeError:
             manifest = None
+        if (
+            isinstance(manifest, dict)
+            and "research" in manifest
+            and artifact_role != "research-inference-package"
+        ):
+            raise ValueError(
+                "research M inference requires its separate publication role"
+            )
         if (
             isinstance(manifest, dict)
             and manifest.get("schema")
@@ -234,9 +265,11 @@ def plan_release(
                 "resume archives require a separately approved publication policy"
             )
     card_path = Path(folder) / "README.md"
-    if artifact_role in ("inference-package", *STATE_REPOS) and (
-        card_path.is_symlink() or card_path.stat().st_size > 1024 * 1024
-    ):
+    if artifact_role in (
+        "inference-package",
+        "research-inference-package",
+        *STATE_REPOS,
+    ) and (card_path.is_symlink() or card_path.stat().st_size > 1024 * 1024):
         raise ValueError("invalid inference Model Card")
     card = card_path.read_text()
     if not re.search(rf"(?m)^license:\s*{re.escape(license_id)}\s*$", card):
@@ -256,7 +289,11 @@ def plan_release(
             if section is None or not section.group(1).strip():
                 raise ValueError(f"Dataset Card requires a populated section: {title}")
     expected = None
-    if artifact_role == "inference-package":
+    if artifact_role == "research-inference-package":
+        from training.research_inference_release import research_inventory
+
+        expected = research_inventory(folder, plan, card)
+    elif artifact_role == "inference-package":
         from training.inference_release import inference_inventory
 
         expected = inference_inventory(folder, plan, card)
