@@ -5,6 +5,7 @@ description = "External Linux CUDA environment for VoxelShogi M6"
 requires-python = ">=3.14,<3.15"
 license = "Apache-2.0"
 dependencies = [
+    "httpx2==2.16.0",
     "huggingface-hub==2.3.0",
     "numpy==2.5.4",
     "onnx==1.23.2",
