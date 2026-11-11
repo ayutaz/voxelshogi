@@ -1,0 +1,209 @@
+{
+  "schema": "voxelshogi-resumption-review-v1",
+  "checked_at_utc": "2026-11-11T14:12:05.583897+00:00",
+  "base_commit": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+  "resources": {
+    "vast_project_instances": [],
+    "prior_instance_59238135_present": false,
+    "cloudrift_project_active_instances": 0,
+    "resource_mutations": 0
+  },
+  "hf_identity": {
+    "name": "ayousanz",
+    "voxelshogi_member": true
+  },
+  "browser": {
+    "repo_id": "voxelshogi/voxelshogi-research-browser-v1",
+    "revision": "ae378b3839a6c11d271b27f3c854b2c10950a8fb",
+    "observed_revision": "ae378b3839a6c11d271b27f3c854b2c10950a8fb",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true,
+    "scope": "Current settings and fixed-revision metadata only; historical Linux all-file receipt remains separate evidence.",
+    "manifest_http_status": 200,
+    "manifest_sha256": "f7d7834e5abe745d99f814b62c4fac1e55ac7a707232d1a1ec7bd47d16e4a61b",
+    "source_commit": "b2c7c094e27b5f253ae5e747109a11dcd5652aa9",
+    "failure": {
+      "complete": false,
+      "elapsed_seconds": 91.7450231090188,
+      "error_type": "ReadTimeout",
+      "stage": "preflight"
+    },
+    "case_rows": 0,
+    "report": null
+  },
+  "corpus": {
+    "repo_id": "voxelshogi/voxelshogi-research-pilot-admission-v1",
+    "revision": "74541c33458699e6d9e7d34608107731408ff9f8",
+    "observed_revision": "74541c33458699e6d9e7d34608107731408ff9f8",
+    "private": false,
+    "gated": "manual",
+    "community_disabled": true,
+    "scope": "Current settings and fixed-revision metadata only; historical Linux all-file receipt remains separate evidence.",
+    "card_http_status": 200,
+    "card_sha256": "cebac339516ad4f3f26842c2765f2b867269ca05fef47652c2bf82b198a02958",
+    "manifest_not_downloaded": "Contains full sample IDs; use original Linux all-file receipt and local small diagnosis summaries, no Mac corpus relay."
+  },
+  "corpus_historical_linux_all_file_receipt": {
+    "community_disabled": true,
+    "dry_run": false,
+    "hub_commit": "74541c33458699e6d9e7d34608107731408ff9f8",
+    "release_sha256": "f6e44d1701779e5708cabe51903ab51ba392a39b5f4ed32720adcc34011383d1",
+    "repo_id": "voxelshogi/voxelshogi-research-pilot-admission-v1",
+    "repo_type": "dataset",
+    "verified": true
+  },
+  "corpus_historical_summary": {
+    "absolute_ply_bins": {
+      "test": {
+        "161+": 1415,
+        "65-160": 96
+      },
+      "train": {
+        "0-64": 411,
+        "161+": 6701,
+        "65-160": 1269
+      },
+      "val": {
+        "0-64": 144,
+        "161+": 930,
+        "65-160": 288
+      }
+    },
+    "admission_sha256": "486a7add1c05effb2e97af306e4e6b9990630af25bc29b743761da3a7447d40f",
+    "assigned_families_by_split": {
+      "test": 2,
+      "train": 12,
+      "val": 2
+    },
+    "counts": {
+      "excluded_cross_split": 0,
+      "excluded_protected": 0,
+      "excluded_repeated_inputs": 280,
+      "raw_samples": 11534,
+      "retained": 11254
+    },
+    "minimum_rows": {
+      "test": 64,
+      "train": 256,
+      "val": 64
+    },
+    "overlaps_by_protection_role": {
+      "development": 0,
+      "final_roots": 0,
+      "legacy": 0
+    },
+    "retained_families_by_split": {
+      "test": 2,
+      "train": 12,
+      "val": 2
+    },
+    "rows_by_split": {
+      "test": 1511,
+      "train": 8381,
+      "val": 1362
+    },
+    "scope": "Small metadata only; no raw samples, IDs, features or model payloads relayed to controller.",
+    "selection_sha256": "8ea4f440469654905998c1819caddd7f3abb699ed89ac47d7da7e5d6a1cd4e53",
+    "source_commit": "b2c7c094e27b5f253ae5e747109a11dcd5652aa9",
+    "source_episodes": 48,
+    "source_generations": 3,
+    "usable_for_pilot": true,
+    "value_origins": {
+      "test": {
+        "bootstrap-v1": 1511
+      },
+      "train": {
+        "bootstrap-v1": 6568,
+        "terminal-v1": 1813
+      },
+      "val": {
+        "bootstrap-v1": 760,
+        "terminal-v1": 602
+      }
+    }
+  },
+  "teacher_diagnosis": {
+    "all_source_episode_terminations": {
+      "cutoff": 35,
+      "natural": 13
+    },
+    "policy": {
+      "completed_visits_max": 32,
+      "completed_visits_min": 32,
+      "mean_entropy_nats": 1.9654505997866727,
+      "mean_max_probability": 0.4119840723298383,
+      "mean_positive_support": 15.899768971032522,
+      "one_hot_samples": 2266
+    },
+    "schema": "voxelshogi-research-target-diagnosis-v1",
+    "scope": "Target provenance/distribution diagnosis only. Bootstrap values remain model estimates, cutoff is not draw, no strength or final-test adoption claim.",
+    "selected_samples": 11254,
+    "teacher_quality_accepted": false,
+    "value_origins": {
+      "bootstrap-v1": 8839,
+      "terminal-v1": 2415
+    },
+    "value_origins_by_split": {
+      "test": {
+        "bootstrap-v1": 1511
+      },
+      "train": {
+        "bootstrap-v1": 6568,
+        "terminal-v1": 1813
+      },
+      "val": {
+        "bootstrap-v1": 760,
+        "terminal-v1": 602
+      }
+    }
+  },
+  "budget": {
+    "approved_total_usd": 200,
+    "reservations": 36,
+    "reserved_usd": 160.75,
+    "remaining_unreserved_usd": 39.25,
+    "reservation_is_not_invoice": true,
+    "state_limit_bytes": 34359738368,
+    "state_reserved_bytes": 1407414632
+  },
+  "github_observation": {
+    "main_commit": "8d27a32d7a560f67a23b5e5fdfa348fcc0e2ec1c",
+    "latest_schedule_runs": {
+      "CI": 42522684443,
+      "Quality measurements": 42521845718,
+      "Security": 42521057413
+    },
+    "latest_schedule_conclusions": "success",
+    "historical_push_failure": 41999659903,
+    "historical_push_failure_cause": "Lint tool download returned HTTP504 through existing retry attempts; CI Gate correctly failed",
+    "guard_run": 41996358865,
+    "guard_result": "success",
+    "guard_termination_requested_utc": "2026-11-05T11:20:58Z",
+    "guard_resources_released_utc": "2026-11-05T11:21:58Z",
+    "guard_instance_ids": [
+      59238135
+    ],
+    "open_prs": [
+      95,
+      155,
+      156,
+      157,
+      158
+    ],
+    "open_pr_scope": "Dependabot updates only; not merged by this planning task"
+  },
+  "public_build_commit": "f3d2d66d73ee0c2085445a68c618a214897c0af1",
+  "limitations": [
+    "Live HF check covers fixed revision metadata, settings and small card/manifest only; Linux historical receipt covers full output files. No fresh all-data hash verification on Mac.",
+    "Public build-info confirms identity only, not fresh public E2E or real browser inference.",
+    "No rental, upload, actual dataset/model execution or final holdout queries performed in this review.",
+    "Uncommitted operational pilot scripts under ignored runs are preparation, not integrated or validated CUDA execution."
+  ],
+  "resource_retirement_diagnosis": {
+    "worker_finished_at_utc": "2026-11-05T09:17:08.704464+00:00",
+    "worker_complete": false,
+    "seconds_from_worker_finish_to_guard_release": 7489.295535564423,
+    "required_improvement": "Controller must retire promptly after verified output preservation or failure diagnosis; keep independent deadline as fallback."
+  }
+}
