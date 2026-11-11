@@ -177,3 +177,163 @@ APIの読取結果と小さい実行記録だけを保存する。データ・�
   ]
 }
 ```
+
+
+## 06:37 JST追補：統合main成功と未統合の配布実装
+
+CIは06:32:48 JSTの取得済み結果を再利用し、10分以内の再取得は行っていない。
+両providerは06:36:49 JSTに読取専用で再確認した。費用予約・作成・公開の変更は0。
+以下のPR #163のHEADはこの文書更新前の観測値であり、更新後のCI成功を示すものではない。
+
+```json
+{
+  "schema": "voxelshogi-resumption-planning-supplement-v3",
+  "recorded_at_utc": "2026-11-11T21:38:19.957932+00:00",
+  "github_observed_at_utc": "2026-11-11T21:32:48.692739+00:00",
+  "ci_cached_result_reused": true,
+  "ci_status_refetches_this_update": 0,
+  "main_source": "8b4289ff0b3354633d271627580480de8170bfcd",
+  "main_ci": {
+    "id": 43089512598,
+    "attempt": 2,
+    "status": "completed",
+    "conclusion": "success",
+    "native_full_executed": true,
+    "training_mutation_shards_success": 8,
+    "research_worker_channel_success": true,
+    "security_run": 43089512550,
+    "security_conclusion": "success",
+    "blocking_codeql_alerts": 0
+  },
+  "main_public_deployment": {
+    "job_id": 130796650651,
+    "conclusion": "success",
+    "executed_successfully": [
+      "Verify published commit",
+      "Public E2E",
+      "Repeat public search and camera regression without retries",
+      "Audit exact public application, model and runtime files",
+      "Public model E2E on the exact approved distribution"
+    ],
+    "scope": "Existing published application/models, not trained-M release or physical mobile validation"
+  },
+  "source_admitted_stages": [
+    "research-browser",
+    "research-corpus"
+  ],
+  "prs": {
+    "161": {
+      "observed_head": "1a3f9393543c9686e59f3bfcb0aa6fdf0691b555",
+      "state": "OPEN",
+      "merge_state": "BLOCKED",
+      "missing_required": [
+        "CI Gate"
+      ],
+      "pending_related": [],
+      "failures": []
+    },
+    "163": {
+      "observed_head": "ef8ec1901997299f58c91eaa9fb036f1c29b0939",
+      "state": "OPEN",
+      "merge_state": "BLOCKED",
+      "missing_required": [
+        "CI Gate",
+        "CodeQL (actions)",
+        "CodeQL (javascript-typescript)",
+        "CodeQL (python)",
+        "CodeQL (rust)",
+        "Known mutation regressions",
+        "Rust core coverage",
+        "Web unit coverage"
+      ],
+      "pending_related": [],
+      "failures": []
+    },
+    "164": {
+      "observed_head": "2ebbd2ed9962dea1aeb5612ed2fc2a2851e2f3f9",
+      "state": "OPEN",
+      "merge_state": "CLEAN",
+      "missing_required": [],
+      "pending_related": [
+        "Browser model inference (real WASM)"
+      ],
+      "failures": []
+    },
+    "165": {
+      "observed_head": "f37c95322c3115424bfdd00fbffc3cf9fd74a71d",
+      "state": "OPEN",
+      "merge_state": "BLOCKED",
+      "missing_required": [
+        "CI Gate",
+        "CodeQL (rust)",
+        "Known mutation regressions",
+        "Rust core coverage",
+        "Web unit coverage"
+      ],
+      "pending_related": [
+        "scope / scope",
+        "CodeQL (rust)",
+        "Python engine and model contracts",
+        "Browser model inference (real WASM)"
+      ],
+      "failures": []
+    }
+  },
+  "read_only_external_audit": {
+    "checked_at_utc": "2026-11-11T21:36:49.822425+00:00",
+    "read_only": true,
+    "resource_mutations": 0,
+    "vast": {
+      "complete_inventory": true,
+      "project_instances": []
+    },
+    "cloudrift": {
+      "project_active_instances": 0,
+      "scope": "Personal Initializing/Active/Deactivating project-tagged instances"
+    },
+    "budget": {
+      "approved_total_usd": 200,
+      "reservations": 36,
+      "reserved_usd": 160.75,
+      "remaining_unreserved_usd": 39.25
+    }
+  },
+  "implementation_evidence": {
+    "distribution": {
+      "source_commit": "2ebbd2ed9962dea1aeb5612ed2fc2a2851e2f3f9",
+      "related_light_tests_passed": 169,
+      "new_mutants_caught": 20,
+      "changed_existing_mutants_caught": 2,
+      "actual_trained_m_browser_inference": 0
+    },
+    "conversion": {
+      "source_commit": "f37c95322c3115424bfdd00fbffc3cf9fd74a71d",
+      "related_light_tests_passed": 138,
+      "new_mutations_caught": 37,
+      "linux_native_tests_added": 2,
+      "linux_native_tests_executed_on_mac": false,
+      "actual_M_conversion_runs": 0
+    }
+  },
+  "actual_progress": {
+    "historical_development_games": 48,
+    "historical_nn_queries_audited": 24579,
+    "gpu_onnx_architectures": 4,
+    "audited_pilot_samples": 11254,
+    "actual_browser_cases": 0,
+    "planned_browser_cases": 8,
+    "actual_m_pilot_runs": 0,
+    "planned_m_pilot_runs": 2,
+    "actual_post_training_development_games": 0,
+    "planned_post_training_development_games": 48,
+    "actual_main_comparison_runs": 0,
+    "planned_main_comparison_runs": 12,
+    "actual_trained_m_format_publications": 0,
+    "planned_trained_m_formats": 3,
+    "physical_phone_secured": false
+  },
+  "new_resource_requests": 0,
+  "new_budget_reservations": 0,
+  "new_hf_publications": 0
+}
+```
