@@ -1,13 +1,85 @@
 """Owned separate-process CUDA attempts with bounded stop and no credentials."""
 
+import hashlib
 import json
 import math
 import os
+import re
 import signal
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+
+class PilotChildError(RuntimeError):
+    def __init__(self, diagnostic):
+        super().__init__("pilot child failed; safe diagnostic attached")
+        self.diagnostic = diagnostic
+
+
+def attempt_command(
+    script, inputs, output, *, deadline, resume=False, max_new_steps=None
+):
+    root = Path(__file__).resolve().parents[3]
+    canonical = root / "infrastructure/research/pilot/attempt.py"
+    if Path(script).is_symlink() or Path(script).resolve() != canonical:
+        raise ValueError("canonical pilot module entrypoint required")
+    command = [
+        sys.executable,
+        "-m",
+        "infrastructure.research.pilot.attempt",
+        str(Path(inputs).resolve()),
+        str(Path(output).resolve()),
+        "--compute-deadline",
+        str(deadline),
+    ]
+    if resume:
+        command.append("--resume")
+    if max_new_steps is not None:
+        command += ["--max-new-steps", str(max_new_steps)]
+    return command, root
+
+
+def child_failure(path, returncode):
+    # Publish only typed exception identity and a hash, never raw child output.
+    with Path(path).open("rb") as stream:
+        size = stream.seek(0, 2)
+        stream.seek(max(0, size - 32768))
+        tail = stream.read(32768)
+    text = tail.decode(errors="replace")
+    exceptions = re.findall(
+        r"(?m)^([A-Za-z_][A-Za-z0-9_.]{0,120}(?:Error|Exception))(?::|$)", text
+    )
+    exception = exceptions[-1] if exceptions else None
+    missing = re.findall(
+        r"ModuleNotFoundError: No module named '([A-Za-z0-9_.]{1,128})'", text
+    )
+    module = missing[-1] if exception == "ModuleNotFoundError" and missing else None
+    if module and module.split(".")[0] not in {
+        "export",
+        "training",
+        "infrastructure",
+        "voxelshogi",
+        "torch",
+        "numpy",
+        "pyarrow",
+        "safetensors",
+        "huggingface_hub",
+        "onnx",
+        "onnxruntime",
+        "psutil",
+    }:
+        module = None
+    return {
+        "schema": "voxelshogi-pilot-child-failure-v1",
+        "returncode": returncode,
+        "exception_type": exception,
+        "missing_module": module,
+        "log_bytes": size,
+        "tail_bytes": len(tail),
+        "tail_sha256": hashlib.sha256(tail).hexdigest(),
+    }
 
 
 def child_environment(source):
@@ -117,18 +189,14 @@ def run_attempt(
         raise InterruptedError("stopped before child launch")
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    command = [
-        sys.executable,
-        str(script),
-        str(inputs),
-        str(output),
-        "--compute-deadline",
-        str(deadline),
-    ]
-    if resume:
-        command.append("--resume")
-    if max_new_steps is not None:
-        command += ["--max-new-steps", str(max_new_steps)]
+    command, cwd = attempt_command(
+        script,
+        inputs,
+        output,
+        deadline=deadline,
+        resume=resume,
+        max_new_steps=max_new_steps,
+    )
     # The parent may hold HF authentication for checkpoint publication. The
     # fitting interpreter receives only this explicit runtime allowlist.
     env = child_environment(os.environ)
@@ -143,6 +211,7 @@ def run_attempt(
             stdout=stream,
             stderr=subprocess.STDOUT,
             env=env,
+            cwd=cwd,
             start_new_session=True,
         )
         retired = None
@@ -153,7 +222,8 @@ def run_attempt(
                     raise InterruptedError("fixed pilot child stop: " + retired)
                 time.sleep(1)
             if child.returncode != 0:
-                raise RuntimeError("pilot child failed; inspect owned attempt log")
+                stream.flush()
+                raise PilotChildError(child_failure(log_path, child.returncode))
             result = json.loads((output / "attempt-wrapper.json").read_text())
             return review_attempt(
                 result,

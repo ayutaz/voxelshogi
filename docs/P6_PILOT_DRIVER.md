@@ -3,6 +3,25 @@
 [再開計画](P6_RESUMPTION_PLAN.md)のA・Cに使う実行経路を
 `infrastructure/research/pilot/`へ移し、一時ファイルだけに依存しないようにする。
 本書は実行契約であり、実2 run・CUDA再開・HF公開の成功報告ではない。
+
+## 初回実行の失敗と起動経路の修正（2026-11-12 JST）
+
+source `1a4c4a0`の初回試行は、M4の1,831ファイル、全4入力束、CUDAとHF出力先の照合後、
+Fullのcontinuous子プロセスが失敗し、科学pilot完了0・保存checkpoint0で終了した。
+[固定HF失敗結果](https://huggingface.co/datasets/voxelshogi/voxelshogi-research-pilot-results-v1/tree/ae09a4efc7341b0ed103b8fcf36b9baa074047f9)は
+public/manual・Community OFF・Linux全hash照合済みで、使用実機の削除と不在も確認した。
+旧記録は`RuntimeError`と失敗段階だけを保持し、削除前の子ログ全文を保存していない。
+
+旧方式のPythonファイル直接実行は、`PYTHONPATH`を継承しないクリーンなfixtureで
+隣接するrepo packageの`ModuleNotFoundError`を再現した。実機ログの詳細が残っていないため、
+実機の例外型を断定する結果とは区別する。子はcanonicalな
+`python -m infrastructure.research.pilot.attempt`と明示したrepo cwdで起動する。
+HF／provider資格情報は従来どおり子へ渡さない。
+
+子失敗時はログ末尾を32KiB以内だけ読み、例外型、既知packageに限ったmissing module、
+終了コード・サイズ・末尾hashを`failure.json`へ残す。生ログや任意の例外メッセージは公開しない。
+既存の失敗結果ハーネスにこのJSONを含め、実機解放後にも診断できるようにする。
+修正後sourceのCIと実CUDA少量学習・保存再開・48局は別途必要であり、この修正だけで完了としない。
 GPUの起動・学習条件の採用・最終評価は、この変更では実行しない。
 
 ## 入力と実行環境
