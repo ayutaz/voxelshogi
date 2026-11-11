@@ -2582,6 +2582,20 @@ MUTATIONS = [
         "test_vast_ssh_startup.py",
     ),
     (
+        "vast-m6-driver-capabilities-json",
+        "training/vast_rental_control.py",
+        '"env": {"NVIDIA_DRIVER_CAPABILITIES": "all"},',
+        '"env": "-e NVIDIA_DRIVER_CAPABILITIES=all",',
+        "test_vast_rental_control.py",
+    ),
+    (
+        "vast-research-driver-capabilities-json",
+        "training/vast_research_control.py",
+        '"env": {"NVIDIA_DRIVER_CAPABILITIES": "all"},',
+        '"env": "-e NVIDIA_DRIVER_CAPABILITIES=all",',
+        "test_vast_research_control.py",
+    ),
+    (
         "vast-research-ssh-startup-required",
         "training/vast_research_control.py",
         '"onstart": onstart,',
