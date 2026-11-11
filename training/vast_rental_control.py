@@ -341,7 +341,7 @@ class VastRental(VastInstanceControl, M6Rental):
                 "label": self.tag,
                 "target_state": "running",
                 "cancel_unavail": True,
-                "env": "-e NVIDIA_DRIVER_CAPABILITIES=all",
+                "env": {"NVIDIA_DRIVER_CAPABILITIES": "all"},
                 "onstart": onstart,
             },
         )

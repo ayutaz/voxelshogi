@@ -69,6 +69,7 @@ def test_research_purpose_reservation_and_two_guards_precede_paid_create(tmp_pat
     }
     assert request["disk"] == 80 and request["label"] == "voxelshogi-phase5-eval-pilot"
     assert request["runtype"] == "ssh_direct" and request["cancel_unavail"] is True
+    assert request["env"] == {"NVIDIA_DRIVER_CAPABILITIES": "all"}
     assert "HF_TOKEN" not in str(request) and "CLOUDRIFT_API_KEY" not in str(request)
     assert c.attach_key() == {"success": True}
     assert c.terminate()["complete"] is True
