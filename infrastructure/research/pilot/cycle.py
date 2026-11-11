@@ -263,6 +263,8 @@ def run_cycle(
         return result
     except BaseException as error:
         failure = {"stage": current, "error_type": type(error).__name__}
+        if isinstance(getattr(error, "diagnostic", None), dict):
+            failure["child_failure"] = error.diagnostic
         atomic_json(base / "failure.json", failure)
         try:
             failure["recovery"] = recover_cycle(
