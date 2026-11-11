@@ -8,14 +8,23 @@ export function assetUrl(base: string, path: string): string {
   return new URL(path, base).href;
 }
 
-function checkRef(file: FileRef) {
-  if (!Number.isSafeInteger(file.bytes) || file.bytes <= 0 || file.bytes > MAX_FILE_BYTES || !/^[0-9a-f]{64}$/.test(file.sha256)) {
+function checkRef(file: FileRef, maximum = MAX_FILE_BYTES) {
+  if (!Number.isSafeInteger(file.bytes) || file.bytes <= 0 || file.bytes > maximum || !/^[0-9a-f]{64}$/.test(file.sha256)) {
     throw new Error('invalid asset size or hash');
   }
 }
 
 export async function verifyBytes(data: Uint8Array<ArrayBuffer>, file: FileRef) {
-  checkRef(file);
+  return verified(data, file, MAX_FILE_BYTES);
+}
+
+/** Only the explicit research-M folder reader uses this larger payload bound. */
+export async function verifyResearchBytes(data: Uint8Array<ArrayBuffer>, file: FileRef) {
+  return verified(data, file, 512 * 1024 * 1024);
+}
+
+async function verified(data: Uint8Array<ArrayBuffer>, file: FileRef, maximum: number) {
+  checkRef(file, maximum);
   if (data.byteLength !== file.bytes) throw new Error('asset byte length mismatch');
   const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', data))].map((n) => n.toString(16).padStart(2, '0')).join('');
   if (hash !== file.sha256) throw new Error('asset hash mismatch');
