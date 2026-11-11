@@ -99,3 +99,36 @@ test('Worker accepts only its dedicated implicit-port message before parsing pay
     assert.equal(messages[0].stage, parses ? 'input' : 'message-origin');
   }
 });
+
+test('Worker reports loading, session, every inference and release without changing fixture counts', async () => {
+  const { readFileSync } = await import('node:fs');
+  const vm = await import('node:vm');
+  const source = readFileSync(new URL('../research-browser-worker.mjs', import.meta.url), 'utf8').replace(/^import .*;$/gm, '');
+  class DedicatedWorkerGlobalScope {}
+  const self = new DedicatedWorkerGlobalScope(), messages = [];
+  self.location = { origin: 'http://127.0.0.1:43819' };self.postMessage = value => messages.push(value);
+  const plan = inputs(), model = plan.models[0];let tick = 0, runs = 0, disposed = 0, released = 0;
+  const policy = new Float32Array(1067985), value = new Float32Array([0]);
+  const context = { self, DedicatedWorkerGlobalScope, Float32Array, performance: { now: () => tick++ },
+    validateBrowserInputs: () => {}, researchRuntime: value => value,
+    readResearch: async descriptor => new Uint8Array(descriptor.path.includes('features') ? new Float32Array(729 * 43).buffer : descriptor.path.includes('policy') ? policy.buffer : descriptor.path.endsWith('onnx') ? new ArrayBuffer(1) : value.buffer),
+    compareVector: (_expected, _actual, elements) => ({ elements, exceeded: 0, max_abs: 0 }),
+    openBackend: async () => ({ createSession: async () => ({ run: async () => { runs++;return { policy, value, dispose: () => { disposed++; } }; }, release: async () => { released++; } }),
+      info: {}, profile: () => ({}), dispose: async () => {} }),
+  };
+  vm.runInNewContext(source, context);
+  await self.onmessage({ origin: '', source: null, data: { name: model.name, backend: 'wasm', plan, runtime: {} } });
+  assert.equal(runs, 80);assert.equal(disposed, 80);assert.equal(released, 1);
+  const progress = messages.filter(m => m.status === 'progress'), terminal = messages.filter(m => m.status !== 'progress');
+  assert.deepEqual(progress.slice(0, 3).map(m => m.stage), ['runtime', 'model-download', 'session']);
+  for (const id of [0,3]) {
+    const actual = progress.filter(m => m.fixture_id === id);
+    assert.equal(actual.filter(m => m.stage === 'warmup').length, 8);
+    assert.equal(actual.filter(m => m.stage === 'measurement').length, 32);
+    assert.deepEqual(actual.filter(m => m.stage === 'measurement').map(m => m.step), Array.from({ length: 32 }, (_, i) => i + 1));
+  }
+  assert.equal(progress.at(-1).stage, 'release');
+  assert.ok(progress.every(m => m.name === 'full' && m.backend === 'wasm' && Number.isFinite(m.elapsed_ms)));
+  assert.equal(terminal.length, 1);assert.equal(terminal[0].status, 'success');
+  assert.deepEqual([...terminal[0].fixtures].map(f => f.samples_ms.length), [32, 32]);
+});

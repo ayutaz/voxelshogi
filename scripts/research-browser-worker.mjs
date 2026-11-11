@@ -16,20 +16,29 @@ self.onmessage = async event => {
     const model = data.plan.models.find(m => m.name === data.name);
     if (!model || !['wasm', 'webgpu'].includes(data.backend)) throw new Error('unknown research case');
     const runtime = researchRuntime(data.runtime, self.location.origin);
+    const started = performance.now();
+    const progress = details => self.postMessage({ status: 'progress', name: data.name, backend: data.backend, stage, elapsed_ms: performance.now() - started, ...details });
     stage = 'runtime';
+    progress();
     port = await openBackend(runtime, data.backend, 'fp32');
-    stage = 'model';
+    stage = 'model-download';
+    progress();
     const bytes = await readResearch(model.model);
+    stage = 'session';
+    progress();
     const begin = performance.now();
     session = await port.createSession(bytes, 'fp32');
     const init_ms = performance.now() - begin, fixtures = [];
     for (const fixture of model.fixtures) {
-      stage = `fixture${fixture.id}`;
+      stage = 'fixture-input';
+      progress({ fixture_id: fixture.id });
       const refs = await Promise.all([fixture.features, fixture.policy, fixture.value].map(f => readResearch(f)));
       const [features, policy, value] = refs.map(b => new Float32Array(b.buffer, b.byteOffset, b.byteLength / 4));
       if (features.length !== 729 * 43 || features.some(x => !Number.isFinite(x))) throw new Error('invalid frozen features');
       const times = [], comparisons = { policy: null, value: null };
       for (let i = 0; i < data.plan.warmup_steps + data.plan.measured_steps; i++) {
+        stage = i < data.plan.warmup_steps ? 'warmup' : 'measurement';
+        progress({ fixture_id: fixture.id, step: i < data.plan.warmup_steps ? i + 1 : i - data.plan.warmup_steps + 1 });
         const tick = performance.now();
         const outputs = await session.run(features);
         const elapsed = performance.now() - tick;
@@ -49,8 +58,10 @@ self.onmessage = async event => {
         } finally { outputs.dispose(); }
       }
       fixtures.push({ id: fixture.id, comparisons, legal_argmax_equal: true, warmup_steps: data.plan.warmup_steps, samples_ms: times });
+      stage = 'fixture-complete';progress({ fixture_id: fixture.id });
     }
     stage = 'release';
+    progress();
     await session.finishProfiling?.();
     await session.release(); session = null;
     const information = port.info, profile = port.profile(), buffers = port.buffers?.() ?? null;

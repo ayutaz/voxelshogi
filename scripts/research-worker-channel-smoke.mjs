@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildResearchWorker } from './research-browser-probe.mjs';
+import { runResearchCase } from './research-browser-channel.mjs';
 
 assert.equal(process.platform, 'linux', 'real Worker execution requires external Linux');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -29,13 +30,7 @@ try {
   const context = await browser.newContext(), page = await context.newPage(), requests = [];
   context.on('request', request => requests.push(request.url()));
   await page.goto(origin);
-  const result = await page.evaluate(() => new Promise((resolve, reject) => {
-    const worker = new Worker('/worker.mjs', { type: 'module' });
-    const timer = setTimeout(() => { worker.terminate();reject(new Error('Worker channel timeout')); }, 30000);
-    worker.onerror = error => { clearTimeout(timer);worker.terminate();reject(new Error(error.message)); };
-    worker.onmessage = event => { clearTimeout(timer);worker.terminate();resolve(event.data); };
-    worker.postMessage({ name: 'full', backend: 'wasm', plan: {} });
-  }));
+  const result = await page.evaluate(runResearchCase, { name: 'full', backend: 'wasm', plan: {} });
   assert.equal(result.status, 'failed');
   assert.equal(result.stage, 'input', 'legitimate private channel must reach input validation');
   assert.match(result.error_message, /invalid untrained research origin/);
