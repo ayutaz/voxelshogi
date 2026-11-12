@@ -1,5 +1,10 @@
 # ゲームエンジン（`crates/voxelshogi-core`）
 
+**2026-11-12・一時停止**：既存Sの公開デモと、Mの少量2 run・48局評価を現段階の成果とする。
+本比較12 run・MのWeb配布・観戦表示2案／実端末各60分は未完了のまま停止する。
+追加GPU・生成・学習を自動再開しない。[停止時点の結果と固定HF版](RESEARCH_CHECKPOINT_20261112.md)を現在の確認元とし、
+以下の旧「現在」「次」「予算」は対象時点の記録、実行コマンドは再開後の手順として読む。
+
 **2026-11-03 16:56:12 UTC・P5-2の終了と停止**：[本条件3世代48対局・HF保存・別VM後続世代](P5_2_COMPLETION.md)の結果を記録した。使用した所有課金資源は0。棋力改善・P5-3・DDP・Phase6は未完了であり、結果共有後に停止する。
 
 更新: 2026-10-28。ルールの正は [RULESET.md](RULESET.md)。標準1王と実験9王は、状態・棋譜・終局APIを分けて扱う。標準1王のM1探索を実装済み。全体検証・通常統合・公開後検証も完了した（[M1検証記録](M1_VALIDATION.md)）。M2の `Game.bestMove` と履歴付き専用Workerによるライブ探索も公開済み（[M2検証](M2_VALIDATION.md)）。M3の未学習モデル推論は別のブラウザWorkerで実装・公開済みで、Rustのルール／探索エンジンへNN依存は加えていない（[M3検証](M3_VALIDATION.md)）。PyO3／maturinのPython境界も実装済み。履歴・ルール・探索をcoreから共有し、Pythonへ再実装しない。[M4の契約](M4_DATA_CONTRACT.md)・[実機とCIの検証](M4_VALIDATION.md)。[M4の本生成・全検証・HF公開](M4_COMPLETION.md)と[M6の学習・変換・実機観戦](M6_COMPLETION.md)は完了済み。自己対局の履歴複製・全手検証は同じRustエンジンを使い、[P5-2の実行・別VM継続](P5_2_COMPLETION.md)で確認した。現在地は [STATUS](STATUS.md)。
