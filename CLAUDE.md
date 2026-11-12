@@ -13,6 +13,7 @@ MはFull／Geometry各1,024更新・HF再開一致・開発48局まで実行済�
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
+- 公開準備の提案（2026-11-13）: `docs/PUBLIC_LAUNCH_PLAN.md`。UI/UX→同意制の棋譜保存→X告知。今回は計画のみで、DB作成・収集・投稿は未実施。GPU・本比較・M配布の停止を解除しない。
 - P5-4の失敗履歴: `docs/P5_4_PARITY_FAILURE.md`。旧sourceの4GPU再開不一致と1rank開始前検査の不具合を保持する。許容差を緩めず修正し、後続sourceの全3構成は完全一致した。
 - P5-2の実行結果と停止点: `docs/P5_2_COMPLETION.md`。本条件48対局・HF保存・別VM継続と全ドキュメント点検後に停止。P5-3・DDP・Phase6は振り返り後に再計画する。
 - 前回の表1〜5の完了: `docs/P5_3_PLAN.md`と`docs/P5_4_RESULTS.md`。条件整備→8局→対照込み150局→12局診断→実1／2／4GPU・各HF保存再開、退避と資源解放まで確認した。新しい「6まで」の範囲・数量・完了条件は`docs/P6_EXECUTION_PLAN.md`。
