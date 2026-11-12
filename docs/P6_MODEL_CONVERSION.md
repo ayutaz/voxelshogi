@@ -108,6 +108,32 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.resea
 所有GPU／独立停止監視・固定費用・転送余裕は外側のworkflowで先に用意する。
 Macの検証は不透明な小さいfakeファイルと手書きcohortのみで、実72局やモデル推論の証拠にはしない。
 
+## 評価済みの42必須ファイルを公開用folderへ組み立てる
+
+`training.research_release_staging`は、実Linux上で同じ変換物・最終評価から配布一式を組み立てる。
+レビューしたModel Card、学習前に固定した最終protocol、`assembled-manifest.json`のraw SHAを指定する。
+最終評価の`complete.json`が72局・query非空・同じsource／manifest／audit／protocolに結び付いていることを要求する。
+全学習源・全開発参照の監査を実行workflowへ接続する作業と実72局は別途必要で、
+この組立処理を実行しただけで未供給の監査対象が検証されたことにはならない。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m training.research_release_staging \
+  runs/p6/conversion runs/p6/final-evaluation runs/p6/reviewed-model-card.md runs/p6/release-stage \
+  --frozen runs/p6/final-protocol.json --manifest-sha256 "$ASSEMBLED_MANIFEST_SHA256" \
+  --card-sha256 "$REVIEWED_CARD_SHA256" --source "$FROZEN_EXPORT_SOURCE" \
+  --deadline "$STAGING_DEADLINE"
+```
+
+全3形式・元重み・特徴量・参照出力と、選択／学習履歴／最終条件／監査／3評価reportを
+hash／bytesで照合してからコピーし、コピー先も照合する。Cardは指定した元bytes、LICENSEは凍結sourceのApache-2.0全文を使う。
+既存のM専用roleで42ファイル・Cardの4節・来歴を再検証し、元ファイル／sourceを再照合してから`pending`を`package`へrenameする。
+失敗時の部分ファイルは`pending`と失敗記録に残し、完成packageと混ぜない。
+
+出力は`package/`、外側の`release-plan.json`と`complete.json`。後者にはplanのraw SHAを保存する。
+この処理はネットワーク・repo作成・アップロード・catalog登録を行わない。
+後続は同じplanを公開ハーネスへ渡し、public/manual・Community OFF、HF固定版全hashを確認してからcatalogを生成する。
+実Mのstaging・公開・Web操作は未実行であり、Macでは小さい不透明fixtureのコピーとfake portだけを検証する。
+
 ## 検証範囲
 
 Macでは手書きの履歴と不透明な小さいファイル、fakeのgraph／ORT portだけを使う。
