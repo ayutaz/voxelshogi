@@ -79,3 +79,33 @@ def test_full_generation_audit_is_linux_only_before_file_or_engine_access(monkey
         audit_generation_runs(
             {}, "absent", "absent", expected_protocol={}, protection="absent"
         )
+
+
+def test_replayed_references_preserve_base_sources_and_bind_every_identity():
+    from training.evaluation_v2 import fingerprint
+    from training.generation_audit import include_reference_sources
+
+    p, i = {"m4": {"1" * 64}}, {"m4": {"2" * 64}}
+    references = {
+        "physical": {"development/prior": {"3" * 64}},
+        "model_input": {"development/prior": {"4" * 64}},
+        "receipt": {
+            "schema": "voxelshogi-development-references-v1",
+            "verified": True,
+            "sources": {
+                "development/prior": {
+                    "positions": 1,
+                    "inputs": 1,
+                    "positions_sha256": fingerprint(["3" * 64]),
+                    "inputs_sha256": fingerprint(["4" * 64]),
+                }
+            },
+        },
+    }
+    physical, inputs = include_reference_sources(p, i, references)
+    assert physical == {"m4": {"1" * 64}, "development/prior": {"3" * 64}}
+    assert inputs == {"m4": {"2" * 64}, "development/prior": {"4" * 64}}
+    assert p == {"m4": {"1" * 64}} and i == {"m4": {"2" * 64}}
+    references["model_input"]["development/prior"].add("5" * 64)
+    with pytest.raises(ValueError):
+        include_reference_sources(p, i, references)

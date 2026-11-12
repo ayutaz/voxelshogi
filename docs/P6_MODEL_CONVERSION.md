@@ -94,6 +94,8 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.resea
   runs/p6/conversion runs/p6/final-protocol.json runs/p6/final-evaluation \
   --conversion-sha256 "$CONVERSION_SHA256" --frozen-sha256 "$FINAL_PROTOCOL_SHA256" \
   --source "$FROZEN_EXPORT_SOURCE" --deadline "$FINAL_EVALUATION_DEADLINE" \
+  --development-sources runs/p6/references/plan.json \
+  --development-sources-sha256 "$DEVELOPMENT_SOURCES_SHA256" \
   --corpus runs/m4/production --selfplay runs/p6/input-selfplay \
   --selfplay-protocol runs/p6/selfplay-protocol.json --protection runs/p6/input-protection/config.json
 ```
@@ -101,8 +103,10 @@ uv run --project infrastructure/cuda --locked --no-sync python -m training.resea
 各形式の全手を既存のnative verifierで再検証し、全24件から指標を再計算する。
 実NN呼出しの全履歴を`queries.jsonl`へ保存し、実呼出し数とuniqueな物理局面／canonical入力数を区別する。
 基底の全入力監査はM4全split・供給した自己対局の全公開raw sample・既存保護と、全対局・全queryを照合する。
-実行workflowでは、採用した全学習sourceと、条件選定に使った全開発対局／queryも監査対象に含める必要がある。
-それらのsource照合・追加監査の接続、実Mの72局実行はまだ完了していない。
+[開発用全入力の再構成](P6_DEVELOPMENT_REFERENCES.md)で、元G2の48局と全NN参照、少量学習後の対局、条件選定へ使った全runを一覧に固定する。
+実行前後のRust再生・全ファイルhash・全query列挙を要求し、元の監査集合へ追加する。
+実行workflowは全対象のHF sourceを取得・照合して一覧へ含める。未列挙sourceの非使用を自動証明するものではない。
+採用した全学習sourceの由来binding・追加監査と、実Mの72局実行はまだ完了していない。
 
 各形式のreportと共通auditを[manifest組立](P6_MODEL_PUBLICATION.md#変換からmanifestを組み立てる)へ渡し、元重み・選択履歴・凍結条件・各runのhashを閉じる。
 最後に元の変換物・source・選択／履歴・凍結protocolを再確認し、期限内だけ`complete.json`を作る。

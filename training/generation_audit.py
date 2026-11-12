@@ -70,8 +70,50 @@ def include_observed_inputs(cases, observed):
     return {**cases, **observed}
 
 
+def include_reference_sources(physical, inputs, references):
+    """Preserve every replayed reference group without replacing base sources."""
+    if references is None:
+        return physical, inputs
+    if type(references) is not dict or set(references) != {
+        "physical",
+        "model_input",
+        "receipt",
+    }:
+        raise ValueError("complete replayed development references required")
+    positions, model_inputs, receipt = (
+        references[k] for k in ("physical", "model_input", "receipt")
+    )
+    _inventory(positions)
+    _inventory(model_inputs)
+    if (
+        set(positions) != set(model_inputs)
+        or positions.keys() & physical.keys()
+        or model_inputs.keys() & inputs.keys()
+        or receipt.get("schema") != "voxelshogi-development-references-v1"
+        or receipt.get("verified") is not True
+        or set(receipt.get("sources", {})) != set(positions)
+    ):
+        raise ValueError("disjoint complete development reference binding required")
+    for name, row in receipt["sources"].items():
+        if (
+            row.get("positions") != len(positions[name])
+            or row.get("inputs") != len(model_inputs[name])
+            or row.get("positions_sha256") != fingerprint(sorted(positions[name]))
+            or row.get("inputs_sha256") != fingerprint(sorted(model_inputs[name]))
+        ):
+            raise ValueError("development reference receipt identities differ")
+    return {**physical, **positions}, {**inputs, **model_inputs}
+
+
 def audit_generation_runs(
-    folders, corpus, selfplay, *, expected_protocol, protection, observed_inputs=None
+    folders,
+    corpus,
+    selfplay,
+    *,
+    expected_protocol,
+    protection,
+    observed_inputs=None,
+    reference_sources=None,
 ):
     """Verify inputs before reporting complete physical/canonical membership."""
     if sys.platform != "linux":
@@ -120,6 +162,7 @@ def audit_generation_runs(
             samples += 1
     physical["selfplay-all-published-samples"] = positions
     inputs["selfplay-all-published-samples"] = sample_inputs
+    physical, inputs = include_reference_sources(physical, inputs, reference_sources)
     cases, receipts = {}, {}
     for name, folder in sorted(folders.items()):
         folder = Path(folder)
@@ -143,6 +186,11 @@ def audit_generation_runs(
     )
     return {
         **result,
+        **(
+            {"development_references": reference_sources["receipt"]}
+            if reference_sources is not None
+            else {}
+        ),
         "schema": "voxelshogi-generation-input-audit-v1",
         "corpus_contract": source_audit["contract"],
         "corpus_counts": corpus_counts,

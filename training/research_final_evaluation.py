@@ -16,8 +16,9 @@ from pathlib import Path
 from export.research_generate import _bounded, _verify
 from infrastructure.research.pilot.validation import _query
 from training.checkpoint import atomic_json
-from training.evaluation_v2 import summarize_matches, validate_match_rows
+from training.evaluation_v2 import fingerprint, summarize_matches, validate_match_rows
 from training.feature_cache import file_hash
+from training.generation_audit import include_reference_sources
 from training.research_inference_release import (
     METADATA_BYTES,
     MODEL_BYTES,
@@ -57,6 +58,7 @@ def verify_roots(frozen):
 def load_ports():
     from training.evaluation_v2_runner import run_protocol, verify_run
     from training.generation_audit import audit_generation_runs
+    from training.research_development_references import collect_references
     from training.supervision import audit_corpus
 
     return {
@@ -68,6 +70,7 @@ def load_ports():
         "run": run_protocol,
         "verify": verify_run,
         "audit": audit_generation_runs,
+        "development": collect_references,
     }
 
 
@@ -79,6 +82,8 @@ def run_final_formats(
     conversion_sha256,
     frozen_sha256,
     expected_source,
+    development_sources,
+    development_sources_sha256,
     corpus,
     selfplay,
     selfplay_protocol,
@@ -109,6 +114,7 @@ def run_final_formats(
             "run",
             "verify",
             "audit",
+            "development",
         }
         or re.fullmatch(r"[0-9a-f]{40}", expected_source or "") is None
         or ports["source"]() != expected_source
@@ -124,9 +130,12 @@ def run_final_formats(
         raise ValueError("regular conversion and fresh final output required")
     conversion_raw = _bounded(converted / "conversion.json", METADATA_BYTES)
     frozen_raw = _bounded(frozen_path, METADATA_BYTES)
+    development_sources = Path(development_sources)
+    development_raw = _bounded(development_sources, METADATA_BYTES)
     if (
         hashlib.sha256(conversion_raw).hexdigest() != conversion_sha256
         or hashlib.sha256(frozen_raw).hexdigest() != frozen_sha256
+        or hashlib.sha256(development_raw).hexdigest() != development_sources_sha256
     ):
         raise ValueError("frozen conversion/final-protocol bytes differ")
     conversion, frozen = _parse(conversion_raw), _parse(frozen_raw)
@@ -157,6 +166,22 @@ def run_final_formats(
     ports["conversion"](converted, conversion)
     ports["roots"](frozen)
     ports["corpus"](corpus)
+    development_plan = _parse(development_raw)
+
+    def read_development():
+        references = ports["development"](
+            development_sources.parent,
+            development_plan,
+            deadline=deadline,
+            clock=clock,
+            stop_requested=stop_requested,
+        )
+        include_reference_sources({}, {}, references)
+        if references["receipt"].get("plan_sha256") != fingerprint(development_plan):
+            raise ValueError("replayed development inventory differs from frozen plan")
+        return references
+
+    references = read_development()
     output.mkdir(parents=True, exist_ok=False)
     (output / "evaluation").mkdir()
     stage, total_queries, groups, folders, reports = "evaluation", 0, {}, {}, {}
@@ -262,15 +287,25 @@ def run_final_formats(
             expected_protocol=selfplay_protocol,
             protection=protection,
             observed_inputs=groups,
+            reference_sources=references,
         )
         atomic_json(output / "input-audit.json", audit)
-        if audit.get("observed_input_counts") != {
+        if audit.get("development_references") != references["receipt"] or audit.get(
+            "observed_input_counts"
+        ) != {
             name: {k: len(ids) for k, ids in group.items()}
             for name, group in groups.items()
         }:
             raise ValueError("audited final neural query inventory differs")
         stage = "final-input-recheck"
         ports["conversion"](converted, conversion)
+        if (
+            read_development() != references
+            or _bounded(development_sources, METADATA_BYTES) != development_raw
+        ):
+            raise ValueError(
+                "development reference sources changed during final evaluation"
+            )
         if (
             ports["source"]() != expected_source
             or _bounded(converted / "conversion.json", METADATA_BYTES) != conversion_raw
@@ -307,6 +342,8 @@ def run_final_formats(
             "source_commit": expected_source,
             "conversion_sha256": conversion_sha256,
             "frozen_sha256": frozen_sha256,
+            "development_sources_sha256": development_sources_sha256,
+            "development_references_sha256": fingerprint(references["receipt"]),
             "query_trace_sha256": file_hash(output / "queries.jsonl"),
             "input_audit_sha256": file_hash(output / "input-audit.json"),
             "assembled_manifest_sha256": file_hash(output / "assembled-manifest.json"),
@@ -339,6 +376,8 @@ def main():
     parser.add_argument("--conversion-sha256", required=True)
     parser.add_argument("--frozen-sha256", required=True)
     parser.add_argument("--source", required=True)
+    parser.add_argument("--development-sources", type=Path, required=True)
+    parser.add_argument("--development-sources-sha256", required=True)
     parser.add_argument("--corpus", type=Path, required=True)
     parser.add_argument("--selfplay", type=Path, required=True)
     parser.add_argument("--selfplay-protocol", type=Path, required=True)
@@ -352,6 +391,8 @@ def main():
         conversion_sha256=args.conversion_sha256,
         frozen_sha256=args.frozen_sha256,
         expected_source=args.source,
+        development_sources=args.development_sources,
+        development_sources_sha256=args.development_sources_sha256,
         corpus=args.corpus,
         selfplay=args.selfplay,
         selfplay_protocol=_parse(_bounded(args.selfplay_protocol, METADATA_BYTES)),
