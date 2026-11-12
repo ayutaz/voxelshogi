@@ -181,6 +181,7 @@ def test_guard_and_shared_reservation_precede_create_and_use_local_public_key(tm
         and payload["cancel_unavail"] is True
     )
     assert payload["runtype"] == "ssh_direct" and "HF_TOKEN" not in str(payload)
+    assert payload["env"] == {"NVIDIA_DRIVER_CAPABILITIES": "all"}
     assert json.loads((control.state / "deadline.json").read_text())["stop_at"] == 14500
     assert json.loads(budget.read_text())["reserved_total_usd"] == 45
     assert control.attach_key()["success"] is True

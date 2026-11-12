@@ -9,6 +9,14 @@ controllerは進行ごとに結果JSONへ保存し、時間上限・Workerエラ
 全8ケース・fixture 0／3・各8 warmup＋32測定・全出力数値基準は維持する。
 この実装だけで旧timeoutの原因が判明した、または全構造／WebGPUが成功したとは扱わない。
 
+Vast作成APIの`env`は[公式CLI](https://github.com/vast-ai/vast-cli/blob/master/vast.py)の
+`parse_env`と同じJSON mapで`NVIDIA_DRIVER_CAPABILITIES=all`を指定する。
+CLIの`-e ...`文字列をJSON値へそのまま送らない。
+[NVIDIAの定義](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html)では、
+未指定の既定はcompute／utilityで、Vulkanにはgraphicsが必要になる。
+次の所有実機で環境変数・Vulkan device・実ブラウザのproviderを確認し、
+このpayload修正だけを過去のWebGPU失敗原因の確定や推論成功と扱わない。
+
 2026-11-05。[実行計画](P6_EXECUTION_PLAN.md)の2で使う計測手順。
 実M・ONNXと単GPUの計測済みファイルを使い、ブラウザ対応は別に検証する。
 この手順の追加は実ブラウザ測定の完了記録ではない。
