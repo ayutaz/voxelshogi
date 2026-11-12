@@ -3,7 +3,7 @@
 [3形式変換](P6_MODEL_CONVERSION.md)と[Web読込](P6_MODEL_DISTRIBUTION.md)の間で、
 選択した重み・各実ONNX・最終評価を同じ配布ファイルへ結び付ける。
 この変更は公開role・メタデータ／hash検証・catalog生成の実装であり、実Mの学習・最終評価・公開の完了記録ではない。
-Linuxでの最終評価実行、実NN参照監査、最終manifestの組立と実配布の登録は後続作業として残る。
+Linuxでの最終評価実行、実NN参照監査、下記組立関数を使う42ファイルのstagingと実配布の登録は後続作業として残る。
 
 ## 公開先と上限
 
@@ -44,6 +44,25 @@ case、seed、探索上限、評価上限、bootstrap、感度条件は維持す
 最終評価を学習条件やbest選択の調整に使わない。
 
 ## 実形式別評価との照合
+
+### 変換からmanifestを組み立てる
+
+`training.research_manifest_assembly.assemble_manifest`は、元の`conversion.json`と
+7 metadataファイルのraw bytesから最終manifestを返す純粋関数である。
+変換receiptのSHAと、学習前に固定した`final-protocol.json`のSHAを明示する。
+後者は[元の保護済み12 rootからの固定slice](experiments/p6-final-protocol-freeze.md)を使い、
+最終評価結果に応じてopeningやseedを差し替えない。
+
+必要なbytesは`selection.json`、`training-history.jsonl`、`final-protocol.json`、
+`input-audit.json`、`evaluation/{fp32,fp16,int8}.json`。
+変換側が固定した選択・履歴・M weights metadataとの一致を確認し、各形式の報告を
+それぞれのONNX／元重みへ結び付けた後、既存の完全な`review_manifest`を通す。
+重複JSON key・非有限値・欠落／余計なファイルを拒否する。
+元bytesのhashと量子化によるargmax不一致を保持し、不完全な評価を完了へ変更しない。
+
+この関数はモデルや棋譜を実行せず、ファイルのコピー・HF公開も行わない。
+Linux実行側は実変換・Rust再生・全NN監査後の同じ7ファイルを保持してmanifestを書き、
+公開ハーネスの42ファイル全bytes／hash検証と固定HF版照合へ進む。
 
 `evaluation/{precision}.json`は`schema="voxelshogi-research-format-evaluation-v1"`とし、
 `complete`、`precision`、`evaluation_source_commit`、`model_sha256`、`weights_sha256`、
