@@ -83,6 +83,13 @@ MUTATIONS = [
         "test_research_release_staging.py",
     ),
     (
+        "pilot-collect-module-process",
+        "infrastructure/research/pilot/collection.py",
+        '        "infrastructure.research.pilot.attempt",\n',
+        "",
+        "test_research_pilot_process_ownership.py",
+    ),
+    (
         "m-final-formats",
         "training/research_final_evaluation.py",
         "for precision in PRECISIONS:",

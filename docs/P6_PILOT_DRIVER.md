@@ -38,6 +38,10 @@ GPUの起動・学習条件の採用・最終評価は、この変更では実�
 
 ## 入力と実行環境
 
+module形式の学習子`infrastructure.research.pilot.attempt`も所有computeとして列挙する。
+親workflowが終了していても、同じrepo cwdとowned baseに属する実学習子が生存する間は回収・削除へ進めない。
+従来のファイル形式も認識し、別cwd／別base／別module・zombie・検査自身は含めない。PID再利用は開始時刻の不一致として拒否する。
+
 - `attempt.validate_inputs`はsource、採用前監査、全開発入力の保護、教師診断のhashと、
   その診断に基づく明示的な教師判断を要求する。少量試行だけを許可し、本比較への採用は許可しない。
 - 固定した実M構造・CUDA・全更新数を使う。小さいCI用モデルやCPUへの置換を拒否する。
