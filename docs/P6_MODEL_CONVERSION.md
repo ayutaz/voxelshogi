@@ -77,6 +77,37 @@ public/manual・Community OFFを維持し、送信と全ファイル再確認は
 初期化後もSHAと停止要求を再確認し、着手前の実NN入力observerを既存の全入力監査へ接続する。
 結果には実ORT versionを記録し、CPUの結果をCUDA性能と呼ばない。
 
+## 固定した最終24局を3形式で実行する
+
+`training.research_final_evaluation.run_final_formats`は、実Linuxの変換結果から
+FP32／FP16重み／INT8重みの各ONNXを読み、同じ最終12 root×先後＝24局、計72局を実行する。
+変換結果と学習前に固定した最終protocolのraw SHA、clean source、全3形式のpath／bytes／SHAを要求する。
+最終rootの盤面とcanonical入力はモデルを割り当てる前にRustで再生・照合する。
+
+```bash
+uv run --project infrastructure/cuda --locked --no-sync python -m training.research_final_evaluation \
+  runs/p6/conversion runs/p6/final-protocol.json runs/p6/final-evaluation \
+  --conversion-sha256 "$CONVERSION_SHA256" --frozen-sha256 "$FINAL_PROTOCOL_SHA256" \
+  --source "$FROZEN_EXPORT_SOURCE" --deadline "$FINAL_EVALUATION_DEADLINE" \
+  --corpus runs/m4/production --selfplay runs/p6/input-selfplay \
+  --selfplay-protocol runs/p6/selfplay-protocol.json --protection runs/p6/input-protection/config.json
+```
+
+各形式の全手を既存のnative verifierで再検証し、全24件から指標を再計算する。
+実NN呼出しの全履歴を`queries.jsonl`へ保存し、実呼出し数とuniqueな物理局面／canonical入力数を区別する。
+基底の全入力監査はM4全split・供給した自己対局の全公開raw sample・既存保護と、全対局・全queryを照合する。
+実行workflowでは、採用した全学習sourceと、条件選定に使った全開発対局／queryも監査対象に含める必要がある。
+それらのsource照合・追加監査の接続、実Mの72局実行はまだ完了していない。
+
+各形式のreportと共通auditを[manifest組立](P6_MODEL_PUBLICATION.md#変換からmanifestを組み立てる)へ渡し、元重み・選択履歴・凍結条件・各runのhashを閉じる。
+最後に元の変換物・source・選択／履歴・凍結protocolを再確認し、期限内だけ`complete.json`を作る。
+途中失敗・期限切れ・query0・再生不一致・漏洩・変更された入力は失敗記録に残す。
+
+`assembled-manifest.json`はmetadataであり、配布用`manifest.json`や42ファイルのstagingではない。
+`inference_publication_approved=false`を維持し、HF送信・公開登録は行わない。
+所有GPU／独立停止監視・固定費用・転送余裕は外側のworkflowで先に用意する。
+Macの検証は不透明な小さいfakeファイルと手書きcohortのみで、実72局やモデル推論の証拠にはしない。
+
 ## 検証範囲
 
 Macでは手書きの履歴と不透明な小さいファイル、fakeのgraph／ORT portだけを使う。
