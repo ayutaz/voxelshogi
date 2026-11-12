@@ -13,6 +13,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "pilot-collect-module-process",
+        "infrastructure/research/pilot/collection.py",
+        '        "infrastructure.research.pilot.attempt",\n',
+        "",
+        "test_research_pilot_process_ownership.py",
+    ),
+    (
         "m-final-formats",
         "training/research_final_evaluation.py",
         "for precision in PRECISIONS:",
