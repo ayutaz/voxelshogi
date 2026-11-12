@@ -52,6 +52,7 @@ def inspect_process(expected, base):
         "infrastructure.research.pilot.workflow",
         "infrastructure.research.pilot.job",
         "infrastructure.research.pilot.post",
+        "infrastructure.research.pilot.attempt",
     }
     attempts = {
         str(root / "infrastructure/research/pilot/attempt.py"),
