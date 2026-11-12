@@ -31,6 +31,27 @@ def setup(tmp_path, monkeypatch, fault=None):
         (folder / name).write_bytes(payloads[name])
     frozen_path = tmp_path / "frozen.json"
     frozen_path.write_bytes(payloads["final-protocol.json"])
+    development_path = tmp_path / "development-sources.json"
+    development_path.write_bytes(raw({"opaque": "frozen development source inventory"}))
+    references = {
+        "physical": {"development/prior": {"9" * 64}},
+        "model_input": {"development/prior": {"8" * 64}},
+        "receipt": {
+            "schema": "voxelshogi-development-references-v1",
+            "verified": True,
+            "plan_sha256": fingerprint(json.loads(development_path.read_bytes())),
+            "sources": {
+                "development/prior": {
+                    "games": 48,
+                    "queries": 24579,
+                    "positions": 1,
+                    "inputs": 1,
+                    "positions_sha256": fingerprint(["9" * 64]),
+                    "inputs_sha256": fingerprint(["8" * 64]),
+                }
+            },
+        },
+    }
     output = tmp_path / "final"
     calls, saved = [], {}
 
@@ -80,7 +101,14 @@ def setup(tmp_path, monkeypatch, fault=None):
         return summary
 
     def audit(
-        folders, corpus, selfplay, *, expected_protocol, protection, observed_inputs
+        folders,
+        corpus,
+        selfplay,
+        *,
+        expected_protocol,
+        protection,
+        observed_inputs,
+        reference_sources,
     ):
         assert set(folders) == {"fp32", "fp16", "int8"}
         assert (corpus, selfplay, protection) == (
@@ -90,11 +118,13 @@ def setup(tmp_path, monkeypatch, fault=None):
         )
         assert expected_protocol == {"fixed": "selfplay"}
         calls.append("audit")
+        assert reference_sources == references
         result = {
             "schema": "voxelshogi-generation-input-audit-v1",
             "passed": fault != "overlap",
             "runs": {},
             "observed_input_counts": {},
+            "development_references": deepcopy(references["receipt"]),
         }
         for precision in ("fp32", "fp16", "int8"):
             spec = module.final_protocol(
@@ -121,6 +151,10 @@ def setup(tmp_path, monkeypatch, fault=None):
             result["observed_input_counts"]["neural-query/int8/model"]["inputs"] = 2
         elif fault == "changed-frozen":
             frozen_path.write_bytes(b"changed frozen protocol")
+        elif fault == "audit-development":
+            result.pop("development_references")
+        elif fault == "changed-development-plan":
+            development_path.write_bytes(b'{"changed":"plan"}\n')
         return result
 
     def query(role, game):
@@ -152,10 +186,27 @@ def setup(tmp_path, monkeypatch, fault=None):
         "verify": lambda path: saved[path.name],
         "audit": audit,
     }
+
+    def development(root, plan, **limits):
+        assert root == tmp_path and plan == {
+            "opaque": "frozen development source inventory"
+        }
+        assert limits["deadline"] == 200 and not limits["stop_requested"]()
+        calls.append("development")
+        result = deepcopy(references)
+        if fault == "changed-development" and calls.count("development") == 2:
+            result["receipt"]["plan_sha256"] = "0" * 64
+        return result
+
+    ports["development"] = development
     kwargs = {
         "conversion_sha256": hashlib.sha256(conversion).hexdigest(),
         "frozen_sha256": options["final_protocol_sha256"],
         "expected_source": options["source_commit"],
+        "development_sources": development_path,
+        "development_sources_sha256": hashlib.sha256(
+            development_path.read_bytes()
+        ).hexdigest(),
         "corpus": "all-m4",
         "selfplay": "all-selfplay",
         "selfplay_protocol": {"fixed": "selfplay"},
@@ -180,11 +231,13 @@ def test_final_runner_evaluates_the_three_actual_formats_and_closes_manifest(
         "conversion",
         "roots",
         "corpus",
+        "development",
         "fp32",
         "fp16",
         "int8",
         "audit",
         "conversion",
+        "development",
     ]
     assert not (output / "manifest.json").exists()
     assembled = json.loads((output / "assembled-manifest.json").read_text())
@@ -211,6 +264,9 @@ def test_final_runner_evaluates_the_three_actual_formats_and_closes_manifest(
         "graph-hash",
         "changed-source",
         "changed-frozen",
+        "changed-development",
+        "audit-development",
+        "changed-development-plan",
     ],
 )
 def test_incomplete_or_changed_evidence_never_emits_success(
@@ -238,6 +294,7 @@ def test_incomplete_or_changed_evidence_never_emits_success(
         "platform",
         "existing-output",
         "model-path",
+        "development-hash",
     ],
 )
 def test_preflight_rejects_unfrozen_or_unowned_execution(tmp_path, monkeypatch, change):
@@ -247,6 +304,8 @@ def test_preflight_rejects_unfrozen_or_unowned_execution(tmp_path, monkeypatch, 
         kwargs["conversion_sha256"] = "0" * 64
     elif change == "frozen-hash":
         kwargs["frozen_sha256"] = "0" * 64
+    elif change == "development-hash":
+        kwargs["development_sources_sha256"] = "0" * 64
     elif change == "expired":
         kwargs["deadline"] = 99
         error = InterruptedError
