@@ -140,11 +140,7 @@ async function record(work, commit) {
     // controls shot. A single step branches from the selected history point.
     await page.getByTestId('ai-step').click();
     await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 3, { polling: 50 });
-    await at(8000); await page.getByTestId('toggle-run').click();
-    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 4, { polling: 50 });
-    await page.getByTestId('toggle-run').click();
-    await at(9000); await page.getByTestId('ai-step').click();
-    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 5, { polling: 50 });
+    assert.equal(await page.getByTestId('ai-phase').textContent(), '一時停止中');
     await at(11000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
     await at(15400);
     conditions = await exportRecord('source-ai-record.json');
@@ -212,7 +208,7 @@ async function main() {
     const wasm = await import(pathToFileURL(join(web, 'src/wasm/pkg/voxelshogi_wasm.js')));
     wasm.initSync({ module: readFileSync(join(web, 'src/wasm/pkg/voxelshogi_wasm_bg.wasm')) });
     const replay = wasm.Game.fromRecordJson(JSON.stringify(captured.conditions.record));
-    try { assert.ok(replay.moveCount() >= captured.hook + 5); } finally { replay.free(); }
+    try { assert.equal(replay.moveCount(), captured.hook + 3); } finally { replay.free(); }
     const rawProbe = probe(captured.raw), stream = rawProbe.streams.find(stream => stream.codec_type === 'video');
     const sourceRate = parseFrameRate(stream.avg_frame_rate);
     const pixels = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', captured.raw, '-vf', 'crop=2:2:0:0', '-pix_fmt', 'rgb24', '-f', 'rawvideo', '-'], { maxBuffer: 1024 * 1024 });
