@@ -103,3 +103,5 @@ gh workflow run demo-video.yml --ref main
 ```
 
 CIの取得は最短10分間隔。生成が成功しても完成判定の目視確認・OGPへの反映・公開版との一致が残る。
+
+告知の本文候補と代替テキストは[未送信の文案](PUBLIC_ANNOUNCEMENT.md)へまとめた。L6の証拠がそろう前や、投稿依頼を受ける前には送信しない。
