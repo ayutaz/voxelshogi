@@ -6,7 +6,7 @@ import { App } from '../src/App';
 import type { AiStatus } from '../src/ai/arena-controller';
 import type { Snapshot } from '../src/game/store';
 
-const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn(), goto: vi.fn(), step: vi.fn(), status: {} as AiStatus, aiListeners: new Set<() => void>() }));
+const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn(), goto: vi.fn(), step: vi.fn(), paused: vi.fn(), status: {} as AiStatus, aiListeners: new Set<() => void>() }));
 vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
   subscribe = (fn: () => void) => { fake.listeners.add(fn); return () => fake.listeners.delete(fn); };
   snapshot = () => fake.snap;
@@ -16,7 +16,7 @@ vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
 } }));
 vi.mock('../src/ai/arena-controller', () => ({ DEFAULT_AI_OPTIONS: { seed: 42, limits: { maxDepth: 6, maxNodes: 50000, maxTimeMs: 1000 } }, ArenaController: class {
   subscribe = (fn: () => void) => { fake.aiListeners.add(fn); return () => { fake.aiListeners.delete(fn); }; }; snapshot = () => fake.status; step = fake.step;
-  configure = fake.configure; pause = () => {}; resume = () => {}; suspend = () => {}; dispose = () => {};
+  configure = fake.configure; pause = fake.paused; resume = () => {}; suspend = () => {}; dispose = () => {};
   journal = { clear: () => {} };
 } }));
 vi.mock('../src/renderer/Board3D', () => ({ Board3D: () => <div data-testid="fake-3d" /> }));
@@ -140,4 +140,21 @@ it('places the current move before the board so layer changes have a visible exp
   const { container } = render(<App />);
   const board = container.querySelector('.board2d')!;
   expect(screen.getByTestId('last-move').compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+
+it('keeps the interrupt control in the same row without hiding it between AI phases', () => {
+  render(<App />); const interrupt = screen.getByTestId('cancel-search') as HTMLButtonElement;
+  const row = screen.getByTestId('ai-step').parentElement;
+  expect(interrupt.parentElement).toBe(row); expect(interrupt.hidden).toBe(false);
+  expect(interrupt.getAttribute('aria-disabled')).toBe('true');
+  fireEvent.click(interrupt); expect(fake.paused).not.toHaveBeenCalled();
+  act(() => { fake.status = { ...fake.status, phase: 'thinking' }; for (const fn of fake.aiListeners) fn(); });
+  expect(screen.getByTestId('cancel-search')).toBe(interrupt);
+  expect(interrupt.parentElement).toBe(row); expect(interrupt.hidden).toBe(false);
+  expect(interrupt.getAttribute('aria-disabled')).toBe('false'); fireEvent.click(interrupt);
+  expect(fake.paused).toHaveBeenCalledTimes(1);
+  act(() => { fake.status = { ...fake.status, phase: 'paused' }; for (const fn of fake.aiListeners) fn(); });
+  expect(screen.getByTestId('cancel-search')).toBe(interrupt);
+  expect(interrupt.hidden).toBe(false); expect(interrupt.getAttribute('aria-disabled')).toBe('true');
 });

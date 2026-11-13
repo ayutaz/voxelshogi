@@ -15,6 +15,7 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  {"name":"interrupt-control-layout-stability","file":"App.tsx","before":"data-testid=\"cancel-search\" aria-disabled=","after":"data-testid=\"cancel-search\" hidden={aiStatus.phase !== 'thinking'} aria-disabled=","test":"app-launch","extension":"tsx"},
   {"name":"collection-native-fetch-receiver","file":"collection/client.ts","before":"fetch.bind(globalThis)","after":"fetch","test":"collection-client"},
   {"name":"collection-terminal-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"submitted","test":"game-collection-panel","extension":"tsx"},
   {"name":"collection-sent-consent-control","file":"collection/GameCollectionPanel.tsx","before":" || !!receipt || ","after":" || ","test":"game-collection-panel","extension":"tsx"},
@@ -245,7 +246,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 185);
+    assert.equal(results.length, 186);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
