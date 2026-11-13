@@ -152,6 +152,8 @@ const mutations = [
   { name: 'ui-square-side', file: 'components/Board2D.tsx', before: "piece.color === 'b' ? '先手' : '後手'", after: "piece.color === 'b' ? '後手' : '先手'", test: 'app-launch', extension: 'tsx' },
   { name: 'trail-infinite-loop', file: 'renderer/useTrailMotion.ts', before: 'Math.min(1, progress.current + delta * 1.2)', after: '(progress.current + delta * 1.2) % 1', test: 'trail-motion', extension: 'tsx' },
   { name: 'trail-idle-jump', file: 'renderer/useTrailMotion.ts', before: 'if (started.current) progress.current =', after: 'progress.current =', test: 'trail-motion', extension: 'tsx' },
+  { name: 'promotion-keyboard-focus', file: 'components/Panels.tsx', before: "dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();", after: '', test: 'promotion-keyboard', extension: 'tsx' },
+  { name: 'promotion-keyboard-escape', file: 'components/Panels.tsx', before: "if (event.key === 'Escape')", after: 'if (false)', test: 'promotion-keyboard', extension: 'tsx' },
   { name: 'collection-consent', file: 'collection/contract.ts', before: 'value.consent !== COLLECTION_CONSENT', after: 'false', test: 'game-receiver' },
   { name: 'collection-origin', file: 'collection/receiver.ts', before: "request.headers.get('origin') !== new URL(request.url).origin", after: 'false', test: 'game-receiver' },
   { name: 'collection-canonical-body', file: 'collection/receiver.ts', before: 'body = canonicalJson(value);', after: '', test: 'game-receiver' },
@@ -237,7 +239,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 177);
+    assert.equal(results.length, 179);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

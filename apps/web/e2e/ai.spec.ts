@@ -278,3 +278,33 @@ test('humans can play either color against Normal search', async ({ page }) => {
   await expect(page.getByTestId('status')).toHaveText('☗先手の勝ち（投了）');
   await expect(page.getByTestId('ai-step')).toBeDisabled();
 });
+
+test('keyboard starts and stops viewing, saves a record, and selects or cancels promotion', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('difficulty-b').selectOption('easy'); await page.getByTestId('difficulty-w').selectOption('easy');
+  const toggle = page.getByTestId('toggle-run'); await toggle.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('status')).not.toHaveText('1手目 ☗先手の番');
+  await expect(toggle).toBeFocused(); await page.keyboard.press('Enter');
+  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: '保存', exact: true }).focus(); await page.keyboard.press('Enter');
+  const saved = Buffer.concat(await (await (await downloading).createReadStream()).toArray()).toString('utf8');
+  const replay = Game.fromRecordJson(saved);
+  try { expect(replay.moveCount()).toBeGreaterThan(0); } finally { replay.free(); }
+
+  await page.getByTestId('mode').selectOption('h-r');
+  await page.getByTestId('import').setInputFiles({ name: 'keyboard.json', mimeType: 'application/json', buffer: Buffer.from(humanRecord()) });
+  await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
+  const from = page.locator('.board2d [data-square="355"]'), to = page.locator('.board2d [data-square="346"]');
+  await from.focus(); await page.keyboard.press('Enter'); await to.focus(); await page.keyboard.press('Enter');
+  const promote = page.getByRole('button', { name: '成る', exact: true });
+  await expect(promote).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: '成りの選択' })).toHaveCount(0);
+  await expect(to).toBeFocused(); await expect(from).toHaveText('歩');
+  await from.focus(); await page.keyboard.press('Enter'); await to.focus(); await page.keyboard.press('Enter');
+  await expect(promote).toBeFocused(); await page.keyboard.press('Enter');
+  await expect(to).toHaveText('と');
+  await expect(page.getByRole('dialog', { name: '成りの選択' })).toHaveCount(0);
+});
