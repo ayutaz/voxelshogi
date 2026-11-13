@@ -23,3 +23,5 @@ OGP・修正版動画・公開commit・実Worker保存・PC操作・実スマホ
 中断ボタンを常時同じ操作行へ置き、操作できない間はaria-disabledとguardで無効化する。focusを外すdisabledや表示切替を使わない。
 存在・同じ親要素・同じDOM node・中断guardの1テストのREDから修正し、再び非表示にする変異を検出・復元した。
 実Normalを1手読んだ後、待機→思考→次の待機の各段階で盤のviewport座標を採取するE2Eも追加した。空の観測・思考なしを合格にせず、全座標が0.5px未満の差で一致することをCIで確認する。
+
+[Claude Codeによる修正差分の再読](reviews/claude-code-watch-layout-delta-20261114.md)でも、P1の原因の解消・中断条件・focus維持を確認した。テストのscroll anchoringの盲点は、盤の座標に加えてwindowとmainのスクロール位置も固定する検証へ補強した。実測の成功はLinux CIの結果で判断する。
