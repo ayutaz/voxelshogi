@@ -109,3 +109,30 @@ test('the public sharing metadata refers to a real board PNG', async ({ page }) 
   expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
   expect([bytes.readUInt32BE(16), bytes.readUInt32BE(20)]).toEqual([1200, 630]);
 });
+
+test('the board stays in place between waiting and real Normal thinking phases', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('thinking-budget').selectOption('1000');
+  await page.getByTestId('move-delay').fill('1000');
+  await page.getByTestId('ai-step').click();
+  await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  await expect(page.getByTestId('ai-analysis')).toBeVisible();
+  const reference = (await page.locator('.views').boundingBox())!.y;
+  await page.evaluate(() => {
+    const phase = document.querySelector('[data-testid="ai-phase"]')!, board = document.querySelector('.views')!;
+    const samples: { phase: string | null; top: number }[] = [];
+    const measure = () => samples.push({ phase: phase.textContent, top: board.getBoundingClientRect().top });
+    const observer = new MutationObserver(measure);
+    observer.observe(phase, { subtree: true, childList: true, characterData: true }); measure();
+    (window as unknown as { watchGeometry: typeof samples }).watchGeometry = samples;
+  });
+  await page.getByTestId('toggle-run').click();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { watchGeometry: { phase: string | null }[] }).watchGeometry.filter(s => s.phase === '次の着手待ち').length), { timeout: 10000 }).toBeGreaterThanOrEqual(2);
+  await page.getByTestId('toggle-run').click();
+  const samples = await page.evaluate(() => (window as unknown as { watchGeometry: { phase: string | null; top: number }[] }).watchGeometry);
+  expect(samples.length).toBeGreaterThanOrEqual(3);
+  expect(samples.some(s => s.phase?.includes('Normal 思考中'))).toBe(true);
+  expect(samples.filter(s => s.phase === '次の着手待ち').length).toBeGreaterThanOrEqual(2);
+  for (const sample of samples) expect(Math.abs(sample.top - reference)).toBeLessThan(0.5);
+});

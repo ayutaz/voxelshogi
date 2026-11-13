@@ -342,6 +342,8 @@ export function App() {
             >
               1手指す
             </button>
+            <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'}
+              onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
           </div>
           <label>
             着手間の待ち時間 {delay}ms（思考時間は別）
@@ -349,7 +351,6 @@ export function App() {
           </label>
           <p data-testid="ai-phase">{phaseText}</p>
           <p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p>
-          {aiStatus.phase === 'thinking' && <button type="button" data-testid="cancel-search" onClick={pause}>思考を中断</button>}
           {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
           {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
             直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
