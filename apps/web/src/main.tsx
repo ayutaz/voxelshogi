@@ -19,6 +19,8 @@ init({ module_or_path: wasmUrl })
       </StrictMode>,
     ),
   )
-  .catch((e: unknown) => {
-    root.render(<p className="fatal">エンジンの読み込みに失敗しました: {String(e)}</p>);
+  .catch(() => {
+    root.render(<div className="fatal" role="alert"><p>盤面を読み込めませんでした。通信を確認して、もう一度お試しください。</p>
+      <button type="button" onClick={() => location.reload()}>再読み込み</button>
+      <p>更新されたChrome・Edge・Safari・Firefoxでご利用ください。</p></div>);
   });

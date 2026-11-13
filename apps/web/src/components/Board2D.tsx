@@ -59,6 +59,8 @@ export function Board2D({ snap, slice, selection, onSquare }: Props) {
                   className={classes.join(' ')}
                   data-square={index}
                   title={displaySquare(index)}
+                  aria-label={`${displaySquare(index)} ${piece ? `${piece.color === 'b' ? '先手' : '後手'} ${piece.label}` : '空きマス'}`}
+                  aria-pressed={selection.type === 'square' && selection.from === index}
                   onClick={() => onSquare(index)}
                 >
                   {piece ? <span className="piece">{piece.label}</span> : null}

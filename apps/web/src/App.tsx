@@ -3,7 +3,8 @@ import { Board2D } from './components/Board2D';
 import { Hands, MoveList, PromotionDialog, resultText } from './components/Panels';
 import type { LayerView } from './renderer/Board3D';
 import { clickHand, clickSquare, NO_SELECTION, type ClickResult, type Selection } from './game/interaction';
-import { coordsOf, type Color, type HandKind, type Slice } from './game/model';
+import { coordsOf, formatMove, type Color, type HandKind, type Slice } from './game/model';
+import { followView, layerTargets } from './game/spectator';
 import { GameStore, MAX_IMPORT_BYTES } from './game/store';
 import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus, type ArenaDifficulty } from './ai/arena-controller';
 import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type ModelChoice, type ModelLibrary } from './ai/model-library';
@@ -39,8 +40,14 @@ export function App() {
   const [aiStatus, setAiStatus] = useState<AiStatus>({ phase: 'paused', error: null, last: null });
   const [delay, setDelay] = useState(400);
   const [view, setView] = useState<'3d' | '2d' | 'both'>('2d');
-  const [slice, setSlice] = useState<Slice>({ axis: 'z', index: 4 });
-  const [layers, setLayers] = useState<LayerView>({ mode: 'focus', z: 4, dim: 0.18 });
+  const [rawSlice, setSlice] = useState<Slice>({ axis: 'z', index: 4 });
+  const [rawLayers, setLayers] = useState<LayerView>({ mode: 'focus', z: 4, dim: 0.18 });
+  const [follow, setFollow] = useState(true);
+  const [trail, setTrail] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(() => typeof matchMedia !== 'function' || !matchMedia('(max-width: 1100px)').matches);
+  const { slice, layers } = followView(snap.lastMove, follow && selection.type === 'none', rawSlice, rawLayers);
+  const targetCounts = layerTargets(selection.type === 'none' ? [] : selection.targets.keys());
+  const manualView = () => { setSlice(slice); setLayers(layers); setFollow(false); };
   const aiRef = useRef<ArenaController | null>(null);
   const importGeneration = useRef(0);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -104,15 +111,19 @@ export function App() {
   };
   const onSquare = (index: number) => {
     if (!humanTurn) return;
+    manualView();
     apply(clickSquare(selection, index, ctx));
     // follow the clicked square in the 2D view when it is on another layer
     const z = coordsOf(index).z;
     if (slice.axis === 'z' && z !== slice.index && selection.type === 'none') setSlice({ axis: 'z', index: z });
   };
-  const onHand = (kind: HandKind) => humanTurn && apply(clickHand(selection, kind, ctx));
+  const onHand = (kind: HandKind) => { if (humanTurn) { manualView(); apply(clickHand(selection, kind, ctx)); } };
 
+  const allowReplacement = () => snap.moveCount === 0 || window.confirm('現在の対局を置き換えます。必要なら先に棋譜を保存してください。続けますか？');
   const reset = (m: Mode = mode) => {
+    if (!allowReplacement()) return;
     pause();
+    setFollow(true); setSlice({ axis: 'z', index: 4 }); setLayers({ ...rawLayers, z: 4 });
     aiRef.current?.journal.clear();
     store.newGame();
     setMode(m);
@@ -147,6 +158,7 @@ export function App() {
     } catch (error) { setMessage(`保存できません: ${String(error)}`); }
   };
   const importRecord = async (file: File) => {
+    if (!allowReplacement()) return;
     pause();
     const generation = importGeneration.current;
     aiRef.current?.suspend();
@@ -183,12 +195,13 @@ export function App() {
         <h1>VoxelShogi Arena</h1>
         <span className="subtitle">9×9×9 三次元将棋</span>
         {ARENA_LINKS.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}
-        <span className="status" data-testid="status" role="status">
+        <span className="status" data-testid="status">
           {status}
         </span>
       </header>
 
       <aside className="panel left">
+        <details open={settingsOpen} onToggle={event => setSettingsOpen(event.currentTarget.open)}><summary>対局・AI設定</summary>
         <section>
           <h2>対局</h2>
           <label>
@@ -256,41 +269,11 @@ export function App() {
             </select>
           </label>
           <p className="muted">Normalは最大6手先・50,000ノード。<a href="/build-info.json" target="_blank" rel="noreferrer">実装バージョン</a></p>
-            <div className="watch">
-              <div className="row">
-                <button type="button" onClick={() => running ? pause() : setRunning(true)} data-testid="toggle-run" disabled={snap.finished}>
-                  {running ? '一時停止' : '再開'}
-                </button>
-                <button
-                  type="button"
-                  data-testid="ai-step"
-                  disabled={running || snap.finished || humanTurn || aiStatus.phase === 'thinking' || aiStatus.phase === 'waiting' || !!aiStatus.error}
-                  onClick={() => aiRef.current?.step()}
-                >
-                  1手指す
-                </button>
-              </div>
-              <label>
-                着手間の待ち時間 {delay}ms（思考時間は別）
-                <input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={(e) => setDelay(Number(e.target.value))} />
-              </label>
-              <p data-testid="ai-phase" role="status">{phaseText}</p>
-              {aiStatus.phase === 'thinking' && <button type="button" data-testid="cancel-search" onClick={pause}>思考を中断</button>}
-              {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
-              {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
-                直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
-                {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />
-                Value {aiStatus.last.result.value?.toFixed(3) ?? '未算出'}（直前のAIの視点）<br />
-                推論{Math.round(aiStatus.last.inferenceMs)}ms・往復{Math.round(aiStatus.last.roundTripMs)}ms
-              </p> : aiStatus.last && <p className="muted" data-testid="ai-analysis">
-                直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.difficulty === 'easy' ? 'Easy・ランダム着手（探索なし）' : `Normal・深さ${aiStatus.last.result.completedDepth}${aiStatus.last.result.completedDepth === 0 ? '・合法な代替手' : ''}`}<br />
-                {aiStatus.last.result.score === null ? '評価は未算出' : Math.abs(aiStatus.last.result.score) === 1_000_000 ? `終局評価：${aiStatus.last.result.score > 0 ? '勝ち' : '負け'}` : `駒得 ${aiStatus.last.result.score >= 0 ? '+' : ''}${aiStatus.last.result.score}（歩=100、直前のAIの視点）`}<br />
-                {aiStatus.last.result.nodes}ノード・往復{Math.round(aiStatus.last.roundTripMs)}ms・停止理由 {aiStatus.last.result.stopReason}
-              </p>}
-            </div>
+
         </section>
         <section>
           <h2>棋譜</h2>
+          <p className="muted">「保存」は端末へのJSONダウンロードです。</p>
           <div className="row">
             <button type="button" onClick={exportRecord}>
               保存
@@ -321,9 +304,50 @@ export function App() {
             }}
           />
         </section>
+        </details>
       </aside>
 
       <main>
+        <section className="intro" aria-label="このデモについて">
+          <p className="eyebrow">9層の将棋を、AIが指す。</p>
+          <p>AI同士の対局を眺める研究用Alpha。駒は層をまたいで動き、相手の玉を詰ませると勝ちです。</p>
+          <p className="muted">Easy／Normalはモデル取得なしで遊べます。学習済みSは任意の追加機能です。</p>
+        </section>
+        <div className="watch playback" aria-label="観戦操作">
+          <div className="row">
+            <button type="button" onClick={() => running ? pause() : setRunning(true)} className="primary" data-testid="toggle-run" disabled={snap.finished}>
+              {running ? '一時停止' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}
+            </button>
+            <button
+              type="button"
+              data-testid="ai-step"
+              disabled={running || snap.finished || humanTurn || aiStatus.phase === 'thinking' || aiStatus.phase === 'waiting' || !!aiStatus.error}
+              onClick={() => aiRef.current?.step()}
+            >
+              1手指す
+            </button>
+          </div>
+          <label>
+            着手間の待ち時間 {delay}ms（思考時間は別）
+            <input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={(e) => setDelay(Number(e.target.value))} />
+          </label>
+          <p data-testid="ai-phase">{phaseText}</p>
+          {aiStatus.phase === 'thinking' && <button type="button" data-testid="cancel-search" onClick={pause}>思考を中断</button>}
+          {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
+          {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
+            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
+            {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />
+            Value {aiStatus.last.result.value?.toFixed(3) ?? '未算出'}（直前のAIの視点）<br />
+            推論{Math.round(aiStatus.last.inferenceMs)}ms・往復{Math.round(aiStatus.last.roundTripMs)}ms
+          </p> : aiStatus.last && <p className="muted" data-testid="ai-analysis">
+            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.difficulty === 'easy' ? 'Easy・ランダム着手（探索なし）' : `Normal・深さ${aiStatus.last.result.completedDepth}${aiStatus.last.result.completedDepth === 0 ? '・合法な代替手' : ''}`}<br />
+            {aiStatus.last.result.score === null ? '評価は未算出' : Math.abs(aiStatus.last.result.score) === 1_000_000 ? `終局評価：${aiStatus.last.result.score > 0 ? '勝ち' : '負け'}` : `駒得 ${aiStatus.last.result.score >= 0 ? '+' : ''}${aiStatus.last.result.score}（歩=100、直前のAIの視点）`}<br />
+            {aiStatus.last.result.nodes}ノード・往復{Math.round(aiStatus.last.roundTripMs)}ms・停止理由 {aiStatus.last.result.stopReason}
+          </p>}
+        </div>
+        <div className="row" role="group" aria-label="盤面の表示">
+          {(['2d', '3d', 'both'] as const).map(v => <button type="button" key={v} aria-pressed={view === v} onClick={() => setView(v)}>{{ '2d': '2D断面', '3d': '立体で見る', both: '立体と断面' }[v]}</button>)}
+        </div>
         {message ? (
           <div className="message" role="alert">
             {message}
@@ -331,18 +355,26 @@ export function App() {
         ) : null}
         {sideHands('w')}
         <div className={`views views-${view}`}>
-          {view !== '2d' ? <Suspense fallback={<p>3D盤面を読み込み中…</p>}><Board3D snap={snap} selection={selection} view={layers} onSquare={onSquare} /></Suspense> : null}
+          {view !== '2d' ? <Suspense fallback={<p>3D盤面を読み込み中…</p>}><Board3D snap={snap} selection={selection} view={layers} showTrail={trail} onSquare={onSquare} /></Suspense> : null}
           {view !== '3d' ? <Board2D snap={snap} slice={slice} selection={selection} onSquare={onSquare} /> : null}
         </div>
         {sideHands('b')}
+        <section className="move-focus" aria-label="表示中の着手">
+          <p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p>
+          <label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} />直前手の層を追う</label>
+          <p className="muted">{follow ? '着手先の層へ自動で切り替えます。層を手動で変えると追従をOFFにします。' : '手動表示中。追従をONにすると表示中の着手先へ戻ります。'}</p>
+          {selection.type !== 'none' && <div className="row" aria-label="層ごとの移動先">{targetCounts.map((count, z) => count > 0 && <button type="button" key={z} onClick={() => { manualView(); setSlice({ axis: 'z', index: z }); setLayers({ ...layers, z }); }}>{ROMAN[z]}層：{count}マス</button>)}</div>}
+        </section>
+
       </main>
 
       <aside className="panel right">
+        <details open={settingsOpen}><summary>表示・操作の設定</summary>
         <section>
           <h2>表示</h2>
-          <div className="row" role="radiogroup" aria-label="表示モード">
+          <div className="row" role="group" aria-label="表示モード">
             {(['both', '3d', '2d'] as const).map((v) => (
-              <button key={v} type="button" className={view === v ? 'primary' : ''} onClick={() => setView(v)}>
+              <button key={v} type="button" className={view === v ? 'primary' : ''} aria-pressed={view === v} onClick={() => setView(v)}>
                 {{ both: '3D+2D', '3d': '3D', '2d': '2D' }[v]}
               </button>
             ))}
@@ -350,6 +382,7 @@ export function App() {
         </section>
         <section>
           <h2>3D 層の表示</h2>
+          <label className="check"><input type="checkbox" checked={trail} onChange={event => setTrail(event.target.checked)} />直前手の軌跡を表示</label>
           <label className="check">
             <input
               type="checkbox"
@@ -366,6 +399,7 @@ export function App() {
               max={8}
               value={layers.z}
               onChange={(e) => {
+                manualView();
                 const z = Number(e.target.value);
                 setLayers({ ...layers, z });
                 if (slice.axis === 'z') setSlice({ axis: 'z', index: z });
@@ -393,7 +427,7 @@ export function App() {
                 key={a}
                 type="button"
                 className={slice.axis === a ? 'primary' : ''}
-                onClick={() => setSlice({ axis: a, index: slice.index })}
+                onClick={() => { manualView(); setSlice({ axis: a, index: slice.index }); }}
               >
                 {{ z: '層', y: '段', x: '筋' }[a]}で切る
               </button>
@@ -408,6 +442,7 @@ export function App() {
               value={slice.index}
               data-testid="slice-index"
               onChange={(e) => {
+                manualView();
                 const index = Number(e.target.value);
                 setSlice({ ...slice, index });
                 if (slice.axis === 'z') setLayers({ ...layers, z: index });
@@ -422,6 +457,7 @@ export function App() {
             ルール: <a href="https://shogitter.com/rule/三次元将棋">将棋ったー「三次元将棋」</a>準拠（ruleset voxelshogi-standard-v1）
           </p>
         </section>
+        </details>
       </aside>
 
       {promotion ? (

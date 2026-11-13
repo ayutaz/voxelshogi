@@ -146,6 +146,11 @@ const mutations = [
   { name: 'store-root-revision', file: 'game/store.ts', before: 'root.revision !== s.revision || ', after: '', test: 'store' },
   { name: 'store-abandoned', file: 'game/store.ts', before: 'legal: g.isFinished() ? [] : g.legalMoves(),', after: 'legal: result ? [] : g.legalMoves(),', test: 'store' },
   { name: 'ui-obsolete-file-read', file: 'App.tsx', before: 'if (generation !== importGeneration.current) return;', after: '', test: 'app-import', extension: 'tsx' },
+  { name: 'spectator-follow-off', file: 'game/spectator.ts', before: '!enabled || !lastMove', after: '!lastMove', test: 'spectator' },
+  { name: 'spectator-layer-source', file: 'game/spectator.ts', before: 'coordsOf(parseMove(lastMove).to).z', after: 'coordsOf(parseMove(lastMove).from ?? parseMove(lastMove).to).z', test: 'spectator' },
+  { name: 'ui-discard-confirmation', file: 'App.tsx', before: 'snap.moveCount === 0 || window.confirm', after: 'true || window.confirm', test: 'app-launch', extension: 'tsx' },
+  { name: 'ui-square-side', file: 'components/Board2D.tsx', before: "piece.color === 'b' ? '先手' : '後手'", after: "piece.color === 'b' ? '後手' : '先手'", test: 'app-launch', extension: 'tsx' },
+  { name: 'trail-infinite-loop', file: 'renderer/useTrailMotion.ts', before: 'Math.min(1, progress.current + delta * 1.2)', after: '(progress.current + delta * 1.2) % 1', test: 'trail-motion', extension: 'tsx' },
   { name: 'arena-pause-cancel', file: 'ai/arena-controller.ts', before: 'if (this.pending) this.client.cancel();', after: '', test: 'arena-controller' },
   { name: 'arena-late-success', file: 'ai/arena-controller.ts', before: '}).then((reply) => {\n        if (this.disposed || generation !== this.generation) return;', after: '}).then((reply) => {\n        if (this.disposed) return;', test: 'arena-controller' },
   { name: 'arena-start-paused', file: 'ai/arena-controller.ts', before: '(!this.options.running && !single)', after: 'false', test: 'arena-controller' },
@@ -222,7 +227,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 162);
+    assert.equal(results.length, 167);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

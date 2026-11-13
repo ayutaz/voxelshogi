@@ -1,11 +1,12 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
+import { Canvas, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
 import type { Selection } from '../game/interaction';
 import type { BoardSnapshot } from '../game/boardSnapshot';
 import { RenderReady } from './RenderReady';
+import { useTrailMotion } from './useTrailMotion';
 
 export interface LayerView {
   /** 'all': every layer opaque; 'focus': the focused layer opaque, others dimmed by `dim`. */
@@ -170,12 +171,7 @@ function MoveTrail({ move }: { move: string }) {
   const start = useMemo(() => worldPosition(parsed.from ?? parsed.to), [parsed]);
   const end = useMemo(() => worldPosition(parsed.to), [parsed]);
   const ball = useRef<THREE.Mesh>(null);
-  const progress = useRef(0);
-  useFrame((_, delta) => {
-    progress.current = (progress.current + delta * 0.6) % 1;
-    const t = progress.current;
-    ball.current?.position.set(start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t + 0.45, start[2] + (end[2] - start[2]) * t);
-  });
+  useTrailMotion(start, end, ball);
   return <>
     <Line points={[start, end]} color="#ffcf71" lineWidth={3} />
     <mesh ref={ball}><sphereGeometry args={[0.17, 12, 8]} /><meshBasicMaterial color="#fff0c2" /></mesh>
@@ -216,7 +212,7 @@ export function Board3D({
   return (
     <div className="board3d" data-testid="board3d" data-ready={ready} aria-busy={!ready}>
       {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
-      <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]} frameloop={showTrail && snap.lastMove ? 'always' : 'demand'}>
+      <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]} frameloop="demand">
         <RenderReady onReady={() => setReady(true)} />
         <color attach="background" args={['#14171d']} />
         <ambientLight intensity={0.8} />
