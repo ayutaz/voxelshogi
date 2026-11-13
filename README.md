@@ -30,7 +30,7 @@ FP32、FP16（重み）、INT8（重み）の実ファイルを選んで比較�
 [Claude Codeを使ったUI/UXレビュー](docs/PUBLIC_LAUNCH_REVIEW.md)を公開しています。初見の観戦開始、層をまたぐ着手の追跡、スマホ幅での盤面の配置に改善候補があり、研究用Alphaとして提供しています。
 [公開準備計画](docs/PUBLIC_LAUNCH_PLAN.md)に各フェーズの目的とゴールをまとめています。現在は観戦導線・着手追跡・狭幅表示の改善を進めています。[動画制作計画](docs/DEMO_VIDEO_PLAN.md)では冒頭3秒と15秒本編を設計しています。動画は未制作、追加学習は停止したままです。[公開準備の現在地](docs/PUBLIC_LAUNCH_PROGRESS.md)
 
-**対局の棋譜はCloudflareへ自動保存されません。** 「保存」は利用者の端末へのJSONダウンロードです。[実装と本番設定の調査](docs/CLOUDFLARE_GAME_DATA_AUDIT.md)に確認範囲をまとめています。
+**対局データの送信は任意で、対局ごとにOFFから始まります。** 同意した終局・明示した中断だけをCloudflareへ保存する[実装と運用](docs/GAME_DATA_COLLECTION.md)を追加しています。通常の「保存」は端末へのJSONダウンロードです。公開URLへの反映・確認状況は[進捗](docs/PUBLIC_LAUNCH_PROGRESS.md)を参照してください。[以前の保存調査](docs/CLOUDFLARE_GAME_DATA_AUDIT.md)は2026-11-12時点の記録です。
 
 ## このプロジェクトで目指すもの
 

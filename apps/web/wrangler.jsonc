@@ -1,11 +1,21 @@
-// Cloudflare Workers Static Assets: the whole app is static (no Worker script),
-// so asset requests are served without invoking a Worker (free, see docs/DEPLOYMENT.md).
+// Static assets remain asset-first; only /api/* invokes the collection Worker first.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "voxelshogi",
   "compatibility_date": "2026-10-01",
+  "main": "src/collection/worker.ts",
+  "vars": { "GAME_COLLECTION_ENABLED": "true" },
+  "d1_databases": [{
+    "binding": "GAMES",
+    "database_name": "voxelshogi-games",
+    "database_id": "5b4bfe35-773b-4c08-84f4-8d76f8f939b9",
+    "migrations_dir": "migrations"
+  }],
+  "triggers": { "crons": ["17 * * * *"] },
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     "not_found_handling": "single-page-application"
   }
 }

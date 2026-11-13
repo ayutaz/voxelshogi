@@ -1,17 +1,19 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { flushSync } from 'react-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/App';
 import type { Snapshot } from '../src/game/store';
 
-const fake = vi.hoisted(() => ({ snap: {} as Snapshot, listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn() }));
+const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn() }));
 vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
   subscribe = (fn: () => void) => { fake.listeners.add(fn); return () => fake.listeners.delete(fn); };
   snapshot = () => fake.snap;
   newGame = fake.reset;
   importRecord = fake.imported;
+  exportRecord = () => fake.record;
 } }));
-vi.mock('../src/ai/arena-controller', () => ({ DEFAULT_AI_OPTIONS: { limits: {} }, ArenaController: class {
+vi.mock('../src/ai/arena-controller', () => ({ DEFAULT_AI_OPTIONS: { seed: 42, limits: { maxDepth: 6, maxNodes: 50000, maxTimeMs: 1000 } }, ArenaController: class {
   subscribe = () => () => {}; snapshot = () => ({ phase: 'paused', error: null, last: null });
   configure = fake.configure; pause = () => {}; resume = () => {}; suspend = () => {}; dispose = () => {};
   journal = { clear: () => {} };
@@ -23,7 +25,7 @@ beforeEach(() => {
     inCheck: { b: false, w: false }, kingSquare: { b: 0, w: 728 }, hash: '0000000000000000' };
   fake.imported.mockReturnValue({ ok: true });
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.clearAllMocks(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.clearAllMocks(); vi.unstubAllGlobals(); });
 function moves() {
   act(() => {
     fake.snap = { ...fake.snap, revision: 1, ply: 1, moveCount: 1, moves: ['575566'], lastMove: '575566', side: 'w' };
@@ -89,4 +91,30 @@ it('gives each square a readable location, side and selection state', () => {
   render(<App />);
   expect(screen.getByRole('button', { name: '5七V 先手 歩' }).getAttribute('aria-pressed')).toBe('false');
   expect(screen.getByRole('button', { name: '5六V 空きマス' })).toBeTruthy();
+});
+
+it('does not send an imported terminal game even if the external store flushes before React state', async () => {
+  const posts: unknown[] = [];
+  vi.stubGlobal('fetch', vi.fn(async (url: string, options?: RequestInit) => {
+    if (url === '/api/collection') return Response.json({ enabled: true, consent: 'game-research-v1' });
+    if (url === '/build-info.json') return Response.json({ commit: 'a'.repeat(40) });
+    const body = JSON.parse(String(options?.body)); posts.push(body);
+    return Response.json({ requestId: body.requestId, status: 'received_unverified' }, { status: 201 });
+  }));
+  render(<App />);
+  await screen.findByTestId('collection-consent');
+  await act(async () => {});
+  expect((screen.getByTestId('collection-consent') as HTMLInputElement).disabled).toBe(false);
+  fireEvent.click(screen.getByTestId('collection-consent'));
+  fake.imported.mockImplementation(() => {
+    fake.record = JSON.stringify({ ruleset_id: 'voxelshogi-standard-v1', initial: '8k/9/K8 b - 1', moves: [], result: { Win: { winner: 'White', reason: 'Resignation' } }, termination: 'Resignation' });
+    flushSync(() => {
+      fake.snap = { ...fake.snap, finished: true, result: { kind: 'win', winner: 'w', reason: 'Resignation' } };
+      for (const fn of fake.listeners) fn();
+    });
+    return { ok: true };
+  });
+  await act(async () => fireEvent.change(screen.getByTestId('import'), { target: { files: [{ size: 10, text: async () => '{}' }] } }));
+  expect(fake.imported).toHaveBeenCalledTimes(1);
+  expect(posts).toEqual([]);
 });
