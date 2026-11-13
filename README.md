@@ -28,9 +28,9 @@ FP32、FP16（重み）、INT8（重み）の実ファイルを選んで比較�
 ### 公開前レビューと対局データ
 
 [Claude Codeを使ったUI/UXレビュー](docs/PUBLIC_LAUNCH_REVIEW.md)を公開しています。初見の観戦開始、層をまたぐ着手の追跡、スマホ幅での盤面の配置に改善候補があり、研究用Alphaとして提供しています。
-[公開準備計画](docs/PUBLIC_LAUNCH_PLAN.md)に各フェーズの目的とゴールをまとめています。現在は観戦導線・着手追跡・狭幅表示の改善を進めています。[動画制作計画](docs/DEMO_VIDEO_PLAN.md)では冒頭3秒と15秒本編を設計しています。15秒本編と3秒候補2本の初稿を生成し、可読性を修正中です。最終動画の納品・公開版との一致確認は未完了で、追加学習は停止したままです。[公開準備の現在地](docs/PUBLIC_LAUNCH_PROGRESS.md)
+[公開準備計画](docs/PUBLIC_LAUNCH_PLAN.md)に各フェーズの目的とゴールをまとめています。観戦導線・着手追跡・狭幅表示・同意制の棋譜保存を公開しました。[動画制作計画](docs/DEMO_VIDEO_PLAN.md)では冒頭3秒と15秒本編を設計しています。15秒本編・3秒候補2本・ポスターを制作し、形式・全編デコード・hash・目視を確認しました。公開版との照合は[L6の記録](docs/L6_PUBLIC_VALIDATION.md)を参照してください。追加学習は停止したままです。[公開準備の現在地](docs/PUBLIC_LAUNCH_PROGRESS.md)
 
-**対局データの送信は任意で、対局ごとにOFFから始まります。** 同意した終局・明示した中断だけをCloudflareへ保存する[実装と運用](docs/GAME_DATA_COLLECTION.md)を追加しています。通常の「保存」は端末へのJSONダウンロードです。公開URLへの反映・確認状況は[進捗](docs/PUBLIC_LAUNCH_PROGRESS.md)を参照してください。[以前の保存調査](docs/CLOUDFLARE_GAME_DATA_AUDIT.md)は2026-11-12時点の記録です。
+**対局データの送信は任意で、対局ごとにOFFから始まります。** 同意した終局・明示した中断だけをCloudflareへ保存する[実装と運用](docs/GAME_DATA_COLLECTION.md)を追加しています。通常の「保存」は端末へのJSONダウンロードです。公開WorkerとD1の保存・再送・hash照合を確認済みです。PC対象の研究用Alphaとして、実スマホと最終PCの差分確認は未完了です。確認状況は[進捗](docs/PUBLIC_LAUNCH_PROGRESS.md)を参照してください。[以前の保存調査](docs/CLOUDFLARE_GAME_DATA_AUDIT.md)は2026-11-12時点の記録です。
 
 ## このプロジェクトで目指すもの
 
