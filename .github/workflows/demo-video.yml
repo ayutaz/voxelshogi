@@ -2,12 +2,15 @@ name: Demo video
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [labeled]
 
 permissions:
   contents: read
 
 jobs:
   record:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'record-demo' && github.event.pull_request.head.repo.full_name == github.repository)
     name: Record the real arena and export the fifteen-second demo
     runs-on: ubuntu-latest
     timeout-minutes: 15

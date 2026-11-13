@@ -81,7 +81,9 @@ X公式の[動画制作の案内](https://business.x.com/en/advertising/creative
 
 ## 実制作の実行と納品確認
 
-`Demo video`は手動だけで起動し、PRごとに録画しない。LinuxでWASMと同じcommitのアプリをbuildし、実際のEasy Worker同士を32手まで進める。
+`Demo video`は手動起動、または同じrepoのPRへ`record-demo`ラベルを付けた時だけ起動し、PRの作成・pushごとには録画しない。
+ラベル起動は取り込み前の候補確認用で、記録の`candidate=true`を保持する。最終納品はmainでの手動起動から生成し直す。
+LinuxでWASMと同じcommitのアプリをbuildし、実際のEasy Worker同士を32手まで進める。
 その中の異層着手を冒頭へ選び、同じ棋譜を履歴で再生する。7〜11秒は実際の1手送り・開始／停止を操作して、最終的に表示した棋譜を保存する。
 これは動画素材のための小さい対局で、停止中の研究データ生成・モデル学習やGPU契約を再開するものではない。
 

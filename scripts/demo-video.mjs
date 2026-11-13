@@ -204,6 +204,7 @@ async function main() {
     render(captured.raw, work, startFrame, sourceRate);
     const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json'];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
+      candidate: process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || process.env.GITHUB_REF !== 'refs/heads/main',
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
       fullRecordReplayedByRust: true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
       performanceMeasurement: false, soundRequired: false,
