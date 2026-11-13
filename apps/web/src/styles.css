@@ -22,7 +22,7 @@ button {
   border-radius: 6px; padding: 6px 10px; cursor: pointer;
 }
 button:hover:not(:disabled) { border-color: #4a5366; }
-button:disabled { opacity: 0.45; cursor: default; }
+button:disabled, button[aria-disabled="true"] { opacity: 0.45; cursor: default; }
 button:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #ffcf71; outline-offset: 3px; }
 summary { cursor: pointer; font-weight: 650; padding: 8px 0; }
 button.primary { background: var(--accent); border-color: var(--accent); }

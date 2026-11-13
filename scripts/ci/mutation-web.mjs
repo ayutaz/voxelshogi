@@ -15,6 +15,12 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  {"name":"collection-native-fetch-receiver","file":"collection/client.ts","before":"fetch.bind(globalThis)","after":"fetch","test":"collection-client"},
+  {"name":"collection-terminal-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"submitted","test":"game-collection-panel","extension":"tsx"},
+  {"name":"collection-sent-consent-control","file":"collection/GameCollectionPanel.tsx","before":" || !!receipt || ","after":" || ","test":"game-collection-panel","extension":"tsx"},
+  {"name":"collection-withdrawn-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"finished","test":"game-collection-panel","extension":"tsx"},
+  {"name":"keyboard-step-busy-guard","file":"App.tsx","before":"if (!stepBusy) aiRef.current?.step();","after":"aiRef.current?.step();","test":"app-launch","extension":"tsx"},
+  {"name":"history-resume-latest","file":"App.tsx","before":"if (snap.ply < snap.moveCount) store.goto(snap.moveCount);","after":"","test":"app-launch","extension":"tsx"},
   { name: 'research-manifest-role', file: 'inference/research-manifest.ts', before: "identity.profile !== 'research-m-v1'", after: 'false', test: 'research-manifest' },
   { name: 'research-manifest-parameters', file: 'inference/research-manifest.ts', before: 'm.parameters !== COUNTS[identity.architecture]', after: 'false', test: 'research-manifest' },
   { name: 'research-manifest-source', file: 'inference/research-manifest.ts', before: 'm.sourceCommit !== identity.sourceCommit', after: 'false', test: 'research-manifest' },
@@ -161,7 +167,7 @@ const mutations = [
   { name: 'collection-daily-cap', file: '../migrations/0001_games.sql', before: 'daily_count >= 1000', after: 'daily_count >= 1001', test: 'game-receiver' },
   { name: 'collection-byte-cap', file: '../migrations/0001_games.sql', before: 'retained_bytes + NEW.payload_bytes > 104857600', after: '1 = 0', test: 'game-receiver' },
   { name: 'collection-client-opt-out', file: 'collection/client.ts', before: 'this.consent = enabled;', after: 'this.consent = true;', test: 'collection-client' },
-  { name: 'collection-imported-record', file: 'collection/GameCollectionPanel.tsx', before: 'disabled={!setup?.available || imported}', after: 'disabled={!setup?.available}', test: 'game-collection-panel', extension: 'tsx' },
+  { name: 'collection-imported-record', file: 'collection/GameCollectionPanel.tsx', before: 'disabled={!setup?.available || imported ||', after: 'disabled={!setup?.available ||', test: 'game-collection-panel', extension: 'tsx' },
   { name: 'collection-import-flush', file: 'App.tsx', before: "if (!ownedRecord.current) throw new Error('imported record');", after: '', test: 'app-launch', extension: 'tsx' },
   { name: 'arena-pause-cancel', file: 'ai/arena-controller.ts', before: 'if (this.pending) this.client.cancel();', after: '', test: 'arena-controller' },
   { name: 'arena-late-success', file: 'ai/arena-controller.ts', before: '}).then((reply) => {\n        if (this.disposed || generation !== this.generation) return;', after: '}).then((reply) => {\n        if (this.disposed) return;', test: 'arena-controller' },
@@ -239,7 +245,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 179);
+    assert.equal(results.length, 185);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

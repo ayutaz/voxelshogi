@@ -3,23 +3,25 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { flushSync } from 'react-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/App';
+import type { AiStatus } from '../src/ai/arena-controller';
 import type { Snapshot } from '../src/game/store';
 
-const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn() }));
+const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: new Set<() => void>(), reset: vi.fn(), imported: vi.fn(), configure: vi.fn(), goto: vi.fn(), step: vi.fn(), status: {} as AiStatus, aiListeners: new Set<() => void>() }));
 vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
   subscribe = (fn: () => void) => { fake.listeners.add(fn); return () => fake.listeners.delete(fn); };
   snapshot = () => fake.snap;
-  newGame = fake.reset;
+  newGame = fake.reset; goto = fake.goto;
   importRecord = fake.imported;
   exportRecord = () => fake.record;
 } }));
 vi.mock('../src/ai/arena-controller', () => ({ DEFAULT_AI_OPTIONS: { seed: 42, limits: { maxDepth: 6, maxNodes: 50000, maxTimeMs: 1000 } }, ArenaController: class {
-  subscribe = () => () => {}; snapshot = () => ({ phase: 'paused', error: null, last: null });
+  subscribe = (fn: () => void) => { fake.aiListeners.add(fn); return () => { fake.aiListeners.delete(fn); }; }; snapshot = () => fake.status; step = fake.step;
   configure = fake.configure; pause = () => {}; resume = () => {}; suspend = () => {}; dispose = () => {};
   journal = { clear: () => {} };
 } }));
 vi.mock('../src/renderer/Board3D', () => ({ Board3D: () => <div data-testid="fake-3d" /> }));
 beforeEach(() => {
+  fake.status = { phase: 'paused', error: null, last: null };
   fake.snap = { revision: 0, side: 'b', ply: 0, moveCount: 0, moves: [], finished: false, result: null,
     lastMove: null, legal: [], board: new Uint8Array(729), hands: new Uint8Array(14),
     inCheck: { b: false, w: false }, kingSquare: { b: 0, w: 728 }, hash: '0000000000000000' };
@@ -117,4 +119,25 @@ it('does not send an imported terminal game even if the external store flushes b
   await act(async () => fireEvent.change(screen.getByTestId('import'), { target: { files: [{ size: 10, text: async () => '{}' }] } }));
   expect(fake.imported).toHaveBeenCalledTimes(1);
   expect(posts).toEqual([]);
+});
+
+
+it('keeps the one-move control focused while busy and ignores repeated activation', () => {
+  render(<App />); const step = screen.getByTestId('ai-step') as HTMLButtonElement; step.focus();
+  act(() => { fake.status = { ...fake.status, phase: 'thinking' }; for (const fn of fake.aiListeners) fn(); });
+  expect(step.disabled).toBe(false); expect(step.getAttribute('aria-disabled')).toBe('true');
+  expect(document.activeElement).toBe(step); fireEvent.click(step); expect(fake.step).not.toHaveBeenCalled();
+  act(() => { fake.status = { ...fake.status, phase: 'paused' }; for (const fn of fake.aiListeners) fn(); });
+  fireEvent.click(step); expect(fake.step).toHaveBeenCalledTimes(1);
+});
+it('returns to the retained latest position before restarting from history', () => {
+  fake.snap = { ...fake.snap, ply: 1, moveCount: 2, moves: ['575566','535544'] };
+  render(<App />); fireEvent.click(screen.getByRole('button', { name: '最新局面から再開' }));
+  expect(fake.goto).toHaveBeenCalledWith(2);
+  expect(fake.configure.mock.calls.at(-1)![0]).toMatchObject({ running: true });
+});
+it('places the current move before the board so layer changes have a visible explanation', () => {
+  const { container } = render(<App />);
+  const board = container.querySelector('.board2d')!;
+  expect(screen.getByTestId('last-move').compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });

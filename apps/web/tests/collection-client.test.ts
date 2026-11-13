@@ -45,3 +45,16 @@ it('suppresses duplicate effect sends while pending and resets state for the nex
   client.newGame(); finish(Response.json({ requestId: frozen().requestId, status: 'received_unverified' }));
   expect((await pending).state).toBe('idle');
 });
+
+it('calls the native browser fetch with its required global receiver', async () => {
+  const nativeLike = vi.fn(function (this: unknown) {
+    if (this !== globalThis) throw new TypeError('Illegal invocation');
+    return Promise.resolve(Response.json({ requestId: frozen().requestId, status: 'received_unverified' }));
+  });
+  vi.stubGlobal('fetch', nativeLike);
+  try {
+    const client = new SubmissionClient(); client.setConsent(true);
+    expect((await client.send(frozen())).state).toBe('sent');
+    expect(nativeLike).toHaveBeenCalledTimes(1);
+  } finally { vi.unstubAllGlobals(); }
+});

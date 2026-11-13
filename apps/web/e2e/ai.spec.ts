@@ -287,6 +287,12 @@ test('keyboard starts and stops viewing, saves a record, and selects or cancels 
   await expect(page.getByTestId('status')).not.toHaveText('1手目 ☗先手の番');
   await expect(toggle).toBeFocused(); await page.keyboard.press('Enter');
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  const step = page.getByTestId('ai-step');
+  const before = await page.getByTestId('status').textContent();
+  await step.focus(); await page.keyboard.press('Enter');
+  await expect(page.getByTestId('status')).not.toHaveText(before!);
+  await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  await expect(step).toBeFocused();
   const downloading = page.waitForEvent('download');
   await page.getByRole('button', { name: '保存', exact: true }).focus(); await page.keyboard.press('Enter');
   const saved = Buffer.concat(await (await (await downloading).createReadStream()).toArray()).toString('utf8');

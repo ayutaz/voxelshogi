@@ -13,7 +13,8 @@ test('consent is OFF by default and a completed game is not sent retroactively',
   await expect(page.getByTestId('collection-consent')).not.toBeChecked();
   await page.getByRole('button', { name: '投了', exact: true }).click();
   await expect(page.getByTestId('status')).toContainText('後手の勝ち');
-  await page.getByTestId('collection-consent').check();
+  await expect(page.getByTestId('collection-consent')).toBeDisabled();
+  await expect(page.getByText(/終局後に送信をONにはできません/)).toBeVisible();
   await expect(page.getByTestId('ai-phase')).toHaveText('対局終了');
   expect(posts).toBe(0);
 });
