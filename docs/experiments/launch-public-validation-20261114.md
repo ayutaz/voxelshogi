@@ -1,6 +1,6 @@
 # 公開検証の固定記録
 
-公開run・実配信・画像を確認した値。最終PC操作は撮影の承認待ちで、L6全完了にはしていない。
+公開run・実配信・画像と最終PC操作を確認した値。L1〜L6は元計画の代替条件に従いPC対象Alphaとして完了。実スマホは未確認。
 
 ```json
 {
@@ -130,10 +130,12 @@
     }
   ],
   "nativeFinalReview": {
-    "status": "pending-explicit-screenshot-approval",
+    "status": "passed-with-accessibility-observation-without-screenshots",
+    "appCommit": "c878c6d08572caa2da2d0cf654caa85ba7dfd501",
     "baselineCommit": "2d1d4c93fd0d3138f6f7217402e493f9f5aaf664",
-    "finalInitialScreenAxSeen": true,
-    "scope": "initial screen only on final commit; full actual interaction proved on baseline; final delta check pending"
+    "at": "2026-11-13T20:25:00Z",
+    "report": "launch-native-final-20261114.md",
+    "scope": "actual Easy start, pause, step, keyboard step, layer change, human vs Easy, local JSON save and non-consenting resignation; no window screenshot"
   },
   "physicalPhone": {
     "available": false,

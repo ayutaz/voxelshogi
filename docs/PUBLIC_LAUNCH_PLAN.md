@@ -3,7 +3,7 @@
 2026-11-13 JST。[Claude CodeのUI/UXレビュー](PUBLIC_LAUNCH_REVIEW.md)と[Cloudflare保存調査](CLOUDFLARE_GAME_DATA_AUDIT.md)に基づく提案。
 レビュー文書の[PR #177](https://github.com/ayutaz/voxelshogi/pull/177)は必須8件・関連CI成功、重大CodeQL指摘0を確認して通常merge済み。
 計画の基準mainは`6d1e2a952dc61e56cdec345724b1bcc699987111`。
-**2026-11-14、ユーザー指定でL1〜L6の実行を開始。** [現在地と検証](PUBLIC_LAUNCH_PROGRESS.md)を参照。L7のX投稿は今回の範囲外。
+**2026-11-14、ユーザー指定のL1〜L6をPC対象の研究用Alphaとして完了。実スマホは未確認。** [現在地と検証](PUBLIC_LAUNCH_PROGRESS.md)を参照。L7のX投稿は今回の範囲外。
 
 ## 目的と公開時のゴール
 
