@@ -7,6 +7,10 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'video-first-content-frame', file: 'scripts/demo-video.mjs', before: 'else if (green >= 3) return frame;', after: 'else if (green >= 3) return frame + 1;', test: 'demo-video' },
+  { name: 'video-cross-layer-hook', file: 'scripts/demo-video.mjs', before: 'move[2] !== move[5]', after: 'move[2] === move[5]', test: 'demo-video' },
+  { name: 'video-duration-proof', file: 'scripts/demo-video.mjs', before: 'Math.abs(Number(probe.format.duration) - seconds) <= 1 / 30', after: 'true', test: 'demo-video' },
+  { name: 'video-frame-count', file: 'scripts/demo-video.mjs', before: 'assert.equal(Number(stream.nb_frames), seconds * 30);', after: '', test: 'demo-video' },
   { name: 'research-channel-progress-not-terminal', file: 'scripts/research-browser-channel.mjs', before: "message.status === 'progress'", after: 'false', test: 'research-browser-channel' },
   { name: 'research-channel-timeout-stage', file: 'scripts/research-browser-channel.mjs', before: "progress.at(-1)?.stage ?? 'worker-start'", after: "'worker-start'", test: 'research-browser-channel' },
   { name: 'research-channel-worker-release', file: 'scripts/research-browser-channel.mjs', before: 'cancel(timer);worker.terminate();', after: 'cancel(timer);', test: 'research-browser-channel' },
