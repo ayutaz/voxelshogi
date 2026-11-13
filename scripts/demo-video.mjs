@@ -51,6 +51,10 @@ main{display:block!important;padding:0!important;overflow:hidden!important;width
 .views{position:absolute!important;left:0!important;top:200px!important;width:1080px!important;height:950px!important;min-height:950px!important;display:block!important}
 .board3d{width:1080px!important;height:950px!important;min-height:950px!important;border:0!important;border-radius:0!important}
 `;
+const controlsComposition = `
+html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#0f1115!important}
+.app{padding-top:190px!important}
+`;
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const web = join(root, 'apps/web');
 const run = (command, args, options = {}) => {
@@ -99,6 +103,14 @@ async function record(work, commit) {
       await page.getByTestId('move-list').locator('button').nth(ply).evaluate(button => button.click());
       await page.waitForFunction(expected => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${expected + 1}手目`), ply);
     };
+    const orbit = async (horizontal, vertical) => {
+      const box = await page.getByTestId('board3d').locator('canvas').boundingBox();
+      assert.ok(box && box.height > 0, 'real canvas bounds required');
+      const x = box.x + box.width / 2, y = box.y + box.height / 2;
+      await page.mouse.move(x, y); await page.mouse.down();
+      await page.mouse.move(x + box.height * horizontal, y + box.height * vertical, { steps: 10 });
+      await page.mouse.up();
+    };
     await page.getByRole('button', { name: '立体で見る', exact: true }).click();
     await page.getByLabel('全層を同じ濃さで表示').check();
     await go(hook - 1);
@@ -106,6 +118,7 @@ async function record(work, commit) {
     let style = await page.addStyleTag({ content: composition });
     await page.getByTestId('board3d').waitFor();
     await page.waitForFunction(() => document.querySelector('[data-testid="board3d"]')?.getAttribute('data-ready') === 'true');
+    await orbit(0.05, -0.08); // Show the nine layers from the side using actual OrbitControls.
     await delay(1000);
     await page.evaluate(() => {
       const marker = document.createElement('div'); marker.id = 'recording-marker';
@@ -115,13 +128,16 @@ async function record(work, commit) {
     await page.evaluate(() => document.getElementById('recording-marker').remove());
     const began = performance.now();
     const at = async milliseconds => { assert.ok(performance.now() - began < milliseconds + 1500, 'recording missed its story timing'); await delay(Math.max(0, milliseconds - (performance.now() - began))); };
-    await at(700); await go(hook);
+    await at(700);
+    await page.getByLabel('全層を同じ濃さで表示').evaluate(checkbox => checkbox.click());
+    await go(hook);
     assert.ok(performance.now() - began < 1700, 'hook move arrived too late for the first three seconds');
     await at(3000);
-    await page.getByLabel('全層を同じ濃さで表示').evaluate(checkbox => checkbox.click());
     await go(hook + 1);
     await at(5000); await go(hook + 2);
     await at(7000); await style.evaluate(node => node.remove());
+    const controlsStyle = await page.addStyleTag({ content: controlsComposition });
+    await orbit(-0.05, 0.08);
     // A single step explicitly branches from history; continuous play alone
     // intentionally refuses to discard the retained future branch.
     await page.getByTestId('ai-step').click();
@@ -131,7 +147,7 @@ async function record(work, commit) {
     await page.getByTestId('toggle-run').click();
     await at(9000); await page.getByTestId('ai-step').click();
     await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 5);
-    await at(11000); style = await page.addStyleTag({ content: composition });
+    await at(11000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
     await at(15400);
     conditions = await exportRecord('source-ai-record.json');
     assert.equal(conditions.applicationCommit, commit);
@@ -158,7 +174,7 @@ function render(raw, work, startFrame, sourceRate) {
   ], agents: lines['agents.txt'], alternativeHook: lines['hook-b.txt'] }, null, 2) + '\n');
   const text = (file, y, size, enable) => `drawtext=fontfile=${font}:textfile=${file}:x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=white:borderw=3:bordercolor=0x0f1115${enable ? `:enable='${enable}'` : ''}`;
   const timeline = `trim=start_frame=${startFrame},setpts=PTS-STARTPTS,fps=30`;
-  const draw = [text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
+  const draw = ["drawbox=x=0:y=1240:w=iw:h=110:color=0x0f1115:t=fill:enable='gte(t,7)*lt(t,11)'", text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
     text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 78, 'gte(t,11)'),
     text('url.txt', 1190, 43, 'gte(t,11)'), text('alpha.txt', 1260, 30, 'gte(t,11)'),
     text('agents.txt', 1280, 30, 'lt(t,11)')];
@@ -172,6 +188,10 @@ function render(raw, work, startFrame, sourceRate) {
   encode('hook-a.mp4', 3, [text('hook-a.txt', 76, 78), text('agents.txt', 1280, 30)]);
   encode('hook-b.mp4', 3, ["zoompan=z='1.12-0.12*min(on/89,1)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1080x1350:fps=30", text('hook-b.txt', 76, 72), text('agents.txt', 1280, 30)]);
   run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', 'demo-main.mp4', '-frames:v', '1', 'poster.png'], { cwd: work });
+  // A real board frame on the right, with sharing copy outside the board.
+  const ogpText = (file, y, size) => `drawtext=fontfile=${font}:textfile=${file}:x=40:y=${y}:fontsize=${size}:fontcolor=white`;
+  run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', 'demo-main.mp4', '-vf',
+    ['crop=1080:950:0:200', 'scale=650:572', 'pad=1200:630:550:29:color=0x0f1115', ogpText('hook-a.txt', 190, 46), ogpText('watch.txt', 290, 30), ogpText('alpha.txt', 390, 26)].join(','), '-frames:v', '1', 'ogp.png'], { cwd: work });
   run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', 'demo-main.mp4', '-vf', "select='eq(n,0)+eq(n,21)+eq(n,45)+eq(n,87)+eq(n,225)+eq(n,345)',scale=360:450,tile=3x2", '-frames:v', '1', 'contact-sheet.png'], { cwd: work });
 }
 
@@ -202,7 +222,7 @@ async function main() {
     const startFrame = contentStartFrame(pixels.stdout);
     assert.ok(Number(rawProbe.format.duration) - startFrame / sourceRate >= 15, 'not enough real footage');
     render(captured.raw, work, startFrame, sourceRate);
-    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json'];
+    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json'];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
       candidate: process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || process.env.GITHUB_REF !== 'refs/heads/main',
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],

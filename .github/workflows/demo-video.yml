@@ -53,6 +53,7 @@ jobs:
             ${{ runner.temp }}/demo-video/demo-main.mp4
             ${{ runner.temp }}/demo-video/hook-a.mp4
             ${{ runner.temp }}/demo-video/hook-b.mp4
+            ${{ runner.temp }}/demo-video/ogp.png
             ${{ runner.temp }}/demo-video/poster.png
             ${{ runner.temp }}/demo-video/contact-sheet.png
             ${{ runner.temp }}/demo-video/source-ai-record.json
