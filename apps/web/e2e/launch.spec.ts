@@ -30,8 +30,9 @@ for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).not.toHaveText(beforeStep!);
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-    const snapshot = await page.screenshot({ fullPage: true });
-    await info.attach(`launch-${width}`, { body: snapshot, contentType: 'image/png' });
+    const path = info.outputPath(`attachments/launch-${width}.png`);
+    await page.screenshot({ path, fullPage: true });
+    await info.attach(`launch-${width}`, { path, contentType: 'image/png' });
     expect(errors).toEqual([]);
   });
 }
@@ -96,4 +97,15 @@ test('a legal fixed record follows both colors across layers, undo/redo, OFF and
   await expect(page.getByTestId('slice-index')).toHaveValue('0'); // White stays on I
   await page.getByTestId('undo').click();
   await expect(page.getByTestId('slice-index')).toHaveValue('8'); // Black stays on IX
+});
+
+test('the public sharing metadata refers to a real board PNG', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', '将棋、9層にした。｜VoxelShogi Arena');
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+  const image = await page.request.get('/social/voxelshogi.png');
+  expect(image.ok()).toBe(true); expect(image.headers()['content-type']).toContain('image/png');
+  const bytes = await image.body();
+  expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+  expect([bytes.readUInt32BE(16), bytes.readUInt32BE(20)]).toEqual([1200, 630]);
 });

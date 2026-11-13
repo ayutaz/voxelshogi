@@ -59,6 +59,7 @@ export function App() {
 
   const controller: Controller = MODES[mode][snap.side];
   const humanTurn = controller === 'human' && !snap.finished;
+  const stepBusy = aiStatus.phase === 'thinking' || aiStatus.phase === 'waiting';
   const aiOptions = useMemo(() => ({ ...DEFAULT_AI_OPTIONS, mode, running, delayMs: delay,
     bDifficulty: difficulty.b, wDifficulty: difficulty.w, bModel: modelSeat(library, 'b'), wModel: modelSeat(library, 'w'),
     limits: { ...DEFAULT_AI_OPTIONS.limits, maxTimeMs: budgetMs } }), [mode, running, delay, difficulty, budgetMs, library]);
@@ -329,14 +330,15 @@ export function App() {
         </section>
         <div className="watch playback" aria-label="観戦操作">
           <div className="row">
-            <button type="button" onClick={() => running ? pause() : setRunning(true)} className="primary" data-testid="toggle-run" disabled={snap.finished}>
-              {running ? '一時停止' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}
+            <button type="button" onClick={() => { if (running) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>
+              {running ? '一時停止' : snap.ply < snap.moveCount ? '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}
             </button>
             <button
               type="button"
               data-testid="ai-step"
-              disabled={running || snap.finished || humanTurn || aiStatus.phase === 'thinking' || aiStatus.phase === 'waiting' || !!aiStatus.error}
-              onClick={() => aiRef.current?.step()}
+              disabled={running || snap.finished || humanTurn || !!aiStatus.error}
+              aria-disabled={stepBusy}
+              onClick={() => { if (!stepBusy) aiRef.current?.step(); }}
             >
               1手指す
             </button>
@@ -346,6 +348,7 @@ export function App() {
             <input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={(e) => setDelay(Number(e.target.value))} />
           </label>
           <p data-testid="ai-phase">{phaseText}</p>
+          <p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p>
           {aiStatus.phase === 'thinking' && <button type="button" data-testid="cancel-search" onClick={pause}>思考を中断</button>}
           {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
           {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
@@ -374,7 +377,6 @@ export function App() {
         </div>
         {sideHands('b')}
         <section className="move-focus" aria-label="表示中の着手">
-          <p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p>
           <label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} />直前手の層を追う</label>
           <p className="muted">{follow ? '着手先の層へ自動で切り替えます。層を手動で変えると追従をOFFにします。' : '手動表示中。追従をONにすると表示中の着手先へ戻ります。'}</p>
           {selection.type !== 'none' && <div className="row" aria-label="層ごとの移動先">{targetCounts.map((count, z) => count > 0 && <button type="button" key={z} onClick={() => { manualView(); setSlice({ axis: 'z', index: z }); setLayers({ ...layers, z }); }}>{ROMAN[z]}層：{count}マス</button>)}</div>}

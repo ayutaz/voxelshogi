@@ -13,6 +13,7 @@ export function GameCollectionPanel({ mode, selectedAgents, getRecord, finished,
   const [setup, setSetup] = useState<{ available: boolean; commit: string } | null>(null);
   const [error, setError] = useState(false);
   const [receipt, setReceipt] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const requestId = useRef(crypto.randomUUID());
   const terminalSeen = useRef(false);
   useEffect(() => {
@@ -39,6 +40,7 @@ export function GameCollectionPanel({ mode, selectedAgents, getRecord, finished,
       const packet = { schema: 1, requestId: requestId.current, consent: COLLECTION_CONSENT, ending,
         applicationCommit: setup.commit, mode, conditionsScope: 'selected-at-submission', selectedAgents, record };
       if (!isGameSubmission(packet)) throw new Error('invalid submission');
+      setSubmitted(true);
       const result = await client.send(packet);
       if (result.state === 'sent') setReceipt(packet.requestId);
     } catch { setError(true); }
@@ -52,9 +54,10 @@ export function GameCollectionPanel({ mode, selectedAgents, getRecord, finished,
   return <section className="collection-panel" aria-label="対局データの送信">
     <h2>対局データの送信（任意）</h2>
     <label className="check"><input type="checkbox" data-testid="collection-consent" checked={checked}
-      disabled={!setup?.available || imported} onChange={event => { const next = event.target.checked; setChecked(next); client.setConsent(next); setError(false); }} />
+      disabled={!setup?.available || imported || !!receipt || (!checked && (finished || submitted))} onChange={event => { const next = event.target.checked; setChecked(next); client.setConsent(next); setError(false); }} />
       この対局の棋譜とAI設定を、改善調査のため送信する</label>
     <p className="muted">既定はOFFです。拒否しても遊べます。ONにした対局の終局時、または下の中断操作時に1回送ります。保持は30日が目安。学習やHF公開へ自動利用しません。<a href="/privacy.html" target="_blank" rel="noreferrer">送信内容・保持・削除の案内</a></p>
+    {receipt ? <p className="muted">この対局は送信済みです。別の棋譜は送信しません。</p> : !checked && finished ? <p className="muted">終局後に送信をONにはできません。次の対局で開始前に選んでください。</p> : submitted && !checked ? <p className="muted">送信を停止しました。再開する場合は新しい対局で同意してください。</p> : null}
     {imported ? <p className="muted">読み込んだ棋譜は送信しません。</p> : setup && !setup.available ? <p className="muted">サーバー送信は現在利用できません。棋譜は端末へ保存できます。</p> : null}
     <button type="button" data-testid="collection-abort" disabled={!checked || !canAbort || imported || status.state !== 'idle' || !setup?.available}
       onClick={() => { onAbort(); void capture('aborted'); }}>ここまでを中断棋譜として送信</button>

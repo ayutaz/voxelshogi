@@ -535,6 +535,11 @@ jobs:
         if: needs.scope.outputs.web == 'true'
       - run: pnpm exec playwright install chromium
         if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
+      - name: Install Japanese fonts for layout evidence
+        if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true')
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
       - name: Verify approved distribution with real model E2E
         if: needs.scope.outputs.deep == 'true' && (needs.scope.outputs.web == 'true' && (steps.model_policy.outputs.publication == 'true'))
         run: pnpm exec playwright test -c model-playwright.config.ts

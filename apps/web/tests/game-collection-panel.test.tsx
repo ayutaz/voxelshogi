@@ -68,3 +68,33 @@ it('retries a frozen failed submission without changing the record or selected A
   await screen.findByText(/保存されました/);
   expect(posts).toEqual([failedBody]);
 });
+
+it('explains that consent cannot start after the game has ended', async () => {
+  const mounted = render(<GameCollectionPanel {...props()} />); await ready();
+  mounted.rerender(<GameCollectionPanel {...props()} finished />);
+  expect((screen.getByTestId('collection-consent') as HTMLInputElement).disabled).toBe(true);
+  expect(screen.getByText(/終局後に送信をONにはできません/)).toBeTruthy(); expect(posts).toEqual([]);
+});
+it('keeps a sent game frozen even if it later reaches a different ending', async () => {
+  const original = props(), mounted = render(<GameCollectionPanel {...original} />); await ready();
+  fireEvent.click(screen.getByTestId('collection-consent')); fireEvent.click(screen.getByTestId('collection-abort'));
+  await screen.findByText(/保存されました/);
+  expect((screen.getByTestId('collection-consent') as HTMLInputElement).disabled).toBe(true);
+  const final = { ...record, result: { Win: { winner: 'Black', reason: 'Resignation' } }, termination: 'Resignation' };
+  mounted.rerender(<GameCollectionPanel {...original} finished getRecord={() => JSON.stringify(final)} />);
+  await act(async () => {}); expect(posts).toHaveLength(1);
+});
+it('allows withdrawing a pending send and prevents a different payload for the same game', async () => {
+  let finish!: (response: Response) => void;
+  render(<GameCollectionPanel {...props()} />); await ready();
+  vi.mocked(fetch).mockImplementationOnce((_path, options) => new Promise<Response>(resolve => {
+    expect(options?.signal?.aborted).toBe(false); finish = resolve;
+  }));
+  fireEvent.click(screen.getByTestId('collection-consent')); fireEvent.click(screen.getByTestId('collection-abort'));
+  await screen.findByText(/棋譜を送信中/);
+  fireEvent.click(screen.getByTestId('collection-consent'));
+  expect((screen.getByTestId('collection-consent') as HTMLInputElement).disabled).toBe(true);
+  expect(screen.getByText(/再開する場合は新しい対局/)).toBeTruthy();
+  await act(async () => finish(Response.json({ error: 'cancelled' }, { status: 503 })));
+  expect(screen.queryByText(/保存されました/)).toBeNull();
+});

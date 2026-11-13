@@ -1,0 +1,295 @@
+{
+  "sourceCommit": "d9d1ff2b99e5c1df7cd003267f31d0f1e8949a8b",
+  "files": [
+    {
+      "file": "apps/web/index.html",
+      "bytes": 661,
+      "sha256": "ce48f64db30512ca1c6e12768934fa41a9ec912d3a1cdeea14f53de63d69ac91"
+    },
+    {
+      "file": "apps/web/public/privacy.html",
+      "bytes": 3210,
+      "sha256": "de3be548809158e5f903b4562bb02d85e56c8b6a42aa8fab8bab032416ac5dc1"
+    },
+    {
+      "file": "apps/web/src/App.tsx",
+      "bytes": 26991,
+      "sha256": "ed9c16fbc2418d936d90e9e6c795bb7d3e60441c0e223d3ca9399abbc41a6246"
+    },
+    {
+      "file": "apps/web/src/ai/arena-client.ts",
+      "bytes": 4550,
+      "sha256": "68317fceb6adc25f0ce29c5e2dc47dc445b12e0a45999560483e009b11666ba7"
+    },
+    {
+      "file": "apps/web/src/ai/arena-controller.ts",
+      "bytes": 8875,
+      "sha256": "4c07697438afcc1f78d7316a4b5e5eeb8c0bd7587af3b35c2d28b67609c754f5"
+    },
+    {
+      "file": "apps/web/src/ai/arena-model.ts",
+      "bytes": 1249,
+      "sha256": "4079fdf50034422b25312fc9c72edb50cdfe019eac478d219da9195cb9ecc02e"
+    },
+    {
+      "file": "apps/web/src/ai/arena-record.ts",
+      "bytes": 3991,
+      "sha256": "09d69a38a90324ff4e5325d44e8fc01d39eeae493e31993cb919d472af130b6a"
+    },
+    {
+      "file": "apps/web/src/ai/model-library.ts",
+      "bytes": 3087,
+      "sha256": "980903a405427493e606bdd5fc5feffb2f2ac02a2db5a4b7d03d990824ab60ee"
+    },
+    {
+      "file": "apps/web/src/ai/random.ts",
+      "bytes": 646,
+      "sha256": "3ad00d0b8f8161787db8491128c4591dedd09c22e55e390721f3334079ffede9"
+    },
+    {
+      "file": "apps/web/src/ai/search-client.ts",
+      "bytes": 3201,
+      "sha256": "5505784885f22c6753b87a974c0aa51576f4f6f70249115be0da712795f37949"
+    },
+    {
+      "file": "apps/web/src/ai/search-engine.ts",
+      "bytes": 2507,
+      "sha256": "2c26281cbabdffc729c20e8818385023e4091e58f968685aa77a2ed7a9971fef"
+    },
+    {
+      "file": "apps/web/src/ai/search-protocol.ts",
+      "bytes": 7210,
+      "sha256": "34f4842ab2cbafbcbc5586e9b369e270d44099f7aa10e6489280d4dbd8fe2dcd"
+    },
+    {
+      "file": "apps/web/src/ai/search.worker.ts",
+      "bytes": 565,
+      "sha256": "fbb805c9cc6799a2a341d0064ef9a145768e0589727dde47b0550dc4b3d2c82e"
+    },
+    {
+      "file": "apps/web/src/collection/GameCollectionPanel.tsx",
+      "bytes": 5383,
+      "sha256": "6df9e03d044fc2f90c137b912209352005eb6bcc1f5a865b424d567053be44af"
+    },
+    {
+      "file": "apps/web/src/collection/agents.ts",
+      "bytes": 1310,
+      "sha256": "151571f9c65132255d4f9e20c74a4a1644795c8768550fc70a95fb44ac4b0f6e"
+    },
+    {
+      "file": "apps/web/src/collection/client.ts",
+      "bytes": 2970,
+      "sha256": "5e54f040c34e6904106e53e057f3298980fa6b6396a62883ec1fec90c4618aa1"
+    },
+    {
+      "file": "apps/web/src/collection/contract.ts",
+      "bytes": 5050,
+      "sha256": "832deb44193e80b536e721e1f8242a540af74b0a66fdcacb0b50a2643f6890b1"
+    },
+    {
+      "file": "apps/web/src/collection/receiver.ts",
+      "bytes": 4244,
+      "sha256": "f2335018abe90415dd564a17c38c45b5cfe249b697fcf00b6067e742d06dae18"
+    },
+    {
+      "file": "apps/web/src/collection/worker.ts",
+      "bytes": 1177,
+      "sha256": "f27f3ec460f46a73cf756bcfbe41fef3bd93f0dc64689775dcf75fd894845272"
+    },
+    {
+      "file": "apps/web/src/components/Board2D.tsx",
+      "bytes": 3344,
+      "sha256": "0469ad660e9b92f0be399f128b597001f78f7409ff0e0dcb357dda4c4fc269f0"
+    },
+    {
+      "file": "apps/web/src/components/Panels.tsx",
+      "bytes": 4146,
+      "sha256": "0d8485bdd9a3e552f626d52335145d33ffdf74e40db31d80e009e8bc0014c983"
+    },
+    {
+      "file": "apps/web/src/experiment/ExperimentViewer.tsx",
+      "bytes": 16994,
+      "sha256": "d26e05b49ee97a6eb5c761286edd34811f47f4ecea1285b818912073d18179eb"
+    },
+    {
+      "file": "apps/web/src/experiment/experiment.css",
+      "bytes": 5705,
+      "sha256": "3621840c9768e782b7a717d849ea898361e5a69c5c90ff31f1e5d02f0e7e0251"
+    },
+    {
+      "file": "apps/web/src/experiment/integrity.ts",
+      "bytes": 475,
+      "sha256": "6a3e4a483fc10369e5c3475ecc782aee85767ffcc5af2ea37a6a9589c53d2b72"
+    },
+    {
+      "file": "apps/web/src/game/boardSnapshot.ts",
+      "bytes": 201,
+      "sha256": "17d08accd892aa517bf46f593c3238b065a3f333d98a1bfb0cd8dcb44c4c577c"
+    },
+    {
+      "file": "apps/web/src/game/interaction.ts",
+      "bytes": 2256,
+      "sha256": "6b9b93e4a5387089e86ceed7d580b9091620be5bc61ac557e2ea9b1970536520"
+    },
+    {
+      "file": "apps/web/src/game/model.ts",
+      "bytes": 5253,
+      "sha256": "d28187b1c392700b8c946b0b203f045b0def5b3551017590b9afcdfce9b06118"
+    },
+    {
+      "file": "apps/web/src/game/spectator.ts",
+      "bytes": 754,
+      "sha256": "e8c57791d8a45ff64489006bbabb5897949d80c58eddb7b6eb2ca8ed0f95bab9"
+    },
+    {
+      "file": "apps/web/src/game/store.ts",
+      "bytes": 4540,
+      "sha256": "9e40dfaab4be27f3f82f8925f0c797bbefc1f8711ff78b8837703b3a99042d44"
+    },
+    {
+      "file": "apps/web/src/inference/ModelDemo.tsx",
+      "bytes": 10647,
+      "sha256": "b32e4c9daef1e7c5ff159b84b7cf588cee6582e2f8a3f5f44bc01c1768db8ca1"
+    },
+    {
+      "file": "apps/web/src/inference/ModelLibraryPanel.tsx",
+      "bytes": 5172,
+      "sha256": "3efce29aa5397c9f951f8c7d4320c6685f33a2bef53a95510d18ce2d4acc1274"
+    },
+    {
+      "file": "apps/web/src/inference/assets.ts",
+      "bytes": 3143,
+      "sha256": "aac218243aad3325fb5d501f118f5aa12e470d85e83f26db59d4f4cc3c48f19c"
+    },
+    {
+      "file": "apps/web/src/inference/backend.ts",
+      "bytes": 5471,
+      "sha256": "4e9b26a22acdfd7f2482d197a9707552f819e3eae342d8292640cc8698d43bb8"
+    },
+    {
+      "file": "apps/web/src/inference/client.ts",
+      "bytes": 7203,
+      "sha256": "1626759ec5070e116fb7ff9317f2b5bf304327353a40148355cad27fc4b437ff"
+    },
+    {
+      "file": "apps/web/src/inference/engine.ts",
+      "bytes": 9099,
+      "sha256": "12c867456551c1ad9f2a4a8746896992cbe579a8fc4d284c948219000059253c"
+    },
+    {
+      "file": "apps/web/src/inference/inference.worker.ts",
+      "bytes": 995,
+      "sha256": "6c6f5884744c79a2b17f695a7ac775e2542b70906b3ee42cc356841995eb4fa0"
+    },
+    {
+      "file": "apps/web/src/inference/local-model.ts",
+      "bytes": 8804,
+      "sha256": "6307449b75d946f5ebca5b14c587928a6e69afbc4730192c05ff0e8873ecf8e3"
+    },
+    {
+      "file": "apps/web/src/inference/manifest.ts",
+      "bytes": 9953,
+      "sha256": "648a0a9800486598f6a8c92b9da9549e33aeeeb6019a818cdd6fe5911075acba"
+    },
+    {
+      "file": "apps/web/src/inference/model-demo.css",
+      "bytes": 1632,
+      "sha256": "39d61bfb5cbee077b34401e915cf39eea5177c87ca841db62b4e65c99b61b559"
+    },
+    {
+      "file": "apps/web/src/inference/numeric.ts",
+      "bytes": 702,
+      "sha256": "6b87a0121110a8e3c7f337638a3e46896db67a4eb14f64600946f82d2475f641"
+    },
+    {
+      "file": "apps/web/src/inference/options.ts",
+      "bytes": 472,
+      "sha256": "0cc0df7c9009bacce47fbc2fc6a6051017b4d2aa6b7b0ae21fc9333385de2344"
+    },
+    {
+      "file": "apps/web/src/inference/policy-client.ts",
+      "bytes": 4838,
+      "sha256": "52e7820b77dfc406a329a9f8e1d1dfea88b2d6db942352ac97d1d8879ad578ea"
+    },
+    {
+      "file": "apps/web/src/inference/policy-contract.ts",
+      "bytes": 3379,
+      "sha256": "f0b9fe8cf25a6ba18546fa05860d125dd8c69452f5023241473826d04d884abd"
+    },
+    {
+      "file": "apps/web/src/inference/policy-factory.ts",
+      "bytes": 2396,
+      "sha256": "1ab8b5c4fe7a581cbb46c805f84682f6b7221d837a390b5d1ab2bf2bdb3c81f2"
+    },
+    {
+      "file": "apps/web/src/inference/policy-host.ts",
+      "bytes": 4049,
+      "sha256": "7dcc075f6a2b9770b79db952a76bb0896cf6e2e6fb714db0fbc95e0a0a8dbab9"
+    },
+    {
+      "file": "apps/web/src/inference/policy-protocol.ts",
+      "bytes": 9168,
+      "sha256": "06cb46eba5028bc0365d7819e6b689c6f4a99227fae12f436c7cae149a89f09f"
+    },
+    {
+      "file": "apps/web/src/inference/policy-session.ts",
+      "bytes": 10136,
+      "sha256": "bc6e33f07277c8ec4472677160d0d08ed3fb732d08e6d43106484fc74902098a"
+    },
+    {
+      "file": "apps/web/src/inference/policy.worker.ts",
+      "bytes": 446,
+      "sha256": "4a1b3a61a1490d764d0672230b1ea36259f6dcd81cbf65ee6133ced418228d01"
+    },
+    {
+      "file": "apps/web/src/inference/profile.ts",
+      "bytes": 650,
+      "sha256": "f81cbe18cbe3d8e82db9d9ae982c1e1952881bf13e833b79e3e16cb138f9f81b"
+    },
+    {
+      "file": "apps/web/src/inference/research-manifest.ts",
+      "bytes": 8489,
+      "sha256": "2ac8346e06ba4ca005c656f7dbc780fb2efb975247214ac274cc4c54a0764067"
+    },
+    {
+      "file": "apps/web/src/inference/resources.ts",
+      "bytes": 1175,
+      "sha256": "c581d75caea199d349bfd0e7d80b27c50ae645f25cad472d49765d878e15f98f"
+    },
+    {
+      "file": "apps/web/src/inference/runtime.ts",
+      "bytes": 2894,
+      "sha256": "abc1b189ed9389f6f350fa8d398b662573c5a716fa4ff19233db00bc87148eef"
+    },
+    {
+      "file": "apps/web/src/main.tsx",
+      "bytes": 1108,
+      "sha256": "e38e6c1e36bbff7a79bd8e51514b9da1299df1a034a08935c9fa2d778ca3bac2"
+    },
+    {
+      "file": "apps/web/src/navigation.ts",
+      "bytes": 367,
+      "sha256": "b537f73cc5e2011f89f5de3aa46c5721bad4909883dc86a91a7a2bd8161351c6"
+    },
+    {
+      "file": "apps/web/src/renderer/Board3D.tsx",
+      "bytes": 9032,
+      "sha256": "9e285f981e7f3719f4f4d5519ccc75f0780c65a384f4aac3fd29433b18eb49c2"
+    },
+    {
+      "file": "apps/web/src/renderer/RenderReady.tsx",
+      "bytes": 629,
+      "sha256": "3c2aaa41586dc8687c3d782b3977f31be8587617705ec34fef4182648a44e708"
+    },
+    {
+      "file": "apps/web/src/renderer/useTrailMotion.ts",
+      "bytes": 988,
+      "sha256": "6753b0594d493ffe36845461bcb7e2a653853a5683c755c689db841c94a51be4"
+    },
+    {
+      "file": "apps/web/src/styles.css",
+      "bytes": 6436,
+      "sha256": "6743ec2743c62be71623b9439da15b8ef5f3bbea08977d0fc6eb3aacee524d45"
+    }
+  ]
+}

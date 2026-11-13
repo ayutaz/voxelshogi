@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { formatMove, handCounts, HAND_KINDS, type Color, type HandKind } from '../game/model';
 import type { Selection } from '../game/interaction';
 import type { ResultInfo, Snapshot } from '../game/store';
@@ -41,8 +42,24 @@ export function Hands({
 }
 
 export function PromotionDialog({ onChoose, onCancel }: { onChoose: (promote: boolean) => void; onCancel: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const previous = document.activeElement;
+    dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    return () => { if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };
+  }, []);
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="成りの選択">
+    <div ref={dialog} className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="成りの選択" onKeyDown={event => {
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onCancel(); }
+      if (event.key === 'Tab' && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        const buttons = Array.from(dialog.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? []);
+        if (!buttons.length) return;
+        event.preventDefault();
+        const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const next = current < 0 ? (event.shiftKey ? buttons.length - 1 : 0) : (current + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length;
+        buttons[next]!.focus();
+      }
+    }}>
       <div className="dialog">
         <p>成りますか？</p>
         <div className="row">

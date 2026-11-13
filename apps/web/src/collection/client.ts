@@ -9,7 +9,7 @@ export class SubmissionClient {
   private active: AbortController | null = null;
   private state: SubmissionState = { state: 'off' };
   private listeners = new Set<() => void>();
-  constructor(private fetcher: typeof fetch = fetch) {}
+  constructor(private fetcher: typeof fetch = fetch.bind(globalThis)) {}
   snapshot = () => this.state;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish(state: SubmissionState['state']) { this.state = { state }; for (const listener of this.listeners) listener(); return this.state; }
