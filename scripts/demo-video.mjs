@@ -136,16 +136,15 @@ async function record(work, commit) {
     await at(5000); await go(hook + 2);
     await at(7000); await style.evaluate(node => node.remove());
     const controlsStyle = await page.addStyleTag({ content: controlsComposition });
-    await orbit(-0.05, 0.08);
-    // A single step explicitly branches from history; continuous play alone
-    // intentionally refuses to discard the retained future branch.
+    // Keep the established angle: an extra orbit would consume the short
+    // controls shot. A single step branches from the selected history point.
     await page.getByTestId('ai-step').click();
-    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 3);
+    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 3, { polling: 50 });
     await at(8000); await page.getByTestId('toggle-run').click();
-    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 4);
+    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 4, { polling: 50 });
     await page.getByTestId('toggle-run').click();
     await at(9000); await page.getByTestId('ai-step').click();
-    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 5);
+    await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 5, { polling: 50 });
     await at(11000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
     await at(15400);
     conditions = await exportRecord('source-ai-record.json');
