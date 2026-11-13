@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "kind": "local-handler-with-real-remote-D1",
+  "at": "2026-11-13T16:24:38.105Z",
+  "database": "5b4bfe35-773b-4c08-84f4-8d76f8f939b9",
+  "first": 201,
+  "retry": 200,
+  "conflict": 409,
+  "readback_sha256": "bb768fcb3979f225981e91ba5e08051393cc34f223e1070d9ddc2ae3843a6b92",
+  "readback_matches": true,
+  "body_bytes": 600,
+  "validation_status": "received_unverified",
+  "cleanup": {
+    "remaining": 0,
+    "retained_bytes": 0,
+    "daily_count": 2
+  },
+  "source": {
+    "parentCommit": "3089204e36cb61e1fab7ffc92d2ad832c94af5cc",
+    "receiverSha256": "f2335018abe90415dd564a17c38c45b5cfe249b697fcf00b6067e742d06dae18",
+    "contractSha256": "832deb44193e80b536e721e1f8242a540af74b0a66fdcacb0b50a2643f6890b1",
+    "migrationSha256": "9ec72ab51d59cd4f2ea45f465a1ed0d810ca16d2f4fd311362fbae5bbb29dcf3",
+    "localTestBundleSha256": "81ab59a440b68e883a7f074abebdddf8b5ed542bfaa382cc9d06e0005cccf947"
+  },
+  "scope": {
+    "realD1": true,
+    "publicWorkerHttp": false,
+    "productionDeployment": false,
+    "realUserData": false
+  }
+}
