@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "voxelshogi-demo-video",
+  "appCommit": "a1ec183b62ff299966ba9748e7e25d5b1fd32131",
+  "ruleset": "voxelshogi-standard-v1",
+  "candidate": true,
+  "agents": [
+    "easy",
+    "easy"
+  ],
+  "hookPly": 3,
+  "hookMove": "797786",
+  "fullRecordReplayedByRust": true,
+  "sourceRate": 25,
+  "firstContentFrame": 268,
+  "outputFps": 30,
+  "performanceMeasurement": false,
+  "soundRequired": false,
+  "recordingScriptSha256": "a777fbd73833ba3945afed331e0280a748c5bb5ea43b704f6760f62b8eb031c4",
+  "webLockSha256": "c09f59c577fa6758f4c55ae62875ec5492afe2c1b0aabee4c1866ee12723dafc",
+  "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "japaneseFontSha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "files": [
+    {
+      "path": "demo-main.mp4",
+      "bytes": 1377812,
+      "sha256": "737e087ce32ac2a465ef0a36bf4f6ba84e7bb0e67ebd2586573952a8a7b8a230"
+    },
+    {
+      "path": "hook-a.mp4",
+      "bytes": 499301,
+      "sha256": "485be0636b64d1ef58d76c1e276ff012cea2ff71b6b80743d975ede4ed8fc15a"
+    },
+    {
+      "path": "hook-b.mp4",
+      "bytes": 558137,
+      "sha256": "50c098efb8fc3de0bc2e45d6a0389c8b351d091a39044bd3fdfd9843757418e8"
+    },
+    {
+      "path": "poster.png",
+      "bytes": 611713,
+      "sha256": "305a23388dba9926a0aff890c9e414d86a80100b8f6f8489cfe2fa055916bf6a"
+    },
+    {
+      "path": "ogp.png",
+      "bytes": 283862,
+      "sha256": "ad66dde8cfa64ac7ede75abdf7f3fa5b9349baae81aae4b8d4c7424e8368bb71"
+    },
+    {
+      "path": "contact-sheet.png",
+      "bytes": 594028,
+      "sha256": "600f1eebe9880e7551912692edd538ebda39978676e5ee4fed57fd2d244f42c2"
+    },
+    {
+      "path": "source-ai-record.json",
+      "bytes": 8043,
+      "sha256": "9c3177f87b74d988d0af40b31cfff8c638ffe8d1462f1c7b62fb6bd302a52dbd"
+    },
+    {
+      "path": "captions.json",
+      "bytes": 601,
+      "sha256": "552b612bc3339a25aac40f685a175fbc7d6411f6f55aa657c5f44430fbc1cd20"
+    }
+  ],
+  "run": "https://github.com/ayutaz/voxelshogi/actions/runs/43480086247",
+  "review": {
+    "at": "2026-11-13T18:24:02.145Z",
+    "allFileHashesVerified": true,
+    "contactSheetViewed": true,
+    "ogpViewed": true,
+    "captionOverlap": false,
+    "hookChoice": "A",
+    "reason": "9層の全体像と異層着手が同時に分かる。Bは同じ映像を拡大した編集候補で、視聴者調査ではない。",
+    "finalPublicVideo": false
+  }
+}

@@ -176,6 +176,7 @@ function render(raw, work, startFrame, sourceRate) {
     run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', raw, '-vf', [timeline, ...filters].join(','),
       '-frames:v', String(seconds * 30), '-an', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', name], { cwd: work });
     verifyVideo(probe(join(work, name)), seconds);
+    run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-xerror', '-i', name, '-map', '0:v:0', '-f', 'null', '-'], { cwd: work });
   };
   assert.ok(sourceRate >= 10);
   encode('demo-main.mp4', 15, draw);
@@ -220,7 +221,7 @@ async function main() {
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
       candidate: process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || process.env.GITHUB_REF !== 'refs/heads/main',
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
-      fullRecordReplayedByRust: true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
+      fullRecordReplayedByRust: true, fullDecodeValidated: true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
       performanceMeasurement: false, soundRequired: false,
       recordingScriptSha256: sha(fileURLToPath(import.meta.url)), webLockSha256: sha(join(web, 'pnpm-lock.yaml')),
       ffmpeg: run('ffmpeg', ['-version']).split('\n')[0], japaneseFontSha256: sha('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'),
