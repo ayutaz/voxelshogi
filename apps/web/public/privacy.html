@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>対局データの送信について — VoxelShogi</title>
+<style>body{font:16px/1.8 system-ui,sans-serif;max-width:48rem;margin:2rem auto;padding:0 1rem;background:#0f1115;color:#e7e9ee}a{color:#8fb3ff}h1{font-size:1.5rem}h2{font-size:1.2rem}code{overflow-wrap:anywhere}</style></head>
+<body><a href="/">← 観戦画面へ</a><h1>対局データの送信について</h1><p>方針の版：<code>game-research-v1</code>（2026年11月14日）</p>
+<h2>選べる任意の機能です</h2><p>送信は既定でOFFです。ONにした対局だけ、終局時または「ここまでを中断棋譜として送信」を押した時に送ります。拒否しても観戦・人間対AI・端末への棋譜保存を利用できます。読み込んだ棋譜は送りません。</p>
+<h2>送る内容と目的</h2><p>立体将棋の対局内容やAIの挙動を調べ、使いやすさを改善するために、初期局面・指し手・申告された結果と中断理由、ルール、対局モード、送信時点で選んでいたAIの設定、モデル名・配布版・精度形式・実行先、アプリの版、送信ID・同意方針の版を保存します。途中のAI設定変更を含む全着手の実行条件が証明されるものではありません。</p>
+<p>名前・メール・HFトークン・モデル本体・フォルダーの場所・操作イベント全件は送信しません。保存DBには生のIP・User-Agent全文を記録しません。配信元Cloudflareの通常のアクセス記録まで取得しないという意味ではありません。</p>
+<h2>保存先と期間</h2><p>プロジェクト所有者が管理するCloudflare D1へ保存します。受信後30日を目安に保持し、1時間ごとの処理で期限を超えたデータを削除します。受信時は未検証として扱い、学習データや公開データセット・Hugging Faceへの公開には自動で使いません。二次利用には別の判断と説明を行います。</p>
+<h2>OFFにする・送信に失敗した場合</h2><p>OFFにすると進行中のリクエストを中断し、未送信分と再送待ちを破棄します。中断がサーバーの受信に間に合わなかった場合や、既に送信が完了したデータは残り得ます。通信失敗時もゲームは続けられ、再送は自分で選べます。ページを閉じる際に無断で送信しません。</p>
+<h2>削除・問い合わせ</h2><p>画面に表示される送信IDを控えてください。削除や方針への問い合わせは<a href="https://github.com/ayutaz/voxelshogi/issues/new">プロジェクトのGitHub Issue</a>へ、送信IDを添えてお願いします。Issueは公開されるため、棋譜本文・個人情報・認証情報は貼らないでください。管理者が保存データを確認・削除します。</p>
+<p>送信上限に達した場合も対局は継続できます。「保存」ボタンによる端末へのJSONダウンロードは、Cloudflareへの送信とは別です。</p></body></html>

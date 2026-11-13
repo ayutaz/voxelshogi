@@ -11,6 +11,8 @@ import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type M
 import { arenaConditions } from './ai/arena-record';
 import { ARENA_LINKS } from './navigation';
 import { fp16WeightOnly } from './inference/manifest';
+import { GameCollectionPanel } from './collection/GameCollectionPanel';
+import { collectionAgents } from './collection/agents';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
 const ModelLibraryPanel = lazy(() => import('./inference/ModelLibraryPanel'));
@@ -35,6 +37,9 @@ export function App() {
   const [difficulty, setDifficulty] = useState<Record<Color, ArenaDifficulty>>({ b: 'normal', w: 'normal' });
   const [library, setLibrary] = useState<ModelLibrary>({ entries: [], choices: {} });
   const [showModels, setShowModels] = useState(false);
+  const [collectionSession, setCollectionSession] = useState(0);
+  const [importedRecord, setImportedRecord] = useState(false);
+  const ownedRecord = useRef(true);
   const sourceSequence = useRef(0);
   const [budgetMs, setBudgetMs] = useState(1000);
   const [aiStatus, setAiStatus] = useState<AiStatus>({ phase: 'paused', error: null, last: null });
@@ -125,7 +130,9 @@ export function App() {
     pause();
     setFollow(true); setSlice({ axis: 'z', index: 4 }); setLayers({ ...rawLayers, z: 4 });
     aiRef.current?.journal.clear();
+    ownedRecord.current = true;
     store.newGame();
+    setCollectionSession(value => value + 1); setImportedRecord(false);
     setMode(m);
     setRunning(m !== 'r-r');
     setSelection(NO_SELECTION);
@@ -171,8 +178,15 @@ export function App() {
     try {
       const text = await file.text();
       if (generation !== importGeneration.current) return;
+      // External-store updates may flush before React's imported/session state.
+      const previousOwnership = ownedRecord.current;
+      ownedRecord.current = false;
       const r = store.importRecord(text);
-      if (r.ok) aiRef.current?.journal.clear();
+      if (!r.ok) ownedRecord.current = previousOwnership;
+      if (r.ok) {
+        aiRef.current?.journal.clear();
+        setCollectionSession(value => value + 1); setImportedRecord(true);
+      }
       setMessage(r.ok ? '棋譜を読み込みました' : `読み込めません: ${r.error}`);
     } catch (error) {
       if (generation === importGeneration.current) setMessage(`読み込めません: ${String(error)}`);
@@ -365,7 +379,9 @@ export function App() {
           <p className="muted">{follow ? '着手先の層へ自動で切り替えます。層を手動で変えると追従をOFFにします。' : '手動表示中。追従をONにすると表示中の着手先へ戻ります。'}</p>
           {selection.type !== 'none' && <div className="row" aria-label="層ごとの移動先">{targetCounts.map((count, z) => count > 0 && <button type="button" key={z} onClick={() => { manualView(); setSlice({ axis: 'z', index: z }); setLayers({ ...layers, z }); }}>{ROMAN[z]}層：{count}マス</button>)}</div>}
         </section>
-
+        <GameCollectionPanel key={collectionSession} mode={mode} selectedAgents={collectionAgents(aiOptions)}
+          getRecord={() => { if (!ownedRecord.current) throw new Error('imported record'); return store.exportRecord(); }} finished={snap.finished && !!snap.result && snap.ply === snap.moveCount}
+          canAbort={!snap.finished && snap.ply > 0 && snap.ply === snap.moveCount} imported={importedRecord} onAbort={pause} />
       </main>
 
       <aside className="panel right">

@@ -152,6 +152,15 @@ const mutations = [
   { name: 'ui-square-side', file: 'components/Board2D.tsx', before: "piece.color === 'b' ? '先手' : '後手'", after: "piece.color === 'b' ? '後手' : '先手'", test: 'app-launch', extension: 'tsx' },
   { name: 'trail-infinite-loop', file: 'renderer/useTrailMotion.ts', before: 'Math.min(1, progress.current + delta * 1.2)', after: '(progress.current + delta * 1.2) % 1', test: 'trail-motion', extension: 'tsx' },
   { name: 'trail-idle-jump', file: 'renderer/useTrailMotion.ts', before: 'if (started.current) progress.current =', after: 'progress.current =', test: 'trail-motion', extension: 'tsx' },
+  { name: 'collection-consent', file: 'collection/contract.ts', before: 'value.consent !== COLLECTION_CONSENT', after: 'false', test: 'game-receiver' },
+  { name: 'collection-origin', file: 'collection/receiver.ts', before: "request.headers.get('origin') !== new URL(request.url).origin", after: 'false', test: 'game-receiver' },
+  { name: 'collection-canonical-body', file: 'collection/receiver.ts', before: 'body = canonicalJson(value);', after: '', test: 'game-receiver' },
+  { name: 'collection-conflict', file: 'collection/receiver.ts', before: 'row.payload_sha256 !== sha', after: 'false', test: 'game-receiver' },
+  { name: 'collection-daily-cap', file: '../migrations/0001_games.sql', before: 'daily_count >= 1000', after: 'daily_count >= 1001', test: 'game-receiver' },
+  { name: 'collection-byte-cap', file: '../migrations/0001_games.sql', before: 'retained_bytes + NEW.payload_bytes > 104857600', after: '1 = 0', test: 'game-receiver' },
+  { name: 'collection-client-opt-out', file: 'collection/client.ts', before: 'this.consent = enabled;', after: 'this.consent = true;', test: 'collection-client' },
+  { name: 'collection-imported-record', file: 'collection/GameCollectionPanel.tsx', before: 'disabled={!setup?.available || imported}', after: 'disabled={!setup?.available}', test: 'game-collection-panel', extension: 'tsx' },
+  { name: 'collection-import-flush', file: 'App.tsx', before: "if (!ownedRecord.current) throw new Error('imported record');", after: '', test: 'app-launch', extension: 'tsx' },
   { name: 'arena-pause-cancel', file: 'ai/arena-controller.ts', before: 'if (this.pending) this.client.cancel();', after: '', test: 'arena-controller' },
   { name: 'arena-late-success', file: 'ai/arena-controller.ts', before: '}).then((reply) => {\n        if (this.disposed || generation !== this.generation) return;', after: '}).then((reply) => {\n        if (this.disposed) return;', test: 'arena-controller' },
   { name: 'arena-start-paused', file: 'ai/arena-controller.ts', before: '(!this.options.running && !single)', after: 'false', test: 'arena-controller' },
@@ -208,7 +217,7 @@ function main() {
   try {
     mkdirSync(copy, { recursive: true });
     assert.ok(existsSync(join(web, 'src/wasm/pkg/voxelshogi_wasm_bg.wasm')), 'Build WASM before running web mutations');
-    for (const path of ['src', 'tests', 'public', 'vite.config.ts', 'package.json']) cpSync(join(web, path), join(copy, path), { recursive: true });
+    for (const path of ['src', 'tests', 'public', 'migrations', 'vite.config.ts', 'package.json']) cpSync(join(web, path), join(copy, path), { recursive: true });
     const fixtures = join(work, 'crates/voxelshogi-wasm/tests/fixtures');
     mkdirSync(fixtures, { recursive: true });
     cpSync(join(root, 'crates/voxelshogi-wasm/tests/fixtures/search.json'), join(fixtures, 'search.json'));
@@ -228,7 +237,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 168);
+    assert.equal(results.length, 177);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

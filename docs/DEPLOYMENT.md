@@ -8,11 +8,11 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 ## 構成
 
-- `apps/web/wrangler.jsonc`: Worker 名 `voxelshogi`。`dist/` を静的アセットとして配信し、SPA へフォールバックする。Worker スクリプトはない。
+- `apps/web/wrangler.jsonc`: Worker名`voxelshogi`。`dist/`はasset-firstで配信し、`/api/*`だけ同意制棋譜保存の受信Workerを先行させる。`GAMES`を専用D1へbindし、毎時の保持期限削除を行う。[保存・schema・停止と復旧](GAME_DATA_COLLECTION.md)。実際の配信状況は[公開準備の現在地](PUBLIC_LAUNCH_PROGRESS.md)を参照。
 - `apps/web/public/_headers`: `/assets/*` とモデル／runtimeのhash付きファイルはimmutable、`/build-info.json`・`/inference-build.json`・モデルindexはno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
 - R0の比較実験: [研究記録](NINE_KINGS_EXPERIMENT.md)を保持する。比較室の公開画面・導線は撤去し、旧`/?experiment=1`も通常の観戦画面を開く。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。
-- デプロイ先は、ユーザーの個人 Cloudflare アカウント（ka1357amnbpdr@gmail.com）。
+- デプロイ先は、プロジェクト所有者の個人Cloudflareアカウント。プロジェクト専用ログインで照合する。
 
 ## 自動デプロイ（GitHub Actions）
 
@@ -64,7 +64,7 @@ CLI の OAuth ログインは期限付きで、API トークンを作る権限�
 
 ```bash
 scripts/cf.sh login --browser=false   # 初回のみ。表示された URL を、個人アカウントでログインしたブラウザで開く
-scripts/cf.sh whoami                  # ka1357amnbpdr@gmail.com であることを確認する
+scripts/cf.sh whoami                  # プロジェクト所有者の個人アカウントであることを確認する
 
 pnpm --dir apps/web install --frozen-lockfile
 pnpm --dir apps/web wasm
