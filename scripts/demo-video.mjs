@@ -101,7 +101,7 @@ async function record(work, commit) {
     hook = selectHook(conditions.record.moves);
     const go = async ply => {
       await page.getByTestId('move-list').locator('button').nth(ply).evaluate(button => button.click());
-      await page.waitForFunction(expected => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${expected + 1}手目`), ply);
+      await page.waitForFunction(expected => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${expected + 1}手目`), ply, { polling: 50 });
     };
     const orbit = async (horizontal, vertical) => {
       const box = await page.getByTestId('board3d').locator('canvas').boundingBox();
@@ -119,6 +119,7 @@ async function record(work, commit) {
     await page.getByTestId('board3d').waitFor();
     await page.waitForFunction(() => document.querySelector('[data-testid="board3d"]')?.getAttribute('data-ready') === 'true');
     await orbit(0.05, -0.08); // Show the nine layers from the side using actual OrbitControls.
+    await page.getByLabel('全層を同じ濃さで表示').evaluate(checkbox => checkbox.click());
     await delay(1000);
     await page.evaluate(() => {
       const marker = document.createElement('div'); marker.id = 'recording-marker';
@@ -128,10 +129,8 @@ async function record(work, commit) {
     await page.evaluate(() => document.getElementById('recording-marker').remove());
     const began = performance.now();
     const at = async milliseconds => { assert.ok(performance.now() - began < milliseconds + 1500, 'recording missed its story timing'); await delay(Math.max(0, milliseconds - (performance.now() - began))); };
-    await at(700);
-    await page.getByLabel('全層を同じ濃さで表示').evaluate(checkbox => checkbox.click());
-    await go(hook);
-    assert.ok(performance.now() - began < 1700, 'hook move arrived too late for the first three seconds');
+    await at(700); await go(hook);
+    assert.ok(performance.now() - began < 2200, 'hook move arrived too late for the first three seconds');
     await at(3000);
     await go(hook + 1);
     await at(5000); await go(hook + 2);

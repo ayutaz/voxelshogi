@@ -30,8 +30,9 @@ for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).not.toHaveText(beforeStep!);
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-    const snapshot = await page.screenshot({ fullPage: true });
-    await info.attach(`launch-${width}`, { body: snapshot, contentType: 'image/png' });
+    const path = info.outputPath(`attachments/launch-${width}.png`);
+    await page.screenshot({ path, fullPage: true });
+    await info.attach(`launch-${width}`, { path, contentType: 'image/png' });
     expect(errors).toEqual([]);
   });
 }

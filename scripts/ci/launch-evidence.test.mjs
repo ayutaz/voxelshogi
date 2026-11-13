@@ -13,3 +13,10 @@ test('layout screenshots are uploaded before a second Playwright invocation clea
   assert.ok(upload.includes('if-no-files-found: error'));
   assert.ok(!upload.includes('path: apps/web/test-results\n'), 'only the synthetic layout images belong in this artifact');
 });
+
+test('screenshots are written as PNG files under the upload glob, not only kept as attachment buffers', () => {
+  const source = readFileSync(new URL('../../apps/web/e2e/launch.spec.ts', import.meta.url), 'utf8');
+  assert.ok(source.includes('info.outputPath(`attachments/launch-${width}.png`)'));
+  assert.ok(source.includes('page.screenshot({ path, fullPage: true })'));
+  assert.ok(source.includes("{ path, contentType: 'image/png' }"));
+});
