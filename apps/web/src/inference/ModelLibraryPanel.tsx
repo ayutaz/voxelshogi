@@ -4,6 +4,14 @@ import { loadLocalModel, parseTrainedCatalog, readTrainedCatalog, type TrainedRe
 import { localFile, packModelFiles } from './policy-protocol';
 
 type Packet = Omit<LoadedModel, 'sourceId'>;
+function guidance(error: string): string {
+  if (/hash mismatch|size mismatch/.test(error)) return 'ファイルの内容が配布情報と一致しません。配布先からフォルダーを取得し直してください。';
+  if (/missing local model file/.test(error)) return '必要なファイルが足りません。取得したモデルのフォルダー全体を選んでください。';
+  if (/folder|file count/.test(error)) return 'モデルのフォルダーを1つ選んでください。分割したフォルダーや、上位フォルダーは選ばないでください。';
+  if (/size|oversized/.test(error)) return '読み込み可能な容量を超えています。公開Sモデルのフォルダーを確認してください。';
+  if (/catalog|download/.test(error)) return '配布情報を取得できません。通信を確認して、モデル読み込みを開き直してください。';
+  return 'モデルを読み込めませんでした。配布元・フォルダー内のファイル・対応する精度形式を確認してください。';
+}
 export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Packet) => void }) {
   const [releases, setReleases] = useState<TrainedRelease[] | null>(null);
   const [selected, setSelected] = useState('');
@@ -39,7 +47,9 @@ export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Pac
     }
   };
   return <div className="model-library" data-testid="model-library">
-    <p className="muted">Hugging Faceで取得承認を受けたモデルフォルダーを選びます。</p>
+    <p className="muted">公開Sモデルは任意です。Easy／Normalの観戦には不要です。</p>
+    <ol className="muted"><li>Hugging Faceで取得申請し、承認を受ける。</li><li>配布ファイル一式を同じフォルダーへダウンロードする。</li><li>そのフォルダーを選択し、先手・後手のAIでモデルと精度形式を選ぶ。</li></ol>
+    <p className="muted">公開Sは1ファイル最大64MiB、フォルダー合計512MiBまで。推論は端末のCPU／GPUを使います。フォルダー選択に対応するPCブラウザをおすすめします。</p>
     {releases?.length === 0 && <p>公開済みの学習モデルはまだありません。</p>}
     {!!releases?.length && <>
       <label>配布モデル<select value={selected} data-testid="model-release" onChange={event => { cancel(); setSelected(event.target.value); setError(null); setMessage(''); }}>
@@ -51,6 +61,6 @@ export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Pac
       }} /></label>
     </>}
     {message && <p role="status">{message}</p>}
-    {error && <p role="alert">{error}</p>}
+    {error && <div role="alert"><p>{guidance(error)}</p><details><summary>技術情報</summary><p>{error}</p></details></div>}
   </div>;
 }

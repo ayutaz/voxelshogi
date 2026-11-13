@@ -13,6 +13,9 @@ test.beforeEach(async ({ page }) => {
   (page as unknown as { errors: string[] }).errors = errors;
   await page.goto('/');
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+  // These legacy move-entry cases intentionally inspect the fixed V slice.
+  await page.getByTestId('follow-move').uncheck();
+  page.on('dialog', dialog => dialog.accept());
 });
 
 test.afterEach(async ({ page }) => {

@@ -46,7 +46,15 @@ it('shows failed validation and allows retrying without changing the approved re
   const loaded = await mount(); fake.pack.mockReturnValue([]); fake.load.mockRejectedValueOnce(new Error('hash mismatch'));
   fireEvent.change(screen.getByTestId('model-folder'), { target: { files: [new File(['x'], 'manifest.json')] } });
   expect((await screen.findByRole('alert')).textContent).toContain('hash mismatch');
+  expect(screen.getByRole('alert').textContent).toContain('ファイルの内容が配布情報と一致しません');
   expect(loaded).not.toHaveBeenCalled();
+});
+it('explains the optional three-step model workflow before selecting a folder', async () => {
+  await mount();
+  expect(screen.getByText(/取得申請/)).toBeTruthy();
+  expect(screen.getByText(/ダウンロード/)).toBeTruthy();
+  expect(screen.getByText(/フォルダーを選択/)).toBeTruthy();
+  expect(screen.getByText(/512MiB/)).toBeTruthy();
 });
 it('uses the current parent callback if the library changes during a folder read', async () => {
   fake.catalog.mockResolvedValue({ schema: 1, releases: [releaseFixture()] });

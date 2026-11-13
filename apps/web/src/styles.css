@@ -23,6 +23,8 @@ button {
 }
 button:hover:not(:disabled) { border-color: #4a5366; }
 button:disabled { opacity: 0.45; cursor: default; }
+button:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #ffcf71; outline-offset: 3px; }
+summary { cursor: pointer; font-weight: 650; padding: 8px 0; }
 button.primary { background: var(--accent); border-color: var(--accent); }
 button.ghost { background: transparent; }
 select, input[type='range'] { width: 100%; }
@@ -40,6 +42,15 @@ header {
   grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; padding: 10px 16px;
   border-bottom: 1px solid var(--line); background: var(--panel);
 }
+header { flex-wrap: wrap; }
+.app > *, main > *, .panel section { min-width: 0; }
+.intro p { margin: 4px 0; }
+.intro .eyebrow { font-size: clamp(18px, 2.2vw, 26px); font-weight: 750; color: #ffcf71; }
+.move-focus, .playback { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.move-focus p { margin: 4px 0; }
+.playback > .row > button { min-height: 44px; }
+.playback > .row > .primary { min-width: 150px; }
+.playback p { margin: 4px 0; }
 header h1 { font-size: 18px; margin: 0; }
 .subtitle { color: var(--muted); font-size: 13px; }
 .status { margin-left: auto; font-weight: 600; }
@@ -63,7 +74,7 @@ main { display: flex; flex-direction: column; min-height: 0; padding: 8px; gap: 
 .board2d { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .board2d-title { font-weight: 600; margin-bottom: 4px; }
 .board2d-grid {
-  display: grid; grid-template-columns: 20px repeat(9, minmax(28px, 46px)); gap: 2px;
+  display: grid; grid-template-columns: 20px repeat(9, minmax(0, 46px)); gap: 2px;
   width: min(100%, 460px);
 }
 .axis-label { display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); }
@@ -100,7 +111,16 @@ main { display: flex; flex-direction: column; min-height: 0; padding: 8px; gap: 
 .fatal { padding: 24px; }
 
 @media (max-width: 1100px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; height: auto; }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; height: auto; }
+  .app > header { grid-row: 1; }
+  .app > main { grid-row: 2; overflow: visible; }
+  .app > .left { grid-row: 3; }
+  .app > .right { grid-row: 4; }
+  .status { margin-left: 0; width: 100%; }
   .views-both { grid-template-columns: 1fr; }
+  .views { min-height: 300px; flex: auto; }
+  .board3d { min-height: 300px; }
   .panel.left, .panel.right { border: none; }
+  .move-list { max-height: 240px; }
+  button { min-height: 40px; }
 }
