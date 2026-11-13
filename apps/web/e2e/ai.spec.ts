@@ -5,6 +5,10 @@ import { installInteractionProbe, readInteractionProbe } from './interaction-pro
 
 loadWasm();
 
+// Replacement cases in this suite deliberately approve discarding the old game.
+// Cancellation is independently checked in launch.spec.ts.
+test.beforeEach(async ({ page }) => { page.on('dialog', dialog => dialog.accept()); });
+
 test('spectator starts paused with independent Normal settings and steps exactly once through a real Worker', async ({ page }) => {
   const workers: string[] = [];
   page.on('worker', (worker) => workers.push(worker.url()));
@@ -266,6 +270,7 @@ test('humans can play either color against Normal search', async ({ page }) => {
   await expect(page.getByTestId('ai-analysis')).toContainText('Normal');
   await page.getByTestId('mode').selectOption('r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+  await page.getByTestId('slice-index').fill('4'); // choose V explicitly after the AI's layer-following move
   await cell(2).click(); await cell(3).click();
   await expect(page.getByTestId('status')).toHaveText('4手目 ☖後手の番');
   await expect(page.getByTestId('ai-analysis')).toContainText('Normal');
