@@ -61,6 +61,7 @@ test('human as White: the AI opens and answers automatically', async ({ page }) 
   await page.getByTestId('difficulty-b').selectOption('easy');
   await page.getByTestId('mode').selectOption('r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 5000 });
+  await page.getByTestId('slice-index').fill('4'); // the opening AI move may have followed another layer
   await cell(page, idx(4, 2, 4)).click();
   await cell(page, idx(4, 3, 4)).click();
   await expect(page.getByTestId('status')).toHaveText('4手目 ☖後手の番', { timeout: 5000 });
@@ -106,6 +107,7 @@ test('records round-trip through save and load, and invalid files are rejected',
   await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   await expect(page.getByTestId('mode')).toHaveValue('h-r');
+  await page.getByTestId('slice-index').fill('4'); // inspect the saved pawn, rather than the last AI move's layer
   await expect(cell(page, idx(4, 5, 4))).toHaveText('歩');
 
   // A tampered record (illegal move) is rejected and the current game is kept.
