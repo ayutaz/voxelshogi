@@ -130,5 +130,7 @@ jobs:
             ${{ runner.temp }}/demo-video/source-ai-record.json
             ${{ runner.temp }}/demo-video/captions.json
             ${{ runner.temp }}/demo-video/receipt.json
+            ${{ runner.temp }}/demo-video/framing.json
+            ${{ runner.temp }}/demo-video/review-*.png
           retention-days: 7
           if-no-files-found: error
