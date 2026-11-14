@@ -44,8 +44,9 @@ function captureRecord(terminal=false){
 }
 async function load(page:Page,terminal=false){
   await openRecords(page);await page.getByTestId('import').setInputFiles({name:'sound-fixture.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(captureRecord(terminal)))});await closeSheet(page);
-  await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');await page.getByRole('button',{name:'メッセージを閉じる'}).click();
+  await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
   if(terminal)await page.getByRole('button',{name:'盤面を見る',exact:true}).click();
+  await page.getByRole('button',{name:'メッセージを閉じる'}).click();
   await display(page,'2d');await sliceAt(page,'4');
 }
 test.beforeEach(async({page,request})=>{
