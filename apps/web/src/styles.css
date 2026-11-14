@@ -9,3 +9,4 @@
 .cell[aria-disabled=true]{opacity:1;cursor:default}
 .sheet [data-testid=record-move-list]{max-height:45svh;margin-bottom:12px;overflow:auto}
 .cell:disabled{opacity:1;cursor:default}
+.layer-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}.layer-labels .layer-label{position:absolute;top:0;left:0;width:36px;height:20px;font-size:12px;line-height:16px;text-align:center;font-weight:700}

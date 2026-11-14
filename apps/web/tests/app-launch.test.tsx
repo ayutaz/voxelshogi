@@ -268,3 +268,17 @@ it('lets a viewer uncover the terminal board without discarding the result',()=>
   expect(screen.queryByRole('region',{name:'対局結果'})).toBeNull();
   expect(screen.getByTestId('status').textContent).toContain('後手の勝ち');
 });
+it('reconfigures the real running option when a human starts another game with the same settings',()=>{
+  let liveRunning=false;
+  fake.configure.mockImplementation((options:{running:boolean})=>{liveRunning=options.running;});
+  fake.paused.mockImplementation(()=>{liveRunning=false;});
+  fake.reset.mockImplementation(()=>{
+    fake.snap={...fake.snap,revision:fake.snap.revision+1,ply:0,moveCount:0,moves:[],side:'b'};
+    for(const fn of fake.listeners)fn();
+  });
+  try{
+    render(<App/>);fireEvent.change(screen.getByTestId('mode'),{target:{value:'h-r'}});expect(liveRunning).toBe(true);
+    fireEvent.click(screen.getByRole('button',{name:'対局設定'}));fireEvent.click(screen.getByRole('button',{name:'新規対局'}));
+    expect(liveRunning).toBe(true);
+  }finally{fake.configure.mockReset();fake.paused.mockReset();fake.reset.mockReset();}
+});

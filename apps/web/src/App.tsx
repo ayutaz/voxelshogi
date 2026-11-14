@@ -93,7 +93,8 @@ export function App() {
     setAiStatus(ai.snapshot());
     return () => { importGeneration.current += 1; unsubscribe(); ai.dispose(); aiRef.current = null; };
   }, [store]);
-  useEffect(() => { aiRef.current?.configure(aiOptions); }, [aiOptions]);
+  // Imperative pause during replacement must be reconciled even if settings stay equal.
+  useEffect(() => { aiRef.current?.configure(aiOptions); }, [aiOptions, snap.revision]);
 
   const play = useCallback(
     (move: string) => {

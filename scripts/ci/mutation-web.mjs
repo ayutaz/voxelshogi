@@ -15,6 +15,8 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'layer-labels-no-clipping', file: 'renderer/layer-label-position.ts', before: 'Math.max(4, Math.min(max, value))', after: 'Math.min(max, value)', test: 'layer-label-position' },
+  { name: 'same-game-settings-reconfigure', file: 'App.tsx', before: '[aiOptions, snap.revision]', after: '[aiOptions]', test: 'app-launch', extension: 'tsx' },
   { name: 'terminal-board-dismiss', file: 'App.tsx', before: 'onClick={() => setResultDismissed(true)}', after: 'onClick={() => setResultDismissed(false)}', test: 'app-launch', extension: 'tsx' },
   { name: 'automatic-d1-trigger-metadata', file: 'collection/automatic-receiver.ts', before: '(changed.meta.changes ?? 0) > 0', after: 'changed.meta.changes === 1', test: 'automatic-receiver' },
   { name: 'human-return-live', file: 'App.tsx', before: "if (mode !== 'r-r' && ply === snap.moveCount", after: "if (false && mode !== 'r-r' && ply === snap.moveCount", test: 'app-launch', extension: 'tsx' },
@@ -265,7 +267,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 205);
+    assert.equal(results.length, 207);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

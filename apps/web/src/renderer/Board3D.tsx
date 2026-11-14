@@ -1,5 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, type ThreeEvent } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
@@ -7,6 +7,7 @@ import type { Selection } from '../game/interaction';
 import type { BoardSnapshot } from '../game/boardSnapshot';
 import { RenderReady } from './RenderReady';
 import { useTrailMotion } from './useTrailMotion';
+import { layerLabelPosition } from './layer-label-position';
 
 export interface LayerView {
   /** 'all': every layer opaque; 'focus': the focused layer opaque, others dimmed by `dim`. */
@@ -193,20 +194,15 @@ function LayerGrid({ view }: { view: LayerView }) {
   );
 }
 
-const labelMaterials = new Map<string,THREE.SpriteMaterial>();
-function LayerLabels() {
-  const labels = ['I','II','III','IV','V','VI','VII','VIII','IX'];
-  return <>{labels.map((label,z) => {
-    let material=labelMaterials.get(label);
-    if (!material) {
-      const canvas=document.createElement('canvas');canvas.width=256;canvas.height=96;
-      const ctx=canvas.getContext('2d')!;
-      ctx.fillStyle='#163239';ctx.fillRect(0,0,256,96);ctx.fillStyle='#d9f1eb';ctx.font='bold 64px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,128,48);
-      const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;
-      material=new THREE.SpriteMaterial({map,transparent:true,depthTest:false,depthWrite:false});labelMaterials.set(label,material);
-    }
-    return <sprite key={label} args={[material]} position={[-6,(z-4)*LAYER_GAP,4.5]} scale={[1,.375,1]} renderOrder={10} />;
-  })}</>;
+function LayerLabels({labels}:{labels:RefObject<(HTMLSpanElement|null)[]>}) {
+  useFrame(({camera,size})=>{
+    camera.updateMatrixWorld();
+    labels.current.forEach((label,z)=>{
+      if(!label)return;const {x,y}=layerLabelPosition(camera,size,z);
+      label.style.transform=`translate(${x}px,${y}px)`;
+    });
+  });
+  return null;
 }
 
 export function Board3D({
@@ -225,6 +221,7 @@ export function Board3D({
   onSquare: (index: number) => void;
 }) {
   const [ready, setReady] = useState(false);
+  const labels=useRef<(HTMLSpanElement|null)[]>([]);
   return (
     <div className="board3d" data-testid="board3d" data-ready={ready} aria-busy={!ready}>
       {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
@@ -234,12 +231,13 @@ export function Board3D({
         <ambientLight intensity={1.15} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />
         <LayerGrid view={view} />
-        <LayerLabels />
+        <LayerLabels labels={labels} />
         <Pieces snap={snap} view={view} onSquare={onSquare} />
         <Highlights snap={snap} selection={selection} onSquare={onSquare} />
         {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}
         <OrbitControls makeDefault enableDamping target={[0, 0, 0]} />
       </Canvas>
+      <div className="layer-labels" aria-hidden="true" style={{opacity:ready?1:0}}>{['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z)=><span key={label} className="layer-label" ref={el=>{labels.current[z]=el;}}>{label}</span>)}</div>
     </div>
   );
 }

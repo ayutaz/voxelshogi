@@ -1,5 +1,5 @@
 import { test, expect } from './test';
-import { display, selectSetting, sliceAt } from './arena-controls';
+import { display, selectSetting, settingsAction, sliceAt } from './arena-controls';
 import {readFileSync} from 'node:fs';
 
 test('match setup traps focus, closes with Escape and returns focus without replacing the game', async ({ page }) => {
@@ -30,6 +30,11 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) for (const side 
     await expect(page.getByTestId('status')).toHaveText(side === 'h-r' ? '3手目 ☗先手の番' : '4手目 ☖後手の番');
     await expect(page.getByTestId('ai-phase')).toHaveText('人間の手番');
     await expect(page.getByTestId('ai-step')).toBeDisabled();
+    page.once('dialog',dialog=>dialog.accept());await settingsAction(page,'新規対局');
+    await expect(page.getByTestId('status')).toHaveText(side === 'h-r' ? '1手目 ☗先手の番' : '2手目 ☖後手の番');
+    await sliceAt(page,'4');await page.locator(`.board2d [data-square="${from}"]`).click();await page.locator(`.board2d [data-square="${to}"]`).click();
+    await expect(page.getByTestId('status')).toHaveText(side === 'h-r' ? '3手目 ☗先手の番' : '4手目 ☖後手の番');
+    await expect(page.getByTestId('ai-phase')).toHaveText('人間の手番');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     const path=info.outputPath(`attachments/launch-human-${width}-${side}-${difficulty}.png`);await page.screenshot({path,fullPage:true});await info.attach('human-match',{path,contentType:'image/png'});
   });
