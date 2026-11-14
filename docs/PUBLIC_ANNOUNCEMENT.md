@@ -5,7 +5,7 @@
 2026-11-15 JST。[公開準備計画](PUBLIC_LAUNCH_PLAN.md)のL5で準備し、L7で使う文案。
 **投稿はしていない。** L6の公開版・動画・保存方針の照合後に、実際の投稿を依頼された場合だけ送信する。
 動画は[制作計画](DEMO_VIDEO_PLAN.md)の15秒MP4を添付する。ソースコードだけの画像や設定画面を先頭にしない。
-添付対象は[S対戦紹介を含む公開版 `7b364c9`](PUBLIC_S_RELEASE_VALIDATION.md)。旧`dc0a95f`版は目視合格を撤回済みなので使わない。
+添付対象は[S対戦紹介を含む公開版 `7b364c9`](PUBLIC_S_RELEASE_VALIDATION.md)に[オリジナルBGMを加えた本編](DEMO_BGM.md)（`demo-main-bgm.mp4`）。旧`dc0a95f`版は目視合格を撤回済みなので使わない。
 
 ## 本文候補
 
