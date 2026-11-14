@@ -55,7 +55,7 @@ class PublicationApi:
                 "key": "header",
                 "value": {
                     "summary": "Save concise public S Model Card",
-                    "description": "Metadata-only correction after readback mismatch",
+                    "description": "Update the public S Model Card",
                     "parentCommit": parent_commit,
                 },
             },
