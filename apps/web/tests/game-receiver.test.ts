@@ -20,6 +20,7 @@ const count = () => (db.prepare('SELECT count(*) AS n FROM games').get() as { n:
 beforeEach(() => {
   db = new DatabaseSync(':memory:');
   db.exec(readFileSync(new URL('../migrations/0001_games.sql', import.meta.url), 'utf8'));
+  db.exec(readFileSync(new URL('../migrations/0002_automatic_games.sql', import.meta.url), 'utf8'));
   binding = { prepare(sql) { let values: (string | number)[] = []; const statement = db.prepare(sql);
     const bound = { bind(...next: (string | number)[]) { values = next; return bound; },
       async first<T>() { return (statement.get(...values) ?? null) as T | null; },

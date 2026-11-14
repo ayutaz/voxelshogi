@@ -1,4 +1,5 @@
 import { COLLECTION_CONSENT, MAX_GAME_BYTES } from './contract';
+import { AUTOMATIC_POLICY } from './automatic-contract';
 import { purgeGames, receiveGame, type CollectionEnv } from './receiver';
 
 interface Env extends CollectionEnv { ASSETS: { fetch: (request: Request) => Promise<Response> } }
@@ -9,6 +10,7 @@ export default {
     if (path === '/api/collection' && request.method === 'GET') return Response.json({
       enabled: env.GAME_COLLECTION_ENABLED === 'true' && !!env.GAMES,
       consent: COLLECTION_CONSENT, retentionDays: 30, maxBytes: MAX_GAME_BYTES, privacyPath: '/privacy.html',
+      schemas: [1, 2], policy: AUTOMATIC_POLICY, snapshotIntervalSeconds: 30,
     }, { headers: { 'cache-control': 'no-store' } });
     if (path.startsWith('/api/')) return Response.json({ error: 'not_found' }, { status: 404 });
     return env.ASSETS.fetch(request);

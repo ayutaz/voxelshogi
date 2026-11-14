@@ -14,7 +14,7 @@ it('describes collection only when enabled and bound, without reading any stored
   const GAMES = { prepare: vi.fn() } as unknown as GameDatabase;
   for (const enabled of ['true', 'false']) {
     const response = await worker.fetch(new Request('https://game.example/api/collection'), { ASSETS: assets(), GAMES, GAME_COLLECTION_ENABLED: enabled });
-    expect(await response.json()).toMatchObject({ enabled: enabled === 'true', consent: 'game-research-v1', retentionDays: 30, maxBytes: 262144, privacyPath: '/privacy.html' });
+    expect(await response.json()).toMatchObject({ enabled: enabled === 'true', consent: 'game-research-v1', retentionDays: 30, maxBytes: 262144, privacyPath: '/privacy.html', schemas: [1, 2], policy: 'automatic-game-v2', snapshotIntervalSeconds: 30 });
     expect(response.headers.get('cache-control')).toBe('no-store');
   }
   expect(GAMES.prepare).not.toHaveBeenCalled();
@@ -33,6 +33,7 @@ it('purges expired records even with collection OFF and surfaces cleanup failure
   const env = { ASSETS: assets(), GAME_COLLECTION_ENABLED: 'false', GAMES: { prepare } as unknown as GameDatabase };
   await worker.scheduled({}, env);
   expect(prepare).toHaveBeenCalledWith('DELETE FROM games WHERE created_at < ?');
+  expect(prepare).toHaveBeenCalledWith('DELETE FROM automatic_games WHERE created_at < ?');
   expect(bind).toHaveBeenCalledWith(2997408000);
   run.mockResolvedValue({ success: false, meta: {} });
   await expect(worker.scheduled({}, env)).rejects.toThrow('retention_cleanup_failed');

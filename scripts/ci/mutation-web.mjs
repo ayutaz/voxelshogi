@@ -15,6 +15,10 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'automatic-monotonic-version', file: 'collection/automatic-receiver.ts', before: 'WHERE excluded.version > automatic_games.version', after: 'WHERE 1 = 1', test: 'automatic-receiver' },
+  { name: 'automatic-terminal-lock', file: '../migrations/0002_automatic_games.sql', before: "OLD.state != 'progress'", after: '0 = 1', test: 'automatic-receiver' },
+  { name: 'automatic-progress-cap', file: '../migrations/0002_automatic_games.sql', before: 'OLD.progress_writes >= 128', after: 'OLD.progress_writes >= 129', test: 'automatic-receiver' },
+  { name: 'automatic-update-byte-accounting', file: '../migrations/0002_automatic_games.sql', before: 'retained_bytes + NEW.payload_bytes - OLD.payload_bytes WHERE singleton', after: 'retained_bytes WHERE singleton', test: 'automatic-receiver' },
   {"name":"interrupt-control-layout-stability","file":"App.tsx","before":"data-testid=\"cancel-search\" aria-disabled=","after":"data-testid=\"cancel-search\" hidden={aiStatus.phase !== 'thinking'} aria-disabled=","test":"app-launch","extension":"tsx"},
   {"name":"collection-native-fetch-receiver","file":"collection/client.ts","before":"fetch.bind(globalThis)","after":"fetch","test":"collection-client"},
   {"name":"collection-terminal-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"submitted","test":"game-collection-panel","extension":"tsx"},
@@ -246,7 +250,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 186);
+    assert.equal(results.length, 190);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });
