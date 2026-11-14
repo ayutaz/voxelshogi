@@ -23,4 +23,13 @@ Macでは軽量単体・静的確認と、完成物／少数静止画の読取�
 
 ## 現在地
 
-修正を作業ブランチで実装し、Linuxで候補を確認する。再制作・公開版一致・目視は未完了。
+**修正・再制作・確認完了。** [PR #190](https://github.com/ayutaz/voxelshogi/pull/190)を必須8件・関連CI成功、CodeQL重大0で通常mergeした。公開sourceは`d3822cbeded2bae7329ddd72b4984cf6e8970db0`。
+
+- [main CI・公開](https://github.com/ayutaz/voxelshogi/actions/runs/43587794604)と[Security](https://github.com/ayutaz/voxelshogi/actions/runs/43587794631)が成功。公開53 E2E・モデル6件・カメラ3回・配信57ファイルを確認した。ゲーム・API・モデルのソースは初回公開`dc0a95f`から変更なし。
+- [最終制作run 43589608131](https://github.com/ayutaz/voxelshogi/actions/runs/43589608131)は公開SHA一致、15秒／3秒／3秒、H.264／1080×1350／yuv420p／30fps・450／90／90 frame、全編デコード・Rust再生が成功。
+- 最終MP4からの21画像すべてを読み、2D盤・速度スライダー・主要ボタンが収まり、字幕と盤が重ならず、7秒／11秒の切替直後も9層が収まることを確認した。自動境界検査はUI 3時点・盤9時点、全30ファイルhashも成功。
+- [最終receipt・全画像hash・目視範囲](experiments/video-framing-final-20261114.md)を固定した。[候補の記録](experiments/video-framing-candidate-20261114.md)とは区別する。
+
+納品先は`runs/arena-redesign-final/d3822cb/video/`。本編は`demo-main.mp4`（1,772,757 bytes）、冒頭案は`hook-a.mp4`／`hook-b.mp4`。旧`dc0a95f`版を取り違えて添付しない。完成動画と確認画像だけを保存し、未編集録画・モデル・profileはMacへ取得していない。
+字幕帯と収録時の文字拡大は動画の編集・配置であり、公開アプリの新設定機能とは説明しない。Xでのアップロード／再生と実スマホは未確認、投稿は未送信。
+完了文書はMarkdownだけで更新し、公開アプリと動画のsourceをずらす再デプロイを行わない。
