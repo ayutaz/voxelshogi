@@ -1,5 +1,7 @@
 # デモ動画制作計画：冒頭3秒で立体将棋を伝える
 
+**次の改訂**：承認された新UIの公開後、[実装計画U6](design/ARENA_IMPLEMENTATION_PLAN.md#u6動画更新)で再制作する。冒頭の盤を明るくし、動く駒へ寄って異層移動を伝える。以下のc878c6d版は既存の制作記録として保持する。
+
 2026-11-13 JST。[公開準備計画](PUBLIC_LAUNCH_PLAN.md)の**フェーズ5（L5）**。
 2026-11-14、[収録・編集スクリプト](../scripts/demo-video.mjs)をLinux CIで実行し、main `c878c6d`の最終版を生成した。
 [制作記録・全hash・ffprobe結果](experiments/launch-video-final-20261114.md)で15秒本編・3秒候補2本・ポスター・OGPを確認できる。全編デコードはLinux、Macでは小さい完成物の読取を行った。Chromeでの再生確認は修正前の完成版`2d1d4c9`で行い、最終版`c878c6d`は全編デコード・形式・hash・確認画像で検証した。
