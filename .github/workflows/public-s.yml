@@ -2,6 +2,11 @@ name: Public trained S
 
 on:
   workflow_dispatch:
+    inputs:
+      public_site:
+        description: Verify the deployed site at this exact main commit
+        type: boolean
+        default: true
   pull_request:
     types: [labeled]
 
@@ -41,6 +46,7 @@ jobs:
         env:
           PW_CHANNEL: ''
           E2E_COMMIT: ${{ github.sha }}
+          E2E_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.public_site && 'https://voxelshogi.yousan-apps.workers.dev' || '' }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:

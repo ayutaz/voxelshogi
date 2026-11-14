@@ -7,6 +7,14 @@ import { Game } from '../src/wasm/pkg/voxelshogi_wasm.js';
 const catalog = JSON.parse(readFileSync(new URL('../public/models/m6/catalog.json', import.meta.url), 'utf8'));
 loadWasm();
 
+test.beforeEach(async ({ request }) => {
+  if (process.env.E2E_COMMIT) {
+    const response = await request.get('/build-info.json');
+    expect(response.ok()).toBe(true);
+    expect((await response.json()).commit).toBe(process.env.E2E_COMMIT);
+  }
+});
+
 for (const precision of ['fp32', 'fp16', 'int8']) {
   test(`anonymous public S ${precision}: human move, real legal AI reply, verified format and mobile controls`, async ({ page }, info) => {
     await page.setViewportSize({ width: 390, height: 844 });
