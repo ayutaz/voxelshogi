@@ -1,6 +1,35 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { contentStartFrame, selectHook, parseFrameRate, verifyVideo } from '../demo-video.mjs';
+import { contentStartFrame, selectHook, parseFrameRate, verifyVideo, zoomAtFrame, verifyRecordedBounds, foregroundBounds, storyCuts, storyFrameSource } from '../demo-video.mjs';
+
+test('cuts out canvas resizing and keeps precisely 210/120/120 settled frames',()=>{
+  const timeline={controlsStartFrame:240,ctaStartFrame:390};
+  assert.deepEqual(storyCuts(timeline),[{start:0,end:210},{start:240,end:360},{start:390,end:510}]);
+  for(const [output,source]of [[0,0],[209,209],[210,240],[329,359],[330,390],[449,509]])assert.equal(storyFrameSource(output,timeline),source);
+  assert.throws(()=>storyFrameSource(450,timeline));
+  assert.throws(()=>storyCuts({controlsStartFrame:200,ctaStartFrame:390}));
+  assert.throws(()=>storyCuts({controlsStartFrame:240,ctaStartFrame:350}));
+});
+
+test('keeps the controls at native scale and limits the opening zoom',()=>{
+  assert.equal(zoomAtFrame(0,1.1),1);assert.equal(zoomAtFrame(18,1.1),1.05);
+  assert.equal(zoomAtFrame(24,1.1),1.1);assert.equal(zoomAtFrame(96,1.1),1.05);
+  for(const frame of [102,209,210,225,329,330,449])assert.equal(zoomAtFrame(frame,1.1),1);
+});
+test('rejects UI cut at the right edge or entering either caption band',()=>{
+  const rect={left:16,right:1064,top:180,bottom:1150};verifyRecordedBounds([rect]);
+  for(const change of [{right:1081},{left:-1},{top:175},{bottom:1161}])assert.throws(()=>verifyRecordedBounds([{...rect,...change}]));
+  // Real source-frame envelope measured before this fix: full board, not the caption pixels.
+  verifyRecordedBounds([{left:249,right:868,top:355,bottom:1095}],1.12);
+  assert.throws(()=>verifyRecordedBounds([{left:249,right:868,top:355,bottom:1095}],1.7));
+  assert.throws(()=>verifyRecordedBounds([]));
+});
+test('measures actual foreground pixels and refuses an empty recording',()=>{
+  const rgb=Buffer.from(Array.from({length:20},()=>[20,40,44]).flat());
+  for(const index of [6,7,11,12])rgb.set([230,210,160],index*3);
+  assert.deepEqual(foregroundBounds(rgb,5,4),{left:1,right:3,top:1,bottom:3});
+  assert.throws(()=>foregroundBounds(Buffer.from(Array.from({length:20},()=>[20,40,44]).flat()),5,4));
+});
 
 const frame = color => Array(4).fill(color).flat();
 test('starts at the first real frame after a sustained green recording marker', () => {

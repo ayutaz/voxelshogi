@@ -46,6 +46,48 @@ export function verifyVideo(probe, seconds) {
   assert.ok(Math.abs(Number(probe.format.duration) - seconds) <= 1 / 30, 'incorrect video duration');
 }
 
+export function zoomAtFrame(frame, maximum) {
+  if(frame<12)return 1;
+  if(frame<24)return 1+(frame-12)*(maximum-1)/12;
+  if(frame<90)return maximum;
+  if(frame<102)return maximum-(frame-90)*(maximum-1)/12;
+  return 1; // UI controls are never cropped or enlarged.
+}
+export function verifyRecordedBounds(rects, zoom=1) {
+  assert.ok(rects.length>0,'recorded content is missing');
+  for(const rect of rects){
+    const r={left:540+(rect.left-540)*zoom,right:540+(rect.right-540)*zoom,
+      top:675+(rect.top-675)*zoom,bottom:675+(rect.bottom-675)*zoom};
+    assert.ok(Object.values(r).every(Number.isFinite)&&r.right>r.left&&r.bottom>r.top,'invalid content bounds');
+    assert.ok(r.left>=0&&r.right<=1080&&r.top>=176&&r.bottom<=1160,`content intersects a caption band or frame edge: ${JSON.stringify(r)}`);
+  }
+}
+export function foregroundBounds(rgb,width,height) {
+  assert.equal(rgb.length,width*height*3);
+  let left=width,right=0,top=height,bottom=0;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    const i=(y*width+x)*3;
+    if(Math.max(Math.abs(rgb[i]-20),Math.abs(rgb[i+1]-40),Math.abs(rgb[i+2]-44))<=40)continue;
+    left=Math.min(left,x);right=Math.max(right,x+1);top=Math.min(top,y);bottom=Math.max(bottom,y+1);
+  }
+  assert.ok(right>left&&bottom>top,'no visible board foreground');
+  return {left,right,top,bottom};
+}
+export function storyCuts(timeline) {
+  assert.ok(Number.isSafeInteger(timeline.controlsStartFrame)&&timeline.controlsStartFrame>=210);
+  assert.ok(Number.isSafeInteger(timeline.ctaStartFrame)&&timeline.ctaStartFrame>=timeline.controlsStartFrame+120);
+  return [{start:0,end:210},{start:timeline.controlsStartFrame,end:timeline.controlsStartFrame+120},
+    {start:timeline.ctaStartFrame,end:timeline.ctaStartFrame+120}];
+}
+export function storyFrameSource(frame,timeline) {
+  assert.ok(Number.isSafeInteger(frame)&&frame>=0&&frame<450);
+  let offset=0;
+  for(const cut of storyCuts(timeline)){
+    if(frame<offset+cut.end-cut.start)return cut.start+frame-offset;
+    offset+=cut.end-cut.start;
+  }
+}
+
 const composition = `
 html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#14282c!important}
 .arena-app{display:block!important;width:1080px!important;height:1350px!important;padding:0!important}
@@ -56,7 +98,10 @@ html,body{margin:0!important;width:1080px!important;height:1350px!important;over
 `;
 const controlsComposition = `
 html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#0f1115!important}
-.arena-app{padding-top:170px!important;padding-bottom:100px!important}
+.arena-app{padding-top:180px!important;padding-bottom:200px!important}
+.arena-board{grid-template-rows:44px 42px minmax(170px,1fr) 52px 150px!important}
+.playback button{font-size:18px!important;height:52px!important}.playback>.row{height:52px!important}
+.playback-options>label{font-size:14px!important}.layer-rail button{font-size:16px!important}
 `;
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const web = join(root, 'apps/web');
@@ -75,7 +120,8 @@ async function record(work, commit) {
   const context = await browser.newContext({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1,
     recordVideo: { dir: join(work, 'raw'), size: { width: 1080, height: 1350 } } });
   const errors = [];
-  let video, conditions, hook;
+  let video, conditions, hook, timeline;
+  const uiLayouts=[];
   try {
     const page = await context.newPage(); video = page.video();
     page.on('pageerror', error => errors.push(error.message));
@@ -140,23 +186,43 @@ async function record(work, commit) {
     await at(5000); await go(hook + 2);
     await at(7000); await style.evaluate(node => node.remove());
     const controlsStyle = await page.addStyleTag({ content: controlsComposition });
+    const settledCanvas=async()=>{
+      await page.waitForFunction(()=>{
+        const canvas=document.querySelector('[data-testid="board3d"] canvas');if(!canvas)return false;
+        const r=canvas.getBoundingClientRect();return Math.abs(canvas.width-r.width)<2&&Math.abs(canvas.height-r.height)<2;
+      });
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      await delay(300); // ResizeObserver/R3F update frames are deliberately excluded from the edit.
+    };
+    await settledCanvas();
+    const checkControls=async()=>{
+      const rects=await page.locator('.masthead,.entry-tabs,.board2d-grid,.playback button,.playback input,.layer-rail button,.follow-explanation').evaluateAll(nodes=>nodes.map(node=>{
+        const r=node.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom};
+      }).filter(r=>r.right>r.left&&r.bottom>r.top));
+      verifyRecordedBounds(rects);uiLayouts.push({atMilliseconds:performance.now()-began,rects});
+    };
+    await checkControls();
+    timeline={controlsStartFrame:Math.ceil((performance.now()-began)*30/1000)};
     // Keep the established angle: an extra orbit would consume the short
     // controls shot. A single step branches from the selected history point.
-    await page.getByTestId('ai-step').click();
+    await delay(500);await page.getByTestId('ai-step').click();
     await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 3, { polling: 50 });
     assert.equal(await page.getByTestId('ai-phase').textContent(), '一時停止中');
-    await at(11000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
-    await at(15400);
+    await checkControls();await at((timeline.controlsStartFrame/30+3.8)*1000);await checkControls();
+    await at((timeline.controlsStartFrame/30+4.2)*1000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
+    await settledCanvas();timeline.ctaStartFrame=Math.ceil((performance.now()-began)*30/1000);
+    await at((timeline.ctaStartFrame/30+4.4)*1000);
     conditions = await exportRecord('source-ai-record.json');
     assert.equal(conditions.applicationCommit, commit);
     assert.equal(conditions.record.moves[hook - 1][2] !== conditions.record.moves[hook - 1][5], true);
     assert.deepEqual(errors, [], 'browser runtime errors');
   } finally { await context.close(); await browser.close(); }
   assert.ok(video && conditions);
-  return { raw: await video.path(), conditions, hook };
+  assert.ok(timeline);storyCuts(timeline);
+  return { raw: await video.path(), conditions, hook, uiLayouts, timeline };
 }
 
-function render(raw, work, startFrame, sourceRate, hookMove) {
+function render(raw, work, startFrame, sourceRate, hookMove, timing) {
   const font = '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc';
   readFileSync(font); // Fail before creating a video with missing Japanese glyphs.
   const lines = {
@@ -173,23 +239,26 @@ function render(raw, work, startFrame, sourceRate, hookMove) {
   ], agents: lines['agents.txt'], crossLayer: lines['cross.txt'], alternativeHook: lines['hook-b.txt'] }, null, 2) + '\n');
   const text = (file, y, size, enable) => `drawtext=fontfile=${font}:textfile=${file}:x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=white:borderw=3:bordercolor=0x0f1115${enable ? `:enable='${enable}'` : ''}`;
   const timeline = `trim=start_frame=${startFrame},setpts=PTS-STARTPTS,fps=30`;
+  const cuts=storyCuts(timing);
+  const settledStory=`[0:v]${timeline},split=3[s0][s1][s2];`+cuts.map((cut,i)=>`[s${i}]trim=start_frame=${cut.start}:end_frame=${cut.end},setpts=PTS-STARTPTS[c${i}];`).join('')+'[c0][c1][c2]concat=n=3:v=1:a=0[story];';
   // Full nine-layer view at frame 0, then enlarge the actual central cross-layer move.
   // Caption compositing follows the crop, so the opening words stay readable.
-  const zoom = maximum => `zoompan=z='if(gte(on,210)*lt(on,330),1.5,if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1)))))':x='iw/2-iw/zoom/2':y='if(gte(on,210)*lt(on,330),ih-ih/zoom,ih/2-ih/zoom/2)':d=1:s=1080x1350:fps=30`;
-  const draw = [zoom(1.7), "drawbox=x=0:y=1240:w=iw:h=110:color=0x0f1115:t=fill:enable='gte(t,7)*lt(t,11)'", text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
+  const zoom = maximum => `zoompan=z='if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1))))':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1080x1350:fps=30`;
+  const bands=['drawbox=x=0:y=0:w=iw:h=176:color=0x10191c:t=fill','drawbox=x=0:y=1160:w=iw:h=190:color=0x10191c:t=fill'];
+  const draw = [zoom(1.1), ...bands, text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
     text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 78, 'gte(t,11)'),
     text('url.txt', 1190, 43, 'gte(t,11)'), text('alpha.txt', 1260, 30, 'gte(t,11)'),
-    text('agents.txt', 1280, 30, 'lt(t,11)'), text('cross.txt', 1120, 52, 'gte(t,0.7)*lt(t,3)')];
+    text('agents.txt', 1280, 30, 'lt(t,11)'), text('cross.txt', 1180, 46, 'gte(t,0.7)*lt(t,3)')];
   const encode = (name, seconds, filters) => {
-    run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', raw, '-vf', [timeline, ...filters].join(','),
+    run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', raw, '-filter_complex', settledStory+'[story]'+filters.join(',')+'[out]', '-map','[out]',
       '-frames:v', String(seconds * 30), '-an', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', name], { cwd: work });
     verifyVideo(probe(join(work, name)), seconds);
     run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-xerror', '-i', name, '-map', '0:v:0', '-f', 'null', '-'], { cwd: work });
   };
   assert.ok(sourceRate >= 10);
   encode('demo-main.mp4', 15, draw);
-  encode('hook-a.mp4', 3, [zoom(1.7), text('hook-a.txt', 76, 78), text('agents.txt', 1280, 30), text('cross.txt', 1120, 52, 'gte(t,0.7)')]);
-  encode('hook-b.mp4', 3, [zoom(1.95), text('hook-b.txt', 76, 72), text('agents.txt', 1280, 30), text('cross.txt', 1120, 52, 'gte(t,0.7)')]);
+  encode('hook-a.mp4', 3, [zoom(1.1), ...bands, text('hook-a.txt', 76, 78), text('agents.txt', 1280, 30), text('cross.txt', 1180, 46, 'gte(t,0.7)')]);
+  encode('hook-b.mp4', 3, [zoom(1.12), ...bands, text('hook-b.txt', 76, 72), text('agents.txt', 1280, 30), text('cross.txt', 1180, 46, 'gte(t,0.7)')]);
   run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', 'demo-main.mp4', '-frames:v', '1', 'poster.png'], { cwd: work });
   // A real board frame on the right, with sharing copy outside the board.
   const ogpText = (file, y, size) => `drawtext=fontfile=${font}:textfile=${file}:x=40:y=${y}:fontsize=${size}:fontcolor=white`;
@@ -229,13 +298,32 @@ async function main() {
     const pixels = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', captured.raw, '-vf', 'crop=2:2:0:0', '-pix_fmt', 'rgb24', '-f', 'rawvideo', '-'], { maxBuffer: 1024 * 1024 });
     assert.equal(pixels.status, 0, String(pixels.stderr));
     const startFrame = contentStartFrame(pixels.stdout);
-    assert.ok(Number(rawProbe.format.duration) - startFrame / sourceRate >= 15, 'not enough real footage');
-    render(captured.raw, work, startFrame, sourceRate, captured.conditions.record.moves[captured.hook-1]);
-    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json'];
+    assert.ok(Number(rawProbe.format.duration) - startFrame / sourceRate >= storyCuts(captured.timeline).at(-1).end/30, 'not enough settled footage');
+    const boardBounds=[];
+    for(const seconds of [0,0.4,0.7,1.5,2.9,3.2,6.9,11.2,14.9]){
+      const frame=spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-ss',String(startFrame/sourceRate+storyFrameSource(Math.round(seconds*30),captured.timeline)/30),'-i',captured.raw,
+        '-vf','crop=1080:950:0:200','-frames:v','1','-pix_fmt','rgb24','-f','rawvideo','-'],{maxBuffer:4*1024*1024});
+      assert.equal(frame.status,0,String(frame.stderr));const r=foregroundBounds(frame.stdout,1080,950),rect={...r,top:r.top+200,bottom:r.bottom+200};
+      const zoom=zoomAtFrame(Math.round(seconds*30),seconds<3?1.12:1.1);
+      verifyRecordedBounds([rect],zoom);boardBounds.push({seconds,rect,zoom});
+    }
+    render(captured.raw, work, startFrame, sourceRate, captured.conditions.record.moves[captured.hook-1],captured.timeline);
+    const reviewFrames=[];
+    for(const [name,times]of [['main',[0,0.4,0.7,1.5,2.9,3,3.2,6.9,7,7.2,7.5,10.8,11,11.2,14.9]],['a',[0,1.5,2.9]],['b',[0,1.5,2.9]]]){
+      for(const seconds of times){
+        const file=`review-${name}-${String(seconds).replace('.','-')}.png`;
+        run('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',String(seconds),'-i',name==='main'?'demo-main.mp4':`hook-${name}.mp4`,'-frames:v','1',file],{cwd:work});
+        reviewFrames.push({file,seconds,source:name});
+      }
+    }
+    writeFileSync(join(work,'framing.json'),JSON.stringify({schema:1,captionBands:{top:[0,176],bottom:[1160,1350]},
+      openingZoom:{a:1.1,b:1.12},controlsZoom:1,timeline:captured.timeline,sourceCuts:storyCuts(captured.timeline),uiLayouts:captured.uiLayouts,boardBounds,reviewFrames,
+      recordedBoundsVerified:true,visualReviewComplete:false},null,2)+'\n');
+    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json','framing.json',...reviewFrames.map(f=>f.file)];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
       candidate,
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
-      fullRecordReplayedByRust: true, fullDecodeValidated: true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
+      fullRecordReplayedByRust: true, fullDecodeValidated: true, recordedBoundsVerified:true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
       performanceMeasurement: false, soundRequired: false,
       recordingScriptSha256: sha(fileURLToPath(import.meta.url)), webLockSha256: sha(join(web, 'pnpm-lock.yaml')),
       ffmpeg: run('ffmpeg', ['-version']).split('\n')[0], japaneseFontSha256: sha('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'),

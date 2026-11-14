@@ -1,5 +1,7 @@
 # 観戦UI再設計の公開確認
 
+**動画の目視判定を訂正（2026-11-14）**：後続の詳細確認で2D盤／速度スライダーの見切れと字幕の重なりを発見した。旧動画を投稿用完成版とする判定を撤回し、[修正と再確認](VIDEO_FRAMING_FIX.md)を進めている。以下のアプリ公開・D1保存の成功と、旧動画の形式／hash記録は保持する。
+
 2026-11-14 JST。[U2〜U6](design/ARENA_IMPLEMENTATION_PLAN.md)の確認記録。
 実装PR [#187](https://github.com/ayutaz/voxelshogi/pull/187)は必須8件・関連CI成功、最新main・CodeQL重大0を確認して通常squash mergeした。
 統合sourceは `dc0a95fa00d4957b2a4d2712f27a0f469a6c3a7b`。
