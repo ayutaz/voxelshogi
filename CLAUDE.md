@@ -1,6 +1,6 @@
 # CLAUDE.md — VoxelShogi
 
-**2026-11-15・音の追加**：Web版SEの[調査・音の割当・段階別ゴール](docs/WEB_SOUND_PLAN.md)を整理した。SEは未実装。動画は確認済みの映像を保持し、[オリジナルBGM](docs/DEMO_BGM.md)のLinux制作・音量と映像不変の検証を進める。
+**2026-11-15・音の追加**：Web版SEの[調査・音の割当・段階別ゴール](docs/WEB_SOUND_PLAN.md)を整理した。SEは未実装。動画は確認済みの映像を保持し、[オリジナルBGM](docs/DEMO_BGM.md)のLinux制作・音量・映像不変検証が完了。
 
 **2026-11-15・HF Model Cardを整理**：モデル概要・使い方・配布形式・評価・制約を読みやすく再構成し、HFへ反映済み。[比較・固定版との違い・確認記録](docs/MODEL_CARD_REVIEW.md)。Webの固定版・重み・公開設定は維持する。
 
