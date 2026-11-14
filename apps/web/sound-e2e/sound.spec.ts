@@ -68,8 +68,12 @@ test('no audio before activation; test cue reaches the real output graph once',a
 test('accepted live capture produces one heavier cue and rejected clicks produce none',async({page})=>{
   await instrument(page);await page.goto('/');await human(page);await load(page);
   await page.locator('.board2d [data-square="364"]').click();expect((await evidence(page)).starts).toHaveLength(0);
-  await page.locator('.board2d [data-square="355"]').click();
-  await expect.poll(async()=>(await evidence(page)).starts.length).toBe(1);await page.getByTestId('toggle-run').click();
+  // Commit the capture and pause in one browser turn, before the real AI reply timer.
+  // Separate Playwright round trips can take longer than the 400ms reply delay on WebKit.
+  await page.evaluate(()=>{document.querySelector<HTMLButtonElement>('.board2d [data-square="355"]')!.click();document.querySelector<HTMLButtonElement>('[data-testid="toggle-run"]')!.click();});
+  await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
+  await expect(page.getByTestId('toggle-run')).toHaveText('再開');
+  await expect.poll(async()=>(await evidence(page)).starts.length).toBe(1);
   await expect.poll(async()=>(await evidence(page)).peak).toBeGreaterThan(0.001);
   expect((await evidence(page)).starts[0]).toBeCloseTo(0.13,3);
   await page.waitForTimeout(180);expect((await evidence(page)).starts).toHaveLength(1);
