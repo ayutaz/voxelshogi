@@ -15,8 +15,15 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'human-return-live', file: 'App.tsx', before: "if (mode !== 'r-r' && ply === snap.moveCount", after: "if (false && mode !== 'r-r' && ply === snap.moveCount", test: 'app-launch', extension: 'tsx' },
+  { name: 'branch-confirm', file: 'App.tsx', before: "if (!window.confirm('この局面から", after: "if (false && !window.confirm('この局面から", test: 'app-launch', extension: 'tsx' },
+  { name: 'human-selection-follow', file: 'App.tsx', before: 'if (!humanTurn) return;\n    setSlice(slice); setLayers(layers);', after: 'if (!humanTurn) return;\n    manualView();', test: 'app-launch', extension: 'tsx' },
+  { name: 'human-first-model-seat', file: 'App.tsx', before: "if (draftOpponent === 'model' && !library.choices[side])", after: 'if (false)', test: 'app-models', extension: 'tsx' },
+  { name: 'automatic-branch-prefix', file: 'collection/automatic-client.ts', before: 'if (candidate.record.moves.length <= g.minimumMoves) return;', after: '', test: 'automatic-client' },
+  { name: 'automatic-metadata-recovery', file: 'collection/automatic-client.ts', before: 'if (this.disposed || attempt === 3) return;', after: 'if (true) return;', test: 'automatic-client' },
+  { name: 'white-first-record-labels', file: 'components/Panels.tsx', before: "const initialSide = snap.ply % 2 === 0 ? snap.side : snap.side === 'b' ? 'w' : 'b';", after: "const initialSide = 'b';", test: 'panels-side', extension: 'tsx' },
   { name: 'automatic-native-fetch', file: 'collection/automatic-client.ts', before: 'fetch.bind(globalThis)', after: 'fetch', test: 'automatic-client' },
-  { name: 'automatic-import-exclusion', file: 'collection/automatic-client.ts', before: 'this.game = newGame(owned);', after: 'this.game = newGame(true);', test: 'automatic-client' },
+  { name: 'automatic-import-exclusion', file: 'collection/automatic-client.ts', before: 'this.game = newGame(owned, minimumMoves);', after: 'this.game = newGame(true, minimumMoves);', test: 'automatic-client' },
   { name: 'automatic-retry-immutable-body', file: 'collection/automatic-client.ts', before: 'body: p.body, signal:', after: 'body: p.attempts ? p.body.replace(\'"version":1\', \'"version":99\') : p.body, signal:', test: 'automatic-client' },
   { name: 'match-start-cancel', file: 'App.tsx', before: 'if (!reset(nextMode)) return;', after: 'reset(nextMode);', test: 'app-launch', extension: 'tsx' },
   { name: 'human-selected-side', file: 'App.tsx', before: 'setDraftMode(e.target.value as Mode)', after: "setDraftMode('h-r')", test: 'app-launch', extension: 'tsx' },
@@ -256,7 +263,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 196);
+    assert.equal(results.length, 203);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

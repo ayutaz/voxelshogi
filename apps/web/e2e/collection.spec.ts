@@ -20,7 +20,7 @@ test('automatically saves a human move and terminal result without any collectio
   expect(new Set(posts.map(p => p.gameId)).size).toBe(1);
   const final = posts.at(-1)!;
   expect(final).toMatchObject({ schema: 2, policy: 'automatic-game-v2', mode: 'h-r', conditionsScope: 'game-start',
-    record: { moves: ['577567', expect.any(String)], result: { Win: { winner: 'White', reason: 'Resignation' } }, termination: 'Resignation' } });
+    record: { moves: ['575565', expect.any(String)], result: { Win: { winner: 'White', reason: 'Resignation' } }, termination: 'Resignation' } });
   expect(Object.keys(final).sort()).toEqual(['applicationCommit','conditionsScope','gameId','mode','policy','record','requestId','schema','selectedAgents','state','version']);
   const replay = Game.fromRecordJson(JSON.stringify(final.record));
   try { expect(replay.moveCount()).toBe(2); expect(replay.isFinished()).toBe(true); } finally { replay.free(); }
@@ -50,8 +50,9 @@ test('imported records and explicit branches from imports produce no collection 
   let posts = 0;
   await page.route('**/api/games', route => { posts++; return route.fulfill({ status: 503 }); });
   await page.goto('/'); await selectSetting(page,'mode','h-r');
+  page.on('dialog',dialog=>dialog.accept());
   const engine = new Game(); let record: string;
-  try { engine.play('577567'); record = engine.recordJson(); } finally { engine.free(); }
+  try { engine.play('575565'); record = engine.recordJson(); } finally { engine.free(); }
   await page.getByTestId('import').setInputFiles({ name: 'import.json', mimeType: 'application/json', buffer: Buffer.from(record) });
   await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
   await page.getByTestId('undo').click(); await page.getByRole('button', { name: 'この局面から対戦を分岐', exact: true }).click();

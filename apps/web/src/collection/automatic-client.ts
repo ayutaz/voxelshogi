@@ -3,11 +3,11 @@ import { MAX_GAME_BYTES } from './contract';
 
 export type StartConditions = Pick<AutomaticSubmission, 'mode' | 'selectedAgents'>;
 interface Game {
-  id: string; owned: boolean; version: number; progressWrites: number; terminal: boolean;
+  id: string; owned: boolean; minimumMoves: number; version: number; progressWrites: number; terminal: boolean;
   latest: AutomaticSubmission['record'] | null; conditions: StartConditions | null; queued: string;
 }
 interface Pending { gameId: string; requestId: string; version: number; body: string; attempts: number }
-const newGame = (owned: boolean): Game => ({ id: crypto.randomUUID(), owned, version: 0, progressWrites: 0,
+const newGame = (owned: boolean, minimumMoves = 0): Game => ({ id: crypto.randomUUID(), owned, minimumMoves, version: 0, progressWrites: 0,
   terminal: false, latest: null, conditions: null, queued: '' });
 
 /** No UI state. One in-flight immutable request; bounded latest-snapshot queue. */
@@ -22,6 +22,8 @@ export class AutomaticCollection {
   private active: Pending | null = null;
   private abort: AbortController | null = null;
   private metadataAbort = new AbortController();
+  private metadataRetry: ReturnType<typeof setTimeout> | null = null;
+  private metadataWake: (() => void) | null = null;
   private retry: ReturnType<typeof setTimeout> | null = null;
   private interval: ReturnType<typeof setInterval>;
   constructor(private fetcher: typeof fetch = fetch.bind(globalThis)) {
@@ -30,18 +32,30 @@ export class AutomaticCollection {
   }
   get gameId() { return this.game.id; }
   private async initialize() {
-    try {
-      const read = async (url: string) => {
-        const response = await this.fetcher(url, { signal: this.metadataAbort.signal, credentials: 'omit', cache: 'no-store', redirect: 'error' });
-        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('metadata');
-        return response.json();
-      };
-      const [config, build] = await Promise.all([read('/api/collection'), read('/build-info.json')]);
-      if (this.disposed || config?.enabled !== true || config?.policy !== AUTOMATIC_POLICY || !Array.isArray(config.schemas) || !config.schemas.includes(2) || typeof build?.commit !== 'string' || !/^[0-9a-f]{40}$/.test(build.commit)) return;
-      this.commit = build.commit; this.enabled = true;
-      for (const [id, game] of this.staged) { this.staged.delete(id); this.enqueue(game, true); }
-      this.flush();
-    } catch { /* Collection never blocks or changes the game. */ }
+    for (let attempt=0;attempt<4&&!this.disposed;attempt++) {
+      const abort = new AbortController(); this.metadataAbort = abort;
+      const timeout = setTimeout(() => abort.abort(),10000);
+      try {
+        const read = async (url: string) => {
+          const response = await this.fetcher(url, { signal: abort.signal, credentials: 'omit', cache: 'no-store', redirect: 'error' });
+          if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('metadata');
+          return response.json();
+        };
+        const [config, build] = await Promise.all([read('/api/collection'), read('/build-info.json')]);
+        if (this.disposed || config?.enabled === false) return;
+        if (config?.enabled !== true || config?.policy !== AUTOMATIC_POLICY || !Array.isArray(config.schemas) || !config.schemas.includes(2) || typeof build?.commit !== 'string' || !/^[0-9a-f]{40}$/.test(build.commit)) throw new Error('metadata');
+        this.commit = build.commit; this.enabled = true;
+        for (const [id, game] of this.staged) { this.staged.delete(id); this.enqueue(game, true); }
+        this.flush();
+        return;
+      } catch { /* Collection never blocks or changes the game. */ }
+      finally { clearTimeout(timeout); }
+      if (this.disposed || attempt === 3) return;
+      await new Promise<void>(resolve => {
+        this.metadataWake = resolve;
+        this.metadataRetry = setTimeout(() => { this.metadataRetry = null; this.metadataWake = null; resolve(); },[2000,8000,30000][attempt]!);
+      });
+    }
   }
   observe(recordJson: string, conditions: StartConditions) {
     const g = this.game;
@@ -54,18 +68,19 @@ export class AutomaticCollection {
       if (record && typeof record === 'object' && 'result' in record && record.result !== null) candidate.state = 'finished';
       else if (record && typeof record === 'object' && 'termination' in record && record.termination === 'Abandoned') candidate.state = 'aborted';
       if (!isAutomaticSubmission(candidate) || new TextEncoder().encode(JSON.stringify(candidate)).length > MAX_GAME_BYTES) return;
+      if (candidate.record.moves.length <= g.minimumMoves) return;
       g.conditions ??= structuredClone(conditions);
       g.latest = candidate.record;
       if (g.version === 0 || candidate.state !== 'progress') this.flush();
     } catch { /* Malformed/imported/oversize data is not sent. */ }
   }
   /** Called before a store replacement; the previous game keeps its own frozen ID/body. */
-  begin(owned: boolean) {
+  begin(owned: boolean, minimumMoves = 0) {
     if (!this.enabled && this.game.owned && this.game.latest) {
       if (this.staged.size >= 8) this.staged.delete(this.staged.keys().next().value!);
       this.staged.set(this.game.id, this.game);
     } else this.flush(true);
-    this.game = newGame(owned);
+    this.game = newGame(owned, minimumMoves);
   }
   flush(abandoned = false) {
     this.enqueue(this.game, abandoned);
@@ -104,7 +119,7 @@ export class AutomaticCollection {
       const response = await this.fetcher('/api/games', { method: 'POST', headers: { 'content-type': 'application/json' },
         body: p.body, signal: abort.signal, credentials: 'omit', cache: 'no-store', redirect: 'error',
         keepalive: new TextEncoder().encode(p.body).length <= 60 * 1024 });
-      retryable = response.status >= 500 || response.status === 408 || response.status === 429 || response.ok;
+      retryable = response.status >= 500 || response.status === 408 || response.ok;
       if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('response');
       const ack = await response.json();
       acknowledged = ack?.gameId === p.gameId && ack?.requestId === p.requestId && Number.isSafeInteger(ack?.version) && ack.version >= p.version && ['received_unverified', 'verified', 'rejected'].includes(ack?.status);
@@ -118,6 +133,7 @@ export class AutomaticCollection {
   }
   dispose() {
     this.disposed = true; clearInterval(this.interval); if (this.retry) clearTimeout(this.retry);
+    if (this.metadataRetry) clearTimeout(this.metadataRetry); this.metadataWake?.();
     this.metadataAbort.abort(); this.abort?.abort(); this.pending.clear(); this.staged.clear(); this.game.latest = null;
   }
 }

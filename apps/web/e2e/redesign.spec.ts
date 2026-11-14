@@ -36,6 +36,7 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) {
     await page.goto('/');
     await display(page,'2d');
     await expect(page.locator('.board2d .cell')).toHaveCount(81);
+    const path=info.outputPath(`attachments/launch-reading-${width}.png`);await page.screenshot({path,fullPage:true});await info.attach(`reading-${width}`,{path,contentType:'image/png'});
     const layout = await page.evaluate(() => {
       const rect = (selector:string) => { const r=document.querySelector(selector)!.getBoundingClientRect(); return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width,height:r.height}; };
       return { board:rect('.board2d-grid'), first:rect('.board2d .cell'), toggle:rect('[data-testid="toggle-run"]'), follow:rect('[data-testid="follow-move"]'), overflow:document.documentElement.scrollWidth>innerWidth, width:innerWidth,height:innerHeight };
@@ -47,6 +48,5 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) {
     const layer = page.getByRole('combobox',{name:'表示する層'});
     if(await layer.isVisible())expect((await layer.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     else { for(const rect of await page.locator('.layer-rail button').evaluateAll(buttons=>buttons.map(b=>({height:b.getBoundingClientRect().height,width:b.getBoundingClientRect().width})))){expect(rect.height).toBeGreaterThanOrEqual(44);expect(rect.width).toBeGreaterThanOrEqual(44);} }
-    const path=info.outputPath(`attachments/launch-reading-${width}.png`);await page.screenshot({path,fullPage:true});await info.attach(`reading-${width}`,{path,contentType:'image/png'});
   });
 }

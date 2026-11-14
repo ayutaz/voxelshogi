@@ -103,6 +103,19 @@ it('keeps the replaced game separate while build metadata is still loading', asy
   expect(packet(0)).toMatchObject({ gameId: oldId, state: 'aborted', record: { moves: ['191281'] } });
   expect(packet(1)).toMatchObject({ gameId: client.gameId, state: 'progress', record: { moves: ['991891'] } });
 });
+it('recovers a transient metadata failure and saves the first move already played', async () => {
+  fetcher.mockRejectedValueOnce(new Error('offline'));
+  client = new AutomaticCollection(fetcher); client.observe(record(),conditions);
+  await tick();expect(posts).toHaveLength(0);
+  await vi.advanceTimersByTimeAsync(1999);expect(posts).toHaveLength(0);
+  await vi.advanceTimersByTimeAsync(1);await client.ready;
+  expect(posts).toHaveLength(1);expect(packet(0).record.moves).toEqual(['191281']);
+});
+it('does not save a copied branch prefix before its first new real move', async () => {
+  client = new AutomaticCollection(fetcher);await client.ready;
+  client.begin(true,1);client.observe(record(),conditions);client.flush();await tick();expect(posts).toHaveLength(0);
+  client.observe(record(['191281','991891']),conditions);await tick();expect(posts).toHaveLength(1);
+});
 
 it('binds native fetch, omits credentials, and keeps unavailable metadata or invalid payloads silent', async () => {
   vi.stubGlobal('fetch', function(this: unknown, url: string, options?: RequestInit) {
@@ -113,7 +126,7 @@ it('binds native fetch, omits credentials, and keeps unavailable metadata or inv
   expect(posts[0]!.options).toMatchObject({ credentials: 'omit', redirect: 'error', cache: 'no-store' });
   client.begin(true); client.observe('invalid', conditions); client.observe(record(Array(2049).fill('191281')), conditions); await tick();
   expect(posts).toHaveLength(2); // replacement finalization only
-  client.dispose(); fetcher.mockResolvedValue(Response.json({ enabled: false }));
+  client.dispose(); fetcher.mockImplementation(async () => Response.json({ enabled: false }));
   client = new AutomaticCollection(fetcher); await client.ready; client.observe(record(), conditions); await tick();
   expect(posts).toHaveLength(2);
 });

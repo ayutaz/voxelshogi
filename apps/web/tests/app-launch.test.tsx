@@ -12,6 +12,7 @@ vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
   snapshot = () => fake.snap;
   newGame = fake.reset; goto = fake.goto;
   importRecord = fake.imported;
+  play = () => ({ok:true});
   exportRecord = () => fake.record;
 } }));
 vi.mock('../src/ai/arena-controller', () => ({ DEFAULT_AI_OPTIONS: { seed: 42, limits: { maxDepth: 6, maxNodes: 50000, maxTimeMs: 1000 } }, ArenaController: class {
@@ -70,7 +71,7 @@ it('undo and redo follow only the cursor move even when a future move remains in
   expect(screen.getByTestId('last-move').textContent).toContain('先手 5七V→5六VI');
   expect((screen.getByTestId('slice-index') as HTMLInputElement).value).toBe('5');
   act(() => {
-    fake.snap = { ...fake.snap, ply: 2, lastMove: '535544' };
+    fake.snap = { ...fake.snap, ply: 2, side:'b', lastMove: '535544' };
     for (const fn of fake.listeners) fn();
   });
   expect(screen.getByTestId('last-move').textContent).toContain('後手 5三V→5四IV');
@@ -232,4 +233,29 @@ it('requires an explicit human history branch and retains only the chosen prefix
   fireEvent.change(screen.getByTestId('mode'), { target: { value: 'h-r' } });
   fireEvent.click(screen.getByRole('button', { name: 'この局面から対戦を分岐' }));
   expect(fake.imported).toHaveBeenCalledWith(JSON.stringify({ ruleset_id: 'voxelshogi-standard-v1', initial: 'fixture', moves: [], result: null, termination: null }));
+});
+it('resumes a human match when returning from history to its live tail', () => {
+  fake.snap = { ...fake.snap,ply:0,moveCount:1,moves:['575565'] };
+  vi.spyOn(window,'confirm').mockReturnValue(true);render(<App />);
+  fireEvent.change(screen.getByTestId('mode'),{target:{value:'h-r'}});
+  fireEvent.click(screen.getByTestId('undo'));
+  fireEvent.click(screen.getByTestId('redo'));
+  expect(fake.configure.mock.calls.at(-1)![0]).toMatchObject({running:true});
+});
+it('keeps the original record when explicit history branching is cancelled', () => {
+  fake.snap = { ...fake.snap,ply:0,moveCount:1,moves:['575565'] };
+  fake.record=JSON.stringify({initial:'fixture',moves:['575565'],result:null,termination:null});
+  const confirm=vi.spyOn(window,'confirm').mockReturnValue(true);render(<App />);
+  fireEvent.change(screen.getByTestId('mode'),{target:{value:'h-r'}});
+  confirm.mockReturnValue(false);fireEvent.click(screen.getByRole('button',{name:'この局面から対戦を分岐'}));
+  expect(fake.imported).not.toHaveBeenCalled();
+});
+it('retains automatic layer following while a human selects and plays a piece', () => {
+  fake.snap.board[382]=1;fake.snap.legal=['575565'];render(<App />);
+  fireEvent.change(screen.getByTestId('mode'),{target:{value:'h-r'}});
+  fireEvent.click(screen.getByRole('button',{name:'5七V 先手 歩'}));
+  expect((screen.getByTestId('follow-move') as HTMLInputElement).checked).toBe(true);
+  fireEvent.click(screen.getByRole('button',{name:'5六V 空きマス 移動候補'}));
+  expect((screen.getByTestId('follow-move') as HTMLInputElement).checked).toBe(true);
+  expect(fake.configure.mock.calls.at(-1)![0]).toMatchObject({running:true});
 });

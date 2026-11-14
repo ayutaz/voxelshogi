@@ -85,6 +85,7 @@ export function resultText(r: ResultInfo): string {
 }
 
 export function MoveList({ snap, onGoto, testId = 'move-list' }: { snap: Snapshot; onGoto: (ply: number) => void; testId?: string }) {
+  const initialSide = snap.ply % 2 === 0 ? snap.side : snap.side === 'b' ? 'w' : 'b';
   return (
     <ol className="move-list" data-testid={testId}>
       <li className={snap.ply === 0 ? 'current' : ''}>
@@ -95,7 +96,7 @@ export function MoveList({ snap, onGoto, testId = 'move-list' }: { snap: Snapsho
       {snap.moves.map((m, i) => (
         <li key={i} className={snap.ply === i + 1 ? 'current' : i + 1 > snap.ply ? 'future' : ''}>
           <button type="button" onClick={() => onGoto(i + 1)}>
-            {i + 1}. {i % 2 === 0 ? '☗' : '☖'}
+            {i + 1}. {(i % 2 === 0 ? initialSide : initialSide === 'b' ? 'w' : 'b') === 'b' ? '☗' : '☖'}
             {formatMove(m)}
           </button>
         </li>

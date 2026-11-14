@@ -185,7 +185,9 @@ test('new game, difficulty, undo/redo, goto and import invalidate a pending sear
   };
   await begin(); await page.getByTestId('undo').click();
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
-  await begin(); await page.getByTestId('redo').click();
+  // Return to the retained tail before the cancelled Worker's old reply could arrive.
+  // An explicit branch now discards future plies, so it is a different operation.
+  await page.getByTestId('redo').click();
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   await begin(); await page.getByRole('button', { name: '開始局面', exact: true }).click();
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');

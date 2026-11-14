@@ -15,6 +15,7 @@ export default defineConfig({
   use: {
     baseURL: remoteBaseURL ?? 'http://localhost:4173',
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chrome', use: { ...devices['Desktop Chrome'], ...(channel ? { channel } : {}) } }],
   webServer: remoteBaseURL
