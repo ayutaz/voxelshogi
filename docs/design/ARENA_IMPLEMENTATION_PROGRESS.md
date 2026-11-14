@@ -69,3 +69,8 @@ Reactが所有する文字要素へ座標だけを反映し、別rootのDOM削�
 最終調整では、全層表示でも選択層を枠線と文字で強調し、狭幅の1手思考を主ボタンから中断できるようにした。
 AI手番の持ち駒も実際にdisabledにし、終局位置では主ボタンを「対局終了」と表示する。
 候補のUI検証は53件、既知Web変異は209件。公開後には通常の応答制御E2Eと別に、実公開ブラウザで自分の合成対局1件を作り、Native fetchの応答・Rust再生・実D1の本文／hashと削除まで確認する。D1資格情報はCIへ渡さない。
+
+source `f02af61`は[候補UI](https://github.com/ayutaz/voxelshogi/actions/runs/43572182718)で53件・実モデル6＋7件・カメラ3回・動画、[品質](https://github.com/ayutaz/voxelshogi/actions/runs/43572185140)で209変異すべてを検出し成功。必須8件と関連CI、CodeQL重大0も確認した。
+[最終ソースレビュー](../reviews/claude-code-arena-final-source-20261114.md)は重大／中0。設定からAI条件を変えた直後は停止し「再開」を押す仕様が軽微として残る。
+[同sourceの7画像レビュー](../reviews/claude-code-arena-images-20261114.md)は重大0・中1で、読込メッセージが後手の持ち駒欄に残る点を指摘した。[画像の出典／hash](../experiments/arena-review-images-20261114.json)を保持する。
+メッセージだけを閉じて対局／履歴を保持する操作をREDから追加し、3サイズの履歴・終局画像を取り直す。これにより既知Web変異は210件。指摘の解消と公開はまだ確認途中。

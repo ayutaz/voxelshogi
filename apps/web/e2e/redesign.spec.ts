@@ -54,12 +54,14 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) {
     const record={...initial,moves:['999888','111222'],result:null,termination:null};
     const load=async(value:unknown)=>page.getByTestId('import').setInputFiles({name:'fixed.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))});
     await load(record);await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
+    await page.getByRole('button',{name:'メッセージを閉じる'}).click();await expect(page.getByRole('alert')).toHaveCount(0);
     await page.getByTestId('undo').click();await expect(page.getByTestId('ai-phase')).toContainText('履歴 1/2手');
     const branch=page.getByRole('button',{name:'この局面から対戦を分岐',exact:true});await expect(branch).toBeInViewport();
     expect((await branch.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     const path=info.outputPath(`attachments/launch-history-${width}.png`);await page.screenshot({path,fullPage:true});await info.attach('history',{path,contentType:'image/png'});
     await load({...record,result:{Win:{winner:'White',reason:'Resignation'}},termination:'Resignation'});
+    await page.getByRole('button',{name:'メッセージを閉じる'}).click();await expect(page.getByRole('alert')).toHaveCount(0);
     await page.getByRole('button',{name:'盤面を見る',exact:true}).click();
     await expect(page.getByRole('region',{name:'対局結果'})).toHaveCount(0);await expect(page.locator('.board2d .cell')).toHaveCount(81);
     const terminal=info.outputPath(`attachments/launch-terminal-${width}.png`);await page.screenshot({path:terminal,fullPage:true});await info.attach('terminal',{path:terminal,contentType:'image/png'});

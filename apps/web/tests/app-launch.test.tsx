@@ -48,6 +48,15 @@ it('offers model-free viewing beside the board and explains the rules', () => {
   expect(screen.getByTestId('toggle-run').textContent).toBe('観戦を開始');
 });
 
+it('dismisses a persistent import message without changing the game or history',async()=>{
+  render(<App/>);const before=fake.snap;
+  await act(async()=>{fireEvent.change(screen.getByTestId('import'),{target:{files:[{size:2,text:async()=>'{}'}]}});});
+  expect(screen.getByRole('alert').textContent).toContain('棋譜を読み込みました');
+  fireEvent.click(screen.getByRole('button',{name:'メッセージを閉じる'}));
+  expect(screen.queryByRole('alert')).toBeNull();expect(fake.snap).toBe(before);
+  expect(fake.reset).not.toHaveBeenCalled();expect(fake.goto).not.toHaveBeenCalled();
+});
+
 it('shows the current move and follows its destination, including undo to the start', () => {
   render(<App />); moves();
   fireEvent.click(screen.getByRole('button', { name: '表示設定' }));

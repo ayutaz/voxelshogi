@@ -29,5 +29,5 @@ it('ignores an obsolete file read but accepts a fresh import under StrictMode', 
     fireEvent.change(screen.getByTestId('import'), { target: { files: [{ size: 1000, text: async () => JSON.stringify(fixtures[0]!.record) }] } });
   });
   expect(pawn()).toBe(''); // the valid two-king record has no pawn on layer V
-  expect(screen.getByRole('alert').textContent).toBe('棋譜を読み込みました');
+  expect(screen.getByRole('alert').textContent).toContain('棋譜を読み込みました');
 });
