@@ -1,5 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, type ThreeEvent } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
@@ -7,6 +7,7 @@ import type { Selection } from '../game/interaction';
 import type { BoardSnapshot } from '../game/boardSnapshot';
 import { RenderReady } from './RenderReady';
 import { useTrailMotion } from './useTrailMotion';
+import { layerLabelPosition } from './layer-label-position';
 
 export interface LayerView {
   /** 'all': every layer opaque; 'focus': the focused layer opaque, others dimmed by `dim`. */
@@ -179,18 +180,29 @@ function MoveTrail({ move }: { move: string }) {
 }
 
 function LayerGrid({ view }: { view: LayerView }) {
-  const layers = view.mode === 'all' ? [0, 1, 2, 3, 4, 5, 6, 7, 8] : [view.z];
+  const layers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <>
       {layers.map((z) => (
         <gridHelper
           key={z}
-          args={[9 * CELL, 9, view.mode === 'all' ? '#5b6474' : '#9fb3d1', view.mode === 'all' ? '#3a4150' : '#6f7f99']}
+          args={[9 * CELL, 9, z === view.z ? '#ffd18b' : view.mode === 'all' ? '#9bd6cd' : '#3e6169', z === view.z ? '#c5ab82' : view.mode === 'all' ? '#6c9398' : '#2e4b52']}
           position={[0, (z - 4) * LAYER_GAP - 0.16, 0]}
         />
       ))}
     </>
   );
+}
+
+function LayerLabels({labels}:{labels:RefObject<(HTMLSpanElement|null)[]>}) {
+  useFrame(({camera,size})=>{
+    camera.updateMatrixWorld();
+    labels.current.forEach((label,z)=>{
+      if(!label)return;const {x,y}=layerLabelPosition(camera,size,z);
+      label.style.transform=`translate(${x}px,${y}px)`;
+    });
+  });
+  return null;
 }
 
 export function Board3D({
@@ -199,7 +211,7 @@ export function Board3D({
   view,
   onSquare,
   showTrail = false,
-  cameraPosition = [0, 13, 15],
+  cameraPosition = [0, 14, 23],
 }: {
   snap: BoardSnapshot;
   selection: Selection;
@@ -209,20 +221,23 @@ export function Board3D({
   onSquare: (index: number) => void;
 }) {
   const [ready, setReady] = useState(false);
+  const labels=useRef<(HTMLSpanElement|null)[]>([]);
   return (
     <div className="board3d" data-testid="board3d" data-ready={ready} aria-busy={!ready}>
       {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
       <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]} frameloop="demand">
         <RenderReady onReady={() => setReady(true)} />
-        <color attach="background" args={['#14171d']} />
-        <ambientLight intensity={0.8} />
+        <color attach="background" args={['#14282c']} />
+        <ambientLight intensity={1.15} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />
         <LayerGrid view={view} />
+        <LayerLabels labels={labels} />
         <Pieces snap={snap} view={view} onSquare={onSquare} />
         <Highlights snap={snap} selection={selection} onSquare={onSquare} />
         {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}
         <OrbitControls makeDefault enableDamping target={[0, 0, 0]} />
       </Canvas>
+      <div className="layer-labels" aria-hidden="true" style={{opacity:ready?1:0}}>{['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z)=><span key={label} className={`layer-label${z===view.z?' selected':''}`} ref={el=>{labels.current[z]=el;}}>{label}</span>)}</div>
     </div>
   );
 }

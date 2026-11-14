@@ -11,14 +11,16 @@ export function Hands({
   color,
   selection,
   onHand,
+  interactive = true,
 }: {
   snap: Snapshot;
   color: Color;
   selection: Selection;
   onHand: (kind: HandKind) => void;
+  interactive?: boolean;
 }) {
   const counts = handCounts(snap.hands)[color];
-  const active = snap.side === color && !snap.result;
+  const active = interactive && snap.side === color && !snap.finished;
   const kinds = HAND_KINDS.filter((k) => counts[k] > 0);
   return (
     <div className={`hands hands-${color}`} data-testid={`hands-${color}`}>
@@ -84,9 +86,10 @@ export function resultText(r: ResultInfo): string {
   return `${SIDE[r.winner]}の勝ち（${why}）`;
 }
 
-export function MoveList({ snap, onGoto }: { snap: Snapshot; onGoto: (ply: number) => void }) {
+export function MoveList({ snap, onGoto, testId = 'move-list' }: { snap: Snapshot; onGoto: (ply: number) => void; testId?: string }) {
+  const initialSide = snap.ply % 2 === 0 ? snap.side : snap.side === 'b' ? 'w' : 'b';
   return (
-    <ol className="move-list" data-testid="move-list">
+    <ol className="move-list" data-testid={testId}>
       <li className={snap.ply === 0 ? 'current' : ''}>
         <button type="button" onClick={() => onGoto(0)}>
           開始局面
@@ -95,7 +98,7 @@ export function MoveList({ snap, onGoto }: { snap: Snapshot; onGoto: (ply: numbe
       {snap.moves.map((m, i) => (
         <li key={i} className={snap.ply === i + 1 ? 'current' : i + 1 > snap.ply ? 'future' : ''}>
           <button type="button" onClick={() => onGoto(i + 1)}>
-            {i + 1}. {i % 2 === 0 ? '☗' : '☖'}
+            {i + 1}. {(i % 2 === 0 ? initialSide : initialSide === 'b' ? 'w' : 'b') === 'b' ? '☗' : '☖'}
             {formatMove(m)}
           </button>
         </li>

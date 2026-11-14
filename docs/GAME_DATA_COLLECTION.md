@@ -1,6 +1,6 @@
 # 同意した棋譜のCloudflare保存
 
-**2026-11-14追加指定**：今後は常時自動保存・送信表示なしへ変更する。[実装計画U4](design/ARENA_IMPLEMENTATION_PLAN.md#u4自動保存と移行)で新APIとclientを接続する。以下は現行schema 1の実装・運用記録であり、今回そのコード・DB・配信を変更していない。
+**旧schema 1の履歴・運用記録**。追加指定の常時自動保存・送信表示なしは[新方式](AUTOMATIC_GAME_STORAGE.md)へ移行する。[実装・公開の進捗](design/ARENA_IMPLEMENTATION_PROGRESS.md)。以下のOFF／ON操作は旧clientに限り、新UIの説明ではない。
 
 2026-11-14 JST。[公開準備L4](PUBLIC_LAUNCH_PLAN.md)の実装。**実装・D1作成と、公開URLの動作確認は別である。**
 [現在地](PUBLIC_LAUNCH_PROGRESS.md)で配信と検証の状態を確認する。利用者向けの説明は[privacy.html](../apps/web/public/privacy.html)。

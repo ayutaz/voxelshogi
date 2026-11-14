@@ -7,20 +7,30 @@ import type { ArenaOptions } from '../src/ai/arena-controller';
 const fake = vi.hoisted(() => ({ configure: vi.fn(), pause: vi.fn() }));
 vi.mock('../src/game/store', () => {
   const snap = { side: 'b', ply: 0, moveCount: 0, finished: false, inCheck: { b: false, w: false }, legal: [], board: [] };
-  return { MAX_IMPORT_BYTES: 4e6, GameStore: class { subscribe = () => () => {}; snapshot = () => snap; exportRecord = () => JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: [] }); } };
+  return { MAX_IMPORT_BYTES: 4e6, GameStore: class { newGame = () => {}; subscribe = () => () => {}; snapshot = () => snap; exportRecord = () => JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: [] }); } };
 });
 vi.mock('../src/ai/arena-controller', async original => ({ ...await original<object>(), ArenaController: class {
   subscribe = () => () => {}; snapshot = () => ({ phase: 'paused', error: null, last: null });
   configure = fake.configure; pause = fake.pause; resume = () => {}; dispose = () => {};
-  journal = { snapshot: () => [] };
+  journal = { snapshot: () => [],clear:()=>{} };
 } }));
+vi.mock('../src/renderer/Board3D', () => ({ Board3D: () => null }));
 vi.mock('../src/components/Board2D', () => ({ Board2D: () => null }));
 vi.mock('../src/components/Panels', () => ({ Hands: () => null, MoveList: () => null, PromotionDialog: () => null, resultText: () => '' }));
 vi.mock('../src/inference/ModelLibraryPanel', () => ({ default: ({ onLoaded }: { onLoaded: (value: unknown) => void }) => <button onClick={() => onLoaded({ release: releaseFixture(), model: trainedFixture(), files: [] })}>fixture folder</button> }));
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 const options = () => fake.configure.mock.calls.at(-1)![0] as ArenaOptions;
+it('assigns an actual loaded model when the human entry selects S for the first time', async () => {
+  render(<App />);fireEvent.click(screen.getByRole('button',{name:'モデル'}));
+  fireEvent.click(screen.getByRole('button',{name:'学習済みモデルを読み込む'}));fireEvent.click(await screen.findByRole('button',{name:'fixture folder'}));
+  fireEvent.click(screen.getByRole('button',{name:'閉じる'}));fireEvent.click(screen.getByRole('button',{name:'AIと対戦'}));
+  fireEvent.change(screen.getByLabelText('相手のAI'),{target:{value:'model'}});fireEvent.click(screen.getByRole('button',{name:'対戦をはじめる'}));
+  expect(options()).toMatchObject({mode:'h-r',running:true,wDifficulty:'model'});
+  expect(options().wModel?.selection.modelId).toBe(releaseFixture().id);
+});
 it.each(['b', 'w'] as const)('preserves the %s Easy seat when an inactive previously used model is removed', async side => {
   render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'モデル' }));
   fireEvent.click(screen.getByRole('button', { name: '学習済みモデルを読み込む' }));
   fireEvent.click(await screen.findByRole('button', { name: 'fixture folder' }));
   fireEvent.change(screen.getByTestId(`difficulty-${side}`), { target: { value: 'model' } });
@@ -33,6 +43,7 @@ it.each(['b', 'w'] as const)('preserves the %s Easy seat when an inactive previo
 });
 it('selects each seat, pauses on changes, and removes an active source explicitly', async () => {
   render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'モデル' }));
   fireEvent.click(screen.getByRole('button', { name: '学習済みモデルを読み込む' }));
   fireEvent.click(await screen.findByRole('button', { name: 'fixture folder' }));
   fireEvent.change(screen.getByTestId('difficulty-b'), { target: { value: 'model' } });

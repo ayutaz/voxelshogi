@@ -24,7 +24,10 @@ export function contentStartFrame(rgb) {
   throw new Error('recording marker not found');
 }
 export function selectHook(moves) {
-  const i = moves.findIndex((move, index) => index + 3 < moves.length && /^[1-9]{6}\+?$/.test(move) && move[2] !== move[5]);
+  const centrality = move => [0, 1, 3, 4].reduce((n, p) => n + Math.abs(Number(move[p]) - 5), 0) + 2 * (Math.abs(Number(move[2]) - 5) + Math.abs(Number(move[5]) - 5));
+  const candidates = moves.map((move, index) => ({ move, index })).filter(({move,index}) => index + 3 < moves.length && /^[1-9]{6}\+?$/.test(move) && move[2] !== move[5]);
+  candidates.sort((a,b) => centrality(a.move) - centrality(b.move) || a.index - b.index);
+  const i = candidates[0]?.index ?? -1;
   assert.ok(i >= 0, 'no real cross-layer move with enough following plies');
   return i + 1;
 }
@@ -44,16 +47,16 @@ export function verifyVideo(probe, seconds) {
 }
 
 const composition = `
-html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#0f1115!important}
-.app{display:block!important;width:1080px!important;height:1350px!important}
-.app>header,.panel,main>.intro,main>.playback,main>.row,main>.hands,main>.move-focus,main>.collection-panel{display:none!important}
-main{display:block!important;padding:0!important;overflow:hidden!important;width:1080px!important;height:1350px!important}
+html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#14282c!important}
+.arena-app{display:block!important;width:1080px!important;height:1350px!important;padding:0!important}
+.arena-app>.masthead,.arena-app>.entry-tabs,.arena-app>.intro,.match-detail,.arena-board>:not(.views){display:none!important}
+.arena-main,.arena-board{display:block!important;padding:0!important;overflow:hidden!important;width:1080px!important;height:1350px!important}
 .views{position:absolute!important;left:0!important;top:200px!important;width:1080px!important;height:950px!important;min-height:950px!important;display:block!important}
 .board3d{width:1080px!important;height:950px!important;min-height:950px!important;border:0!important;border-radius:0!important}
 `;
 const controlsComposition = `
 html,body{margin:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;background:#0f1115!important}
-.app{padding-top:190px!important}
+.arena-app{padding-top:170px!important;padding-bottom:100px!important}
 `;
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const web = join(root, 'apps/web');
@@ -78,9 +81,10 @@ async function record(work, commit) {
     page.on('pageerror', error => errors.push(error.message));
     page.on('dialog', dialog => dialog.accept());
     await page.goto('http://127.0.0.1:4173/');
-    await page.getByText('対局・AI設定', { exact: true }).click();
+    await page.getByRole('button', { name: '対局設定', exact: true }).click();
     await page.getByTestId('difficulty-b').selectOption('easy');
     await page.getByTestId('difficulty-w').selectOption('easy');
+    await page.getByRole('button', { name: '閉じる', exact: true }).click();
     const exportRecord = async name => {
       const download = page.waitForEvent('download');
       // Disclosure panels may be hidden by the composition-only recording CSS.
@@ -111,15 +115,15 @@ async function record(work, commit) {
       await page.mouse.move(x + box.height * horizontal, y + box.height * vertical, { steps: 10 });
       await page.mouse.up();
     };
-    await page.getByRole('button', { name: '立体で見る', exact: true }).click();
+    await page.getByRole('button', { name: '立体で眺める', exact: true }).click();
+    await page.getByRole('button', { name: '表示設定', exact: true }).click();
     await page.getByLabel('全層を同じ濃さで表示').check();
+    await page.getByRole('button', { name: '閉じる', exact: true }).click();
     await go(hook - 1);
-    await page.getByText('対局・AI設定', { exact: true }).click();
     let style = await page.addStyleTag({ content: composition });
     await page.getByTestId('board3d').waitFor();
     await page.waitForFunction(() => document.querySelector('[data-testid="board3d"]')?.getAttribute('data-ready') === 'true');
-    await orbit(0.05, -0.08); // Show the nine layers from the side using actual OrbitControls.
-    await page.getByLabel('全層を同じ濃さで表示').evaluate(checkbox => checkbox.click());
+    await orbit(0.05, -0.04); // Show the nine layers from the side using actual OrbitControls.
     await delay(1000);
     await page.evaluate(() => {
       const marker = document.createElement('div'); marker.id = 'recording-marker';
@@ -152,26 +156,30 @@ async function record(work, commit) {
   return { raw: await video.path(), conditions, hook };
 }
 
-function render(raw, work, startFrame, sourceRate) {
+function render(raw, work, startFrame, sourceRate, hookMove) {
   const font = '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc';
   readFileSync(font); // Fail before creating a video with missing Japanese glyphs.
   const lines = {
     'hook-a.txt': '将棋、9層にした。', 'hook-b.txt': 'その一手、別の階へ。',
     'watch.txt': 'AI同士の対局を、眺める。', 'step.txt': '止めて、一手ずつ追える。',
     'cta.txt': 'ブラウザで観戦', 'url.txt': 'voxelshogi.yousan-apps.workers.dev',
-    'alpha.txt': '研究用Alpha', 'agents.txt': 'Easy vs Easy・実対局の再生',
+    'alpha.txt': '9×9×9・ブラウザで動く立体将棋', 'agents.txt': 'Easy vs Easy・実対局の再生',
+    'cross.txt': `${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[2])-1]}層 → ${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[5])-1]}層`,
   };
   for (const [name, text] of Object.entries(lines)) writeFileSync(join(work, name), text + '\n');
   writeFileSync(join(work, 'captions.json'), JSON.stringify({ schema: 1, segments: [
     { start: 0, end: 3, text: lines['hook-a.txt'] }, { start: 3, end: 7, text: lines['watch.txt'] },
     { start: 7, end: 11, text: lines['step.txt'] }, { start: 11, end: 15, text: lines['cta.txt'], url: lines['url.txt'], note: lines['alpha.txt'] },
-  ], agents: lines['agents.txt'], alternativeHook: lines['hook-b.txt'] }, null, 2) + '\n');
+  ], agents: lines['agents.txt'], crossLayer: lines['cross.txt'], alternativeHook: lines['hook-b.txt'] }, null, 2) + '\n');
   const text = (file, y, size, enable) => `drawtext=fontfile=${font}:textfile=${file}:x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=white:borderw=3:bordercolor=0x0f1115${enable ? `:enable='${enable}'` : ''}`;
   const timeline = `trim=start_frame=${startFrame},setpts=PTS-STARTPTS,fps=30`;
-  const draw = ["drawbox=x=0:y=1240:w=iw:h=110:color=0x0f1115:t=fill:enable='gte(t,7)*lt(t,11)'", text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
+  // Full nine-layer view at frame 0, then enlarge the actual central cross-layer move.
+  // Caption compositing follows the crop, so the opening words stay readable.
+  const zoom = maximum => `zoompan=z='if(gte(on,210)*lt(on,330),1.5,if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1)))))':x='iw/2-iw/zoom/2':y='if(gte(on,210)*lt(on,330),ih-ih/zoom,ih/2-ih/zoom/2)':d=1:s=1080x1350:fps=30`;
+  const draw = [zoom(1.7), "drawbox=x=0:y=1240:w=iw:h=110:color=0x0f1115:t=fill:enable='gte(t,7)*lt(t,11)'", text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
     text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 78, 'gte(t,11)'),
     text('url.txt', 1190, 43, 'gte(t,11)'), text('alpha.txt', 1260, 30, 'gte(t,11)'),
-    text('agents.txt', 1280, 30, 'lt(t,11)')];
+    text('agents.txt', 1280, 30, 'lt(t,11)'), text('cross.txt', 1120, 52, 'gte(t,0.7)*lt(t,3)')];
   const encode = (name, seconds, filters) => {
     run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', raw, '-vf', [timeline, ...filters].join(','),
       '-frames:v', String(seconds * 30), '-an', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', name], { cwd: work });
@@ -180,8 +188,8 @@ function render(raw, work, startFrame, sourceRate) {
   };
   assert.ok(sourceRate >= 10);
   encode('demo-main.mp4', 15, draw);
-  encode('hook-a.mp4', 3, [text('hook-a.txt', 76, 78), text('agents.txt', 1280, 30)]);
-  encode('hook-b.mp4', 3, ["zoompan=z='1.12-0.12*min(on/89,1)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1080x1350:fps=30", text('hook-b.txt', 76, 72), text('agents.txt', 1280, 30)]);
+  encode('hook-a.mp4', 3, [zoom(1.7), text('hook-a.txt', 76, 78), text('agents.txt', 1280, 30), text('cross.txt', 1120, 52, 'gte(t,0.7)')]);
+  encode('hook-b.mp4', 3, [zoom(1.95), text('hook-b.txt', 76, 72), text('agents.txt', 1280, 30), text('cross.txt', 1120, 52, 'gte(t,0.7)')]);
   run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', 'demo-main.mp4', '-frames:v', '1', 'poster.png'], { cwd: work });
   // A real board frame on the right, with sharing copy outside the board.
   const ogpText = (file, y, size) => `drawtext=fontfile=${font}:textfile=${file}:x=40:y=${y}:fontsize=${size}:fontcolor=white`;
@@ -194,6 +202,12 @@ async function main() {
   assert.equal(process.platform, 'linux', 'Continuous capture and encoding run on Linux CI, not a Mac.');
   const commit = process.env.GITHUB_SHA ?? run('git', ['rev-parse', 'HEAD'], { cwd: root }).trim();
   assert.match(commit, /^[0-9a-f]{40}$/);
+  const candidate = process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || process.env.GITHUB_REF !== 'refs/heads/main';
+  if (!candidate) {
+    const published = await fetch('https://voxelshogi.yousan-apps.workers.dev/build-info.json', { cache: 'no-store', signal: AbortSignal.timeout(15000) });
+    assert.ok(published.ok, 'public build metadata unavailable');
+    assert.equal((await published.json()).commit, commit, 'record the current public application commit');
+  }
   const work = resolve(process.argv[2] ?? join(root, 'runs/demo-video')); mkdirSync(work, { recursive: true });
   const server = spawn('pnpm', ['--dir', web, 'exec', 'vite', 'preview', '--host', '127.0.0.1', '--port', '4173', '--strictPort'], { detached: true, stdio: 'ignore' });
   let spawnError; server.on('error', error => { spawnError = error; });
@@ -216,10 +230,10 @@ async function main() {
     assert.equal(pixels.status, 0, String(pixels.stderr));
     const startFrame = contentStartFrame(pixels.stdout);
     assert.ok(Number(rawProbe.format.duration) - startFrame / sourceRate >= 15, 'not enough real footage');
-    render(captured.raw, work, startFrame, sourceRate);
+    render(captured.raw, work, startFrame, sourceRate, captured.conditions.record.moves[captured.hook-1]);
     const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json'];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
-      candidate: process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || process.env.GITHUB_REF !== 'refs/heads/main',
+      candidate,
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
       fullRecordReplayedByRust: true, fullDecodeValidated: true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
       performanceMeasurement: false, soundRequired: false,

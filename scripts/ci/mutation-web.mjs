@@ -15,6 +15,26 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'dismiss-persistent-message', file: 'App.tsx', before: 'onClick={() => setMessage(null)}', after: 'onClick={() => {}}', test: 'app-launch', extension: 'tsx' },
+  { name: 'readonly-hands', file: 'components/Panels.tsx', before: 'const active = interactive && snap.side === color', after: 'const active = snap.side === color', test: 'panels-side', extension: 'tsx' },
+  { name: 'primary-single-step-cancel', file: 'App.tsx', before: 'if (running || stepBusy) pause();', after: 'if (running) pause();', test: 'app-launch', extension: 'tsx' },
+  { name: 'layer-labels-no-clipping', file: 'renderer/layer-label-position.ts', before: 'Math.max(4, Math.min(max, value))', after: 'Math.min(max, value)', test: 'layer-label-position' },
+  { name: 'same-game-settings-reconfigure', file: 'App.tsx', before: '[aiOptions, snap.revision]', after: '[aiOptions]', test: 'app-launch', extension: 'tsx' },
+  { name: 'terminal-board-dismiss', file: 'App.tsx', before: 'onClick={() => setResultDismissed(true)}', after: 'onClick={() => setResultDismissed(false)}', test: 'app-launch', extension: 'tsx' },
+  { name: 'automatic-d1-trigger-metadata', file: 'collection/automatic-receiver.ts', before: '(changed.meta.changes ?? 0) > 0', after: 'changed.meta.changes === 1', test: 'automatic-receiver' },
+  { name: 'human-return-live', file: 'App.tsx', before: "if (mode !== 'r-r' && ply === snap.moveCount", after: "if (false && mode !== 'r-r' && ply === snap.moveCount", test: 'app-launch', extension: 'tsx' },
+  { name: 'branch-confirm', file: 'App.tsx', before: "if (!window.confirm('この局面から", after: "if (false && !window.confirm('この局面から", test: 'app-launch', extension: 'tsx' },
+  { name: 'human-selection-follow', file: 'App.tsx', before: 'if (!humanTurn) return;\n    setSlice(slice); setLayers(layers);', after: 'if (!humanTurn) return;\n    manualView();', test: 'app-launch', extension: 'tsx' },
+  { name: 'human-first-model-seat', file: 'App.tsx', before: "if (draftOpponent === 'model' && !library.choices[side])", after: 'if (false)', test: 'app-models', extension: 'tsx' },
+  { name: 'automatic-branch-prefix', file: 'collection/automatic-client.ts', before: 'if (candidate.record.moves.length <= g.minimumMoves) return;', after: '', test: 'automatic-client' },
+  { name: 'automatic-metadata-recovery', file: 'collection/automatic-client.ts', before: 'if (this.disposed || attempt === 3) return;', after: 'if (true) return;', test: 'automatic-client' },
+  { name: 'white-first-record-labels', file: 'components/Panels.tsx', before: "const initialSide = snap.ply % 2 === 0 ? snap.side : snap.side === 'b' ? 'w' : 'b';", after: "const initialSide = 'b';", test: 'panels-side', extension: 'tsx' },
+  { name: 'automatic-native-fetch', file: 'collection/automatic-client.ts', before: 'fetch.bind(globalThis)', after: 'fetch', test: 'automatic-client' },
+  { name: 'automatic-import-exclusion', file: 'collection/automatic-client.ts', before: 'this.game = newGame(owned, minimumMoves);', after: 'this.game = newGame(true, minimumMoves);', test: 'automatic-client' },
+  { name: 'automatic-retry-immutable-body', file: 'collection/automatic-client.ts', before: 'body: p.body, signal:', after: 'body: p.attempts ? p.body.replace(\'"version":1\', \'"version":99\') : p.body, signal:', test: 'automatic-client' },
+  { name: 'match-start-cancel', file: 'App.tsx', before: 'if (!reset(nextMode)) return;', after: 'reset(nextMode);', test: 'app-launch', extension: 'tsx' },
+  { name: 'human-selected-side', file: 'App.tsx', before: 'setDraftMode(e.target.value as Mode)', after: "setDraftMode('h-r')", test: 'app-launch', extension: 'tsx' },
+  { name: 'history-terminal-outcome', file: 'game/store.ts', before: 'terminalResult = recordOutcome(recordJson)', after: 'terminalResult = result', test: 'store' },
   { name: 'automatic-monotonic-version', file: 'collection/automatic-receiver.ts', before: 'WHERE excluded.version > automatic_games.version', after: 'WHERE 1 = 1', test: 'automatic-receiver' },
   { name: 'automatic-terminal-lock', file: '../migrations/0002_automatic_games.sql', before: "OLD.state != 'progress'", after: '0 = 1', test: 'automatic-receiver' },
   { name: 'automatic-progress-cap', file: '../migrations/0002_automatic_games.sql', before: 'OLD.progress_writes >= 128', after: 'OLD.progress_writes >= 129', test: 'automatic-receiver' },
@@ -24,7 +44,7 @@ const mutations = [
   {"name":"collection-terminal-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"submitted","test":"game-collection-panel","extension":"tsx"},
   {"name":"collection-sent-consent-control","file":"collection/GameCollectionPanel.tsx","before":" || !!receipt || ","after":" || ","test":"game-collection-panel","extension":"tsx"},
   {"name":"collection-withdrawn-consent-control","file":"collection/GameCollectionPanel.tsx","before":"(finished || submitted)","after":"finished","test":"game-collection-panel","extension":"tsx"},
-  {"name":"keyboard-step-busy-guard","file":"App.tsx","before":"if (!stepBusy) aiRef.current?.step();","after":"aiRef.current?.step();","test":"app-launch","extension":"tsx"},
+  {"name":"keyboard-step-busy-guard","file":"App.tsx","before":"if (stepBusy) return;","after":"","test":"app-launch","extension":"tsx"},
   {"name":"history-resume-latest","file":"App.tsx","before":"if (snap.ply < snap.moveCount) store.goto(snap.moveCount);","after":"","test":"app-launch","extension":"tsx"},
   { name: 'research-manifest-role', file: 'inference/research-manifest.ts', before: "identity.profile !== 'research-m-v1'", after: 'false', test: 'research-manifest' },
   { name: 'research-manifest-parameters', file: 'inference/research-manifest.ts', before: 'm.parameters !== COUNTS[identity.architecture]', after: 'false', test: 'research-manifest' },
@@ -250,7 +270,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 190);
+    assert.equal(results.length, 210);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

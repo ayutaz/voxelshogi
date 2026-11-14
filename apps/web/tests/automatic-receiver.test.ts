@@ -33,6 +33,16 @@ beforeEach(() => {
 });
 afterEach(() => db.close());
 
+it('reports creation when D1 counts trigger writes in meta.changes',async()=>{
+  const original=GAMES;
+  GAMES={prepare(sql){const st=original.prepare(sql);const bound={
+    bind(...values:(string|number)[]){st.bind(...values);return bound;},first:<T>()=>st.first<T>(),
+    async run(){const result=await st.run();return{...result,meta:{changes:result.meta.changes?5:0}};}
+  };return bound;}};
+  expect((await send()).status).toBe(201);
+  expect(await(await send()).json()).toMatchObject({duplicate:true});
+});
+
 it('creates one row, extends it atomically, and never charges duplicate or stale snapshots', async () => {
   const first = packet(); expect((await send(first)).status).toBe(201);
   const next = packet(2); next.record.moves.push('991891');

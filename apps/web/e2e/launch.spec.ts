@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { selectSetting, settingsAction, sliceAt } from './arena-controls';
+import { test, expect } from './test';
 import { readFileSync } from 'node:fs';
 
 for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
@@ -11,15 +12,13 @@ for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
     await expect(toggle).toHaveText('観戦を開始');
     await expect(toggle).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    if (width! < 1100) {
-      const board = await page.locator('main').boundingBox();
-      const settings = await page.locator('.panel.left').boundingBox();
-      expect(board!.y).toBeLessThan(settings!.y);
-      await expect(page.getByTestId('mode')).not.toBeVisible();
-      await page.getByText('対局・AI設定', { exact: true }).click();
-    }
-    await page.getByTestId('difficulty-b').selectOption('easy');
-    await page.getByTestId('difficulty-w').selectOption('easy');
+    await expect(page.getByTestId('mode')).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'AIと対戦', exact: true })).toBeInViewport();
+    const board = await page.locator('.views').boundingBox();
+    expect(board!.y).toBeGreaterThan(0); expect(board!.y + board!.height).toBeLessThanOrEqual(height!);
+    const follow = page.getByTestId('follow-move'); await expect(follow).toBeInViewport();
+    await selectSetting(page, 'difficulty-b', 'easy');
+    await selectSetting(page, 'difficulty-w', 'easy');
     await toggle.click();
     await expect(page.getByTestId('status')).not.toHaveText('1手目 ☗先手の番');
     await toggle.click();
@@ -30,6 +29,7 @@ for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).not.toHaveText(beforeStep!);
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+    await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready','true');
     const path = info.outputPath(`attachments/launch-${width}.png`);
     await page.screenshot({ path, fullPage: true });
     await info.attach(`launch-${width}`, { path, contentType: 'image/png' });
@@ -46,20 +46,20 @@ test('failed engine download offers an actionable Japanese recovery screen', asy
 
 test('discard confirmation cancels all three replacements and accepting a new game works', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('difficulty-b').selectOption('easy');
+  await selectSetting(page, 'difficulty-b', 'easy');
   await page.getByTestId('ai-step').click();
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
   const dialogs: string[] = [];
   const cancel = async (dialog: import('@playwright/test').Dialog) => { dialogs.push(dialog.message()); await dialog.dismiss(); };
   page.on('dialog', cancel);
-  await page.getByRole('button', { name: '新規対局', exact: true }).click();
-  await page.getByTestId('mode').selectOption('h-r');
+  await settingsAction(page, '新規対局');
+  await selectSetting(page, 'mode', 'h-r');
   await page.getByTestId('import').setInputFiles({ name: 'replacement.json', mimeType: 'application/json', buffer: Buffer.from('{}') });
   expect(dialogs).toHaveLength(3);
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
   await expect(page.getByTestId('mode')).toHaveValue('r-r');
   page.off('dialog', cancel); page.once('dialog', dialog => dialog.accept());
-  await page.getByRole('button', { name: '新規対局', exact: true }).click();
+  await settingsAction(page, '新規対局');
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
 });
 
@@ -88,7 +88,7 @@ test('a legal fixed record follows both colors across layers, undo/redo, OFF and
   await page.getByTestId('follow-move').uncheck();
   await page.getByTestId('redo').click();
   await expect(page.getByTestId('slice-index')).toHaveValue('7');
-  await page.getByTestId('slice-index').fill('2');
+  await sliceAt(page, '2');
   await expect(page.getByTestId('follow-move')).not.toBeChecked();
   await expect(page.getByTestId('slice-index')).toHaveValue('2');
   await page.getByTestId('follow-move').check();
@@ -112,12 +112,12 @@ test('the public sharing metadata refers to a real board PNG', async ({ page }) 
 
 test('the board stays in place between waiting and real Normal thinking phases', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('thinking-budget').selectOption('1000');
+  await selectSetting(page, 'thinking-budget', '1000');
   await page.getByTestId('move-delay').fill('1000');
   await page.getByTestId('ai-step').click();
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-  await expect(page.getByTestId('ai-analysis')).toBeVisible();
+  await expect(page.getByTestId('ai-analysis')).toBeHidden();
   const reference = await page.evaluate(() => ({ top: document.querySelector('.views')!.getBoundingClientRect().top, windowY: window.scrollY, mainY: document.querySelector('main')!.scrollTop }));
   await page.evaluate(() => {
     const phase = document.querySelector('[data-testid="ai-phase"]')!, board = document.querySelector('.views')!;

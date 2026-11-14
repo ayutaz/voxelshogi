@@ -13,7 +13,7 @@ MはFull／Geometry各1,024更新・HF再開一致・開発48局まで実行済�
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- UI再設計（2026-11-14）: モックはユーザー承認済み。`docs/design/ARENA_IMPLEMENTATION_PLAN.md`のU2画面構成→U3対局接続→U4自動保存→U5公開検証→U6動画更新を次の計画とする。送信表示・切替を置かず常時自動保存へ移すが、現行公開版は未変更。研究・GPUの停止は維持する。
+- UI再設計（2026-11-14）: モックはユーザー承認済み。`docs/design/ARENA_IMPLEMENTATION_PLAN.md`のU2〜U6を実装中。後方互換の自動保存API #186をmergeし、専用D1へ追加migrationを適用した。新画面・対戦導線・常時保存clientは#187でLinux検証中。公開・実画像の再レビュー・動画更新は未完了。`docs/design/ARENA_IMPLEMENTATION_PROGRESS.md`を参照し、研究・GPUの停止は維持する。
 - 公開準備（2026-11-14）: main `c878c6d`の公開33 E2E・モデル6件・カメラ3回、同意制D1保存、最終動画を確認。最終公開版のPC操作はウィンドウを撮影せずAX情報で確認し、`docs/PUBLIC_LAUNCH_PLAN.md`のL1〜L6をPC対象Alphaとして完了。実スマホは未確認。実装・検証の現在地は`docs/PUBLIC_LAUNCH_PROGRESS.md`。冒頭3秒と15秒本編の構成は`docs/DEMO_VIDEO_PLAN.md`。L7のX投稿は今回の範囲外。GPU・本比較・M配布の停止を解除しない。
 - P5-4の失敗履歴: `docs/P5_4_PARITY_FAILURE.md`。旧sourceの4GPU再開不一致と1rank開始前検査の不具合を保持する。許容差を緩めず修正し、後続sourceの全3構成は完全一致した。
 - P5-2の実行結果と停止点: `docs/P5_2_COMPLETION.md`。本条件48対局・HF保存・別VM継続と全ドキュメント点検後に停止。P5-3・DDP・Phase6は振り返り後に再計画する。

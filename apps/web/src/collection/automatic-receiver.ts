@@ -19,5 +19,5 @@ export async function persistAutomatic(db: GameDatabase, value: AutomaticSubmiss
   if (row.version === value.version && row.payload_sha256 !== sha) throw new Error('collection_conflict');
   return { body: { gameId: value.gameId, requestId: value.requestId, version: row.version, status: row.status,
     duplicate: changed.meta.changes === 0 && row.version === value.version, ignored: row.version > value.version },
-  status: changed.meta.changes === 1 && value.version === 1 ? 201 : 200 };
+  status: (changed.meta.changes ?? 0) > 0 && value.version === 1 ? 201 : 200 };
 }

@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "kind": "automatic-storage-semantics-diagnostic",
+  "applicationCommit": "ef7c93ef223e46c2ef52b6fa3b5e9dc221b044ab",
+  "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+  "syntheticOnly": true,
+  "receivedUnverified": true,
+  "requests": [
+    {
+      "name": "first",
+      "httpStatus": 200,
+      "ack": {
+        "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+        "requestId": "5ad0156a-70ef-4100-97d6-d5a6eed11536",
+        "version": 1,
+        "status": "received_unverified",
+        "duplicate": false,
+        "ignored": false
+      }
+    },
+    {
+      "name": "extend",
+      "httpStatus": 200,
+      "ack": {
+        "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+        "requestId": "10cc7130-de16-4fb0-bec6-9ec8b0058945",
+        "version": 2,
+        "status": "received_unverified",
+        "duplicate": false,
+        "ignored": false
+      }
+    },
+    {
+      "name": "same body retry",
+      "httpStatus": 200,
+      "ack": {
+        "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+        "requestId": "10cc7130-de16-4fb0-bec6-9ec8b0058945",
+        "version": 2,
+        "status": "received_unverified",
+        "duplicate": true,
+        "ignored": false
+      }
+    },
+    {
+      "name": "same version conflict",
+      "httpStatus": 409,
+      "ack": {
+        "error": "snapshot_conflict"
+      }
+    },
+    {
+      "name": "old version",
+      "httpStatus": 200,
+      "ack": {
+        "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+        "requestId": "5ad0156a-70ef-4100-97d6-d5a6eed11536",
+        "version": 2,
+        "status": "received_unverified",
+        "duplicate": false,
+        "ignored": true
+      }
+    },
+    {
+      "name": "finished",
+      "httpStatus": 200,
+      "ack": {
+        "gameId": "1b85be10-bfbf-431e-8d75-ca1bf72fe9e4",
+        "requestId": "7b638efa-b7af-4524-b7de-dc750618aa59",
+        "version": 3,
+        "status": "received_unverified",
+        "duplicate": false,
+        "ignored": false
+      }
+    },
+    {
+      "name": "late progress",
+      "httpStatus": 409,
+      "ack": {
+        "error": "snapshot_conflict"
+      }
+    }
+  ],
+  "startedAt": "2026-11-14T06:49:54.759Z",
+  "stored": {
+    "version": 3,
+    "state": "finished",
+    "progressWrites": 2,
+    "status": "received_unverified",
+    "payloadBytes": 704,
+    "payloadSha256": "4e300e9f2c405a9aa995a234c9e1da78e85f5453d91a5640d7df6162876222d6",
+    "bodyMatches": true
+  },
+  "storageSemanticsComplete": true,
+  "apiContractComplete": false,
+  "contractIssue": "initial HTTP 200 instead of 201; fixed in candidate",
+  "syntheticRowDeleted": true,
+  "finishedAt": "2026-11-14T06:49:59.963Z",
+  "scriptSha256": "7b4a17a0d31e24f30260db9c71a11a879916d38037482cbe872f09b6623e0dea"
+}
