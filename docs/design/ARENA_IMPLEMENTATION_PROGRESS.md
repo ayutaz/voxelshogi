@@ -11,8 +11,8 @@
 | U5 | 新UIのE2E・画像の保存経路を更新 | Claude Codeの実装後再レビュー、必須／関連CI、通常公開と配信照合 |
 | U6 | 新画面の収録操作、中央の実異層着手の選択、冒頭の拡大と層字幕、公開SHA照合をハーネスへ追加 | Linuxで冒頭3秒、15秒本編・2案・ポスターの再制作／実画像と全検査 |
 
-Macの軽量確認は関連11ファイル91テスト、typecheck、関連lintが成功。
-APIの4変異、UI／自動保存の8変異、レビュー修正の7変異を検出して復元した。動画の中央異層着手選択の変異も検出した。全変異・WebGL・探索・実モデル・録画はLinuxへ置く。
+Macの軽量確認は固定Node 24.22.1で関連11ファイル93テスト、typecheck、関連lintが成功。
+APIの4変異、UI／自動保存の8変異、レビュー修正の7変異、終局表示・D1応答の2変異を検出して復元した。動画の中央異層着手選択の変異も検出した。全変異・WebGL・探索・実モデル・録画はLinuxへ置く。
 これらのローカル結果を公開済み・実ブラウザの成功とは扱わない。
 
 専用D1 `voxelshogi-games`へ0002 migrationを先行適用済み。追加table／triggerだけで旧tableは保持した。
@@ -50,3 +50,13 @@ readonlyの2D駒は実際にdisabledにし、計測driverを新UIの入口へ接
 
 [候補動画run 43566217608](https://github.com/ayutaz/voxelshogi/actions/runs/43566217608)はsource `f486ab9`から成功。
 これは公開版一致の最終動画ではない。冒頭の明るさと中央異層着手はcontact sheetで確認し、7〜11秒の操作をさらに拡大して再収録する。
+
+修正source `ff33b0d`の実モデル7件は成功し、通常E2Eは40成功・固定V断面の確認1件が失敗した。
+新規対局で追従がONへ戻るため、手動OFFを明示して駒位置を確認するテストへ直した。
+全変異では通信mock内のassertをmetadata再試行が捕捉し、失敗でなく時間上限になったため、呼出receiverを記録してtest本体で検査するよう修正した。変異の時間上限を成功へ読み替えていない。
+
+実D1の[診断](../experiments/arena-storage-diagnostic-20261114.json)は、延長・再送・競合・古いsnapshot・終局固定・保存本文／hashを確認し、合成行を削除済み。
+新規応答が200になったためAPI契約の最終成功はfalseを保持し、D1がtrigger分を含めて返す`meta.changes`にも対応した回帰テストを追加した。修正版の配信後に201を含め再確認する。
+
+候補の追加検証はDemo videoの`verify_ui=true`（全52 UI E2E・実モデル・カメラ3回・画像・動画）とQuality measurementsへ絞る。
+同じUI修正のためにPython学習変異8 shardを毎回再実行しない。通常PRの必須8件とmainの全Gate／公開前検証は維持する。

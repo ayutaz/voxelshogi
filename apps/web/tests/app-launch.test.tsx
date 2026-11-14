@@ -231,6 +231,7 @@ it('requires an explicit human history branch and retains only the chosen prefix
   vi.spyOn(window, 'confirm').mockReturnValue(true);
   render(<App />);
   fireEvent.change(screen.getByTestId('mode'), { target: { value: 'h-r' } });
+  fireEvent.click(screen.getByTestId('toggle-run'));
   fireEvent.click(screen.getByRole('button', { name: 'この局面から対戦を分岐' }));
   expect(fake.imported).toHaveBeenCalledWith(JSON.stringify({ ruleset_id: 'voxelshogi-standard-v1', initial: 'fixture', moves: [], result: null, termination: null }));
 });
@@ -247,7 +248,9 @@ it('keeps the original record when explicit history branching is cancelled', () 
   fake.record=JSON.stringify({initial:'fixture',moves:['575565'],result:null,termination:null});
   const confirm=vi.spyOn(window,'confirm').mockReturnValue(true);render(<App />);
   fireEvent.change(screen.getByTestId('mode'),{target:{value:'h-r'}});
+  fireEvent.click(screen.getByTestId('toggle-run'));
   confirm.mockReturnValue(false);fireEvent.click(screen.getByRole('button',{name:'この局面から対戦を分岐'}));
+  expect(confirm).toHaveBeenCalledTimes(2);
   expect(fake.imported).not.toHaveBeenCalled();
 });
 it('retains automatic layer following while a human selects and plays a piece', () => {
@@ -258,4 +261,10 @@ it('retains automatic layer following while a human selects and plays a piece', 
   fireEvent.click(screen.getByRole('button',{name:'5六V 空きマス 移動候補'}));
   expect((screen.getByTestId('follow-move') as HTMLInputElement).checked).toBe(true);
   expect(fake.configure.mock.calls.at(-1)![0]).toMatchObject({running:true});
+});
+it('lets a viewer uncover the terminal board without discarding the result',()=>{
+  fake.snap={...fake.snap,finished:true,terminalFinished:true,result:{kind:'win',winner:'w',reason:'Resignation'}};
+  render(<App/>);fireEvent.click(screen.getByRole('button',{name:'盤面を見る'}));
+  expect(screen.queryByRole('region',{name:'対局結果'})).toBeNull();
+  expect(screen.getByTestId('status').textContent).toContain('後手の勝ち');
 });

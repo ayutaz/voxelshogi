@@ -39,11 +39,14 @@ test('shows the initial position in 2D and 3D', async ({ page }) => {
 test('human vs AI: select, see targets, move, inspect history, undo', async ({ page }) => {
   await selectSetting(page, 'difficulty-w', 'easy');
   await selectSetting(page, 'mode', 'h-r');
+  // Starting a match restores automatic following; choose the fixed V view explicitly.
+  await page.getByTestId('follow-move').uncheck();
   await cell(page, idx(4, 6, 4)).click();
   await expect(page.locator('.board2d .cell.target')).toHaveCount(1);
   await expect(cell(page, idx(4, 5, 4))).toHaveClass(/target/);
   await cell(page, idx(4, 5, 4)).click();
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
+  await expect(page.getByTestId('follow-move')).not.toBeChecked();
   await expect(cell(page, idx(4, 5, 4))).toHaveText('歩');
   await expect(cell(page, idx(4, 6, 4))).toHaveText('');
   await expect(page.getByTestId('move-list')).toContainText('1. ☗5七V→5六V');

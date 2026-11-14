@@ -34,6 +34,7 @@ export function App() {
   const [selection, setSelection] = useState<Selection>(NO_SELECTION);
   const [promotion, setPromotion] = useState<ClickResult['promotion']>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [resultDismissed,setResultDismissed] = useState(false);
   const [mode, setMode] = useState<Mode>('r-r');
   const [running, setRunning] = useState(false);
   const [difficulty, setDifficulty] = useState<Record<Color, ArenaDifficulty>>({ b: 'normal', w: 'normal' });
@@ -156,6 +157,7 @@ export function App() {
   const reset = (m: Mode = mode) => {
     if (!allowReplacement()) return false;
     pause();
+    setResultDismissed(false);
     setFollow(true); setSlice({ axis: 'z', index: 4 }); setLayers({ ...rawLayers, z: 4 });
     if (m !== 'r-r') setView('2d');
     aiRef.current?.journal.clear();
@@ -216,6 +218,7 @@ export function App() {
       const r = store.importRecord(text);
       if (!r.ok) ownedRecord.current = previousOwnership;
       if (r.ok) {
+        setResultDismissed(false);
         collection.current?.begin(false);
         aiRef.current?.journal.clear();
       }
@@ -230,7 +233,7 @@ export function App() {
   const status = snap.result
     ? resultText(snap.result)
     : snap.finished ? '対局中断' : `${snap.ply + 1}手目 ${snap.side === 'b' ? '☗先手' : '☖後手'}の番${snap.inCheck[snap.side] ? '（王手）' : ''}`;
-  const phaseText = snap.ply < snap.moveCount ? '履歴表示中：分岐は専用ボタンから' : { paused: '一時停止中', waiting: '次の着手待ち', thinking: `${snap.side === 'b' ? '先手' : '後手'} ${difficulty[snap.side] === 'model' ? 'モデル準備・思考中…' : `${difficulty[snap.side] === 'normal' ? 'Normal' : 'Easy'} 思考中…`}`,
+  const phaseText = snap.ply < snap.moveCount ? `履歴 ${snap.ply}/${snap.moveCount}手${snap.terminalFinished ? '・終局済み' : ''}` : { paused: '一時停止中', waiting: '次の着手待ち', thinking: `${snap.side === 'b' ? '先手' : '後手'} ${difficulty[snap.side] === 'model' ? 'モデル準備・思考中…' : `${difficulty[snap.side] === 'normal' ? 'Normal' : 'Easy'} 思考中…`}`,
     human: '人間の手番', history: '履歴表示中：分岐は専用ボタンから', finished: '対局終了', error: 'AIエラー' }[aiStatus.phase];
 
   const sideHands = (c: Color) => <Hands snap={snap} color={c} selection={selection} onHand={onHand} />;
@@ -265,6 +268,7 @@ export function App() {
       finally { ownedRecord.current=wasOwned; }
       if (!result.ok) { setMessage(`分岐できません: ${result.error}`); return false; }
       collection.current?.begin(wasOwned,snap.ply);
+      setResultDismissed(false);
       aiRef.current?.journal.clear();
       setRunning(mode !== 'r-r'); return true;
     } catch { setMessage('棋譜を分岐できません'); return false; }
@@ -307,15 +311,15 @@ export function App() {
           <div className="row">
             <button type="button" data-testid="undo" onClick={() => goto(Math.max(0,snap.ply-1))} disabled={snap.ply === 0}>◀ 1手戻る</button>
             <button type="button" onClick={() => { if (running) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); if (!terminalFinished) setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>{running ? '一時停止' : snap.ply < snap.moveCount ? terminalFinished ? '終局位置へ' : '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}</button>
-            <button type="button" data-testid="ai-step" disabled={running || snap.finished || controller === 'human' || !!aiStatus.error} aria-disabled={stepBusy} onClick={stepOnce}>{snap.ply < snap.moveCount ? 'ここからAIで分岐' : '1手指す'}</button>
+            <button type="button" data-testid="ai-step" aria-label={snap.ply < snap.moveCount && mode !== 'r-r' ? 'この局面から対戦を分岐' : undefined} disabled={running || snap.finished || (controller === 'human' && snap.ply === snap.moveCount) || !!aiStatus.error} aria-disabled={stepBusy} onClick={() => { if (snap.ply < snap.moveCount && mode !== 'r-r') branchGame(); else stepOnce(); }}>{snap.ply < snap.moveCount ? mode === 'r-r' ? 'ここからAIで分岐' : 'ここから対戦を分岐' : '1手指す'}</button>
             <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'} onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
             <button type="button" data-testid="redo" onClick={() => goto(Math.min(snap.moveCount,snap.ply+1))} disabled={snap.ply === snap.moveCount}>1手進む ▶</button>
           </div>
           <div className="row playback-options"><label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} /> {follow ? '直前手の層を追う' : '手動表示・追従OFF'}</label><label>着手間の待ち時間 {delay}ms（思考時間は別）<input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={e => setDelay(Number(e.target.value))} /></label></div>
           <p className="muted follow-explanation">{follow ? '着手先の層へ自動で切り替えます。' : '手動表示中。追従をONにすると着手先へ戻ります。'}</p>
-          {snap.ply < snap.moveCount && <p className="history-position">履歴 {snap.ply} / {snap.moveCount}手{terminalFinished && <span> · {terminalResult ? resultText(terminalResult) : '中断した対局'}</span>}<button type="button" onClick={() => goto(snap.moveCount)}>末尾へ戻る</button>{mode !== 'r-r' && <button type="button" onClick={branchGame}>この局面から対戦を分岐</button>}</p>}
+          {snap.ply < snap.moveCount && <p className="sr-only">履歴 {snap.ply} / {snap.moveCount}手{terminalFinished && <span> · {terminalResult ? resultText(terminalResult) : '中断した対局'}</span>}</p>}
         </section>
-        {terminalFinished && snap.ply === snap.moveCount && <section className="game-result" aria-label="対局結果"><h2>{terminalResult ? resultText(terminalResult) : '対局中断'}</h2><div className="row"><button type="button" onClick={() => reset()}>同じ設定でもう一局</button><button type="button" onClick={() => goto(0)}>最初から振り返る</button><button type="button" onClick={exportRecord}>棋譜を保存</button></div></section>}
+        {terminalFinished && snap.ply === snap.moveCount && !resultDismissed && <section className="game-result" aria-label="対局結果"><h2>{terminalResult ? resultText(terminalResult) : '対局中断'}</h2><div className="row"><button type="button" onClick={() => { if (reset()) setRunning(true); }}>同じ設定でもう一局</button><button type="button" onClick={() => goto(0)}>最初から振り返る</button><button type="button" onClick={exportRecord}>棋譜を保存</button><button type="button" onClick={() => setResultDismissed(true)}>盤面を見る</button></div></section>}
       </section>
       <aside className="match-detail" aria-label="局面の詳細"><h2>棋譜をたどる</h2><MoveList snap={snap} onGoto={goto} /><button type="button" onClick={() => setSheet('research')}>AIの詳細を見る</button><button type="button" onClick={() => setSheet('record')}>棋譜を保存・読み込み</button></aside>
     </main>

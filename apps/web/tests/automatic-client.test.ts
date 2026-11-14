@@ -118,11 +118,14 @@ it('does not save a copied branch prefix before its first new real move', async 
 });
 
 it('binds native fetch, omits credentials, and keeps unavailable metadata or invalid payloads silent', async () => {
+  const receivers:unknown[]=[];
   vi.stubGlobal('fetch', function(this: unknown, url: string, options?: RequestInit) {
-    expect(this).toBe(globalThis); return fetcher(url, options);
+    receivers.push(this); return fetcher(url, options);
   });
   client = new AutomaticCollection(); await client.ready;
   client.observe(record(), conditions); await tick();
+  expect(receivers.length).toBeGreaterThanOrEqual(3);
+  expect(receivers.every(receiver=>receiver===globalThis)).toBe(true);
   expect(posts[0]!.options).toMatchObject({ credentials: 'omit', redirect: 'error', cache: 'no-store' });
   client.begin(true); client.observe('invalid', conditions); client.observe(record(Array(2049).fill('191281')), conditions); await tick();
   expect(posts).toHaveLength(2); // replacement finalization only
