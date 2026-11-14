@@ -1,5 +1,7 @@
 # 対局データはCloudflareへ保存されるか
 
+**現行サービスは常時自動保存する。** 新UIから実公開ブラウザ→Worker→D1の本文／hash照合と検証行削除まで確認済み。[現行仕様](AUTOMATIC_GAME_STORAGE.md)・[公開確認](ARENA_RELEASE_VALIDATION.md)。以下は導入前の調査記録として保持する。
+
 2026-11-12調査。**この日時に調べたサービスは、遊ばれた棋譜をCloudflareへ自動送信・保存しない。**
 2026-11-14のL4では[同意制の保存実装](GAME_DATA_COLLECTION.md)を追加した。以下のソース・bindingの記述は旧source `f3d2d66`の履歴であり、新しい受信Workerの実装状況ではない。[公開版への反映状況](PUBLIC_LAUNCH_PROGRESS.md)を別に確認する。
 対局中の盤面・履歴はブラウザのメモリ内で保持し、「保存」は端末へのJSONダウンロードである。

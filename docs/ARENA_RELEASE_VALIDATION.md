@@ -49,3 +49,9 @@ artifact `demo-video-dc0a95fa00d4957b2a4d2712f27a0f469a6c3a7b`は7日保持。�
 設定からAI条件を変えた直後は停止状態になり「再開」で続ける軽微な操作上の制約を保持する。
 X投稿・技術記事の外部公開・追加GPU・生成・学習・M配布は実行していない。
 研究停止とHFのpublic/manual・Community OFFは維持し、収集棋譜を学習やHFへ自動送信しない。
+
+## 関連文書の現在地
+
+README・CLAUDE・STATUS・ROADMAP、実装計画／進捗、自動保存仕様、動画計画／制作記録、未送信の告知文案を現行公開版へ更新した。
+元の[問題整理](design/SPECTATOR_UX_REVIEW.md)・[承認モック](design/ARENA_MOCKUP.md)、[旧公開計画](PUBLIC_LAUNCH_PLAN.md)・[旧レビュー](PUBLIC_LAUNCH_REVIEW.md)・[保存導入前の調査](CLOUDFLARE_GAME_DATA_AUDIT.md)には、当時の記録という区別とこの最新確認への案内を付けた。
+[M6の操作案内](M6_ARENA.md)・[取得済みモデルの入口](M6_PORTABLE.md)も現行UIへ合わせた。モデルhash・固定HF版・過去の性能／棋力・失敗やClaude Code回答原文は当時の証拠として保持する。
