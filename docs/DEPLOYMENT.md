@@ -1,6 +1,6 @@
 # デプロイ（Cloudflare Workers Static Assets）
 
-**2026-11-14更新**：[CIの変更範囲判定](CI_PERFORMANCE.md)により、文書だけのmain更新ではWebの再ビルド・デプロイを省略する。公開SHAは最後に検証・配信したアプリcommitで、文書のみ更新されたmain HEADと異なることがある。アプリに影響する変更は従来どおり同じrunの検証済み成果物で公開し、公開E2Eまで確認する。新UI `dc0a95f`の公開53 E2E・カメラ3回・モデル6件と配信57ファイルの照合は[公開確認](ARENA_RELEASE_VALIDATION.md)を参照。
+**2026-11-15更新**：[CIの変更範囲判定](CI_PERFORMANCE.md)により、文書だけのmain更新ではWebの再ビルド・デプロイを省略する。公開SHAは最後に検証・配信したアプリcommitで、文書のみ更新されたmain HEADと異なることがある。アプリに影響する変更は従来どおり同じrunの検証済み成果物で公開し、公開E2Eまで確認する。最新の公開source `7b364c9`は公開53 E2E・カメラ3回・未学習モデル6件と配信59ファイルに加え、公開S3形式を含む5件が成功。[公開確認](PUBLIC_S_RELEASE_VALIDATION.md)を参照。
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
@@ -8,7 +8,7 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 ## 構成
 
-- `apps/web/wrangler.jsonc`: Worker名`voxelshogi`。`dist/`はasset-firstで配信し、`/api/*`だけ棋譜保存の受信Workerを先行させる。`GAMES`を専用D1へbindし、毎時の保持期限削除を行う。現行は[常時自動保存schema 2](AUTOMATIC_GAME_STORAGE.md)、旧同意制schema 1は後方互換で保持する。[実際の配信状況](ARENA_RELEASE_VALIDATION.md)。
+- `apps/web/wrangler.jsonc`: Worker名`voxelshogi`。`dist/`はasset-firstで配信し、`/api/*`はWorkerを先行させ、棋譜受信と固定Sの`/api/models/s/<revision>/...`を扱う。Sは許可した34パスだけHFから取得・キャッシュし、ユーザーの認証ヘッダーを転送しない。`GAMES`を専用D1へbindし、毎時の保持期限削除を行う。現行は[常時自動保存schema 2](AUTOMATIC_GAME_STORAGE.md)、旧同意制schema 1は後方互換で保持する。[実際の配信状況](ARENA_RELEASE_VALIDATION.md)。
 - `apps/web/public/_headers`: `/assets/*` とモデル／runtimeのhash付きファイルはimmutable、`/build-info.json`・`/inference-build.json`・モデルindexはno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
 - R0の比較実験: [研究記録](NINE_KINGS_EXPERIMENT.md)を保持する。比較室の公開画面・導線は撤去し、旧`/?experiment=1`も通常の観戦画面を開く。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。
@@ -22,7 +22,7 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 2. `web`: WASM ビルド、型チェック、Vitest、Native/WASM照合。承認済みの公開設定からuvで3モデルを生成し、ライセンス・clean source・全形式を検証。SHA付きbuild、モデル6件・既存21件の実E2Eを実行する。配信用 `web-dist` と、E2EがNodeで棋譜を再検証する生成WASM `web-e2e-wasm` を別artifactに保存
 3. `CI Gate`: 変更範囲判定・通常検証を集約し、main／手動／週次ではモデル変異・学習系4シャード・共通Qualityのcoverage／既知変異も要求する。影響なしの依存job、PRで延期する深い検証、main/手動でのPR専用jobのskipだけを許容し、失敗・中断・欠落は拒否する
 4. `deploy`: mainのpush・Gate成功・Web影響ありの場合のみ。productionのロック取得後に候補SHAと最新mainを照合し、古い候補は理由を表示して省略する。現行候補は設定を検証し、同じrunの`web-dist`をWranglerで公開する。`web-e2e-wasm`も同じrunからdigest照合付きで復元し、公開前に`pnpm e2e --list`で全テストのimportを確認する
-5. 配信された `build-info.json` のSHAと対象コミットを有限回の取得で照合し、公開URLに対して既存21件・C0追加3件・モデル6件を実行する。モデル配布物とアプリWorker等の実ファイルを同じCI artifactのmanifestへ照合し、hash・長さ・MIME・cacheを保存する
+5. 配信された `build-info.json` のSHAと対象コミットを有限回の取得で照合し、固定SのCard・manifest・LICENSEを公開gateway経由でhash照合し、公開URLに対してUI53件・カメラ3回・未学習モデル6件を実行する。公開Sの3形式・中断・破損の5件は`public-s.yml`の`public_site=true`で別途検証する。モデル配布物とアプリWorker等の実ファイルを同じCI artifactのmanifestへ照合し、hash・長さ・MIME・cacheを保存する
 
 CodeQL は別の Security workflow、カバレッジと変異テストは Quality measurements workflow で実行する。PR ではCodeQL 4種類、Rust/Webカバレッジと既知変異の3種類も必須とする（CI Gateと計8件）。全体変異調査は週次・手動のみ。Rust は `rust-toolchain.toml`、Node は `.node-version`、Python は `.python-version`、pnpm は `packageManager`、Wrangler は Web の lockfile に固定する。
 

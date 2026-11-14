@@ -1,6 +1,6 @@
 # M6のブラウザ向け変換と検証済みHF配布
 
-**2026-11-14・申請不要のS公開**：既存SをWebから申請・ログイン・フォルダー取得なしで選べるようにした。HFはgateなし・Community OFF、短い日本語Cardへ更新済み。実モデル3形式・全37ファイルの匿名照合が成功し、#192を通常マージした。[公開版・動画の確認記録](PUBLIC_S_RELEASE_VALIDATION.md)。研究・GPUの停止は維持する。
+**2026-11-15・申請不要のS公開完了**：公開source `7b364c9`。HFはgateなし・Community OFF、簡潔な日本語Card。公開URLで3形式の実対戦・中断・破損時の表示が全5件成功し、全37ファイルの匿名hashも一致。公開版を直接撮影したS紹介動画を再制作し、全31ファイル・21画像を確認した。[固定版と検証記録](PUBLIC_S_RELEASE_VALIDATION.md)。研究・GPUは停止を維持する。
 
 2026-10-29 UTC。混合精度FP16のブラウザ数値検証が失敗したため、FP16重み・FP32計算の形式を追加し、全3形式を新しい実ファイルで固定評価した。本記録は候補計測時点の履歴。公開catalog差し替えなしの実機検証・資源終了を含む最終状態は[M6完了記録](M6_COMPLETION.md)を参照。 [固定集計](experiments/m6-portable-release.json)。
 
@@ -34,12 +34,11 @@ Random40局は各モデルすべて打切り。最大256手、同じ序盤・先
 
 [固定HF revision](https://huggingface.co/voxelshogi/voxelshogi-transformer-s/tree/f196c75236f0f0cfd028b91661b39a2c64ee448f)をpublic/manual・Community OFF・Apache-2.0で公開し、全37ファイルをLinuxから再取得・bytes／SHA-256照合した。Model Cardには各形式の評価・差・容量・実機候補性能、学習元と変換元、取得条件・制約を記載した。モデル・データ・checkpointはMacへ中継していない。
 
-HFの取得申請が承認されたら、HF CLIでログインしてフォルダー全体を取得できる。リポジトリのuv環境を使う場合は次のとおり。
+現在は取得申請・ログイン不要。Webでは自動取得する。手元で再現する場合だけ、HF CLIから検証済みの固定版を取得できる（Macでは検証に必要なモデルだけに限る）。上段の旧manual公開は2026-10-29時点の履歴。
 
 ```bash
-uv run --locked hf auth login
 uv run --locked hf download voxelshogi/voxelshogi-transformer-s \
-  --revision f196c75236f0f0cfd028b91661b39a2c64ee448f \
+  --revision 6ab524574d36536348dbe323a2b779b9cebe37ed \
   --local-dir ./voxelshogi-model
 ```
 

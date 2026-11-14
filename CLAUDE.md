@@ -1,6 +1,6 @@
 # CLAUDE.md — VoxelShogi
 
-**2026-11-14・S公開のCORS対応中**：HFはgateなし・Community OFF、短い日本語Cardに更新し、全37ファイルの匿名hash照合と実モデル3形式の候補対戦が成功。#192の統合後検証を#193で修正し、全8shardの事前確認後に取り込んだ。[公開版と最終動画の証拠](docs/PUBLIC_S_RELEASE_VALIDATION.md)。データ・state・Mのmanual gateと研究／GPU停止は維持する。
+**2026-11-15・申請不要のS公開完了**：公開source `7b364c9`。HFはgateなし・Community OFF、簡潔な日本語Card。公開URLで3形式の実対戦・中断・破損時の表示が全5件成功し、全37ファイルの匿名hashも一致。公開版を直接撮影したS紹介動画を再制作し、全31ファイル・21画像を確認した。[公開と最終動画の証拠](docs/PUBLIC_S_RELEASE_VALIDATION.md)。研究・GPUの停止と、データ・state・Mのmanual gateは維持する。
 
 **前回の動画修正履歴（2026-11-14）**：当時の公開source `d3822cb`で見切れ・字幕重なり・切替途中の描画を修正。公開E2Eと再制作、21画像の目視・境界・全編デコード・全hashが成功した。`docs/VIDEO_FRAMING_FIX.md`の新しい納品先を使い、旧`dc0a95f`動画の目視合格は撤回したまま保持する。ゲーム・API・モデルのソースは初回公開から変更せず、研究停止を維持する。
 

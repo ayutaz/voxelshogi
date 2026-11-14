@@ -1,5 +1,7 @@
 # M6のモデル用Worker通信
 
+**2026-11-15・現在のS利用方法**：Webの「AIと対戦」→「学習済みS」から、申請・ログイン・手動フォルダー取得なしで3形式を選べる。HFはpublic・gateなし・Community OFF、固定版は`6ab524574d36536348dbe323a2b779b9cebe37ed`。[公開サイトの実対戦と最終動画](PUBLIC_S_RELEASE_VALIDATION.md)。以下の旧manual gate・手動フォルダー手順・計測は対象時点の記録として保持する。
+
 学習済みモデルの端末内読込と数値検証付きsessionを専用Workerへ接続し、公開catalog・観戦UI・実GPUまで検証済み（[M6完了記録](M6_COMPLETION.md)）。catalogは最終HF revisionを固定しており、空ではない。以下は通信・中断・配信の仕様と初期実装時の検証記録。
 
 ## ファイルと実行先
