@@ -699,6 +699,9 @@ jobs:
         id: verify
         if: steps.candidate.outputs.current == 'true'
         run: node scripts/ci/deployment.mjs verify
+      - name: Verify and warm the anonymous S gateway
+        if: steps.candidate.outputs.current == 'true'
+        run: node scripts/verify-public-model-gateway.mjs public-s-gateway.json --public
       - name: Public E2E
         id: e2e
         if: steps.candidate.outputs.current == 'true'
@@ -741,6 +744,7 @@ jobs:
           path: |
             deployment-info.json
             model-distribution.json
+            public-s-gateway.json
           retention-days: 30
           if-no-files-found: error
       - name: Report deployment phases

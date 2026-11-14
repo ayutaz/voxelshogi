@@ -2,8 +2,15 @@ import { afterEach, expect, it, vi } from 'vitest';
 import worker from '../src/collection/worker';
 import type { GameDatabase } from '../src/collection/receiver';
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 const assets = () => ({ fetch: vi.fn().mockResolvedValue(new Response('static shell')) });
+it('serves approved model paths before the API 404 and static SPA, without touching games', async () => {
+  const fetcher=vi.fn(async()=>new Response('model metadata'));vi.stubGlobal('fetch',fetcher);
+  const ASSETS=assets(),GAMES={prepare:vi.fn()} as unknown as GameDatabase;
+  const response=await worker.fetch(new Request('https://game.example/api/models/s/6ab524574d36536348dbe323a2b779b9cebe37ed/manifest.json'),{ASSETS,GAMES});
+  expect(response.status).toBe(200);expect(await response.text()).toBe('model metadata');
+  expect(ASSETS.fetch).not.toHaveBeenCalled();expect(GAMES.prepare).not.toHaveBeenCalled();expect(fetcher).toHaveBeenCalledTimes(1);
+});
 it('routes /api/games to JSON admission, never the SPA fallback', async () => {
   const ASSETS = assets();
   const response = await worker.fetch(new Request('https://game.example/api/games', { method: 'POST' }), { ASSETS });

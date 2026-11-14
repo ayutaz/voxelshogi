@@ -64,6 +64,6 @@ uv run --locked hf download voxelshogi/voxelshogi-transformer-s \
 
 同じモデルの前回計測は数値48条件・40切替に成功したが、WASMの準備中に操作を使い切り、測定中のtrusted入力が0のため全量検査が失敗した。[失敗した元記録](experiments/m6-portable-browser-interaction-failed.json)は保持する。操作開始を測定リクエストのpending後へ移したhelper `f279649cc95ab76ae88ab86371a5f53c3552b991`で再計測し、必須8チェック・関連CIの成功後に受理した。閾値や成功条件の緩和はしていない。
 
-この記録は`candidate=true`で、最終の公開catalogの証拠とは区別する。次はPRの必須CI・通常取り込み・自動公開後に、差し替えなしの全48条件・40実切替、実Arenaの3GPU形式と7 E2Eを検証する。当時はmanual gateを維持した。Sは2026-11-14の明示承認に基づきゲートを解除し、固定HF版から直接読み込む。他のmanual対象のゲートは迂回しない。
+この記録は`candidate=true`で、最終の公開catalogの証拠とは区別する。次はPRの必須CI・通常取り込み・自動公開後に、差し替えなしの全48条件・40実切替、実Arenaの3GPU形式と7 E2Eを検証する。当時はmanual gateを維持した。Sは2026-11-14の明示承認に基づきゲートを解除し、固定HF版をCloudflareの同一origin経由で読み込む。他のmanual対象のゲートは迂回しない。
 
 同じ最終HF配布を使う[候補Arenaの実ONNX E2E](experiments/m6-portable-arena-candidate.json)も7件・58.6秒で成功した（retry／skip／flakyなし）。3形式の合法手・条件付き棋譜、速度・自動再生、3D準備中の操作と中断、破損拒否、GPUなし時の明示エラーと人間対AI、実計測driverのsmokeを確認した。公開URL上でcatalogだけを差し替えた候補検証であり、差し替えなしの最終公開検証とは区別する。

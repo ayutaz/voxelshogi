@@ -1,6 +1,6 @@
 # 申請不要の学習済みS：公開確認
 
-2026-11-14。実装は[PR #192](https://github.com/ayutaz/voxelshogi/pull/192)、統合sourceは`417b286103be88059f976298796d584caf5ca6b4`。mainの深い検証で公開が止まったため修正中。公開サイトは従来版のままで、HF公開とWeb反映を区別する。
+2026-11-14。実装は[PR #192](https://github.com/ayutaz/voxelshogi/pull/192)、深い検証の修正は[#193](https://github.com/ayutaz/voxelshogi/pull/193)。後者の統合source `201d93c5e20c210db829a6dba72931b7219a5ab3`は配信されたが、公開E2EでHF直接取得のCORSエラーが出たため、同一origin配信へ修正中。
 
 ## HFと実モデル
 
@@ -20,6 +20,14 @@
 最初の[main CI](https://github.com/ayutaz/voxelshogi/actions/runs/43599508038)は、Python変異の隔離環境にM6の公開記録がないことと、Webの`human-first-model-seat`指定が旧コードを指していることで失敗した。Gateがデプロイを停止し、失敗を無視した公開は行っていない。
 記録ファイル2件の明示コピー、隔離環境で実Card planを準備する独立テスト、変異指定の更新を行った。全Python883件・Web215件の指定も軽量に検査し、曖昧・欠落0。手動の既知バグ注入は一時コピーで検出し、各復元後の正常系を確認した。新しいmain CI・配信確認は追記する。
 公開Sのworkflowは手動実行で本番URLを直接検証でき、全ケースの開始時に期待した配信SHAを要求する。データ保存APIの契約は変更しておらず、[以前の実ブラウザ→D1照合](ARENA_RELEASE_VALIDATION.md)を保持する。
+
+## 公開後に見つかったCORSと配信の修正
+
+[#193の事前深いCI](https://github.com/ayutaz/voxelshogi/actions/runs/43601508565)と、統合後の全8shard・Quality・Securityは成功した。続く[main run](https://github.com/ayutaz/voxelshogi/actions/runs/43602932972)では配信自体は成功し、公開E2Eは50成功・3失敗だった。失敗は公開originからHF manifestを読む際のCORSエラーで、localhost候補には出なかった。後のHTTP再確認では両originに許可ヘッダーが返ったため、恒久的なorigin拒否とは断定しない。
+
+公開ブラウザは`/api/models/s/<固定HF版>/...`を使い、Cloudflareが固定Sの34推論ファイルだけを取得・キャッシュする。repo・revision・パスはコードの許可リストから選び、Cookie／Authorizationを渡さず、checkpoint・dataset・任意URLは拒否する。ブラウザのbytes／SHA-256と同形式の全参照値の検証は維持する。ローカル開発はHF直接取得を残す。
+
+マージ前にはLinuxの実WorkerでCard・manifest・LICENSEの匿名hashを確認する。デプロイ後にもこの3件を確認してから公開E2Eを進め、手動のS5 E2Eは本番URLで実行する。最終動画も本番サイトを直接撮影し、試験用の収集APIだけを置き換えてD1に合成棋譜を残さない。これらは現時点で実行待ち。
 
 ## 動画
 
