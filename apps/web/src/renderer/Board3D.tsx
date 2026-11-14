@@ -186,7 +186,7 @@ function LayerGrid({ view }: { view: LayerView }) {
       {layers.map((z) => (
         <gridHelper
           key={z}
-          args={[9 * CELL, 9, view.mode === 'all' || z === view.z ? '#9bd6cd' : '#3e6169', view.mode === 'all' || z === view.z ? '#6c9398' : '#2e4b52']}
+          args={[9 * CELL, 9, z === view.z ? '#ffd18b' : view.mode === 'all' ? '#9bd6cd' : '#3e6169', z === view.z ? '#c5ab82' : view.mode === 'all' ? '#6c9398' : '#2e4b52']}
           position={[0, (z - 4) * LAYER_GAP - 0.16, 0]}
         />
       ))}
@@ -237,7 +237,7 @@ export function Board3D({
         {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}
         <OrbitControls makeDefault enableDamping target={[0, 0, 0]} />
       </Canvas>
-      <div className="layer-labels" aria-hidden="true" style={{opacity:ready?1:0}}>{['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z)=><span key={label} className="layer-label" ref={el=>{labels.current[z]=el;}}>{label}</span>)}</div>
+      <div className="layer-labels" aria-hidden="true" style={{opacity:ready?1:0}}>{['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z)=><span key={label} className={`layer-label${z===view.z?' selected':''}`} ref={el=>{labels.current[z]=el;}}>{label}</span>)}</div>
     </div>
   );
 }

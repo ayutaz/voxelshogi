@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'public-browser-storage-status', file: 'scripts/verify-public-arena-storage.mjs', before: 'assert.equal(first.httpStatus,201);', after: '', test: 'public-browser-storage' },
   { name: 'candidate-private-evidence', file: '.github/workflows/demo-video.yml', before: 'apps/web/test-results/*/test-failed-*.png', after: 'apps/web/test-results/**/*', test: 'candidate-ui' },
   { name: 'video-central-hook', file: 'scripts/demo-video.mjs', before: 'candidates.sort((a,b) => centrality(a.move) - centrality(b.move) || a.index - b.index);', after: '', test: 'demo-video' },
   { name: 'video-first-content-frame', file: 'scripts/demo-video.mjs', before: 'else if (green >= 3) return frame;', after: 'else if (green >= 3) return frame + 1;', test: 'demo-video' },

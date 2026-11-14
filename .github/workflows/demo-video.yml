@@ -7,6 +7,10 @@ on:
         description: Verify arena UI, real models and camera before recording
         type: boolean
         default: false
+      verify_public_storage:
+        description: Create one owned public test game for subsequent D1 readback and deletion
+        type: boolean
+        default: false
   pull_request:
     types: [labeled]
 
@@ -97,6 +101,21 @@ jobs:
       - name: Capture and validate the real game
         working-directory: .
         run: node scripts/demo-video.mjs "$RUNNER_TEMP/demo-video"
+      - name: Verify automatic storage from the actual public browser
+        if: inputs.verify_public_storage
+        working-directory: .
+        run: node scripts/verify-public-arena-storage.mjs "$RUNNER_TEMP/public-storage"
+      - name: Save only the owned public game proof for D1 readback
+        if: always() && inputs.verify_public_storage
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: public-storage-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/public-storage/public-storage.json
+            ${{ runner.temp }}/public-storage/public-storage-payload.json
+            ${{ runner.temp }}/public-storage/public-storage.png
+          retention-days: 2
+          if-no-files-found: error
       - name: Save only reviewable deliverables
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:

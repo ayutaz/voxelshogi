@@ -11,14 +11,16 @@ export function Hands({
   color,
   selection,
   onHand,
+  interactive = true,
 }: {
   snap: Snapshot;
   color: Color;
   selection: Selection;
   onHand: (kind: HandKind) => void;
+  interactive?: boolean;
 }) {
   const counts = handCounts(snap.hands)[color];
-  const active = snap.side === color && !snap.result;
+  const active = interactive && snap.side === color && !snap.finished;
   const kinds = HAND_KINDS.filter((k) => counts[k] > 0);
   return (
     <div className={`hands hands-${color}`} data-testid={`hands-${color}`}>

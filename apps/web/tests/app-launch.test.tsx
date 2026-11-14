@@ -267,6 +267,14 @@ it('lets a viewer uncover the terminal board without discarding the result',()=>
   render(<App/>);fireEvent.click(screen.getByRole('button',{name:'盤面を見る'}));
   expect(screen.queryByRole('region',{name:'対局結果'})).toBeNull();
   expect(screen.getByTestId('status').textContent).toContain('後手の勝ち');
+  expect(screen.getByTestId('toggle-run').textContent).toBe('対局終了');
+});
+it('cancels a paused single-step search from the primary control used on narrow screens',()=>{
+  render(<App/>);
+  act(()=>{fake.status={...fake.status,phase:'thinking'};for(const fn of fake.aiListeners)fn();});
+  expect(screen.getByTestId('toggle-run').textContent).toBe('思考を中断');
+  fireEvent.click(screen.getByTestId('toggle-run'));expect(fake.paused).toHaveBeenCalledTimes(1);
+  expect(fake.configure.mock.calls.at(-1)![0]).toMatchObject({running:false});
 });
 it('reconfigures the real running option when a human starts another game with the same settings',()=>{
   let liveRunning=false;

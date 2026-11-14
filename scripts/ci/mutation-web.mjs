@@ -15,6 +15,8 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'readonly-hands', file: 'components/Panels.tsx', before: 'const active = interactive && snap.side === color', after: 'const active = snap.side === color', test: 'panels-side', extension: 'tsx' },
+  { name: 'primary-single-step-cancel', file: 'App.tsx', before: 'if (running || stepBusy) pause();', after: 'if (running) pause();', test: 'app-launch', extension: 'tsx' },
   { name: 'layer-labels-no-clipping', file: 'renderer/layer-label-position.ts', before: 'Math.max(4, Math.min(max, value))', after: 'Math.min(max, value)', test: 'layer-label-position' },
   { name: 'same-game-settings-reconfigure', file: 'App.tsx', before: '[aiOptions, snap.revision]', after: '[aiOptions]', test: 'app-launch', extension: 'tsx' },
   { name: 'terminal-board-dismiss', file: 'App.tsx', before: 'onClick={() => setResultDismissed(true)}', after: 'onClick={() => setResultDismissed(false)}', test: 'app-launch', extension: 'tsx' },
@@ -267,7 +269,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 207);
+    assert.equal(results.length, 209);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

@@ -11,6 +11,12 @@ test('match setup traps focus, closes with Escape and returns focus without repl
   await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(opener).toBeFocused();
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
 });
+test('the primary mobile control cancels a real single-step search without a late move',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await page.goto('/');await selectSetting(page,'thinking-budget','3000');
+  await page.getByTestId('ai-step').click();await expect(page.getByTestId('toggle-run')).toHaveText('思考を中断');
+  await page.getByTestId('toggle-run').click();await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+  await page.waitForTimeout(3300);await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+});
 
 for (const [width,height] of [[390,844],[768,1024],[1440,900]]) for (const side of ['h-r','r-h']) for (const difficulty of ['easy','normal']) {
   test(`human entry starts ${side} against ${difficulty} at ${width} and the real AI answers`, async ({ page },info) => {
@@ -75,5 +81,12 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) {
     const layer = page.getByRole('combobox',{name:'表示する層'});
     if(await layer.isVisible())expect((await layer.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     else { for(const rect of await page.locator('.layer-rail button').evaluateAll(buttons=>buttons.map(b=>({height:b.getBoundingClientRect().height,width:b.getBoundingClientRect().width})))){expect(rect.height).toBeGreaterThanOrEqual(44);expect(rect.width).toBeGreaterThanOrEqual(44);} }
+    await display(page,'both');await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready','true');
+    await sliceAt(page,'6');await expect(page.locator('.layer-label.selected')).toHaveText('VII');
+    const frame=(await page.getByTestId('board3d').boundingBox())!;
+    for(const bounds of await page.locator('.layer-label').evaluateAll(labels=>labels.map(label=>{const r=label.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,font:parseFloat(getComputedStyle(label).fontSize)};}))){
+      expect(bounds.font).toBeGreaterThanOrEqual(12);expect(bounds.left).toBeGreaterThanOrEqual(frame.x);expect(bounds.right).toBeLessThanOrEqual(frame.x+frame.width);expect(bounds.top).toBeGreaterThanOrEqual(frame.y);expect(bounds.bottom).toBeLessThanOrEqual(frame.y+frame.height);
+    }
+    const three=info.outputPath(`attachments/launch-three-${width}.png`);await page.screenshot({path:three,fullPage:true});await info.attach('three-dimensional',{path:three,contentType:'image/png'});
   });
 }

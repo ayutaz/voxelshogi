@@ -237,7 +237,7 @@ export function App() {
   const phaseText = snap.ply < snap.moveCount ? `履歴 ${snap.ply}/${snap.moveCount}手${snap.terminalFinished ? '・終局済み' : ''}` : { paused: '一時停止中', waiting: '次の着手待ち', thinking: `${snap.side === 'b' ? '先手' : '後手'} ${difficulty[snap.side] === 'model' ? 'モデル準備・思考中…' : `${difficulty[snap.side] === 'normal' ? 'Normal' : 'Easy'} 思考中…`}`,
     human: '人間の手番', history: '履歴表示中：分岐は専用ボタンから', finished: '対局終了', error: 'AIエラー' }[aiStatus.phase];
 
-  const sideHands = (c: Color) => <Hands snap={snap} color={c} selection={selection} onHand={onHand} />;
+  const sideHands = (c: Color) => <Hands snap={snap} color={c} selection={selection} interactive={humanTurn} onHand={onHand} />;
 
   const openMatch = (kind: 'watch' | 'human') => {
     setMatchKind(kind); setDraftMode(mode === 'r-r' ? 'h-r' : mode);
@@ -311,7 +311,7 @@ export function App() {
         <section className="watch playback" aria-label="観戦操作">
           <div className="row">
             <button type="button" data-testid="undo" onClick={() => goto(Math.max(0,snap.ply-1))} disabled={snap.ply === 0}>◀ 1手戻る</button>
-            <button type="button" onClick={() => { if (running) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); if (!terminalFinished) setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>{running ? '一時停止' : snap.ply < snap.moveCount ? terminalFinished ? '終局位置へ' : '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}</button>
+            <button type="button" onClick={() => { if (running || stepBusy) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); if (!terminalFinished) setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>{terminalFinished && snap.ply === snap.moveCount ? '対局終了' : running ? '一時停止' : stepBusy ? '思考を中断' : snap.ply < snap.moveCount ? terminalFinished ? '終局位置へ' : '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}</button>
             <button type="button" data-testid="ai-step" aria-label={snap.ply < snap.moveCount && mode !== 'r-r' ? 'この局面から対戦を分岐' : undefined} disabled={running || snap.finished || (controller === 'human' && snap.ply === snap.moveCount) || !!aiStatus.error} aria-disabled={stepBusy} onClick={() => { if (snap.ply < snap.moveCount && mode !== 'r-r') branchGame(); else stepOnce(); }}>{snap.ply < snap.moveCount ? mode === 'r-r' ? 'ここからAIで分岐' : 'ここから対戦を分岐' : '1手指す'}</button>
             <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'} onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
             <button type="button" data-testid="redo" onClick={() => goto(Math.min(snap.moveCount,snap.ply+1))} disabled={snap.ply === snap.moveCount}>1手進む ▶</button>
