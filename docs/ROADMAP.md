@@ -1,5 +1,7 @@
 # ROADMAP / 進捗
 
+**2026-11-14・観戦UIの再設計レビュー**：[問題整理・目的とゴール・段階別計画](design/SPECTATOR_UX_REVIEW.md)、[操作モック](design/ARENA_MOCKUP.md)を追加。公開済みUIをClaude Codeで再評価し、U1のモックはユーザー承認済み。[本番実装計画](design/ARENA_IMPLEMENTATION_PLAN.md)にU2画面構成・U3対局接続・U4自動保存・U5公開検証・U6動画更新の目的と完了条件を固定した。本実装は未着手。
+
 **2026-11-12・一時停止**：既存Sの公開デモと、Mの少量2 run・48局評価を現段階の成果とする。
 本比較12 run・MのWeb配布・観戦表示2案／実端末各60分は未完了のまま停止する。
 追加GPU・生成・学習を自動再開しない。[停止時点の結果と固定HF版](RESEARCH_CHECKPOINT_20261112.md)を現在の確認元とし、

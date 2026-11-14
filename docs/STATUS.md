@@ -1,5 +1,8 @@
 # 現在の状態と文書の案内
 
+**2026-11-14・UIモック承認と実装計画**：将棋経験者／AI・理系の人を対象とする[操作モック](design/ARENA_MOCKUP.md)はユーザー承認済み。[問題整理](design/SPECTATOR_UX_REVIEW.md)から、[U2〜U6の本番実装計画](design/ARENA_IMPLEMENTATION_PLAN.md)へ進む。
+次は盤中心の画面構成、その後に観戦／人間対AIの接続、自動保存、公開検証、動画更新。自動保存は新API→clientの順に導入する。公開中のUI・任意送信API・DBはまだ変更していない。
+
 2026-11-14更新。**研究実行の停止を維持し、公開準備L1〜L6をPC対象の研究用Alphaとして完了。実スマホは未確認。**
 追加GPU・研究データ生成・学習・Mの公開は行わない。[公開準備の進捗](PUBLIC_LAUNCH_PROGRESS.md)を参照する。
 詳しい結果・固定HF版・未達項目は[停止時点の記録](RESEARCH_CHECKPOINT_20261112.md)を正とする。
