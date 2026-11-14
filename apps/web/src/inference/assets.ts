@@ -33,7 +33,7 @@ async function verified(data: Uint8Array<ArrayBuffer>, file: FileRef, maximum: n
 
 export async function fetchVerified(url: string, file: FileRef, signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Uint8Array<ArrayBuffer>> {
   checkRef(file);
-  const response = await fetcher(url, { signal, cache: 'force-cache' });
+  const response = await fetcher(url, { signal, cache: 'force-cache', credentials: 'omit' });
   if (!response.ok || !response.body) throw new Error(`asset download failed: ${response.status}`);
   const declared = response.headers.get('content-length');
   const encoding = response.headers.get('content-encoding');

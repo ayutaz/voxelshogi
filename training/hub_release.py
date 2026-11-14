@@ -1,6 +1,7 @@
 """Explicit, hash-pinned Hub releases from external Linux hosts."""
 
 import argparse
+import base64
 import hashlib
 import json
 import platform
@@ -43,6 +44,63 @@ class PublicationApi:
         response.raise_for_status()
         return False
 
+    def commit_public_s_card(self, *, card, parent_commit, restore_fp32=None):
+        """Commit one small regular README explicitly; never stage model binaries."""
+        if not 0 < len(card) <= 8192 or not re.fullmatch(
+            r"[0-9a-f]{40}", parent_commit
+        ):
+            raise ValueError("bounded Card and immutable parent required")
+        records = [
+            {
+                "key": "header",
+                "value": {
+                    "summary": "Save concise public S Model Card",
+                    "description": "Metadata-only correction after readback mismatch",
+                    "parentCommit": parent_commit,
+                },
+            },
+            {
+                "key": "file",
+                "value": {
+                    "content": base64.b64encode(card).decode("ascii"),
+                    "path": "README.md",
+                    "encoding": "base64",
+                },
+            },
+        ]
+        if restore_fp32 is not None:
+            if (
+                set(restore_fp32) != {"bytes", "sha256"}
+                or restore_fp32["bytes"] != 20461391
+                or restore_fp32["sha256"]
+                != "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63"
+            ):
+                raise ValueError("only the original approved FP32 may be restored")
+            records.append(
+                {
+                    "key": "lfsFile",
+                    "value": {
+                        "path": "fp32.onnx",
+                        "algo": "sha256",
+                        "oid": restore_fp32["sha256"],
+                        "size": restore_fp32["bytes"],
+                    },
+                }
+            )
+        response = self.session.post(
+            self._url(PUBLIC_S_REPO, "model") + "/commit/main",
+            headers={**self.headers, "Content-Type": "application/x-ndjson"},
+            content=(
+                "\n".join(json.dumps(record) for record in records) + "\n"
+            ).encode(),
+            timeout=30,
+        )
+        response.raise_for_status()
+        commit = response.json()["commitOid"]
+        if not re.fullmatch(r"[0-9a-f]{40}", commit):
+            raise ValueError("invalid returned Card commit")
+        return commit
+
 
 def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
@@ -54,6 +112,9 @@ STATE_REPOS = {
     "distributed-training-state": "voxelshogi/voxelshogi-transformer-s-distributed-training-state-v1",
     "research-training-state": "voxelshogi/voxelshogi-research-training-state-v1",
 }
+
+PUBLIC_S_PROFILE = "public-s-inference-v1"
+PUBLIC_S_REPO = "voxelshogi/voxelshogi-transformer-s"
 
 
 def _policy(plan):
@@ -89,7 +150,19 @@ def _policy(plan):
         raise ValueError("release destination must be voxelshogi/NAME")
     if plan["repo_type"] not in ("model", "dataset"):
         raise ValueError("release type must be model or dataset")
-    if plan["private"] is not False or plan["gated"] != "manual":
+    public_s = plan.get("access_profile") == PUBLIC_S_PROFILE
+    if plan.get("access_profile") is not None and not public_s:
+        raise ValueError("unsupported access profile")
+    if public_s and (
+        role != "inference-package"
+        or plan["repo_type"] != "model"
+        or plan["repo_id"] != PUBLIC_S_REPO
+        or plan["license"] != "apache-2.0"
+    ):
+        raise ValueError("ungated publication is approved only for S inference")
+    if plan["private"] is not False or (
+        plan["gated"] is not False if public_s else plan["gated"] != "manual"
+    ):
         raise ValueError(
             "release requires a public repository with manual access gating"
         )
@@ -205,6 +278,7 @@ def plan_release(
     artifact_role="artifacts",
     state_publication_approved=False,
     expected_binding=None,
+    access_profile=None,
 ):
     plan = {
         "schema": 1,
@@ -218,6 +292,8 @@ def plan_release(
     }
     if artifact_role != "artifacts":
         plan["artifact_role"] = artifact_role
+    if access_profile is not None:
+        plan.update(access_profile=access_profile, gated=False)
     if artifact_role in STATE_REPOS:
         plan.update(
             state_publication_approved=state_publication_approved,
@@ -321,6 +397,7 @@ def publish_release(
         artifact_role=plan.get("artifact_role", "artifacts"),
         state_publication_approved=plan.get("state_publication_approved", False),
         expected_binding=plan.get("expected_binding"),
+        access_profile=plan.get("access_profile"),
     )
     if current != plan:
         raise ValueError("release artifacts changed since review")
@@ -364,13 +441,13 @@ def create_release_repository(plan, api, *, execute=False, system=None):
     info = api.repo_info(**destination)
     if info.private:
         raise ValueError("refusing to expose an existing private repository")
-    api.update_repo_settings(**destination, gated="manual")
+    api.update_repo_settings(**destination, gated=plan["gated"])
     api.disable_community(**destination)
     if api.community_disabled(**destination) is not True:
         raise ValueError("Community OFF has not been confirmed")
     info = api.repo_info(**destination)
-    if info.private or info.gated != "manual":
-        raise ValueError("public/manual Hub settings have not been confirmed")
+    if info.private or info.gated != plan["gated"]:
+        raise ValueError("public Hub access settings have not been confirmed")
     return info
 
 
@@ -391,7 +468,7 @@ def verify_release(plan, receipt, api, fetch, *, system=None):
         "revision": receipt["hub_commit"],
     }
     info = api.repo_info(**destination)
-    if info.private or info.gated != "manual" or info.sha != receipt["hub_commit"]:
+    if info.private or info.gated != plan["gated"] or info.sha != receipt["hub_commit"]:
         raise ValueError("Hub settings or immutable revision mismatch")
     if (
         api.community_disabled(repo_id=plan["repo_id"], repo_type=plan["repo_type"])

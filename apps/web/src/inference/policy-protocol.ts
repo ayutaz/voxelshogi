@@ -29,13 +29,13 @@ export function localFile(entry: ModelFile): LocalFile {
   return { name: entry.file.name, webkitRelativePath: entry.path, size: entry.file.size, arrayBuffer: () => entry.file.arrayBuffer() };
 }
 function parseFiles(value: unknown): ModelFile[] {
-  if (!Array.isArray(value) || value.length < 1 || value.length > 512) throw new Error('invalid transferred model files');
+  if (!Array.isArray(value) || value.length > 512) throw new Error('invalid transferred model files');
   const files = value.map(item => {
     const entry = record(item);
     if (Object.keys(entry).length !== 2 || typeof entry.path !== 'string' || !(entry.file instanceof File) || entry.file.name !== entry.path.split('/').at(-1)) throw new Error('invalid transferred model file/path');
     return { path: entry.path, file: entry.file };
   });
-  indexLocalFolder(files.map(localFile), 'transfer'); // Bounded handles only; catalog approval precedes reads.
+  if (files.length) indexLocalFolder(files.map(localFile), 'transfer'); // Empty explicitly selects catalog-approved public S; never a caller-supplied URL.
   return files;
 }
 /** Explicit relative paths survive even where File's nonstandard path property is not cloned. */

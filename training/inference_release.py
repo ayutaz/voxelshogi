@@ -129,6 +129,7 @@ def catalog_release(folder, plan, receipt):
         license_approved=plan["license_approved"],
         source_commit=plan["source_commit"],
         artifact_role="inference-package",
+        access_profile=plan.get("access_profile"),
     )
     if current != plan:
         raise ValueError("catalog artifacts changed since verified release")
@@ -145,4 +146,9 @@ def catalog_release(folder, plan, receipt):
         "notices": [
             files[name] for name in ("README.md", "LICENSE", "NOTICE") if name in files
         ],
+        **(
+            {"publicDownload": True}
+            if plan.get("access_profile") == "public-s-inference-v1"
+            else {}
+        ),
     }

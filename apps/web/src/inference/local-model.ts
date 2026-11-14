@@ -5,6 +5,7 @@ import { isResearchArchitecture, parseResearchModel, RESEARCH_MODEL_BYTES, type 
 export interface TrainedRelease extends TrainedIdentity {
   approved: true; repo: string; revision: string; manifest: FileRef; notices: FileRef[];
   profile?: 'research-m-v1'; architecture?: ResearchArchitecture;
+  publicDownload?: true;
 }
 export interface LocalFile {
   name: string; webkitRelativePath: string; size: number; arrayBuffer: () => Promise<ArrayBuffer>;
@@ -38,6 +39,7 @@ export function parseTrainedCatalog(value: unknown): TrainedRelease[] {
   const releases = catalog.releases.map(item => {
     const release = record(item);
     if (release.approved !== true) throw new Error('trained release approval is pending');
+    if (Object.hasOwn(release, 'publicDownload') && (release.publicDownload !== true || release.repo !== 'voxelshogi/voxelshogi-transformer-s' || release.id !== 'voxelshogi-transformer-s-m6-314159-v1' || release.profile !== undefined || release.license !== 'Apache-2.0')) throw new Error('public download approval is limited to the S inference release');
     if (Object.hasOwn(release, 'profile') || Object.hasOwn(release, 'architecture')) {
       if (release.profile !== 'research-m-v1' || !isResearchArchitecture(release.architecture) || release.license !== 'Apache-2.0') throw new Error('invalid research catalog profile');
     }

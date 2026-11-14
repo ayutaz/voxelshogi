@@ -7,14 +7,13 @@
 
 1. [Arena](https://voxelshogi.yousan-apps.workers.dev)を開き、「観戦を開始」を押す。モデル取得なしでNormal同士を眺められる。
    停止・1手送り・速度変更、2D／3Dを使って盤面を追える。「AIと対戦」から先後と相手AIを選んで自分でも指せる。
-2. 学習済みSを試す場合は[HF](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)で取得申請し、
-   承認後に画面が指定する固定revisionのフォルダー全体を取得して読み込む。
-   両AIでFP32／FP16重み／INT8重みとbackendを選べる。[取得手順・対応範囲](M6_PORTABLE.md)を確認する。
+2. 学習済みSは「AIと対戦」から選ぶ。申請・ログイン・手動ダウンロードは不要で、FP32／FP16重み／INT8重みを選べる。
+   [HFの短いモデル説明](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)・[取得条件の変更と公開確認の状態](PUBLIC_S_ACCESS.md)を参照する。
 3. [推論ラボ](https://voxelshogi.yousan-apps.workers.dev/?models=1)は未学習モデルの3形式比較である。
    学習済みSの強さを示す画面として紹介しない。
 
 Mの少量学習checkpointは研究保存物であり、Webで読み込む配布パッケージではない。
-HFのmanual gateは維持し、記事や別サイトへモデルを転載して取得申請を迂回しない。
+S推論用だけは2026-11-14の指示で取得ゲートを解除する。データ・state・Mのmanual gateは維持し、別配布先で迂回しない。
 既存の実機検証は[M6完了記録](M6_COMPLETION.md)、今回未実施の確認は[停止時点](RESEARCH_CHECKPOINT_20261112.md)を参照する。
 新UIの公開SHA・公開53 E2E・カメラ3回・未学習モデル6件を確認した。実スマートフォンの操作は未確認である。
 

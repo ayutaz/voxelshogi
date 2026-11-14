@@ -56,6 +56,16 @@ it('disposes a session whose numeric initialization fails', async () => {
   expect(f.session.dispose).toHaveBeenCalledTimes(1);
 });
 
+it('uses empty transferred files only for an explicitly public S release', async () => {
+  const f = setup(), publicModel = vi.fn(async () => f.source);
+  await expect(createPolicyRuntime([], f.selection, vi.fn(), { ...f.dependencies, publicModel })).rejects.toThrow(/not approved/);
+  expect(publicModel).not.toHaveBeenCalled(); expect(f.dependencies.model).not.toHaveBeenCalled();
+  f.dependencies.catalog.mockResolvedValue({ schema: 1, releases: [{ ...f.release, publicDownload: true }] });
+  await createPolicyRuntime([], f.selection, vi.fn(), { ...f.dependencies, publicModel });
+  expect(publicModel).toHaveBeenCalledWith({ ...f.release, publicDownload: true });
+  expect(f.dependencies.model).not.toHaveBeenCalled();
+});
+
 it('fetches only bounded public catalog JSON without credentials, file bodies or redirects', async () => {
   const fetcher = vi.fn(async () => new Response('{"schema":1,"releases":[]}'));
   expect(await readTrainedCatalog('https://demo.example/models/m6/catalog.json', fetcher)).toEqual({ schema: 1, releases: [] });

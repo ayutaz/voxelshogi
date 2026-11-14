@@ -1,5 +1,9 @@
 # Hugging Faceの公開・保存ルール
 
+**2026-11-14・S推論用の例外**：明示指示により`voxelshogi/voxelshogi-transformer-s`だけ取得ゲートなしのpublicへ変更する。[承認と完了条件](PUBLIC_S_ACCESS.md)。`public-s-inference-v1` profileを使い、Community OFF・Apache-2.0・既存重みhashを維持する。その他のデータ・state・M repoはmanualのまま。本書の過去のpublic/manualは対象時点の記録である。
+
+既存Sの設定と小さいCardだけの更新は[public_s_release.py](../training/public_s_release.py)を使い、Macからメタデータのみ更新できる。既存重み・データ・checkpointは取得も中継もしない。旧固定版を親commitに指定してREADMEだけを送る。続いてLinux／GitHub Actionsで全37ファイルの匿名取得とhashを確認してからWeb catalogを切り替える。
+
 **2026-11-12・一時停止**：既存Sの公開デモと、Mの少量2 run・48局評価を現段階の成果とする。
 本比較12 run・MのWeb配布・観戦表示2案／実端末各60分は未完了のまま停止する。
 追加GPU・生成・学習を自動再開しない。[停止時点の結果と固定HF版](RESEARCH_CHECKPOINT_20261112.md)を現在の確認元とし、

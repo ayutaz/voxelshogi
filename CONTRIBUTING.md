@@ -25,6 +25,7 @@ CIは[変更範囲とPR／深い検証の分離](docs/CI_PERFORMANCE.md)を使�
 
 - 仕様・ルールを確認し、テストを先に書いて RED を確認してから実装する。期待値は手計算か独立した参照実装で用意し、空の結果で通らないようにする。
 - 新しいテストが対象のバグを検出することを、変異の注入で確認する。一時的な変異は成果物に残さない。
+  Pythonの手動変異は一時コピーで行い、`PYTHONDONTWRITEBYTECODE=1`と新しい空のbytecode cacheを使う。各復元後にも正常系を確認する。変異を実行した作業領域の既存`.pyc`を、公開・制御処理へ持ち込まない。
 - ルール変更は `docs/RULESET.md` を先に更新し、互換性に応じて `ruleset_id` を変更する。進捗・完了条件は `docs/ROADMAP.md` に反映する。
 - Python は `.python-version`（3.14系）を使い、依存が未対応の場合のみ3.13へ切り替える。さらに古い版が必要なら理由・対象・解消条件を記録する。
 - Pythonの実行は `uv run --locked`、依存追加は `uv add`（開発用は `uv add --dev`）。`uv.lock` をcommitし、CIで `uv sync --locked`・`uv audit --locked`・Pythonテストと既知変異を実行する。LinuxのtorchはCPU専用indexを使う。

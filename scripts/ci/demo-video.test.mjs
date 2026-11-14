@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { contentStartFrame, selectHook, parseFrameRate, verifyVideo, zoomAtFrame, verifyRecordedBounds, foregroundBounds, storyCuts, storyFrameSource } from '../demo-video.mjs';
+import { contentStartFrame, selectHook, parseFrameRate, verifyVideo, zoomAtFrame, verifyRecordedBounds, foregroundBounds, storyCuts, storyFrameSource, verifyHumanModel } from '../demo-video.mjs';
+
+test('model CTA requires an actual trained S reply with the pinned format and all four numeric checks',()=>{
+  const release={repo:'voxelshogi/voxelshogi-transformer-s',revision:'a'.repeat(40),manifest:{sha256:'b'.repeat(64)}};
+  const model={repo:release.repo,revision:release.revision,selection:{modelId:'voxelshogi-transformer-s-m6-314159-v1',packageHash:release.manifest.sha256,precision:'int8',backend:'wasm'}};
+  const record={selectedAgents:{mode:'h-r',b:{controller:'human'},w:{controller:'ai',difficulty:'model',model}},record:{moves:['575565','535545']},observationsThroughCursor:[{reply:{kind:'model-result',model,result:{bestMove:'535545'},validation:{fixtures:Array.from({length:4},()=>({comparison:{policy:{exceeded:0},value:{exceeded:0}}}))}}}]};
+  verifyHumanModel(record,release);
+  for(const mutate of [r=>{r.observationsThroughCursor[0].reply.kind='result'},r=>{r.observationsThroughCursor[0].reply.model.selection.precision='fp32'},r=>{r.observationsThroughCursor[0].reply.validation.fixtures.pop()},r=>{r.observationsThroughCursor[0].reply.validation.fixtures[0].comparison.policy.exceeded=1},r=>{r.record.moves[1]='111222'}]){
+    const bad=structuredClone(record);mutate(bad);assert.throws(()=>verifyHumanModel(bad,release));
+  }
+});
 
 test('cuts out canvas resizing and keeps precisely 210/120/120 settled frames',()=>{
   const timeline={controlsStartFrame:240,ctaStartFrame:390};

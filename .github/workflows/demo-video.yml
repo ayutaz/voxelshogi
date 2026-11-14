@@ -67,6 +67,10 @@ jobs:
           uv run --locked python -m export.generate runs/m3/ci
           uv run --locked python scripts/ci/prepare-m6-model.py
           node scripts/prepare-inference.mjs runs/m3/ci apps/web/public/models/m3 --local
+      - name: Prepare the pinned installed runtime for the public S shot
+        if: ${{ !inputs.verify_ui }}
+        working-directory: .
+        run: node scripts/prepare-public-runtime.mjs
       - run: pnpm build
       - name: Verify actual model formats and arena integration
         if: inputs.verify_ui
@@ -128,6 +132,7 @@ jobs:
             ${{ runner.temp }}/demo-video/poster.png
             ${{ runner.temp }}/demo-video/contact-sheet.png
             ${{ runner.temp }}/demo-video/source-ai-record.json
+            ${{ runner.temp }}/demo-video/source-human-record.json
             ${{ runner.temp }}/demo-video/captions.json
             ${{ runner.temp }}/demo-video/receipt.json
             ${{ runner.temp }}/demo-video/framing.json

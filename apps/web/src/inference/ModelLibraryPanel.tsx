@@ -47,8 +47,9 @@ export default function ModelLibraryPanel({ onLoaded }: { onLoaded: (packet: Pac
     }
   };
   return <div className="model-library" data-testid="model-library">
-    <p className="muted">公開Sモデルは任意です。Easy／Normalの観戦には不要です。</p>
-    <ol className="muted"><li>Hugging Faceで取得申請し、承認を受ける。</li><li>配布ファイル一式を同じフォルダーへダウンロードする。</li><li>そのフォルダーを選択し、先手・後手のAIでモデルと精度形式を選ぶ。</li></ol>
+    <p className="muted">公開Sは「AIと対戦」または先手・後手のAI設定で選ぶと自動で読み込めます。申請・ログインは不要です。</p>
+    <p className="muted">以下は、手元に保存したモデルを使う場合の追加操作です。</p>
+    <ol className="muted"><li>HFの配布ファイル一式を同じフォルダーへダウンロードする。</li><li>そのフォルダーを選択し、先手・後手のAIでモデルと精度形式を選ぶ。</li></ol>
     <p className="muted">公開Sは1ファイル最大64MiB、フォルダー合計512MiBまで。推論は端末のCPU／GPUを使います。フォルダー選択に対応するPCブラウザをおすすめします。</p>
     {releases?.length === 0 && <p>公開済みの学習モデルはまだありません。</p>}
     {!!releases?.length && <>
