@@ -97,4 +97,6 @@ C0のカメラ／探索回帰はmain／定期の深いWeb CIと公開後に各3�
 
 ## Hugging Face公開と保存場所
 
+2026-11-14の明示指示で、S推論用`voxelshogi/voxelshogi-transformer-s`だけはpublic・gateなし・Community OFFへ変更済み。[専用profileと公開証拠](docs/PUBLIC_S_RELEASE_VALIDATION.md)に従い、Webは固定版の推論ファイルだけを同一originで配信する。データセット・学習再開state・Mのmanual gateは維持する。
+
 repo作成・公開は[hf-publication](.agents/skills/hf-publication/SKILL.md)と[公開ハーネス](docs/HF_PUBLICATION.md)を使う。生成物をMacへ中継せず、外部Linuxから`voxelshogi/`配下へ送信する。public/manual・Community OFF・Dataset Card・ライセンス・ファイル一覧とhashを検査し、固定Hub revisionでの全件照合後に転送完了とする。純粋テストと既知変異はCIへ含めるが、CIで実repoを作成したりデータを公開したりしない。
