@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { contentStartFrame, selectHook, parseFrameRate, verifyVideo, zoomAtFrame, verifyRecordedBounds, foregroundBounds } from '../demo-video.mjs';
+import { contentStartFrame, selectHook, parseFrameRate, verifyVideo, zoomAtFrame, verifyRecordedBounds, foregroundBounds, storyCuts, storyFrameSource } from '../demo-video.mjs';
+
+test('cuts out canvas resizing and keeps precisely 210/120/120 settled frames',()=>{
+  const timeline={controlsStartFrame:240,ctaStartFrame:390};
+  assert.deepEqual(storyCuts(timeline),[{start:0,end:210},{start:240,end:360},{start:390,end:510}]);
+  for(const [output,source]of [[0,0],[209,209],[210,240],[329,359],[330,390],[449,509]])assert.equal(storyFrameSource(output,timeline),source);
+  assert.throws(()=>storyFrameSource(450,timeline));
+  assert.throws(()=>storyCuts({controlsStartFrame:200,ctaStartFrame:390}));
+  assert.throws(()=>storyCuts({controlsStartFrame:240,ctaStartFrame:350}));
+});
 
 test('keeps the controls at native scale and limits the opening zoom',()=>{
   assert.equal(zoomAtFrame(0,1.1),1);assert.equal(zoomAtFrame(18,1.1),1.05);

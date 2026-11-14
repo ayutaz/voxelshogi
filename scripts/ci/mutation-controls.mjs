@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'video-resize-frames-excluded', file: 'scripts/demo-video.mjs', before: '{start:timeline.controlsStartFrame,end:timeline.controlsStartFrame+120}', after: '{start:210,end:330}', test: 'demo-video' },
   { name: 'video-caption-safe-bounds', file: 'scripts/demo-video.mjs', before: 'r.left>=0&&r.right<=1080&&r.top>=176&&r.bottom<=1160', after: 'true', test: 'demo-video' },
   { name: 'video-empty-foreground', file: 'scripts/demo-video.mjs', before: "assert.ok(right>left&&bottom>top,'no visible board foreground');", after: '', test: 'demo-video' },
   { name: 'video-native-controls-scale', file: 'scripts/demo-video.mjs', before: 'return 1; // UI controls are never cropped or enlarged.', after: 'return 1.5;', test: 'demo-video' },
