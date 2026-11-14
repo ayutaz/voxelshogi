@@ -15,6 +15,7 @@ import { BoardFrame } from './components/BoardFrame';
 import { Sheet } from './components/Sheet';
 import { AutomaticCollection } from './collection/automatic-client';
 import { collectionAgents } from './collection/agents';
+import { useGameSound } from './audio/useGameSound';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
 const ModelLibraryPanel = lazy(() => import('./inference/ModelLibraryPanel'));
@@ -36,6 +37,7 @@ export function App() {
   const [message, setMessage] = useState<string | null>(null);
   const [resultDismissed,setResultDismissed] = useState(false);
   const [mode, setMode] = useState<Mode>('r-r');
+  const sound = useGameSound(store,mode);
   const [running, setRunning] = useState(false);
   const [difficulty, setDifficulty] = useState<Record<Color, ArenaDifficulty>>({ b: 'normal', w: 'normal' });
   const [library, setLibrary] = useState<ModelLibrary>({ entries: [], choices: {} });
@@ -274,7 +276,7 @@ export function App() {
     }
     setView(nextMode === 'r-r' ? 'both' : '2d'); setRunning(true); setSheet(null);
   };
-  const goto = (ply: number) => { pause(); store.goto(ply); if (mode !== 'r-r' && ply === snap.moveCount && !(snap.terminalFinished ?? snap.finished)) setRunning(true); };
+  const goto = (ply: number, forward = false) => { pause(); if(forward)store.stepForward();else store.goto(ply); if (mode !== 'r-r' && ply === snap.moveCount && !(snap.terminalFinished ?? snap.finished)) setRunning(true); };
   const branchGame = () => {
     if (!window.confirm('この局面から新しい対局へ分岐します。元の棋譜は必要なら先に保存してください。続けますか？')) return false;
     pause();
@@ -310,7 +312,9 @@ export function App() {
 
   return <div className="app arena-app">
     <header className="masthead"><h1>VoxelShogi <span>9×9×9</span></h1>
-      <nav aria-label="メニュー"><button type="button" onClick={() => setSheet('models')}>モデル</button><button type="button" onClick={() => setSheet('record')}>棋譜</button><button type="button" onClick={() => setSheet('settings')}>対局設定</button></nav>
+      <nav aria-label="メニュー"><button type="button" className="sound-toggle" aria-label={sound.settings.enabled?'効果音をミュート':'効果音をON'} title={`効果音：${sound.settings.enabled?'ON':'OFF'}`} aria-pressed={sound.settings.enabled} onClick={sound.toggle}>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 9h4l5-4v14l-5-4H4z"/>{sound.settings.enabled?<path d="M16 8q4 4 0 8m3-11q7 7 0 14"/>:<path d="m16 9 6 6m0-6-6 6"/>}</svg>
+      </button><button type="button" onClick={() => setSheet('models')}>モデル</button><button type="button" onClick={() => setSheet('record')}>棋譜</button><button type="button" onClick={() => setSheet('settings')}>対局設定</button></nav>
     </header>
     <nav className="entry-tabs" aria-label="遊び方"><button type="button" aria-pressed={mode === 'r-r'} onClick={() => { if (mode !== 'r-r') openMatch('watch'); }}>AIを観戦</button><button type="button" aria-pressed={mode !== 'r-r'} onClick={() => openMatch('human')}>AIと対戦</button></nav>
     <section className="intro" aria-label="このデモについて"><div><h2>次の一手は、別の層へ。</h2><p>9層の将棋。相手の玉を詰ませると勝ちです。</p></div>
@@ -338,7 +342,7 @@ export function App() {
             <button type="button" onClick={() => { if (running || stepBusy) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); if (!terminalFinished) setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>{terminalFinished && snap.ply === snap.moveCount ? '対局終了' : running ? '一時停止' : stepBusy ? '思考を中断' : snap.ply < snap.moveCount ? terminalFinished ? '終局位置へ' : '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}</button>
             <button type="button" data-testid="ai-step" aria-label={snap.ply < snap.moveCount && mode !== 'r-r' ? 'この局面から対戦を分岐' : undefined} disabled={running || snap.finished || (controller === 'human' && snap.ply === snap.moveCount) || !!aiStatus.error} aria-disabled={stepBusy} onClick={() => { if (snap.ply < snap.moveCount && mode !== 'r-r') branchGame(); else stepOnce(); }}>{snap.ply < snap.moveCount ? mode === 'r-r' ? 'ここからAIで分岐' : 'ここから対戦を分岐' : '1手指す'}</button>
             <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'} onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
-            <button type="button" data-testid="redo" onClick={() => goto(Math.min(snap.moveCount,snap.ply+1))} disabled={snap.ply === snap.moveCount}>1手進む ▶</button>
+            <button type="button" data-testid="redo" onClick={() => goto(Math.min(snap.moveCount,snap.ply+1),true)} disabled={snap.ply === snap.moveCount}>1手進む ▶</button>
           </div>
           <div className="row playback-options"><label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} /> {follow ? '直前手の層を追う' : '手動表示・追従OFF'}</label><label>着手間の待ち時間 {delay}ms（思考時間は別）<input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={e => setDelay(Number(e.target.value))} /></label></div>
           <p className="muted follow-explanation">{follow ? '着手先の層へ自動で切り替えます。' : '手動表示中。追従をONにすると着手先へ戻ります。'}</p>
@@ -432,6 +436,12 @@ export function App() {
 
       </section>
       <section className="panel right" hidden={sheet !== 'display'}>
+        <section aria-label="サウンド設定">
+          <h2>サウンド</h2>
+          <label className="check"><input type="checkbox" checked={sound.settings.enabled} onChange={sound.toggle}/>効果音を使う</label>
+          <label>効果音の音量<input aria-label="効果音の音量" type="range" min="0" max="100" step="5" value={Math.round(sound.settings.volume*100)} onChange={event=>sound.setVolume(Number(event.target.value)/100)}/><output>{Math.round(sound.settings.volume*100)}%</output></label>
+          <button type="button" onClick={sound.preview} disabled={!sound.settings.enabled||sound.settings.volume===0}>テスト音を鳴らす</button>
+        </section>
         <section>
           <h2>表示</h2>
           <div className="row" role="group" aria-label="表示モード">

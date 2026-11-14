@@ -12,3 +12,5 @@
 .layer-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}.layer-labels .layer-label{position:absolute;top:0;left:0;width:36px;height:20px;font-size:12px;line-height:16px;text-align:center;font-weight:700}
 .layer-labels .selected{background:var(--accent);color:#102d24;outline:1px solid var(--accent)}
 .arena-board>.message{display:flex;align-items:center;justify-content:space-between;gap:12px}.arena-board>.message button{flex-shrink:0;min-width:44px}
+
+.masthead nav .sound-toggle{width:44px;min-width:44px;height:44px;padding:0;display:grid;place-items:center;flex-shrink:0}.sound-toggle[aria-pressed=false]{color:var(--muted)}

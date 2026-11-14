@@ -10,6 +10,8 @@ const fake = vi.hoisted(() => ({ snap: {} as Snapshot, record: '', listeners: ne
 vi.mock('../src/game/store', () => ({ MAX_IMPORT_BYTES: 4e6, GameStore: class {
   subscribe = (fn: () => void) => { fake.listeners.add(fn); return () => fake.listeners.delete(fn); };
   snapshot = () => fake.snap;
+  subscribePresentation = () => () => {};
+  stepForward = () => fake.goto(fake.snap.ply + 1);
   newGame = fake.reset; goto = fake.goto;
   importRecord = fake.imported;
   play = () => ({ok:true});
@@ -35,6 +37,20 @@ function moves() {
     for (const fn of fake.listeners) fn();
   });
 }
+
+it('offers a persistent sound mute and a labelled volume/test control without touching the game', () => {
+  localStorage.clear();const first=render(<App/>);
+  const toggle=screen.getByRole('button',{name:'効果音をミュート'});
+  expect(toggle.getAttribute('aria-pressed')).toBe('true');fireEvent.click(toggle);
+  expect(screen.getByRole('button',{name:'効果音をON'}).getAttribute('aria-pressed')).toBe('false');
+  fireEvent.click(screen.getByRole('button',{name:'表示設定'}));
+  fireEvent.change(screen.getByLabelText('効果音の音量'),{target:{value:'60'}});
+  expect((screen.getByRole('button',{name:'テスト音を鳴らす'}) as HTMLButtonElement).disabled).toBe(true);
+  first.unmount();render(<App/>);
+  expect(screen.getByRole('button',{name:'効果音をON'})).toBeTruthy();
+  expect(JSON.parse(localStorage.getItem('voxelshogi:sound:v1')!)).toEqual({enabled:false,volume:0.6});
+  expect(fake.reset).not.toHaveBeenCalled();localStorage.clear();
+});
 
 it('offers model-free viewing beside the board and explains the rules', () => {
   const { container } = render(<App />);

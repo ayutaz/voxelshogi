@@ -15,6 +15,14 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  {"name":"sound-cue-priority","file":"audio/cues.ts","before":"if (event.kind !== 'forward' && event.result)","after":"if (false)","test":"sound-cues"},
+  {"name":"sound-mute","file":"audio/player.ts","before":"if(this.disposed||!this.visible||!this.settings.enabled||this.settings.volume===0||context?.state!=='running'||!this.gain)return;","after":"if(this.disposed||!this.visible||this.settings.volume===0||context?.state!=='running'||!this.gain)return;","test":"sound-player"},
+  {"name":"sound-hidden","file":"audio/player.ts","before":"if(this.disposed||!this.visible||!this.settings.enabled||this.settings.volume===0||context?.state!=='running'||!this.gain)return;","after":"if(this.disposed||!this.settings.enabled||this.settings.volume===0||context?.state!=='running'||!this.gain)return;","test":"sound-player"},
+  {"name":"sound-cooldown","file":"audio/player.ts","before":"now-this.lastMove<120","after":"now-this.lastMove<0","test":"sound-player"},
+  {"name":"sound-dedupe","file":"audio/player.ts","before":"sequence<=(this.seen.get(owner)??0)","after":"false","test":"sound-player"},
+  {"name":"sound-accepted-only","file":"game/store.ts","before":"if (result.ok) this.presentMove(before, move, 'move');","after":"this.presentMove(before, move, 'move');","test":"store-presentation"},
+  {"name":"sound-capture","file":"game/store.ts","before":"capture: before.board[parsed.to] !== 0","after":"capture: false","test":"store-presentation"},
+  {"name":"sound-preference-bounds","file":"audio/player.ts","before":"value.volume<=1)","after":"value.volume<=100)","test":"sound-player"},
   { name: 'public-s-proxy-route', file: 'collection/worker.ts', before: "if (path.startsWith('/api/models/')) return publicModelAsset(request);", after: '', test: 'collection-worker' },
   { name: 'public-s-same-origin', file: 'inference/public-model.ts', before: "['localhost', '127.0.0.1', '[::1]'].includes(host)", after: 'true', test: 'public-model' },
   { name: 'public-s-proxy-allowlist', file: 'collection/public-model-proxy.ts', before: 'if (!upstream || url.search)', after: 'if (false)', test: 'public-model-proxy' },
@@ -279,7 +287,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 219);
+    assert.equal(results.length, 227);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

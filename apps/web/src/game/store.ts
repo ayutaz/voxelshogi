@@ -1,7 +1,10 @@
 // Observable wrapper around the WASM engine for React (useSyncExternalStore).
 import { Game, rulesetId } from '../wasm/pkg/voxelshogi_wasm.js';
 import { recordOutcome } from './record-outcome';
-import type { Color } from './model';
+import { parseMove, type Color } from './model';
+import type { PresentationEvent, PresentationInput } from './presentation';
+
+let storeIdentity = 0;
 
 /** Imports larger than this are rejected before they reach the engine. */
 export const MAX_IMPORT_BYTES = 4 * 1024 * 1024;
@@ -52,6 +55,27 @@ export class GameStore {
   private cached: Snapshot | null = null;
   private listeners = new Set<() => void>();
   private revision = 0;
+  private identity = ++storeIdentity;
+  private presentationSequence = 0;
+  private presentationListeners = new Set<(event: PresentationEvent) => void>();
+
+  subscribePresentation = (listener: (event: PresentationEvent) => void): (() => void) => {
+    this.presentationListeners.add(listener);
+    return () => this.presentationListeners.delete(listener);
+  };
+
+  private present(event: PresentationInput): void {
+    const value = { ...event, id: `${this.identity}:${++this.presentationSequence}` };
+    for (const listener of this.presentationListeners) {
+      try { listener(value); } catch { /* Presentation never interrupts an accepted game operation. */ }
+    }
+  }
+
+  private presentMove(before: Snapshot, move: string, kind: 'move' | 'forward'): void {
+    const parsed = parseMove(move), after = this.snapshot();
+    this.present({ kind, mover: before.side, capture: before.board[parsed.to] !== 0,
+      promotion: parsed.promote, check: after.inCheck[after.side], result: after.result });
+  }
 
   constructor(game: Game = new Game()) {
     this.game = game;
@@ -105,7 +129,10 @@ export class GameStore {
   }
 
   play(move: string): ActionResult {
-    return this.attempt(() => this.game.play(move));
+    const before = this.snapshot();
+    const result = this.attempt(() => this.game.play(move));
+    if (result.ok) this.presentMove(before, move, 'move');
+    return result;
   }
 
   searchState(): SearchRoot & { recordJson: string } {
@@ -123,20 +150,32 @@ export class GameStore {
   }
 
   undo(): void {
-    if (this.game.undo()) this.changed();
+    if (this.game.undo()) { this.changed(); this.present({ kind: 'clear' }); }
   }
 
   redo(): void {
-    if (this.game.redo()) this.changed();
+    if (this.game.redo()) { this.changed(); this.present({ kind: 'clear' }); }
   }
 
   goto(ply: number): ActionResult {
-    return this.attempt(() => this.game.goto(ply));
+    const result = this.attempt(() => this.game.goto(ply));
+    if (result.ok) this.present({ kind: 'clear' });
+    return result;
+  }
+
+  stepForward(): ActionResult {
+    const before = this.snapshot();
+    if (before.ply >= before.moveCount) return { ok: true };
+    const result = this.goto(before.ply + 1);
+    if (result.ok) this.presentMove(before, before.moves[before.ply]!, 'forward');
+    return result;
   }
 
   resign(): void {
+    if (this.snapshot().finished) return;
     this.game.resign();
     this.changed();
+    this.present({ kind: 'end', result: this.snapshot().result });
   }
 
   newGame(): void {
@@ -161,5 +200,6 @@ export class GameStore {
     this.game.free();
     this.game = next;
     this.changed();
+    this.present({ kind: 'clear' });
   }
 }
