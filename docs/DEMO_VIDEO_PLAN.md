@@ -1,6 +1,6 @@
 # デモ動画制作計画：冒頭3秒で立体将棋を伝える
 
-**新UI版を制作中**：[実装計画U6](design/ARENA_IMPLEMENTATION_PLAN.md#u6動画更新)で動画・ポスターを更新する。[進捗と候補版](design/ARENA_IMPLEMENTATION_PROGRESS.md)。以下のc878c6d版は旧UIの完成記録であり、新UI版の完成とは扱わない。
+**新UI版も完成**：[実装計画U6](design/ARENA_IMPLEMENTATION_PLAN.md#u6動画更新)の15秒本編・3秒2案・ポスター／OGPを公開source `dc0a95f`で制作した。[最終制作記録・hash・形式](experiments/arena-video-final-20261114.md)・[公開版一致と確認範囲](ARENA_RELEASE_VALIDATION.md)。以下のc878c6d版は旧UIの完成履歴として保持する。実スマホ再生・拡散数は未確認、X投稿は未送信。
 
 2026-11-13 JST。[公開準備計画](PUBLIC_LAUNCH_PLAN.md)の**フェーズ5（L5）**。
 2026-11-14、[収録・編集スクリプト](../scripts/demo-video.mjs)をLinux CIで実行し、main `c878c6d`の最終版を生成した。
@@ -100,8 +100,9 @@ LinuxでWASMと同じcommitのアプリをbuildし、実際のEasy Worker同士�
 Macでは最終動画・小さい確認画像と記録だけを読み、連続録画・エンコードは実行しない。
 
 ```bash
-# workflowを通常PR経由で取り込んだ後、対象mainの版で一度実行する
-gh workflow run demo-video.yml --ref main
+# アプリを公開し、main HEADと公開buildのSHAが一致する段階で一度実行する
+# 完了文書だけのPRをmergeした後はmain HEADが進むため、同じ版とは限らない
+gh workflow run demo-video.yml --ref main -f verify_ui=false -f verify_public_storage=true
 ```
 
 CIの取得は最短10分間隔。生成が成功しても完成判定の目視確認・OGPへの反映・公開版との一致が残る。

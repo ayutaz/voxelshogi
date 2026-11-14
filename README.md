@@ -19,7 +19,7 @@
 
 「観戦を開始」でAI同士の対局を始められます。「立体で眺める」で全体を見渡し、「断面を読む」で1層を詳しく読めます。
 自分で指す場合は、上部の「AIと対戦」から先手／後手と相手を選び、「対戦をはじめる」を押します。
-新画面の公開・検証状況は[実装の進捗](docs/design/ARENA_IMPLEMENTATION_PROGRESS.md)を参照してください。
+新画面は公開済みです。[公開版の検証記録](docs/ARENA_RELEASE_VALIDATION.md)を参照してください。
 
 ### 学習済みモデルで観戦する
 
@@ -31,11 +31,11 @@ FP32、FP16（重み）、INT8（重み）の実ファイルを選んで比較�
 
 ### UIレビューと対局データ
 
-[Claude Codeによるレビューと改修計画](docs/design/ARENA_IMPLEMENTATION_PLAN.md)に沿って、盤中心の観戦画面と人間対AIの入口を整えています。
+[Claude Codeによるレビューと改修計画](docs/design/ARENA_IMPLEMENTATION_PLAN.md)に沿って、盤中心の観戦画面と人間対AIの入口を公開しました。
 目的・実装・検証済みの範囲は[進捗](docs/design/ARENA_IMPLEMENTATION_PROGRESS.md)、映像は[動画制作計画](docs/DEMO_VIDEO_PLAN.md)へ記録します。
 
 新画面で始めた対局は、初手・途中経過・終局をCloudflare D1へ自動保存します。読み込んだ棋譜やその分岐は収集せず、学習・HF公開へ自動利用しません。
-「棋譜」の保存は端末へのJSONダウンロードです。[保存内容と期間](apps/web/public/privacy.html)・[実装と運用](docs/AUTOMATIC_GAME_STORAGE.md)を参照してください。
+「棋譜」の保存は端末へのJSONダウンロードです。[保存内容と期間](https://voxelshogi.yousan-apps.workers.dev/privacy.html)・[実装と運用](docs/AUTOMATIC_GAME_STORAGE.md)を参照してください。
 実スマホの操作確認は未完了です。過去の任意送信と旧UIの公開確認は[L6の履歴](docs/L6_PUBLIC_VALIDATION.md)として保持しています。
 
 ## このプロジェクトで目指すもの

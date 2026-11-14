@@ -1,6 +1,6 @@
 # ROADMAP / 進捗
 
-**2026-11-14・観戦UIの再設計**：[問題整理](design/SPECTATOR_UX_REVIEW.md)と[操作モック](design/ARENA_MOCKUP.md)のU1はユーザー承認済み。[本番実装計画](design/ARENA_IMPLEMENTATION_PLAN.md)のU2画面構成・U3対局接続・U4自動保存を実装し、Linux検証へ進めている。U5公開検証・U6動画更新まで継続する。[進捗と未確認範囲](design/ARENA_IMPLEMENTATION_PROGRESS.md)。
+**2026-11-14・観戦UIの再設計：U2〜U6完了**。[承認モック](design/ARENA_MOCKUP.md)から画面構成・対局接続・自動保存を#187で公開した。source `dc0a95f`の公開53 E2E・モデル6件・カメラ3回・配信57ファイル、実公開ブラウザ→D1の保存／hash／検証行削除を確認。Claude Codeの中1件は修正・再レビューで解消し、同sourceの15秒動画・3秒2案・ポスター／OGPも完成した。[公開確認](ARENA_RELEASE_VALIDATION.md)・[進捗と未確認範囲](design/ARENA_IMPLEMENTATION_PROGRESS.md)。研究・GPUの停止を維持し、X投稿は行っていない。
 
 **2026-11-12・一時停止**：既存Sの公開デモと、Mの少量2 run・48局評価を現段階の成果とする。
 本比較12 run・MのWeb配布・観戦表示2案／実端末各60分は未完了のまま停止する。

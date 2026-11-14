@@ -13,8 +13,8 @@ MはFull／Geometry各1,024更新・HF再開一致・開発48局まで実行済�
 **実行環境（2026-10-28ユーザー指定）**: Macは編集・読み取り・軽量な静的／単体確認のみ。探索・データ生成・性能計測・学習・重い回帰検証はGitHub Actionsまたは承認済みVast.ai／CloudRift上で行う。M4はGPUサーバーのCPU、M6は同じサービスのGPUへつなぐ。[初回試行の構成・見積もり・準備](docs/M4_REMOTE_PLAN.md)。初回利用は2026-10-28に承認され、CloudRift実機の初回・代表計測が成功。Mac計測へ戻さない。
 
 - 現在地・公開／品質の確認元: `docs/STATUS.md`
-- UI再設計（2026-11-14）: モックはユーザー承認済み。`docs/design/ARENA_IMPLEMENTATION_PLAN.md`のU2〜U6を実装中。後方互換の自動保存API #186をmergeし、専用D1へ追加migrationを適用した。新画面・対戦導線・常時保存clientは#187でLinux検証中。公開・実画像の再レビュー・動画更新は未完了。`docs/design/ARENA_IMPLEMENTATION_PROGRESS.md`を参照し、研究・GPUの停止は維持する。
-- 公開準備（2026-11-14）: main `c878c6d`の公開33 E2E・モデル6件・カメラ3回、同意制D1保存、最終動画を確認。最終公開版のPC操作はウィンドウを撮影せずAX情報で確認し、`docs/PUBLIC_LAUNCH_PLAN.md`のL1〜L6をPC対象Alphaとして完了。実スマホは未確認。実装・検証の現在地は`docs/PUBLIC_LAUNCH_PROGRESS.md`。冒頭3秒と15秒本編の構成は`docs/DEMO_VIDEO_PLAN.md`。L7のX投稿は今回の範囲外。GPU・本比較・M配布の停止を解除しない。
+- UI再設計（2026-11-14）: U2〜U6完了。承認済みモックから新画面・対戦導線・常時保存clientを#187で公開した。公開sourceは`dc0a95fa00d4957b2a4d2712f27a0f469a6c3a7b`。公開53 E2E・モデル6件・カメラ3回・配信57ファイル照合が成功。Claude Codeの中1件は修正・再レビューで解消。実HTTP／D1に加えて実公開ブラウザ→D1の本文／hashと検証行削除も確認し、同sourceの15秒本編・3秒2案・ポスターを完成した。`docs/ARENA_RELEASE_VALIDATION.md`・`docs/design/ARENA_IMPLEMENTATION_PROGRESS.md`を参照する。研究・GPUの停止は維持する。
+- 旧公開準備（2026-11-14）: `docs/PUBLIC_LAUNCH_PROGRESS.md`と`docs/L6_PUBLIC_VALIDATION.md`は旧UI `c878c6d`の確認履歴。新UIの自動保存や動画の現在地とは区別する。実スマホは未確認、L7のX投稿は今回の範囲外。GPU・本比較・M配布の停止を解除しない。
 - P5-4の失敗履歴: `docs/P5_4_PARITY_FAILURE.md`。旧sourceの4GPU再開不一致と1rank開始前検査の不具合を保持する。許容差を緩めず修正し、後続sourceの全3構成は完全一致した。
 - P5-2の実行結果と停止点: `docs/P5_2_COMPLETION.md`。本条件48対局・HF保存・別VM継続と全ドキュメント点検後に停止。P5-3・DDP・Phase6は振り返り後に再計画する。
 - 前回の表1〜5の完了: `docs/P5_3_PLAN.md`と`docs/P5_4_RESULTS.md`。条件整備→8局→対照込み150局→12局診断→実1／2／4GPU・各HF保存再開、退避と資源解放まで確認した。新しい「6まで」の範囲・数量・完了条件は`docs/P6_EXECUTION_PLAN.md`。
@@ -104,7 +104,7 @@ E2E_BASE_URL=https://voxelshogi.yousan-apps.workers.dev E2E_COMMIT="$published_c
 - Cloudflareはプロジェクト所有者の個人アカウントを使う。このマシンのwranglerはグローバルには別アカウントでログインしているため、**必ず `scripts/cf.sh`（プロジェクト専用ログイン）経由でwranglerを使う**。素のwranglerは使わない（`apps/web`の`pnpm run deploy`も`scripts/cf.sh`を経由する。`pnpm deploy`はpnpmの組み込みコマンドなので使わない）。
 - 将棋ったーの公開棋譜による互換性検証は非公開の作業領域で行う（棋譜をコミット・HF公開しない）。重い検証は承認済み外部Linuxで実行し、Macへ計算を戻さない。
 
-## 現在の進捗と次の判断
+## 研究停止時点の進捗と次の判断（2026-11-12の履歴）
 
 - M0〜M6／Phase0〜4、P5-2の3世代48対局、P5-3の8／150／12局、P5-4の実1／2／4GPU保存再開を確認済み。
   元の失敗・保護入力重複4件・小標本・各固定SHAは変更しない。一般棋力改善は未確認。

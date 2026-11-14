@@ -1,7 +1,7 @@
 # 対局の自動保存：schema 2
 
-2026-11-14。承認済み[U4](design/ARENA_IMPLEMENTATION_PLAN.md)のAPI先行変更。
-このPR時点では旧画面の任意送信を維持し、常時自動送信clientは後続PRで接続する。
+2026-11-14。承認済み[U4](design/ARENA_IMPLEMENTATION_PLAN.md)をAPI #186→client #187の順に公開した。
+現行の観戦／対戦画面は常時自動保存で、送信状態・切替・同意フォームを表示しない。[公開確認](ARENA_RELEASE_VALIDATION.md)。
 schema 1の同意・送信ID・保存済み行を自動保存へ読み替えない。
 
 ## 契約と更新
@@ -29,7 +29,7 @@ schema 1の同意・送信ID・保存済み行を自動保存へ読み替えな�
 - 上限429／障害503。対局は継続し、SQLや棋譜を例外ログへ出さない。
 
 生IP・User-Agent・名前・メール・token・モデル本体・ファイルpathをDBへ追加しない。
-利用者向けprivacyはclient移行と同時に更新する。
+利用者向け[privacy](https://voxelshogi.yousan-apps.workers.dev/privacy.html)も自動保存へ更新した。
 
 ## 配備と実データの確認
 
