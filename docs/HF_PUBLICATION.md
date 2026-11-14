@@ -1,5 +1,7 @@
 # Hugging Faceの公開・保存ルール
 
+**2026-11-15・S Model Cardの編集更新**：他モデルと公式ガイドを参考に、モデル概要→使い方→配布形式・評価→学習→制約→ライセンスへ整理した。[現在のCard原本](model-cards/transformer-s.md)・[比較と反映記録](MODEL_CARD_REVIEW.md)。HFの表示用READMEは`3ec81d0`、Webで検証済みの固定パッケージは`6ab5245`を維持する。重み・設定・Web配布を更新したものではない。
+
 **2026-11-15・S推論用の例外（公開・本番対戦確認済み）**：[全37ファイルの匿名照合と固定版](PUBLIC_S_RELEASE_VALIDATION.md)を確認した。明示指示により`voxelshogi/voxelshogi-transformer-s`だけ取得ゲートなしのpublicへ変更済み。[承認と完了条件](PUBLIC_S_ACCESS.md)。`public-s-inference-v1` profileを使い、Community OFF・Apache-2.0・既存重みhashを維持する。その他のデータ・state・M repoはmanualのまま。本書の過去のpublic/manualは対象時点の記録である。
 
 既存Sの設定と小さいCardだけの更新は[public_s_release.py](../training/public_s_release.py)を使い、Macからメタデータのみ更新できる。既存重み・データ・checkpointは取得も中継もしない。旧固定版を親commitに指定してREADMEだけを送る。続いてLinux／GitHub Actionsで全37ファイルの匿名取得とhashを確認してからWeb catalogを切り替える。
