@@ -1,5 +1,7 @@
 # 公開準備計画：観戦の使いやすさ・棋譜保存・デモ動画・X告知
 
+**旧UIの計画・完了条件の記録**。後続の[U2〜U6](design/ARENA_IMPLEMENTATION_PLAN.md)で新UI・常時自動保存・動画更新まで完了した。[最新の公開確認](ARENA_RELEASE_VALIDATION.md)。以下の同意制保存・送信OFF・Alphaの表示案は当時の計画であり、現行UIの操作説明ではない。X投稿は未送信。
+
 2026-11-13 JST。[Claude CodeのUI/UXレビュー](PUBLIC_LAUNCH_REVIEW.md)と[Cloudflare保存調査](CLOUDFLARE_GAME_DATA_AUDIT.md)に基づく提案。
 レビュー文書の[PR #177](https://github.com/ayutaz/voxelshogi/pull/177)は必須8件・関連CI成功、重大CodeQL指摘0を確認して通常merge済み。
 計画の基準mainは`6d1e2a952dc61e56cdec345724b1bcc699987111`。
