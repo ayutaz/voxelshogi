@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 // CI sets PW_CHANNEL='' to use Playwright's bundled Chromium.
 const channel = process.env.PW_CHANNEL ?? 'chrome';
 // Set E2E_BASE_URL to run the suite against a deployed site instead of a local preview.
-const remoteBaseURL = process.env.E2E_BASE_URL;
+const remoteBaseURL = process.env.E2E_BASE_URL || undefined;
 
 export default defineConfig({
   testDir: 'e2e',
