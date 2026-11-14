@@ -3,6 +3,8 @@
 2026-11-15。動くSデモと技術検証を現段階の成果とし、追加学習は[一時停止](RESEARCH_CHECKPOINT_20261112.md)する。観戦画面と人間対AIの入口を再設計し、[公開版の検証](ARENA_RELEASE_VALIDATION.md)を更新した。
 本書は記事の材料と確認範囲の整理であり、記事の執筆・外部投稿・公開の実施記録ではない。
 
+Webの効果音は[移動・捕獲・節目の音と検証記録](WEB_SOUND_VALIDATION.md)を参照する。動画の撮影sourceは引き続き`7b364c9`で、Webへ後から追加したSEは既存動画へ再収録していない。納品動画は[オリジナルBGM付き](DEMO_BGM.md)を使用する。
+
 ## 既存デモを試す
 
 1. [Arena](https://voxelshogi.yousan-apps.workers.dev)を開き、「観戦を開始」を押す。モデル取得なしでNormal同士を眺められる。

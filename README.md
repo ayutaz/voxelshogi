@@ -19,6 +19,7 @@
 
 「観戦を開始」でAI同士の対局を始められます。「立体で眺める」で全体を見渡し、「断面を読む」で1層を詳しく読めます。
 自分で指す場合は、上部の「AIと対戦」から先手／後手と相手を選び、「対戦をはじめる」を押します。
+移動・捕獲・成り・王手・終局には短い効果音が鳴ります。上部のスピーカーボタンでミュートでき、「表示設定」のサウンド欄で音量調整と試聴ができます。音は最初の操作後から有効になります。[検証範囲](docs/WEB_SOUND_VALIDATION.md)を参照してください。
 新画面は公開済みです。[公開版の検証記録](docs/ARENA_RELEASE_VALIDATION.md)を参照してください。
 
 ### 学習済みモデルで観戦する
@@ -54,7 +55,7 @@ AI同士の観戦を主用途とし、人間対AIも提供します。人間同�
 
 CloudRiftで1,800局を生成し、重複除外後113,321局面・探索教師36,894件の全検証と全再生成一致を確認しました。[HFのデータセットとDataset Card](https://huggingface.co/datasets/voxelshogi/voxelshogi-synthetic-v1)を公開済みです（public・手動取得承認・Community OFF）。[公開対象1,831ファイルの全hash照合と実機終了の記録](docs/M4_COMPLETION.md)も残しています。
 
-CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging FaceにModel Card付きで公開](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)しました。取得にはHFでの申請と承認が必要です。教師手の再現精度は固定testで約75.6%ですが、今回の対局評価では探索AIに対する棋力向上は確認できていません。[評価結果と制約](docs/M6_COMPLETION.md)を公開しています。
+CloudRiftのRTX 5090で最初の教師ありモデルを学習し、[Hugging FaceにModel Card付きで公開](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)しました。現在、S推論用モデルは申請・承認なしで取得できます。教師手の再現精度は固定testで約75.6%ですが、今回の対局評価では探索AIに対する棋力向上は確認できていません。[評価結果と制約](docs/M6_COMPLETION.md)を公開しています。
 
 観戦画面には[取得済みモデルの読み込み・両AIの形式選択・AI条件付き棋譜保存](docs/M6_ARENA.md)があります。ブラウザ向けの全3形式をHFで公開し、固定revisionとファイルhashをモデル一覧に登録しました。Linux実GPUで公開後の全48条件・40回の形式切替、各形式の実着手・7件の実モデルE2Eを確認し、GPUの資源解放まで完了しました（[M6完了記録](docs/M6_COMPLETION.md)）。初回の混合精度FP16と計測手順の失敗も[記録](docs/M6_PORTABLE.md)へ残しています。
 
