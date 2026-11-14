@@ -80,9 +80,8 @@ test('AI vs AI can be watched and paused', async ({ page }) => {
   await page.waitForTimeout(1200);
   expect(await page.getByTestId('move-list').locator('li').count()).toBe(n);
   // While paused nothing changes over time, so a human click must not select AI pieces.
-  const side = (await page.getByTestId('status').textContent())!.includes('先手') ? 'b' : 'w';
-  const pawnRank = side === 'b' ? 6 : 2;
-  for (let x = 0; x < 9; x++) await cell(page, idx(x, pawnRank, 4)).click();
+  await expect(page.locator('.board2d .cell:enabled')).toHaveCount(0);
+  await expect(page.locator('.board2d .cell[tabindex="0"]')).toHaveCount(0);
   await page.waitForTimeout(300);
   expect(await page.locator('.board2d .cell.target').count()).toBe(0);
   expect(await page.locator('.board2d .cell.selected').count()).toBe(0);

@@ -74,7 +74,7 @@ export async function measureTrainedModels({browser,base,modelFolder,catalog,out
       if(!candidate) assert.deepEqual(await (await context.request.get(base+'/models/m6/catalog.json')).json(),catalog,'public catalog differs from measured release');
       await page.getByTestId('import').setInputFiles({name:'fixed-position.json',mimeType:'application/json',buffer:Buffer.from(position.root.recordJson)});
       await page.getByRole('alert').filter({hasText:'棋譜を読み込みました'}).waitFor();
-      await page.getByRole('button',{name:show3D?'3D+2D':'2D',exact:true}).click();
+      await page.getByRole('button',{name:show3D?'立体で眺める':'断面を読む',exact:true}).click();
       if(show3D) { await page.getByTestId('board3d').waitFor({state:'visible'});await page.waitForFunction(()=>document.querySelector('[data-testid="board3d"]')?.dataset.ready==='true');await page.getByTestId('board3d').scrollIntoViewIfNeeded(); }
       await page.evaluate(()=>{const input=document.createElement('input');input.type='file';input.multiple=true;input.setAttribute('webkitdirectory','');input.id='trained-benchmark-files';input.hidden=true;document.body.append(input);});
       await page.locator('#trained-benchmark-files').setInputFiles(modelFolder);

@@ -48,7 +48,7 @@ export class AutomaticCollection {
         for (const [id, game] of this.staged) { this.staged.delete(id); this.enqueue(game, true); }
         this.flush();
         return;
-      } catch { /* Collection never blocks or changes the game. */ }
+      } catch { abort.abort(); /* Cancel the other metadata request before retrying. */ }
       finally { clearTimeout(timeout); }
       if (this.disposed || attempt === 3) return;
       await new Promise<void>(resolve => {

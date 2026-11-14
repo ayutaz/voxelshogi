@@ -47,7 +47,7 @@ export function App() {
   const [delay, setDelay] = useState(400);
   const [view, setView] = useState<'3d' | '2d' | 'both'>('both');
   const [rawSlice, setSlice] = useState<Slice>({ axis: 'z', index: 4 });
-  const [rawLayers, setLayers] = useState<LayerView>({ mode: 'focus', z: 4, dim: 0.4 });
+  const [rawLayers, setLayers] = useState<LayerView>({ mode: 'all', z: 4, dim: 0.4 });
   const [follow, setFollow] = useState(true);
   const [trail, setTrail] = useState(true);
   const [sheet, setSheet] = useState<'match' | 'settings' | 'record' | 'display' | 'models' | 'research' | null>(null);

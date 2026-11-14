@@ -8,3 +8,4 @@
 .slice-board{container-type:size}.board2d-grid{width:min(calc(100cqw - 4px),calc(100cqh - 72px),570px)}.layer-label{font-size:11px;background:#163239;color:#c8e5e1;padding:2px 5px;border-radius:4px;white-space:nowrap}@media(max-width:720px){.board2d-grid{width:min(calc(100cqw - 4px),calc(100cqh - 60px),352px)}}
 .cell[aria-disabled=true]{opacity:1;cursor:default}
 .sheet [data-testid=record-move-list]{max-height:45svh;margin-bottom:12px;overflow:auto}
+.cell:disabled{opacity:1;cursor:default}

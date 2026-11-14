@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, type ThreeEvent } from '@react-three/fiber';
-import { OrbitControls, Line, Html } from '@react-three/drei';
+import { OrbitControls, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
 import type { Selection } from '../game/interaction';
@@ -193,13 +193,29 @@ function LayerGrid({ view }: { view: LayerView }) {
   );
 }
 
+const labelMaterials = new Map<string,THREE.SpriteMaterial>();
+function LayerLabels() {
+  const labels = ['I','II','III','IV','V','VI','VII','VIII','IX'];
+  return <>{labels.map((label,z) => {
+    let material=labelMaterials.get(label);
+    if (!material) {
+      const canvas=document.createElement('canvas');canvas.width=256;canvas.height=96;
+      const ctx=canvas.getContext('2d')!;
+      ctx.fillStyle='#163239';ctx.fillRect(0,0,256,96);ctx.fillStyle='#d9f1eb';ctx.font='bold 64px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,128,48);
+      const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;
+      material=new THREE.SpriteMaterial({map,transparent:true,depthTest:false,depthWrite:false});labelMaterials.set(label,material);
+    }
+    return <sprite key={label} args={[material]} position={[-6,(z-4)*LAYER_GAP,4.5]} scale={[1,.375,1]} renderOrder={10} />;
+  })}</>;
+}
+
 export function Board3D({
   snap,
   selection,
   view,
   onSquare,
   showTrail = false,
-  cameraPosition = [0, 13, 15],
+  cameraPosition = [0, 14, 23],
 }: {
   snap: BoardSnapshot;
   selection: Selection;
@@ -218,7 +234,7 @@ export function Board3D({
         <ambientLight intensity={1.15} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />
         <LayerGrid view={view} />
-        {['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z) => <Html key={label} position={[-6,(z-4)*LAYER_GAP,4.5]} style={{ pointerEvents: 'none' }}><span className="layer-label" aria-hidden="true">{label}</span></Html>)}
+        <LayerLabels />
         <Pieces snap={snap} view={view} onSquare={onSquare} />
         <Highlights snap={snap} selection={selection} onSquare={onSquare} />
         {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}

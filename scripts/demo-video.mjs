@@ -123,7 +123,7 @@ async function record(work, commit) {
     let style = await page.addStyleTag({ content: composition });
     await page.getByTestId('board3d').waitFor();
     await page.waitForFunction(() => document.querySelector('[data-testid="board3d"]')?.getAttribute('data-ready') === 'true');
-    await orbit(0.05, -0.08); // Show the nine layers from the side using actual OrbitControls.
+    await orbit(0.05, -0.04); // Show the nine layers from the side using actual OrbitControls.
     await delay(1000);
     await page.evaluate(() => {
       const marker = document.createElement('div'); marker.id = 'recording-marker';
@@ -175,7 +175,7 @@ function render(raw, work, startFrame, sourceRate, hookMove) {
   const timeline = `trim=start_frame=${startFrame},setpts=PTS-STARTPTS,fps=30`;
   // Full nine-layer view at frame 0, then enlarge the actual central cross-layer move.
   // Caption compositing follows the crop, so the opening words stay readable.
-  const zoom = maximum => `zoompan=z='if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1))))':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1080x1350:fps=30`;
+  const zoom = maximum => `zoompan=z='if(gte(on,210)*lt(on,330),1.5,if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1)))))':x='iw/2-iw/zoom/2':y='if(gte(on,210)*lt(on,330),ih-ih/zoom,ih/2-ih/zoom/2)':d=1:s=1080x1350:fps=30`;
   const draw = [zoom(1.7), "drawbox=x=0:y=1240:w=iw:h=110:color=0x0f1115:t=fill:enable='gte(t,7)*lt(t,11)'", text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
     text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 78, 'gte(t,11)'),
     text('url.txt', 1190, 43, 'gte(t,11)'), text('alpha.txt', 1260, 30, 'gte(t,11)'),
