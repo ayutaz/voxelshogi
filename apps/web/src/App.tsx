@@ -55,6 +55,22 @@ export function App() {
   const [matchKind, setMatchKind] = useState<'watch' | 'human'>('human');
   const [draftMode, setDraftMode] = useState<Mode>('h-r');
   const [draftOpponent, setDraftOpponent] = useState<ArenaDifficulty>('normal');
+  const [draftPrecision, setDraftPrecision] = useState<ModelChoice['precision']>('int8');
+  const [publicModelState, setPublicModelState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [publicAttempt, setPublicAttempt] = useState(0);
+  const needsPublicModel = library.entries.length === 0 && ((sheet === 'match' && draftOpponent === 'model') || sheet === 'models' || sheet === 'settings');
+  useEffect(() => {
+    if (!needsPublicModel) return;
+    const abort = new AbortController();
+    setPublicModelState('loading');
+    void import('./inference/public-model').then(module => module.preparePublicModel(abort.signal)).then(packet => {
+      if (abort.signal.aborted) return;
+      const entry = { ...packet, sourceId: `public-${++sourceSequence.current}` };
+      setLibrary(previous => previous.entries.length ? previous : addModel(previous, entry));
+      setPublicModelState('idle');
+    }).catch(() => { if (!abort.signal.aborted) setPublicModelState('error'); });
+    return () => abort.abort();
+  }, [needsPublicModel, publicAttempt]);
   const { slice, layers } = followView(snap.lastMove, follow && selection.type === 'none', rawSlice, rawLayers);
   const targetCounts = layerTargets(selection.type === 'none' ? [] : selection.targets.keys());
   const manualView = () => { setSlice(slice); setLayers(layers); setFollow(false); };
@@ -245,13 +261,14 @@ export function App() {
   };
   const startMatch = () => {
     const nextMode = matchKind === 'watch' ? 'r-r' : draftMode;
+    if (nextMode !== 'r-r' && draftOpponent === 'model' && !library.entries.length) return;
     if (!reset(nextMode)) return;
     if (nextMode !== 'r-r') {
       const side = nextMode === 'h-r' ? 'w' : 'b';
-      if (draftOpponent === 'model' && !library.choices[side]) {
-        const first=library.entries[0];
-        if (!first) return;
-        setLibrary(chooseModel(library,side,{ sourceId:first.sourceId,precision:first.model.variants[0]!.precision,backend:'wasm' }));
+      if (draftOpponent === 'model') {
+        const first=library.entries.find(entry => entry.sourceId === library.choices[side]?.sourceId) ?? library.entries[0]!;
+        const precision = first.model.variants.some(v => v.precision === draftPrecision) ? draftPrecision : first.model.variants[0]!.precision;
+        setLibrary(chooseModel(library,side,{ sourceId:first.sourceId,precision,backend:'wasm' }));
       }
       setDifficulty(previous => ({ ...previous, [side]: draftOpponent }));
     }
@@ -280,7 +297,14 @@ export function App() {
     aiRef.current?.step();
   };
   const previousMove = snap.lastMove ? parseMove(snap.lastMove) : null;
-  const seatName = (side: Color) => MODES[mode][side] === 'human' ? 'あなた' : difficulty[side] === 'easy' ? 'Easy · ランダム' : difficulty[side] === 'normal' ? 'Normal · 探索' : modelSeat(library, side)?.selection.modelId ?? '学習済みS';
+  const seatName = (side: Color) => {
+    if (MODES[mode][side] === 'human') return 'あなた';
+    if (difficulty[side] === 'easy') return 'Easy · ランダム';
+    if (difficulty[side] === 'normal') return 'Normal · 探索';
+    const selection = modelSeat(library, side)?.selection;
+    return selection?.modelId === 'voxelshogi-transformer-s-m6-314159-v1'
+      ? `学習済みS · ${selection.precision.toUpperCase()}${selection.precision === 'fp32' ? '' : '（重み）'}` : selection?.modelId ?? '学習済みS';
+  };
   const terminalResult = snap.terminalResult ?? snap.result;
   const terminalFinished = snap.terminalFinished ?? snap.finished;
 
@@ -326,11 +350,17 @@ export function App() {
     </main>
     <Sheet title={sheet === 'match' ? matchKind === 'human' ? 'AIと対戦' : 'AIを観戦' : sheet === 'display' ? '表示・操作の設定' : sheet === 'record' ? '棋譜' : sheet === 'models' ? 'モデル・研究' : sheet === 'research' ? 'AIの詳細' : '対局・AI設定'} open={sheet !== null} onClose={() => setSheet(null)}>
       <section hidden={sheet !== 'match'}>
-        {matchKind === 'human' && <><label>あなたの先後<select value={draftMode} onChange={e => setDraftMode(e.target.value as Mode)}><option value="h-r">先手（最初に指す）</option><option value="r-h">後手（AIが先に指す）</option></select></label><label>相手のAI<select value={draftOpponent} onChange={e => setDraftOpponent(e.target.value as ArenaDifficulty)}><option value="easy">Easy（ランダム）</option><option value="normal">Normal（探索）</option><option value="model" disabled={!library.entries.length}>学習済みS</option></select></label></>}
+        {matchKind === 'human' && <><label>あなたの先後<select value={draftMode} onChange={e => setDraftMode(e.target.value as Mode)}><option value="h-r">先手（最初に指す）</option><option value="r-h">後手（AIが先に指す）</option></select></label><label>相手のAI<select value={draftOpponent} onChange={e => setDraftOpponent(e.target.value as ArenaDifficulty)}><option value="easy">Easy（ランダム）</option><option value="normal">Normal（探索）</option><option value="model">学習済みS</option></select></label>
+          {draftOpponent === 'model' && <><p className="muted">申請・ログイン不要。モデルは対局開始後に自動で読み込み、この端末で動きます。</p>{library.entries[0] && <label>モデルの精度形式<select value={library.entries[0].model.variants.some(v => v.precision === draftPrecision) ? draftPrecision : library.entries[0].model.variants[0]!.precision} onChange={event => setDraftPrecision(event.target.value as ModelChoice['precision'])}>{library.entries[0].model.variants.map(variant => <option key={variant.precision} value={variant.precision}>{variant.precision === 'fp32' ? 'FP32（標準）' : `${variant.precision.toUpperCase()}（重み）`}</option>)}</select></label>}</>}
+        </>}
         {matchKind === 'watch' && <p>現在の先後AI設定で、新しい観戦を始めます。</p>}
-        <button type="button" className="primary" onClick={startMatch}>{matchKind === 'human' ? '対戦をはじめる' : '観戦をはじめる'}</button>
+        {draftOpponent === 'model' && !library.entries.length && <p role="status">{publicModelState === 'error' ? 'モデル情報を取得できませんでした。通信を確認して再試行してください。' : 'モデル情報を確認中…'}</p>}
+        {draftOpponent === 'model' && publicModelState === 'error' && !library.entries.length && <button type="button" onClick={() => setPublicAttempt(value => value + 1)}>モデル情報を再取得</button>}
+        <button type="button" className="primary" disabled={matchKind === 'human' && draftOpponent === 'model' && !library.entries.length} onClick={startMatch}>{matchKind === 'human' ? '対戦をはじめる' : '観戦をはじめる'}</button>
       </section>
       <section className="panel left" hidden={sheet !== 'settings' && sheet !== 'models'}>
+        {!library.entries.length && <p role="status">{publicModelState === 'error' ? 'Sモデル情報を取得できませんでした。' : '公開Sモデルの情報を確認中…'}</p>}
+        {!library.entries.length && publicModelState === 'error' && <button type="button" onClick={() => setPublicAttempt(value => value + 1)}>モデル情報を再取得</button>}
         <label>モード<select value={mode} onChange={e => reset(e.target.value as Mode)} data-testid="mode">{Object.entries(MODES).map(([key,value]) => <option key={key} value={key}>{value.label}</option>)}</select></label>
         <div className="row"><button type="button" onClick={() => reset()}>新規対局</button><button type="button" onClick={() => { pause(); store.resign(); }} disabled={!humanTurn}>投了</button></div>
           <button type="button" onClick={() => setShowModels(!showModels)}>{showModels ? 'モデル読み込みを閉じる' : '学習済みモデルを読み込む'}</button>
@@ -491,7 +521,7 @@ export function App() {
         </section>
 
       </section>
-      <section hidden={sheet !== 'research' && sheet !== 'models'}><p>Easy／Normalはモデル取得なしで遊べます。学習済みSは任意の追加機能です。</p>
+      <section hidden={sheet !== 'research' && sheet !== 'models'}><p>学習済みSは申請・ログイン不要で対戦・観戦できます。Easyはランダム、Normalは探索AIです。Sの棋力向上は未確認です。</p>
           {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
             直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
             {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />

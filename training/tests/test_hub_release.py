@@ -48,6 +48,54 @@ class Hub:
         return SimpleNamespace(oid="c" * 40)
 
 
+def test_ungated_access_is_limited_to_the_explicit_s_inference_profile(tmp_path):
+    from training.hub_release import _policy
+
+    base = release(tmp_path)
+    public = {
+        **base,
+        "repo_id": "voxelshogi/voxelshogi-transformer-s",
+        "artifact_role": "inference-package",
+        "gated": False,
+        "access_profile": "public-s-inference-v1",
+    }
+    _policy(public)
+    for change in (
+        {"repo_id": "voxelshogi/other"},
+        {"repo_type": "dataset"},
+        {"artifact_role": "artifacts"},
+        {"access_profile": None},
+        {"gated": "auto"},
+    ):
+        with pytest.raises(ValueError):
+            _policy({**public, **change})
+    for change in ({"gated": False}, {"gated": "auto"}):
+        with pytest.raises(ValueError):
+            _policy({**base, **change})
+
+
+def test_public_s_settings_are_verified_before_upload_and_stay_community_off(tmp_path):
+    from training.hub_release import create_release_repository
+
+    class PublicHub(Hub):
+        def update_repo_settings(self, **kwargs):
+            super().update_repo_settings(**kwargs)
+            self.gated = kwargs["gated"]
+
+    plan = {
+        **release(tmp_path),
+        "repo_id": "voxelshogi/voxelshogi-transformer-s",
+        "artifact_role": "inference-package",
+        "gated": False,
+        "access_profile": "public-s-inference-v1",
+    }
+    api = PublicHub()
+    create_release_repository(plan, api, execute=True, system="linux")
+    assert next(v for name, v in api.calls if name == "settings")["gated"] is False
+    assert any(name == "community" for name, _ in api.calls)
+    assert not any(name == "upload" for name, _ in api.calls)
+
+
 def test_new_repo_is_public_and_gated_before_any_artifact_upload(tmp_path):
     from training.hub_release import create_release_repository
 

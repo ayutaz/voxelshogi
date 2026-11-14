@@ -16,7 +16,7 @@ it('carries explicit paths alongside cloneable File objects without reading thei
   expect(parsePolicyRequest({ ...request, files: [{ path: entries[0]!.path, file: separateFile }] }).files![0]!.path).toBe('download/manifest.json');
 });
 
-for (const change of [{ requestId: 0 }, { requestId: 1.5 }, { kind: 'other' }, { schema: 2 }, { extra: true }, { files: [] }]) {
+for (const change of [{ requestId: 0 }, { requestId: 1.5 }, { kind: 'other' }, { schema: 2 }, { extra: true }, { files: null }]) {
   it(`rejects malformed request metadata ${JSON.stringify(change)}`, () => expect(() => parsePolicyRequest({ ...policyRequest(), ...change })).toThrow());
 }
 it('rejects non-file data, traversal, duplicate paths and mismatched file names', () => {

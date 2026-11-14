@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, expect, it, vi } from 'vitest';
+import { act as __publicAct, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { App } from '../src/App';
 import { releaseFixture, trainedFixture } from './local-model-fixtures';
 import type { ArenaOptions } from '../src/ai/arena-controller';
-const fake = vi.hoisted(() => ({ configure: vi.fn(), pause: vi.fn() }));
+const fake = vi.hoisted(() => ({ configure: vi.fn(), pause: vi.fn(), publicModel: vi.fn() }));
+vi.mock('../src/inference/public-model', () => ({ preparePublicModel: fake.publicModel }));
 vi.mock('../src/game/store', () => {
   const snap = { side: 'b', ply: 0, moveCount: 0, finished: false, inCheck: { b: false, w: false }, legal: [], board: [] };
   return { MAX_IMPORT_BYTES: 4e6, GameStore: class { newGame = () => {}; subscribe = () => () => {}; snapshot = () => snap; exportRecord = () => JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: [] }); } };
@@ -19,7 +20,32 @@ vi.mock('../src/components/Board2D', () => ({ Board2D: () => null }));
 vi.mock('../src/components/Panels', () => ({ Hands: () => null, MoveList: () => null, PromotionDialog: () => null, resultText: () => '' }));
 vi.mock('../src/inference/ModelLibraryPanel', () => ({ default: ({ onLoaded }: { onLoaded: (value: unknown) => void }) => <button onClick={() => onLoaded({ release: releaseFixture(), model: trainedFixture(), files: [] })}>fixture folder</button> }));
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
+beforeEach(() => { fake.publicModel.mockRejectedValue(new Error('no public fixture requested')); });
 const options = () => fake.configure.mock.calls.at(-1)![0] as ArenaOptions;
+it('starts a public S match without a folder and keeps the chosen precision', async () => {
+  const model = trainedFixture(); model.variants.push({ ...model.variants[0]!, id: 'int8', precision: 'int8' });
+  fake.publicModel.mockResolvedValue({ release: { ...releaseFixture(), publicDownload: true }, model, files: [] });
+  render(<App />); fireEvent.click(screen.getByRole('button', { name: 'AIと対戦' }));
+  fireEvent.change(screen.getByLabelText('相手のAI'), { target: { value: 'model' } });
+  await waitFor(() => expect(fake.publicModel).toHaveBeenCalledTimes(1));
+  await screen.findByLabelText('モデルの精度形式');
+  fireEvent.change(screen.getByLabelText('モデルの精度形式'), { target: { value: 'int8' } });
+  fireEvent.click(screen.getByRole('button', { name: '対戦をはじめる' }));
+  expect(options()).toMatchObject({ mode: 'h-r', running: true, wDifficulty: 'model', wModel: { files: [], selection: { precision: 'int8', backend: 'wasm' } } });
+});
+it('ignores public metadata that finishes after the match sheet is closed', async () => {
+  let finish!: (packet: unknown) => void;
+  fake.publicModel.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  render(<App />); fireEvent.click(screen.getByRole('button', { name: 'AIと対戦' }));
+  fireEvent.change(screen.getByLabelText('相手のAI'), { target: { value: 'model' } });
+  await waitFor(() => expect(fake.publicModel).toHaveBeenCalledTimes(1));
+  const signal = fake.publicModel.mock.calls[0]![0] as AbortSignal;
+  fireEvent.click(screen.getByRole('button', { name: '閉じる' }));
+  expect(signal.aborted).toBe(true);
+  await __publicAct(async () => finish({ release: releaseFixture(), model: trainedFixture(), files: [] }));
+  expect(options().wModel).toBeUndefined(); expect(options().running).toBe(false);
+  expect(document.querySelectorAll('.model-source')).toHaveLength(0);
+});
 it('assigns an actual loaded model when the human entry selects S for the first time', async () => {
   render(<App />);fireEvent.click(screen.getByRole('button',{name:'モデル'}));
   fireEvent.click(screen.getByRole('button',{name:'学習済みモデルを読み込む'}));fireEvent.click(await screen.findByRole('button',{name:'fixture folder'}));

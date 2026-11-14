@@ -1,0 +1,13 @@
+{
+  "schema": "voxelshogi-public-s-approval-v1",
+  "approved_on": "2026-11-14",
+  "inference_repository": "voxelshogi/voxelshogi-transformer-s",
+  "model_id": "voxelshogi-transformer-s-m6-314159-v1",
+  "access_profile": "public-s-inference-v1",
+  "private": false,
+  "gated": false,
+  "community_disabled": true,
+  "license": "Apache-2.0",
+  "browser_download_approved": true,
+  "scope": "Existing S inference package and concise Model Card. No new training, GPU rental, dataset or training-state access changes."
+}

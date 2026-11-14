@@ -46,6 +46,18 @@ export function verifyVideo(probe, seconds) {
   assert.ok(Math.abs(Number(probe.format.duration) - seconds) <= 1 / 30, 'incorrect video duration');
 }
 
+export function verifyHumanModel(record, release) {
+  assert.equal(record.selectedAgents.mode, 'h-r'); assert.equal(record.selectedAgents.b.controller, 'human');
+  assert.equal(record.selectedAgents.w.difficulty, 'model'); assert.equal(record.record.moves.length, 2);
+  assert.equal(record.observationsThroughCursor.length, 1);
+  const reply=record.observationsThroughCursor[0].reply;
+  assert.equal(reply.kind, 'model-result'); assert.equal(reply.result.bestMove, record.record.moves[1]);
+  assert.equal(reply.model.repo, release.repo); assert.equal(reply.model.revision, release.revision);
+  assert.deepEqual(reply.model.selection, {modelId:'voxelshogi-transformer-s-m6-314159-v1',packageHash:release.manifest.sha256,precision:'int8',backend:'wasm'});
+  assert.equal(reply.validation.fixtures.length, 4);
+  assert.ok(reply.validation.fixtures.every(f=>f.comparison.policy.exceeded===0&&f.comparison.value.exceeded===0));
+}
+
 export function zoomAtFrame(frame, maximum) {
   if(frame<12)return 1;
   if(frame<24)return 1+(frame-12)*(maximum-1)/12;
@@ -120,7 +132,7 @@ async function record(work, commit) {
   const context = await browser.newContext({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1,
     recordVideo: { dir: join(work, 'raw'), size: { width: 1080, height: 1350 } } });
   const errors = [];
-  let video, conditions, hook, timeline;
+  let video, conditions, humanConditions, hook, timeline;
   const uiLayouts=[];
   try {
     const page = await context.newPage(); video = page.video();
@@ -209,17 +221,33 @@ async function record(work, commit) {
     await page.waitForFunction(ply => document.querySelector('[data-testid="status"]')?.textContent?.startsWith(`${ply + 1}手目`), hook + 3, { polling: 50 });
     assert.equal(await page.getByTestId('ai-phase').textContent(), '一時停止中');
     await checkControls();await at((timeline.controlsStartFrame/30+3.8)*1000);await checkControls();
-    await at((timeline.controlsStartFrame/30+4.2)*1000); await controlsStyle.evaluate(node => node.remove()); style = await page.addStyleTag({ content: composition });
-    await settledCanvas();timeline.ctaStartFrame=Math.ceil((performance.now()-began)*30/1000);
-    await at((timeline.ctaStartFrame/30+4.4)*1000);
+    await at((timeline.controlsStartFrame/30+4.2)*1000);
     conditions = await exportRecord('source-ai-record.json');
     assert.equal(conditions.applicationCommit, commit);
     assert.equal(conditions.record.moves[hook - 1][2] !== conditions.record.moves[hook - 1][5], true);
+    // Record a separate real human/S game. Preparation/resize frames stay outside the edit.
+    await page.getByRole('button',{name:'AIと対戦',exact:true}).click();
+    await page.getByLabel('あなたの先後').selectOption('h-r');
+    await page.getByLabel('相手のAI').selectOption('model');
+    await page.getByLabel('モデルの精度形式').waitFor({timeout:60000});
+    await page.getByLabel('モデルの精度形式').selectOption('int8');
+    await page.getByRole('button',{name:'対戦をはじめる',exact:true}).click();
+    await page.getByRole('button',{name:/^V層を見る(?:、|$)/}).click();
+    await page.locator('.board2d [data-square="382"]').click();
+    await page.locator('.board2d [data-square="373"]').click();
+    await page.waitForFunction(()=>document.querySelector('[data-testid="status"]')?.textContent?.startsWith('3手目'),{},{timeout:120000});
+    humanConditions=await exportRecord('source-human-record.json');
+    assert.equal(humanConditions.applicationCommit,commit);
+    const release=JSON.parse(readFileSync(join(web,'public/models/m6/catalog.json'))).releases.find(r=>r.publicDownload===true);
+    assert.ok(release);verifyHumanModel(humanConditions,release);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await delay(300);
+    await checkControls();timeline.ctaStartFrame=Math.ceil((performance.now()-began)*30/1000);
+    await at((timeline.ctaStartFrame/30+4.4)*1000);await checkControls();
     assert.deepEqual(errors, [], 'browser runtime errors');
   } finally { await context.close(); await browser.close(); }
   assert.ok(video && conditions);
   assert.ok(timeline);storyCuts(timeline);
-  return { raw: await video.path(), conditions, hook, uiLayouts, timeline };
+  return { raw: await video.path(), conditions, humanConditions, hook, uiLayouts, timeline };
 }
 
 function render(raw, work, startFrame, sourceRate, hookMove, timing) {
@@ -228,8 +256,8 @@ function render(raw, work, startFrame, sourceRate, hookMove, timing) {
   const lines = {
     'hook-a.txt': '将棋、9層にした。', 'hook-b.txt': 'その一手、別の階へ。',
     'watch.txt': 'AI同士の対局を、眺める。', 'step.txt': '止めて、一手ずつ追える。',
-    'cta.txt': 'ブラウザで観戦', 'url.txt': 'voxelshogi.yousan-apps.workers.dev',
-    'alpha.txt': '9×9×9・ブラウザで動く立体将棋', 'agents.txt': 'Easy vs Easy・実対局の再生',
+    'cta.txt': '開発したAIと、あなたが対戦。', 'url.txt': 'voxelshogi.yousan-apps.workers.dev',
+    'alpha.txt': '学習済みS・INT8（重み）／申請・ログイン不要', 'agents.txt': 'Easy vs Easy・実対局の再生',
     'cross.txt': `${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[2])-1]}層 → ${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[5])-1]}層`,
   };
   for (const [name, text] of Object.entries(lines)) writeFileSync(join(work, name), text + '\n');
@@ -246,7 +274,7 @@ function render(raw, work, startFrame, sourceRate, hookMove, timing) {
   const zoom = maximum => `zoompan=z='if(lt(on,12),1,if(lt(on,24),1+(on-12)*${maximum-1}/12,if(lt(on,90),${maximum},if(lt(on,102),${maximum}-(on-90)*${maximum-1}/12,1))))':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d=1:s=1080x1350:fps=30`;
   const bands=['drawbox=x=0:y=0:w=iw:h=176:color=0x10191c:t=fill','drawbox=x=0:y=1160:w=iw:h=190:color=0x10191c:t=fill'];
   const draw = [zoom(1.1), ...bands, text('hook-a.txt', 76, 78, 'lt(t,3)'), text('watch.txt', 76, 60, 'gte(t,3)*lt(t,7)'),
-    text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 78, 'gte(t,11)'),
+    text('step.txt', 76, 60, 'gte(t,7)*lt(t,11)'), text('cta.txt', 76, 54, 'gte(t,11)'),
     text('url.txt', 1190, 43, 'gte(t,11)'), text('alpha.txt', 1260, 30, 'gte(t,11)'),
     text('agents.txt', 1280, 30, 'lt(t,11)'), text('cross.txt', 1180, 46, 'gte(t,0.7)*lt(t,3)')];
   const encode = (name, seconds, filters) => {
@@ -293,6 +321,8 @@ async function main() {
     wasm.initSync({ module: readFileSync(join(web, 'src/wasm/pkg/voxelshogi_wasm_bg.wasm')) });
     const replay = wasm.Game.fromRecordJson(JSON.stringify(captured.conditions.record));
     try { assert.equal(replay.moveCount(), captured.hook + 3); } finally { replay.free(); }
+    const humanReplay=wasm.Game.fromRecordJson(JSON.stringify(captured.humanConditions.record));
+    try { assert.equal(humanReplay.moveCount(),2); } finally { humanReplay.free(); }
     const rawProbe = probe(captured.raw), stream = rawProbe.streams.find(stream => stream.codec_type === 'video');
     const sourceRate = parseFrameRate(stream.avg_frame_rate);
     const pixels = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', captured.raw, '-vf', 'crop=2:2:0:0', '-pix_fmt', 'rgb24', '-f', 'rawvideo', '-'], { maxBuffer: 1024 * 1024 });
@@ -300,7 +330,7 @@ async function main() {
     const startFrame = contentStartFrame(pixels.stdout);
     assert.ok(Number(rawProbe.format.duration) - startFrame / sourceRate >= storyCuts(captured.timeline).at(-1).end/30, 'not enough settled footage');
     const boardBounds=[];
-    for(const seconds of [0,0.4,0.7,1.5,2.9,3.2,6.9,11.2,14.9]){
+    for(const seconds of [0,0.4,0.7,1.5,2.9,3.2,6.9]){
       const frame=spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-ss',String(startFrame/sourceRate+storyFrameSource(Math.round(seconds*30),captured.timeline)/30),'-i',captured.raw,
         '-vf','crop=1080:950:0:200','-frames:v','1','-pix_fmt','rgb24','-f','rawvideo','-'],{maxBuffer:4*1024*1024});
       assert.equal(frame.status,0,String(frame.stderr));const r=foregroundBounds(frame.stdout,1080,950),rect={...r,top:r.top+200,bottom:r.bottom+200};
@@ -319,10 +349,11 @@ async function main() {
     writeFileSync(join(work,'framing.json'),JSON.stringify({schema:1,captionBands:{top:[0,176],bottom:[1160,1350]},
       openingZoom:{a:1.1,b:1.12},controlsZoom:1,timeline:captured.timeline,sourceCuts:storyCuts(captured.timeline),uiLayouts:captured.uiLayouts,boardBounds,reviewFrames,
       recordedBoundsVerified:true,visualReviewComplete:false},null,2)+'\n');
-    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'captions.json','framing.json',...reviewFrames.map(f=>f.file)];
+    const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'source-human-record.json', 'captions.json','framing.json',...reviewFrames.map(f=>f.file)];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
       candidate,
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
+      humanModel:captured.humanConditions.selectedAgents.w.model, humanModelReplyVerified:true,
       fullRecordReplayedByRust: true, fullDecodeValidated: true, recordedBoundsVerified:true, sourceRate, firstContentFrame: startFrame, outputFps: 30,
       performanceMeasurement: false, soundRequired: false,
       recordingScriptSha256: sha(fileURLToPath(import.meta.url)), webLockSha256: sha(join(web, 'pnpm-lock.yaml')),

@@ -1,6 +1,6 @@
 # M6のブラウザ向け変換と検証済みHF配布
 
-**現在の入口（2026-11-14）**：新UIでも同じ取得済みSのFP32／FP16重み／INT8重みを選択できる。上部「モデル」から読み込み、「対局設定」で先後の形式・backendを選ぶ。[現在の操作案内](../README.md#学習済みモデルで観戦する)・[新UIの公開確認](ARENA_RELEASE_VALIDATION.md)。本書のモデルhash・HF固定版・過去の実機結果は更新せず保持する。
+**現在の変更（2026-11-14）**：既存Sを申請・ログインなしでWeb対戦できるようにする。[取得条件変更と公開確認](PUBLIC_S_ACCESS.md)・[操作案内](../README.md#学習済みモデルで観戦する)。本書のモデルhash・旧固定版・実機結果は履歴として保持する。
 
 2026-10-29 UTC。混合精度FP16のブラウザ数値検証が失敗したため、FP16重み・FP32計算の形式を追加し、全3形式を新しい実ファイルで固定評価した。本記録は候補計測時点の履歴。公開catalog差し替えなしの実機検証・資源終了を含む最終状態は[M6完了記録](M6_COMPLETION.md)を参照。 [固定集計](experiments/m6-portable-release.json)。
 
@@ -64,6 +64,6 @@ uv run --locked hf download voxelshogi/voxelshogi-transformer-s \
 
 同じモデルの前回計測は数値48条件・40切替に成功したが、WASMの準備中に操作を使い切り、測定中のtrusted入力が0のため全量検査が失敗した。[失敗した元記録](experiments/m6-portable-browser-interaction-failed.json)は保持する。操作開始を測定リクエストのpending後へ移したhelper `f279649cc95ab76ae88ab86371a5f53c3552b991`で再計測し、必須8チェック・関連CIの成功後に受理した。閾値や成功条件の緩和はしていない。
 
-この記録は`candidate=true`で、最終の公開catalogの証拠とは区別する。次はPRの必須CI・通常取り込み・自動公開後に、差し替えなしの全48条件・40実切替、実Arenaの3GPU形式と7 E2Eを検証する。HF取得ゲートを迂回する重みのCloudflare複製は行わない。
+この記録は`candidate=true`で、最終の公開catalogの証拠とは区別する。次はPRの必須CI・通常取り込み・自動公開後に、差し替えなしの全48条件・40実切替、実Arenaの3GPU形式と7 E2Eを検証する。当時はmanual gateを維持した。Sは2026-11-14の明示承認に基づきゲートを解除し、固定HF版から直接読み込む。他のmanual対象のゲートは迂回しない。
 
 同じ最終HF配布を使う[候補Arenaの実ONNX E2E](experiments/m6-portable-arena-candidate.json)も7件・58.6秒で成功した（retry／skip／flakyなし）。3形式の合法手・条件付き棋譜、速度・自動再生、3D準備中の操作と中断、破損拒否、GPUなし時の明示エラーと人間対AI、実計測driverのsmokeを確認した。公開URL上でcatalogだけを差し替えた候補検証であり、差し替えなしの最終公開検証とは区別する。

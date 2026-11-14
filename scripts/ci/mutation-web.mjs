@@ -15,6 +15,11 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'public-s-explicit-approval', file: 'inference/public-model.ts', before: "if (release.publicDownload !== true) throw new Error('public model download is not approved');", after: '', test: 'public-model' },
+  { name: 'public-s-fixed-revision', file: 'inference/public-model.ts', before: '/resolve/${release.revision}/', after: '/resolve/main/', test: 'public-model' },
+  { name: 'public-s-worker-approval', file: 'inference/policy-factory.ts', before: "if (!files.length && release.publicDownload !== true) throw new Error('public model download is not approved');", after: '', test: 'policy-factory' },
+  { name: 'public-s-late-metadata', file: 'App.tsx', before: 'if (abort.signal.aborted) return;', after: '', test: 'app-models', extension: 'tsx' },
+  { name: 'public-s-chosen-precision', file: 'App.tsx', before: 'sourceId:first.sourceId,precision,backend:', after: "sourceId:first.sourceId,precision:'fp32',backend:", test: 'app-models', extension: 'tsx' },
   { name: 'dismiss-persistent-message', file: 'App.tsx', before: 'onClick={() => setMessage(null)}', after: 'onClick={() => {}}', test: 'app-launch', extension: 'tsx' },
   { name: 'readonly-hands', file: 'components/Panels.tsx', before: 'const active = interactive && snap.side === color', after: 'const active = snap.side === color', test: 'panels-side', extension: 'tsx' },
   { name: 'primary-single-step-cancel', file: 'App.tsx', before: 'if (running || stepBusy) pause();', after: 'if (running) pause();', test: 'app-launch', extension: 'tsx' },
@@ -270,7 +275,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 210);
+    assert.equal(results.length, 215);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

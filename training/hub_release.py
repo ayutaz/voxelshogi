@@ -55,6 +55,9 @@ STATE_REPOS = {
     "research-training-state": "voxelshogi/voxelshogi-research-training-state-v1",
 }
 
+PUBLIC_S_PROFILE = "public-s-inference-v1"
+PUBLIC_S_REPO = "voxelshogi/voxelshogi-transformer-s"
+
 
 def _policy(plan):
     role = plan.get("artifact_role", "artifacts")
@@ -89,7 +92,19 @@ def _policy(plan):
         raise ValueError("release destination must be voxelshogi/NAME")
     if plan["repo_type"] not in ("model", "dataset"):
         raise ValueError("release type must be model or dataset")
-    if plan["private"] is not False or plan["gated"] != "manual":
+    public_s = plan.get("access_profile") == PUBLIC_S_PROFILE
+    if plan.get("access_profile") is not None and not public_s:
+        raise ValueError("unsupported access profile")
+    if public_s and (
+        role != "inference-package"
+        or plan["repo_type"] != "model"
+        or plan["repo_id"] != PUBLIC_S_REPO
+        or plan["license"] != "apache-2.0"
+    ):
+        raise ValueError("ungated publication is approved only for S inference")
+    if plan["private"] is not False or (
+        plan["gated"] is not False if public_s else plan["gated"] != "manual"
+    ):
         raise ValueError(
             "release requires a public repository with manual access gating"
         )
@@ -205,6 +220,7 @@ def plan_release(
     artifact_role="artifacts",
     state_publication_approved=False,
     expected_binding=None,
+    access_profile=None,
 ):
     plan = {
         "schema": 1,
@@ -218,6 +234,8 @@ def plan_release(
     }
     if artifact_role != "artifacts":
         plan["artifact_role"] = artifact_role
+    if access_profile is not None:
+        plan.update(access_profile=access_profile, gated=False)
     if artifact_role in STATE_REPOS:
         plan.update(
             state_publication_approved=state_publication_approved,
@@ -321,6 +339,7 @@ def publish_release(
         artifact_role=plan.get("artifact_role", "artifacts"),
         state_publication_approved=plan.get("state_publication_approved", False),
         expected_binding=plan.get("expected_binding"),
+        access_profile=plan.get("access_profile"),
     )
     if current != plan:
         raise ValueError("release artifacts changed since review")
@@ -364,13 +383,13 @@ def create_release_repository(plan, api, *, execute=False, system=None):
     info = api.repo_info(**destination)
     if info.private:
         raise ValueError("refusing to expose an existing private repository")
-    api.update_repo_settings(**destination, gated="manual")
+    api.update_repo_settings(**destination, gated=plan["gated"])
     api.disable_community(**destination)
     if api.community_disabled(**destination) is not True:
         raise ValueError("Community OFF has not been confirmed")
     info = api.repo_info(**destination)
-    if info.private or info.gated != "manual":
-        raise ValueError("public/manual Hub settings have not been confirmed")
+    if info.private or info.gated != plan["gated"]:
+        raise ValueError("public Hub access settings have not been confirmed")
     return info
 
 
@@ -391,7 +410,7 @@ def verify_release(plan, receipt, api, fetch, *, system=None):
         "revision": receipt["hub_commit"],
     }
     info = api.repo_info(**destination)
-    if info.private or info.gated != "manual" or info.sha != receipt["hub_commit"]:
+    if info.private or info.gated != plan["gated"] or info.sha != receipt["hub_commit"]:
         raise ValueError("Hub settings or immutable revision mismatch")
     if (
         api.community_disabled(repo_id=plan["repo_id"], repo_type=plan["repo_type"])

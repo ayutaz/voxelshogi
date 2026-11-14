@@ -13,6 +13,27 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "crates/voxelshogi-python/python/voxelshogi"
 MUTATIONS = [
     (
+        "public-s-parent-revision",
+        "training/public_s_release.py",
+        "if info.private or info.sha != parent:",
+        "if info.private:",
+        "test_public_s_release.py",
+    ),
+    (
+        "public-s-card-only",
+        "training/public_s_release.py",
+        'path_in_repo="README.md",',
+        'path_in_repo="fp32.onnx",',
+        "test_public_s_release.py",
+    ),
+    (
+        "public-s-destination-isolation",
+        "training/hub_release.py",
+        'or plan["repo_id"] != PUBLIC_S_REPO',
+        "or False",
+        "test_hub_release.py",
+    ),
+    (
         "pilot-collect-module-process",
         "infrastructure/research/pilot/collection.py",
         '        "infrastructure.research.pilot.attempt",\n',
@@ -5990,7 +6011,7 @@ MUTATIONS = [
     (
         "hub-manual-gate",
         "training/hub_release.py",
-        'if info.private or info.gated != "manual":',
+        'if info.private or info.gated != plan["gated"]:',
         "if info.private:",
         "test_hub_release.py",
     ),

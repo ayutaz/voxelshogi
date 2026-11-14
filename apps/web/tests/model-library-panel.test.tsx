@@ -49,9 +49,9 @@ it('shows failed validation and allows retrying without changing the approved re
   expect(screen.getByRole('alert').textContent).toContain('ファイルの内容が配布情報と一致しません');
   expect(loaded).not.toHaveBeenCalled();
 });
-it('explains the optional three-step model workflow before selecting a folder', async () => {
+it('explains ungated automatic access and the optional local folder workflow', async () => {
   await mount();
-  expect(screen.getByText(/取得申請/)).toBeTruthy();
+  expect(screen.getByText(/申請・ログインは不要/)).toBeTruthy();
   expect(screen.getByText(/ダウンロード/)).toBeTruthy();
   expect(screen.getByText(/フォルダーを選択/)).toBeTruthy();
   expect(screen.getByText(/512MiB/)).toBeTruthy();
