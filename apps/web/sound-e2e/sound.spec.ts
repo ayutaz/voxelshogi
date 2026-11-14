@@ -1,6 +1,8 @@
 import { test, expect } from '../e2e/test';
 import { closeSheet, display, openRecords, sliceAt } from '../e2e/arena-controls';
 import type { Page } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 interface SoundEvidence { contexts:number; starts:number[]; stops:number; peak:number }
 declare global { interface Window { __soundEvidence:SoundEvidence } }
@@ -54,7 +56,7 @@ test.beforeEach(async({page,request})=>{
   if(process.env.E2E_COMMIT){const r=await request.get('/build-info.json');expect(r.ok()).toBe(true);expect((await r.json()).commit).toBe(process.env.E2E_COMMIT);}
 });
 test.afterEach(async({page},info)=>{
-  const data=await evidence(page).catch(()=>null);if(data)await info.attach('sound-evidence',{body:JSON.stringify({expectedCommit:process.env.E2E_COMMIT,browser:info.project.name,test:info.title,visibilityMayBeSimulated:info.title.includes('hidden'),...data}),contentType:'application/json'});
+  const data=await evidence(page).catch(()=>null);if(data){const path=info.outputPath('attachments/sound-evidence.json');mkdirSync(dirname(path),{recursive:true});writeFileSync(path,JSON.stringify({expectedCommit:process.env.E2E_COMMIT,browser:info.project.name,test:info.title,visibilityMayBeSimulated:info.title.includes('hidden'),...data}),{flag:'wx'});await info.attach('sound-evidence',{path,contentType:'application/json'});}
 });
 
 test('no audio before activation; test cue reaches the real output graph once',async({page})=>{
