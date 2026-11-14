@@ -41,6 +41,7 @@ jobs:
           tool: wasm-bindgen-cli@0.2.129
       - run: pnpm --dir apps/web wasm
       - run: pnpm --dir apps/web build
+      - run: node scripts/verify-public-model-gateway.mjs "$RUNNER_TEMP/public-s-gateway.json"
       - run: pnpm --dir apps/web exec playwright install --with-deps chromium
       - run: pnpm --dir apps/web exec playwright test -c public-model-playwright.config.ts
         env:
@@ -53,6 +54,7 @@ jobs:
           name: public-s-${{ github.sha }}
           path: |
             ${{ runner.temp }}/public-s-verification.json
+            ${{ runner.temp }}/public-s-gateway.json
             apps/web/public-model-test-results/**/attachments/public-s-*.png
             apps/web/public-model-test-results/**/test-failed-*.png
           retention-days: 7

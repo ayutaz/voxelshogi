@@ -3,6 +3,11 @@ import { loadPublicModel } from '../src/inference/public-model';
 import { ref, releaseFixture, trainedFixture } from './local-model-fixtures';
 
 afterEach(() => vi.unstubAllGlobals());
+it('uses the site origin for deployed browsers so HF CORS cannot block the model', async () => {
+  const f=fixture(),fetcher=vi.fn(async()=>new Response('corrupt'));
+  await expect(loadPublicModel(f.release,undefined,fetcher,'https://game.example')).rejects.toThrow();
+  expect(fetcher).toHaveBeenCalledWith(`https://game.example/api/models/s/${f.release.revision}/manifest.json`,expect.objectContaining({credentials:'omit'}));
+});
 function fixture() {
   const model = trainedFixture(); model.variants[0]!.model = ref('fp32.onnx', 'abc');
   const manifest = JSON.stringify(model), release = { ...releaseFixture(manifest), publicDownload: true };

@@ -20,7 +20,7 @@ for (const precision of ['fp32', 'fp16', 'int8']) {
     await page.setViewportSize({ width: 390, height: 844 });
     const downloads: string[] = [];
     page.on('request', request => {
-      if (request.url().includes('huggingface.co/')) {
+      if (request.url().includes('huggingface.co/') || request.url().includes('/api/models/s/')) {
         expect(request.headers().authorization).toBeUndefined();
         if (request.url().endsWith('.onnx')) downloads.push(request.url());
       }
@@ -37,7 +37,10 @@ for (const precision of ['fp32', 'fp16', 'int8']) {
     await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番', { timeout: 120_000 });
     await expect(page.getByTestId('ai-phase')).toHaveText('人間の手番');
     await expect(page.getByTestId('ai-error')).toHaveCount(0);
-    expect(downloads).toEqual([`https://huggingface.co/${catalog.releases[0].repo}/resolve/${catalog.releases[0].revision}/${precision}.onnx`]);
+    const expected = process.env.E2E_BASE_URL
+      ? `${new URL(process.env.E2E_BASE_URL).origin}/api/models/s/${catalog.releases[0].revision}/${precision}.onnx`
+      : `https://huggingface.co/${catalog.releases[0].repo}/resolve/${catalog.releases[0].revision}/${precision}.onnx`;
+    expect(downloads).toEqual([expected]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const downloading = page.waitForEvent('download'); await openRecords(page);
     await page.getByTestId('export-ai-record').click();
@@ -71,18 +74,19 @@ test('public model download stays interactive and cancellation prevents a late m
   let release!: () => void, arrive!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
   const arrived = new Promise<void>(resolve => { arrive = resolve; });
-  await context.route('**/resolve/*/int8.onnx', async route => { arrive(); await gate; await route.continue().catch(() => {}); });
+  const pattern = '**/int8.onnx';
+  await context.route(pattern, async route => { arrive(); await gate; await route.continue().catch(() => {}); });
   await startAsWhite(page); await arrived;
   await sliceAt(page, '5');
   await expect(page.getByTestId('slice-index')).toHaveValue('5');
   await page.getByTestId('toggle-run').click();
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-  release(); await context.unroute('**/resolve/*/int8.onnx');
+  release(); await context.unroute(pattern);
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
 });
 
 test('corrupt public weights show an error and never substitute Normal or an unverified move', async ({ page, context }) => {
-  await context.route('**/resolve/*/int8.onnx', route => route.fulfill({ body: 'corrupt' }));
+  await context.route('**/int8.onnx', route => route.fulfill({ body: 'corrupt' }));
   await startAsWhite(page);
   await expect(page.getByTestId('ai-error')).toBeVisible({ timeout: 60_000 });
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');

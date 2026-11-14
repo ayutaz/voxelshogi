@@ -125,12 +125,15 @@ const run = (command, args, options = {}) => {
 const probe = file => JSON.parse(run('ffprobe', ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', file]));
 const sha = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 
-async function record(work, commit) {
+async function record(work, commit, site) {
   const require = createRequire(join(web, 'package.json'));
   const { chromium } = require('@playwright/test');
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1,
     recordVideo: { dir: join(work, 'raw'), size: { width: 1080, height: 1350 } } });
+  // Synthetic recording games never enter production D1; model and UI requests stay real.
+  await context.route('**/api/collection',route=>route.fulfill({json:{enabled:true,policy:'automatic-game-v2',schemas:[1,2]}}));
+  await context.route('**/api/games',route=>{const p=route.request().postDataJSON();return route.fulfill({json:{gameId:p.gameId,requestId:p.requestId,version:p.version,status:'received_unverified'}})});
   const errors = [];
   let video, conditions, humanConditions, hook, timeline;
   const uiLayouts=[];
@@ -138,7 +141,7 @@ async function record(work, commit) {
     const page = await context.newPage(); video = page.video();
     page.on('pageerror', error => errors.push(error.message));
     page.on('dialog', dialog => dialog.accept());
-    await page.goto('http://127.0.0.1:4173/');
+    await page.goto(site);
     await page.getByRole('button', { name: '対局設定', exact: true }).click();
     await page.getByTestId('difficulty-b').selectOption('easy');
     await page.getByTestId('difficulty-w').selectOption('easy');
@@ -316,7 +319,7 @@ async function main() {
       await delay(250);
     }
     assert.ok(ready, 'tested app commit did not start');
-    const captured = await record(work, commit);
+    const captured = await record(work, commit, candidate ? 'http://127.0.0.1:4173/' : 'https://voxelshogi.yousan-apps.workers.dev/');
     const wasm = await import(pathToFileURL(join(web, 'src/wasm/pkg/voxelshogi_wasm.js')));
     wasm.initSync({ module: readFileSync(join(web, 'src/wasm/pkg/voxelshogi_wasm_bg.wasm')) });
     const replay = wasm.Game.fromRecordJson(JSON.stringify(captured.conditions.record));
@@ -352,6 +355,7 @@ async function main() {
     const outputs = ['demo-main.mp4', 'hook-a.mp4', 'hook-b.mp4', 'poster.png', 'ogp.png', 'contact-sheet.png', 'source-ai-record.json', 'source-human-record.json', 'captions.json','framing.json',...reviewFrames.map(f=>f.file)];
     const receipt = { schema: 1, kind: 'voxelshogi-demo-video', appCommit: commit, ruleset: 'voxelshogi-standard-v1',
       candidate,
+      captureOrigin: candidate ? 'http://127.0.0.1:4173' : 'https://voxelshogi.yousan-apps.workers.dev',
       agents: ['easy', 'easy'], hookPly: captured.hook, hookMove: captured.conditions.record.moves[captured.hook - 1],
       humanModel:captured.humanConditions.selectedAgents.w.model, humanModelReplyVerified:true,
       fullRecordReplayedByRust: true, fullDecodeValidated: true, recordedBoundsVerified:true, sourceRate, firstContentFrame: startFrame, outputFps: 30,

@@ -15,6 +15,10 @@ export function classifyVitest(processResult, report) {
 }
 
 const mutations = [
+  { name: 'public-s-proxy-route', file: 'collection/worker.ts', before: "if (path.startsWith('/api/models/')) return publicModelAsset(request);", after: '', test: 'collection-worker' },
+  { name: 'public-s-same-origin', file: 'inference/public-model.ts', before: "['localhost', '127.0.0.1', '[::1]'].includes(host)", after: 'true', test: 'public-model' },
+  { name: 'public-s-proxy-allowlist', file: 'collection/public-model-proxy.ts', before: 'if (!upstream || url.search)', after: 'if (false)', test: 'public-model-proxy' },
+  { name: 'public-s-proxy-no-credentials', file: 'collection/public-model-proxy.ts', before: "headers: { accept: 'application/octet-stream' },", after: 'headers: request.headers,', test: 'public-model-proxy' },
   { name: 'public-s-explicit-approval', file: 'inference/public-model.ts', before: "if (release.publicDownload !== true) throw new Error('public model download is not approved');", after: '', test: 'public-model' },
   { name: 'public-s-fixed-revision', file: 'inference/public-model.ts', before: '/resolve/${release.revision}/', after: '/resolve/main/', test: 'public-model' },
   { name: 'public-s-worker-approval', file: 'inference/policy-factory.ts', before: "if (!files.length && release.publicDownload !== true) throw new Error('public model download is not approved');", after: '', test: 'policy-factory' },
@@ -275,7 +279,7 @@ function main() {
         assert.equal(outcome, 'caught', `Mutation not caught by an executed assertion: ${mutation.name}`);
       } finally { writeFileSync(path, original); }
     }
-    assert.equal(results.length, 215);
+    assert.equal(results.length, 219);
   } finally {
     writeFileSync(join(output, 'results.json'), JSON.stringify({ results }, null, 2) + '\n');
     rmSync(work, { recursive: true, force: true });

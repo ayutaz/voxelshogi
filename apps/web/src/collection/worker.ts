@@ -1,11 +1,13 @@
 import { COLLECTION_CONSENT, MAX_GAME_BYTES } from './contract';
 import { AUTOMATIC_POLICY } from './automatic-contract';
 import { purgeGames, receiveGame, type CollectionEnv } from './receiver';
+import { publicModelAsset } from './public-model-proxy';
 
 interface Env extends CollectionEnv { ASSETS: { fetch: (request: Request) => Promise<Response> } }
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const path = new URL(request.url).pathname;
+    if (path.startsWith('/api/models/')) return publicModelAsset(request);
     if (path === '/api/games') return receiveGame(request, env);
     if (path === '/api/collection' && request.method === 'GET') return Response.json({
       enabled: env.GAME_COLLECTION_ENABLED === 'true' && !!env.GAMES,

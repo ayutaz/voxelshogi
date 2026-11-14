@@ -3,11 +3,14 @@ import { loadLocalModel, parseTrainedCatalog, readTrainedCatalog, type LocalMode
 import { parseTrainedModel } from './manifest';
 
 /** Public S only. Main thread reads small metadata; the Worker lazily fetches weights/references. */
-export async function loadPublicModel(value: unknown, signal?: AbortSignal, fetcher: typeof fetch = globalThis.fetch.bind(globalThis)): Promise<LocalModel> {
+export async function loadPublicModel(value: unknown, signal?: AbortSignal, fetcher: typeof fetch = globalThis.fetch.bind(globalThis), origin = globalThis.location?.origin): Promise<LocalModel> {
   const release = parseTrainedCatalog({ schema: 1, releases: [value] })[0]!;
   if (release.publicDownload !== true) throw new Error('public model download is not approved');
   signal?.throwIfAborted();
-  const base = `https://huggingface.co/${release.repo}/resolve/${release.revision}/`;
+  const host = origin ? new URL(origin).hostname : 'localhost';
+  const base = ['localhost', '127.0.0.1', '[::1]'].includes(host)
+    ? `https://huggingface.co/${release.repo}/resolve/${release.revision}/`
+    : new URL(`/api/models/s/${release.revision}/`, origin).href;
   const read = (file: FileRef, readSignal = signal) => fetchVerified(assetUrl(base, file.path), file, readSignal, fetcher);
   const manifest = await read(release.manifest);
   const model = parseTrainedModel(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(manifest)), release);
