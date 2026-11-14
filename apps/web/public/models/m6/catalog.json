@@ -7,7 +7,7 @@
       "license": "Apache-2.0",
       "sourceCommit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
       "repo": "voxelshogi/voxelshogi-transformer-s",
-      "revision": "f196c75236f0f0cfd028b91661b39a2c64ee448f",
+      "revision": "6ab524574d36536348dbe323a2b779b9cebe37ed",
       "manifest": {
         "path": "manifest.json",
         "bytes": 28477,
@@ -16,15 +16,16 @@
       "notices": [
         {
           "path": "README.md",
-          "bytes": 14208,
-          "sha256": "4e83b3fc66f0611ec7d5ef090fc897232933444edcf3e2ff86343fc3c6c4b1ec"
+          "bytes": 3035,
+          "sha256": "3d787303f56b551876ba3cd4a83624b2658b89d9a58eec804dad132583987ce2"
         },
         {
           "path": "LICENSE",
           "bytes": 11358,
           "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
         }
-      ]
+      ],
+      "publicDownload": true
     }
   ]
 }

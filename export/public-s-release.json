@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "plan": {
+    "schema": 1,
+    "repo_id": "voxelshogi/voxelshogi-transformer-s",
+    "repo_type": "model",
+    "private": false,
+    "gated": false,
+    "license": "apache-2.0",
+    "license_approved": true,
+    "source_commit": "5415899c445b95c5ce19d3a79c1ebb55f48bf642",
+    "artifact_role": "inference-package",
+    "files": [
+      {
+        "path": "LICENSE",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "README.md",
+        "bytes": 3035,
+        "sha256": "3d787303f56b551876ba3cd4a83624b2658b89d9a58eec804dad132583987ce2"
+      },
+      {
+        "path": "evaluation.json",
+        "bytes": 16727,
+        "sha256": "03ac2a96b06d36d31cf1c2fab38d28c2b71ad0cd60f24ac5c23f89ed968eee26"
+      },
+      {
+        "path": "fp16.onnx",
+        "bytes": 10463104,
+        "sha256": "b22a7fd9a5e31a15cc6fb15cca76b945bed3cac6ce199b62294c885840f4dd0a"
+      },
+      {
+        "path": "fp32.onnx",
+        "bytes": 20461391,
+        "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63"
+      },
+      {
+        "path": "inputs/after-one-w.f32",
+        "bytes": 125388,
+        "sha256": "fea43477b26cf5b66d8da7c9123309a2bb4a20821952e0ab47c845347135d1b6"
+      },
+      {
+        "path": "inputs/initial-b.f32",
+        "bytes": 125388,
+        "sha256": "e45e6524437c01d7ad4d61db1faded24a2b1d0aaaf814fbbbcb42aa198f0642a"
+      },
+      {
+        "path": "inputs/mate-in-one-b.f32",
+        "bytes": 125388,
+        "sha256": "c817286c328d398fe4026bc5ac9c888c6aab963fd19314d527e473e82d80c3b6"
+      },
+      {
+        "path": "inputs/material-b.f32",
+        "bytes": 125388,
+        "sha256": "9f98fdc7ba475e87e9128faeded6254a3b809ab0c96d1d7e50d80be5b8dfc5ca"
+      },
+      {
+        "path": "int8.onnx",
+        "bytes": 5467835,
+        "sha256": "12b225402ce32d483e44ba766d7c695e08698408d310e8f88197a8a2ef92deb9"
+      },
+      {
+        "path": "manifest.json",
+        "bytes": 28477,
+        "sha256": "9ea2685c1d1cd8529292dbf6a70d4e692bd639bc3425215a8bd5c2b9a888afae"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 20092056,
+        "sha256": "dcdf28431a7eab40d98f98a1f2ef7b80fbea1b7d9e66f98b6428cfaa67336c85"
+      },
+      {
+        "path": "reference/fp16/after-one-w-policy.f32",
+        "bytes": 4271940,
+        "sha256": "c3ea0e287d5b19a0b4691b7486a33e504425fd7b4429d215e492fe1899806bc7"
+      },
+      {
+        "path": "reference/fp16/after-one-w-value.f32",
+        "bytes": 4,
+        "sha256": "7f126866de8a52ec4cab684fcfac43a68577c61f9fea9b909de0d0df0a8ef3c9"
+      },
+      {
+        "path": "reference/fp16/initial-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "d85348a611e4355bbda12ed365e158cb66d3b080fd5bd0e4f40a0e52da39757f"
+      },
+      {
+        "path": "reference/fp16/initial-b-value.f32",
+        "bytes": 4,
+        "sha256": "f27d18c30bd0d75312062780811dc758912b9cde179f11296c7bb9a63f323c61"
+      },
+      {
+        "path": "reference/fp16/mate-in-one-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "9ef1323e114631cecbf4438bf37267b9837d8e739cefc36208b1ae52c6d623f7"
+      },
+      {
+        "path": "reference/fp16/mate-in-one-b-value.f32",
+        "bytes": 4,
+        "sha256": "fdf2c5a655f2217eb9e8eb97b5cc2e18e0d29c73372bc8487ae5802277e17163"
+      },
+      {
+        "path": "reference/fp16/material-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "0cd4f21751ef3194c27fcd932271ad0a00cf056048a19dc568d14e880964dfae"
+      },
+      {
+        "path": "reference/fp16/material-b-value.f32",
+        "bytes": 4,
+        "sha256": "c5b0cfab4723aa49b569fe3fadd76939e63d60041f3e9df1a8c351287870d537"
+      },
+      {
+        "path": "reference/fp32/after-one-w-policy.f32",
+        "bytes": 4271940,
+        "sha256": "28caffd0d11e425a372e531f5123d83c75b94241914167ffa93ed30f6e876602"
+      },
+      {
+        "path": "reference/fp32/after-one-w-value.f32",
+        "bytes": 4,
+        "sha256": "46ee13466df9db06797d1674aed680769c3c1362c1283bf10aeb7173659b95bd"
+      },
+      {
+        "path": "reference/fp32/initial-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "fe736dbe41faa1eef3feb734006934a92241d912fe2a277a4be467cac9e55194"
+      },
+      {
+        "path": "reference/fp32/initial-b-value.f32",
+        "bytes": 4,
+        "sha256": "8f3629ebea8482801feef9c5815154679a36107f08cdfde744678e35e7c8cb65"
+      },
+      {
+        "path": "reference/fp32/mate-in-one-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "66b4d3ad2546085fdfbc2ebcf1105d4e2827fed9781b889ba4298e68e625e9d2"
+      },
+      {
+        "path": "reference/fp32/mate-in-one-b-value.f32",
+        "bytes": 4,
+        "sha256": "7ea33f0467017e2827347feff079e7ddcc4b916685a3b8d10794c08fd1edce43"
+      },
+      {
+        "path": "reference/fp32/material-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "bb3a640ddb48f7178af7fe407443ade0c76e774a38a63adb70079c0b1f7d16df"
+      },
+      {
+        "path": "reference/fp32/material-b-value.f32",
+        "bytes": 4,
+        "sha256": "646725b620a9c116f662612a021873cc88354ce79b4e1f30be2cc2e478b93c27"
+      },
+      {
+        "path": "reference/int8/after-one-w-policy.f32",
+        "bytes": 4271940,
+        "sha256": "c68e4351d8f79dd5c7eefeaaf43d7250ccf412765c8b1543118ef45d585dcb4f"
+      },
+      {
+        "path": "reference/int8/after-one-w-value.f32",
+        "bytes": 4,
+        "sha256": "5710db294a716bb4d3203c1e73a60e1c938931b96f1f8225db8ed52d110fb8c4"
+      },
+      {
+        "path": "reference/int8/initial-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "599d0c56bd643adefa9b6d7c6ec3686c7c39cd30a0d6c70ea423338b41b641a3"
+      },
+      {
+        "path": "reference/int8/initial-b-value.f32",
+        "bytes": 4,
+        "sha256": "d7a05c28350c3547acb90de51e7d5ace373aefa830ca05599ef63ee225e80cd3"
+      },
+      {
+        "path": "reference/int8/mate-in-one-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "e3af88c73b11b9b57718e7f30771b6fbd1aeeaff34bb87e54c7451861dff21a4"
+      },
+      {
+        "path": "reference/int8/mate-in-one-b-value.f32",
+        "bytes": 4,
+        "sha256": "5ec98029ac45a12e952661fc2060d37916f6239a5be63a0497ea916bf30758be"
+      },
+      {
+        "path": "reference/int8/material-b-policy.f32",
+        "bytes": 4271940,
+        "sha256": "dd9470ad150f886409894ca5a93371a2d897cea729e47e44516101d61937ba02"
+      },
+      {
+        "path": "reference/int8/material-b-value.f32",
+        "bytes": 4,
+        "sha256": "cfa9cd54596c63cf383c158c3e5e5bf6aa3788d858f032aa978e0e228fb56ead"
+      },
+      {
+        "path": "test.json",
+        "bytes": 379,
+        "sha256": "f34ed1cf8ed39e440b663a2ac083965e67cae1e3c83dff044230bc1a351d2498"
+      }
+    ],
+    "access_profile": "public-s-inference-v1"
+  },
+  "receipt": {
+    "dry_run": false,
+    "verified": false,
+    "release_sha256": "f0fc9f4813a59fdd4eb6fa7fce66c30098843ea4d0ac9aa43f619a8c953540e3",
+    "repo_id": "voxelshogi/voxelshogi-transformer-s",
+    "repo_type": "model",
+    "hub_commit": "6ab524574d36536348dbe323a2b779b9cebe37ed",
+    "metadata_only": true,
+    "previous_hub_commit": "ae9e9fc4327b79391d1e76c1066e19aa6e42a710",
+    "metadata_retry": 1,
+    "restored_original_fp32": true
+  }
+}

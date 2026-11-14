@@ -67,7 +67,7 @@ jobs:
           uv run --locked python -m export.generate runs/m3/ci
           uv run --locked python scripts/ci/prepare-m6-model.py
           node scripts/prepare-inference.mjs runs/m3/ci apps/web/public/models/m3 --local
-      - name: Prepare only the already published runtime for the public S shot
+      - name: Prepare the pinned installed runtime for the public S shot
         if: ${{ !inputs.verify_ui }}
         working-directory: .
         run: node scripts/prepare-public-runtime.mjs

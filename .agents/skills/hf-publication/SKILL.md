@@ -17,6 +17,7 @@ description: VoxelShogiのHF公開・取得条件の更新に使う。S推論用
 - アップロード成功だけで完了にしない。返されたHub commitへrevisionを固定し、Linux上で全ファイルのbytes・SHA-256とpublic/manual・Community OFF設定を確認する。検証済みreceiptを残してから外部作業データの整理・インスタンス終了を進める。
 - Model Cardは人間向けに簡潔にする。Sは[短いカード](../../../export/public-s-model-card.md)を原本とし、遊び方・学習元・形式別容量と教師一致率・棋力の制約・利用条件を優先する。詳細hash・構造・評価条件はmanifestと固定記録へリンクする。
 - 既存Sの取得設定と小さいCardだけの変更は[専用ハーネス](../../../training/public_s_release.py)を使う。Macでは既存重みをstage／取得せず、このメタデータだけを更新できる。親HF commitを固定し、別アカウント・private repo・変更済み親revisionを拒否する。その後、外部Linux／GitHub Actionsで匿名取得と全37ファイルのhashを検査するまで配布完了とはしない。
+- Pythonの変異検証後は既存bytecodeを再利用しない。新しい空の`PYTHONPYCACHEPREFIX`と`PYTHONDONTWRITEBYTECODE=1`で公開処理を実行する。S Cardは送信先がREADMEに固定されたadapterを通す。2026-11-14の誤配置は[記録](../../../docs/PUBLIC_S_ACCESS.md)を保持し、修正は自分の失敗receiptと全ファイルのmetadata照合に限る1回のハーネスから行う。旧固定版を改変・削除しない。
 - manual対象の取得ゲートを、別配布先やWebデモで迂回しない。Sは上記の明示承認に基づく直接HF取得とする。過去のM3配布・旧Sのmanual公開は履歴として保持する。
 
 ハーネスは送信先・ライセンス・ファイル一覧・hash・実行OS・Hub設定を検査する。生のAPIや別ツールを使った操作までOSレベルで禁止するものではないため、repo作成とアップロードの経路をこの手順へそろえる。ローカル純粋テストと既知変異は通常CIで実行し、実アップロードをCIのテストとして走らせない。

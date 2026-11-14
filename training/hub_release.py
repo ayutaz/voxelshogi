@@ -1,6 +1,7 @@
 """Explicit, hash-pinned Hub releases from external Linux hosts."""
 
 import argparse
+import base64
 import hashlib
 import json
 import platform
@@ -42,6 +43,63 @@ class PublicationApi:
             return True
         response.raise_for_status()
         return False
+
+    def commit_public_s_card(self, *, card, parent_commit, restore_fp32=None):
+        """Commit one small regular README explicitly; never stage model binaries."""
+        if not 0 < len(card) <= 8192 or not re.fullmatch(
+            r"[0-9a-f]{40}", parent_commit
+        ):
+            raise ValueError("bounded Card and immutable parent required")
+        records = [
+            {
+                "key": "header",
+                "value": {
+                    "summary": "Save concise public S Model Card",
+                    "description": "Metadata-only correction after readback mismatch",
+                    "parentCommit": parent_commit,
+                },
+            },
+            {
+                "key": "file",
+                "value": {
+                    "content": base64.b64encode(card).decode("ascii"),
+                    "path": "README.md",
+                    "encoding": "base64",
+                },
+            },
+        ]
+        if restore_fp32 is not None:
+            if (
+                set(restore_fp32) != {"bytes", "sha256"}
+                or restore_fp32["bytes"] != 20461391
+                or restore_fp32["sha256"]
+                != "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63"
+            ):
+                raise ValueError("only the original approved FP32 may be restored")
+            records.append(
+                {
+                    "key": "lfsFile",
+                    "value": {
+                        "path": "fp32.onnx",
+                        "algo": "sha256",
+                        "oid": restore_fp32["sha256"],
+                        "size": restore_fp32["bytes"],
+                    },
+                }
+            )
+        response = self.session.post(
+            self._url(PUBLIC_S_REPO, "model") + "/commit/main",
+            headers={**self.headers, "Content-Type": "application/x-ndjson"},
+            content=(
+                "\n".join(json.dumps(record) for record in records) + "\n"
+            ).encode(),
+            timeout=30,
+        )
+        response.raise_for_status()
+        commit = response.json()["commitOid"]
+        if not re.fullmatch(r"[0-9a-f]{40}", commit):
+            raise ValueError("invalid returned Card commit")
+        return commit
 
 
 def _canonical(value):

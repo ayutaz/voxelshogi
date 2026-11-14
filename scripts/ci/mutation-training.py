@@ -21,9 +21,9 @@ MUTATIONS = [
     ),
     (
         "public-s-card-only",
-        "training/public_s_release.py",
-        'path_in_repo="README.md",',
-        'path_in_repo="fp32.onnx",',
+        "training/hub_release.py",
+        '"path": "README.md",',
+        '"path": "fp32.onnx",',
         "test_public_s_release.py",
     ),
     (

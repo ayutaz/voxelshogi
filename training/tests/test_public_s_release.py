@@ -4,7 +4,12 @@ import hashlib
 import unittest
 from types import SimpleNamespace
 
-from training.public_s_release import ROOT, prepare_public_s_card, publish_public_s_card
+from training.public_s_release import (
+    ROOT,
+    prepare_public_s_card,
+    publish_public_s_card,
+    repair_public_s_card,
+)
 
 
 class Hub:
@@ -32,6 +37,14 @@ class Hub:
     def upload_file(self, **kwargs):
         self.calls.append(("upload", kwargs))
         return SimpleNamespace(oid="a" * 40)
+
+    def commit_public_s_card(self, *, card, parent_commit):
+        return self.upload_file(
+            repo_id="voxelshogi/voxelshogi-transformer-s",
+            path_in_repo="README.md",
+            parent_commit=parent_commit,
+            path_or_fileobj=card,
+        ).oid
 
 
 class PublicSReleaseTests(unittest.TestCase):
@@ -110,3 +123,131 @@ class PublicSReleaseTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 _policy({**plan, **change})
+
+    def repair_fixture(self):
+        api = Hub()
+        plan, receipt = publish_public_s_card(self.card, api, execute=True)
+        tree = [
+            SimpleNamespace(rfilename=f["path"], size=f["bytes"], blob_id="b" * 40)
+            for f in plan["files"]
+        ]
+        tree.append(
+            SimpleNamespace(rfilename=".gitattributes", size=50, blob_id="c" * 40)
+        )
+        api.repo_info = lambda **kwargs: SimpleNamespace(
+            private=False,
+            gated=False,
+            sha=kwargs.get("revision", receipt["hub_commit"]),
+            siblings=tree,
+        )
+        api.commit_public_s_card = lambda **kwargs: (
+            api.calls.append(("repair", kwargs)) or "d" * 40
+        )
+        api.calls.clear()
+        return api, {"plan": plan, "receipt": receipt}, tree
+
+    def test_one_readback_correction_only_uploads_card_against_our_unchanged_tree(self):
+        api, failed, _ = self.repair_fixture()
+        plan, receipt = repair_public_s_card(self.card, api, failed)
+        self.assertEqual(
+            api.calls,
+            [("repair", {"card": self.card.encode(), "parent_commit": "a" * 40})],
+        )
+        self.assertEqual(receipt["hub_commit"], "d" * 40)
+        self.assertIs(receipt["verified"], False)
+        with self.assertRaises(ValueError):
+            repair_public_s_card(self.card, api, {"plan": plan, "receipt": receipt})
+
+    def test_correction_rejects_changed_or_empty_tree(self):
+        for empty in [False, True]:
+            api, failed, tree = self.repair_fixture()
+            baseline = list(tree)
+            if empty:
+                tree.clear()
+            else:
+                tree[0] = SimpleNamespace(
+                    rfilename=tree[0].rfilename, size=tree[0].size, blob_id="e" * 40
+                )
+            api.repo_info = lambda **kwargs: SimpleNamespace(
+                private=False,
+                gated=False,
+                sha=kwargs.get("revision", "a" * 40),
+                siblings=baseline if "revision" in kwargs else tree,
+            )
+            with self.assertRaises(ValueError):
+                repair_public_s_card(self.card, api, failed)
+            self.assertEqual(api.calls, [])
+
+    def test_explicit_card_commit_has_one_regular_readme_and_an_immutable_parent(self):
+        import base64
+        import json
+
+        from training.hub_release import PublicationApi
+
+        posts = []
+        response = SimpleNamespace(
+            raise_for_status=lambda: None, json=lambda: {"commitOid": "d" * 40}
+        )
+        session = SimpleNamespace(
+            post=lambda *args, **kwargs: posts.append((args, kwargs)) or response
+        )
+        api = PublicationApi(None, session, {})
+        self.assertEqual(
+            api.commit_public_s_card(card=self.card.encode(), parent_commit="a" * 40),
+            "d" * 40,
+        )
+        args, kwargs = posts[0]
+        self.assertEqual(
+            args,
+            (
+                "https://huggingface.co/api/models/voxelshogi/voxelshogi-transformer-s/commit/main",
+            ),
+        )
+        records = [json.loads(line) for line in kwargs["content"].decode().splitlines()]
+        self.assertEqual(len(records), 2)
+        self.assertEqual(records[0]["value"]["parentCommit"], "a" * 40)
+        self.assertEqual(records[1]["key"], "file")
+        self.assertEqual(records[1]["value"]["path"], "README.md")
+        self.assertEqual(
+            base64.b64decode(records[1]["value"]["content"]), self.card.encode()
+        )
+
+    def test_correction_can_restore_only_the_exact_card_misplaced_at_fp32(self):
+        api, failed, tree = self.repair_fixture()
+        baseline = list(tree)
+        i = next(i for i, f in enumerate(tree) if f.rfilename == "fp32.onnx")
+        descriptor = next(
+            f for f in failed["plan"]["files"] if f["path"] == "fp32.onnx"
+        )
+        baseline[i] = SimpleNamespace(
+            rfilename="fp32.onnx",
+            size=descriptor["bytes"],
+            blob_id="b" * 40,
+            lfs=SimpleNamespace(sha256=descriptor["sha256"]),
+        )
+        tree[i] = SimpleNamespace(
+            rfilename="fp32.onnx",
+            size=len(self.card.encode()),
+            blob_id="e" * 40,
+            lfs=SimpleNamespace(sha256=hashlib.sha256(self.card.encode()).hexdigest()),
+        )
+        api.repo_info = lambda **kwargs: SimpleNamespace(
+            private=False,
+            gated=False,
+            sha=kwargs.get("revision", "a" * 40),
+            siblings=baseline if "revision" in kwargs else tree,
+        )
+        _, receipt = repair_public_s_card(self.card, api, failed)
+        self.assertIs(receipt["restored_original_fp32"], True)
+        self.assertEqual(
+            api.calls[-1][1]["restore_fp32"],
+            {
+                "bytes": 20461391,
+                "sha256": "8bd7bd91e38d7319f72b87495f63f0a86a85f3759d22913f787d963834b92e63",
+            },
+        )
+        tree[i].lfs.sha256 = "0" * 64
+        api.calls.clear()
+        with self.assertRaises(ValueError):
+            repair_public_s_card(self.card, api, failed)
+        self.assertEqual(api.calls, [])
