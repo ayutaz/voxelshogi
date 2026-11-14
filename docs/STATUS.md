@@ -1,13 +1,13 @@
 # 現在の状態と文書の案内
 
-**2026-11-14・UIモック承認と実装計画**：将棋経験者／AI・理系の人を対象とする[操作モック](design/ARENA_MOCKUP.md)はユーザー承認済み。[問題整理](design/SPECTATOR_UX_REVIEW.md)から、[U2〜U6の本番実装計画](design/ARENA_IMPLEMENTATION_PLAN.md)へ進む。
-盤中心の画面・観戦／人間対AI・自動保存を実装し、Linux検証へ進んでいる。[実装の進捗と未確認範囲](design/ARENA_IMPLEMENTATION_PROGRESS.md)。自動保存は新API→clientの順に導入し、専用D1へ追加migrationを先行適用済み。新UI・自動保存clientの公開、公開検証、動画更新は未完了。
+**2026-11-14・新しい観戦画面を公開**：将棋経験者／AI・理系の人を対象とする[承認モック](design/ARENA_MOCKUP.md)から、盤中心の観戦・「AIと対戦」の開始導線・常時自動保存を公開した。sourceは`dc0a95f`、PR #186→#187の順で通常merge。[公開53 E2E・カメラ3回・モデル6件・配信57ファイル・実D1の確認](ARENA_RELEASE_VALIDATION.md)が成功。Claude Codeの画像レビューで見つかった中1件も修正・再レビュー済み。
+公開版一致の15秒本編・3秒2案・ポスター／OGPと、実公開ブラウザ→D1の全2手・投了・本文／hash照合・検証行削除も完了した。[U2〜U6の進捗](design/ARENA_IMPLEMENTATION_PROGRESS.md)。ゲーム画面にAlpha／データ送信の常時表示・切替は置かない。実スマホの操作は未確認、X投稿は未送信。
 
 2026-11-14更新。**研究実行の停止を維持し、公開準備L1〜L6をPC対象の研究用Alphaとして完了。実スマホは未確認。**
 追加GPU・研究データ生成・学習・Mの公開は行わない。[公開準備の進捗](PUBLIC_LAUNCH_PROGRESS.md)を参照する。
 詳しい結果・固定HF版・未達項目は[停止時点の記録](RESEARCH_CHECKPOINT_20261112.md)を正とする。
 
-## 公開準備の計画（2026-11-13）
+## 旧UIの公開準備（2026-11-13〜14の履歴）
 
 [公開準備計画](PUBLIC_LAUNCH_PLAN.md)の各フェーズに目的・ゴール・完了条件を明記した。観戦の入口→着手追跡→狭幅と誤操作対策→同意制の棋譜保存→**L5デモ動画制作**→公開確認→X告知の順に進める提案。
 レビュー文書PR #177は必須8件・関連CI成功後にmain `6d1e2a9`へ通常merge済み。

@@ -1,6 +1,6 @@
 # デプロイ（Cloudflare Workers Static Assets）
 
-**2026-11-02 UTC更新**：[CIの変更範囲判定](CI_PERFORMANCE.md)により、文書だけのmain更新ではWebの再ビルド・デプロイを省略する。公開SHAは最後に検証・配信したアプリcommitで、文書のみ更新されたmain HEADと異なることがある。アプリに影響する変更は従来どおり同じrunの検証済み成果物で公開し、公開E2Eまで確認する。
+**2026-11-14更新**：[CIの変更範囲判定](CI_PERFORMANCE.md)により、文書だけのmain更新ではWebの再ビルド・デプロイを省略する。公開SHAは最後に検証・配信したアプリcommitで、文書のみ更新されたmain HEADと異なることがある。アプリに影響する変更は従来どおり同じrunの検証済み成果物で公開し、公開E2Eまで確認する。新UI `dc0a95f`の公開53 E2E・カメラ3回・モデル6件と配信57ファイルの照合は[公開確認](ARENA_RELEASE_VALIDATION.md)を参照。
 
 M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確認済み。隔離した旧成果物による復旧訓練も実施し、Chrome E2E 6件が成功した（[復旧元の版・手順・検証結果](M0_VALIDATION.md)）。本番rollback自体は実行していない。調査・計画・検証記録は [CI_CD_PLAN.md](CI_CD_PLAN.md) を参照。
 
@@ -8,7 +8,7 @@ M0-4 の自動公開・配信 SHA・公開 E2E・production Secrets 移行は確
 
 ## 構成
 
-- `apps/web/wrangler.jsonc`: Worker名`voxelshogi`。`dist/`はasset-firstで配信し、`/api/*`だけ同意制棋譜保存の受信Workerを先行させる。`GAMES`を専用D1へbindし、毎時の保持期限削除を行う。[保存・schema・停止と復旧](GAME_DATA_COLLECTION.md)。実際の配信状況は[公開準備の現在地](PUBLIC_LAUNCH_PROGRESS.md)を参照。
+- `apps/web/wrangler.jsonc`: Worker名`voxelshogi`。`dist/`はasset-firstで配信し、`/api/*`だけ棋譜保存の受信Workerを先行させる。`GAMES`を専用D1へbindし、毎時の保持期限削除を行う。現行は[常時自動保存schema 2](AUTOMATIC_GAME_STORAGE.md)、旧同意制schema 1は後方互換で保持する。[実際の配信状況](ARENA_RELEASE_VALIDATION.md)。
 - `apps/web/public/_headers`: `/assets/*` とモデル／runtimeのhash付きファイルはimmutable、`/build-info.json`・`/inference-build.json`・モデルindexはno-store、`/experiments/*` はno-cache。基本セキュリティヘッダーあり。COOP/COEPは未設定。
 - R0の比較実験: [研究記録](NINE_KINGS_EXPERIMENT.md)を保持する。比較室の公開画面・導線は撤去し、旧`/?experiment=1`も通常の観戦画面を開く。
 - 公開 URL: **https://voxelshogi.yousan-apps.workers.dev**（2026-10-25 に初回デプロイ。独自ドメインは後で検討。ユーザー決定）。

@@ -1,12 +1,12 @@
 # 公開デモと技術記事への案内
 
-2026-11-12。動く既存デモと技術検証を現段階の成果とし、追加学習は[一時停止](RESEARCH_CHECKPOINT_20261112.md)する。
+2026-11-14。動くSデモと技術検証を現段階の成果とし、追加学習は[一時停止](RESEARCH_CHECKPOINT_20261112.md)する。観戦画面と人間対AIの入口を再設計し、[公開版の検証](ARENA_RELEASE_VALIDATION.md)を更新した。
 本書は記事の材料と確認範囲の整理であり、記事の執筆・外部投稿・公開の実施記録ではない。
 
 ## 既存デモを試す
 
-1. [Arena](https://voxelshogi.yousan-apps.workers.dev)を開き、両AIをEasy／Normalにして観戦する。
-   停止・1手送り・速度変更、2D／3Dを使って盤面を追える。人間対AIも提供する。
+1. [Arena](https://voxelshogi.yousan-apps.workers.dev)を開き、「観戦を開始」を押す。モデル取得なしでNormal同士を眺められる。
+   停止・1手送り・速度変更、2D／3Dを使って盤面を追える。「AIと対戦」から先後と相手AIを選んで自分でも指せる。
 2. 学習済みSを試す場合は[HF](https://huggingface.co/voxelshogi/voxelshogi-transformer-s)で取得申請し、
    承認後に画面が指定する固定revisionのフォルダー全体を取得して読み込む。
    両AIでFP32／FP16重み／INT8重みとbackendを選べる。[取得手順・対応範囲](M6_PORTABLE.md)を確認する。
@@ -16,7 +16,7 @@
 Mの少量学習checkpointは研究保存物であり、Webで読み込む配布パッケージではない。
 HFのmanual gateは維持し、記事や別サイトへモデルを転載して取得申請を迂回しない。
 既存の実機検証は[M6完了記録](M6_COMPLETION.md)、今回未実施の確認は[停止時点](RESEARCH_CHECKPOINT_20261112.md)を参照する。
-今回の文書更新では公開E2E・現在の配信SHA・実スマートフォンの動作を新たに検証していない。
+新UIの公開SHA・公開53 E2E・カメラ3回・未学習モデル6件を確認した。実スマートフォンの操作は未確認である。
 
 ## 記事で説明できること
 

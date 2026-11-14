@@ -1,5 +1,7 @@
 # 公開準備L1〜L6の進捗
 
+**旧UIの固定記録**。後続の新UI・常時自動保存・動画の現在地は[新しい公開確認](ARENA_RELEASE_VALIDATION.md)を参照する。以下の同意UI・旧動画・sourceは当時の記録として保持する。
+
 2026-11-14 JST。ユーザーの「6まで進めてください」は、直近の[公開準備計画](PUBLIC_LAUNCH_PLAN.md)のL1〜L6を対象とする。
 研究比較・GPU・追加学習は停止したまま。X投稿（L7）は実行しない。
 計画PR [#178](https://github.com/ayutaz/voxelshogi/pull/178)は必須8件・関連CI成功、重大CodeQL指摘0を確認後、main `460c641`へ通常merge済み。
