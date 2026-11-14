@@ -29,6 +29,7 @@ for (const [width, height] of [[390, 844], [768, 1024], [1440, 900]]) {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).not.toHaveText(beforeStep!);
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
+    await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready','true');
     const path = info.outputPath(`attachments/launch-${width}.png`);
     await page.screenshot({ path, fullPage: true });
     await info.attach(`launch-${width}`, { path, contentType: 'image/png' });

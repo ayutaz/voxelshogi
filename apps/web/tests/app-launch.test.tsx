@@ -94,6 +94,7 @@ it('gives each square a readable location, side and selection state', () => {
   fake.snap.board[382] = 1; // 5七V, Black pawn (hand-calculated index)
   render(<App />);
   expect(screen.getByRole('button', { name: '5七V 先手 歩' }).getAttribute('aria-pressed')).toBe('false');
+  expect(screen.getByRole('button', { name: '5七V 先手 歩' }).getAttribute('tabindex')).toBe('-1');
   expect(screen.getByRole('button', { name: '5六V 空きマス' })).toBeTruthy();
 });
 

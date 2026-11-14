@@ -1,6 +1,16 @@
 import { test, expect } from './test';
 import { display, selectSetting, sliceAt } from './arena-controls';
 
+test('match setup traps focus, closes with Escape and returns focus without replacing the game', async ({ page }) => {
+  await page.goto('/');
+  const opener=page.getByRole('button',{name:'AIと対戦',exact:true});await opener.click();
+  const close=page.getByRole('button',{name:'閉じる',exact:true});await expect(close).toBeFocused();
+  await page.keyboard.press('Shift+Tab');await expect(page.getByRole('button',{name:'対戦をはじめる',exact:true})).toBeFocused();
+  await page.keyboard.press('Tab');await expect(close).toBeFocused();
+  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(opener).toBeFocused();
+  await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
+});
+
 for (const side of ['h-r','r-h']) for (const difficulty of ['easy','normal']) {
   test(`human entry starts ${side} against ${difficulty} and the real AI answers`, async ({ page }) => {
     await page.goto('/');

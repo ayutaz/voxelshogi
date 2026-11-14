@@ -64,6 +64,7 @@ export function Board2D({ snap, slice, selection, onSquare, interactive = true }
                   aria-label={`${displaySquare(index)} ${piece ? `${piece.color === 'b' ? '先手' : '後手'} ${piece.label}` : '空きマス'}${targets.has(index) ? ' 移動候補' : ''}`}
                   aria-pressed={selection.type === 'square' && selection.from === index}
                   aria-disabled={!interactive}
+                  tabIndex={interactive ? 0 : -1}
                   onClick={() => { if (interactive) onSquare(index); }}
                 >
                   {piece ? <span className="piece">{piece.label}</span> : null}

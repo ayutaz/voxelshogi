@@ -15,6 +15,9 @@ test('selects a real cross-layer board move with enough subsequent moves for the
   assert.equal(selectHook(moves), 3);
   assert.throws(() => selectHook(['575565', 'P*566', '575566']), /cross-layer/);
 });
+test('prefers a central real cross-layer move that can be read in the close-up', () => {
+  assert.equal(selectHook(['111222', '991891', '575566', '222111', '999888', '222111', '888999']), 3);
+});
 test('reads the actual recording frame rate and rejects missing or invalid timing', () => {
   assert.equal(parseFrameRate('25/1'), 25);
   assert.equal(parseFrameRate('30000/1001'), 30000 / 1001);

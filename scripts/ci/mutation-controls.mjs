@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'video-central-hook', file: 'scripts/demo-video.mjs', before: 'candidates.sort((a,b) => centrality(a.move) - centrality(b.move) || a.index - b.index);', after: '', test: 'demo-video' },
   { name: 'video-first-content-frame', file: 'scripts/demo-video.mjs', before: 'else if (green >= 3) return frame;', after: 'else if (green >= 3) return frame + 1;', test: 'demo-video' },
   { name: 'video-cross-layer-hook', file: 'scripts/demo-video.mjs', before: 'move[2] !== move[5]', after: 'move[2] === move[5]', test: 'demo-video' },
   { name: 'video-duration-proof', file: 'scripts/demo-video.mjs', before: 'Math.abs(Number(probe.format.duration) - seconds) <= 1 / 30', after: 'true', test: 'demo-video' },
