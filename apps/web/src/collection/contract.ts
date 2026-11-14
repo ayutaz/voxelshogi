@@ -13,11 +13,11 @@ export interface GameSubmission {
   record: { ruleset_id: 'voxelshogi-standard-v1'; initial: string; moves: string[]; result: unknown; termination: string | null };
 }
 type ObjectValue = Record<string, unknown>;
-function object(value: unknown): value is ObjectValue { return value !== null && typeof value === 'object' && !Array.isArray(value); }
-function keys(value: ObjectValue, expected: string): boolean { const names = expected.split(','); return Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name)); }
-function integer(value: unknown, min: number, max: number): value is number { return Number.isSafeInteger(value) && Number(value) >= min && Number(value) <= max; }
-const hex = (value: unknown, count: number) => typeof value === 'string' && new RegExp(`^[0-9a-f]{${count}}$`).test(value);
-function agent(value: unknown): value is CollectionAgent {
+export function object(value: unknown): value is ObjectValue { return value !== null && typeof value === 'object' && !Array.isArray(value); }
+export function keys(value: ObjectValue, expected: string): boolean { const names = expected.split(','); return Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name)); }
+export function integer(value: unknown, min: number, max: number): value is number { return Number.isSafeInteger(value) && Number(value) >= min && Number(value) <= max; }
+export const hex = (value: unknown, count: number) => typeof value === 'string' && new RegExp(`^[0-9a-f]{${count}}$`).test(value);
+export function agent(value: unknown): value is CollectionAgent {
   if (!object(value)) return false;
   if (value.kind === 'human') return keys(value, 'kind');
   if (value.kind === 'easy') return keys(value, 'kind,seed') && integer(value.seed, 0, 4294967295);
@@ -29,7 +29,7 @@ function agent(value: unknown): value is CollectionAgent {
     typeof value.license === 'string' && /^[A-Za-z0-9.-]{1,64}$/.test(value.license) &&
     ['fp32', 'fp16', 'int8'].includes(String(value.precision)) && ['wasm', 'webgpu'].includes(String(value.backend));
 }
-function result(value: unknown): boolean {
+export function result(value: unknown): boolean {
   if (value === null) return true;
   if (!object(value)) return false;
   if (keys(value, 'Win') && object(value.Win) && keys(value.Win, 'winner,reason')) return ['Black', 'White'].includes(String(value.Win.winner)) && ['Checkmate', 'Resignation', 'PerpetualCheck'].includes(String(value.Win.reason));

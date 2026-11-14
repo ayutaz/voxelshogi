@@ -1,4 +1,6 @@
 import { isGameSubmission, MAX_GAME_BYTES } from './contract';
+import { isAutomaticSubmission } from './automatic-contract';
+import { persistAutomatic } from './automatic-receiver';
 
 export interface GameStatement {
   bind: (...values: (string | number)[]) => GameStatement;
@@ -43,13 +45,17 @@ export async function receiveGame(request: Request, env: CollectionEnv): Promise
   let body: string, value: unknown;
   try { body = await boundedBody(request); value = JSON.parse(body); }
   catch (error) { return json({ error: error instanceof RangeError ? 'payload_too_large' : 'invalid_json' }, error instanceof RangeError ? 413 : 400); }
-  if (!isGameSubmission(value)) return json({ error: 'invalid_submission' }, 400);
+  if (!isGameSubmission(value) && !isAutomaticSubmission(value)) return json({ error: 'invalid_submission' }, 400);
   // Do not retain raw JSON properties hidden by duplicate keys during parsing.
   body = canonicalJson(value);
   const bytes = new TextEncoder().encode(body);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   const sha = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
   try {
+    if (value.schema === 2) {
+      const saved = await persistAutomatic(env.GAMES, value, body, sha, bytes.byteLength);
+      return json(saved.body, saved.status);
+    }
     const inserted = await env.GAMES.prepare('INSERT INTO games(request_id, payload_sha256, payload, payload_bytes) VALUES (?, ?, ?, ?) ON CONFLICT(request_id) DO NOTHING')
       .bind(value.requestId, sha, body, bytes.byteLength).run();
     if (!inserted.success) throw new Error('write failed');
@@ -61,10 +67,14 @@ export async function receiveGame(request: Request, env: CollectionEnv): Promise
   } catch (error) {
     // Return a stable code; never log the request, SQL bindings, IP, or exception.
     const quota = error instanceof Error && error.message.includes('collection_quota');
+    if (error instanceof Error && error.message.includes('collection_conflict')) return json({ error: 'snapshot_conflict' }, 409);
     return json({ error: quota ? 'collection_limit' : 'collection_unavailable' }, quota ? 429 : 503);
   }
 }
 
 export async function purgeGames(db: GameDatabase, nowSeconds = Math.floor(Date.now() / 1000)) {
-  return db.prepare('DELETE FROM games WHERE created_at < ?').bind(nowSeconds - 30 * 86400).run();
+  const cutoff = nowSeconds - 30 * 86400;
+  const legacy = await db.prepare('DELETE FROM games WHERE created_at < ?').bind(cutoff).run();
+  const automatic = await db.prepare('DELETE FROM automatic_games WHERE created_at < ?').bind(cutoff).run();
+  return { success: legacy.success && automatic.success, meta: {} };
 }
