@@ -1,6 +1,6 @@
 # 観戦UI再設計の公開確認
 
-**動画の目視判定を訂正（2026-11-14）**：後続の詳細確認で2D盤／速度スライダーの見切れと字幕の重なりを発見した。旧動画を投稿用完成版とする判定を撤回し、[修正と再確認](VIDEO_FRAMING_FIX.md)を進めている。以下のアプリ公開・D1保存の成功と、旧動画の形式／hash記録は保持する。
+**動画修正版を確認済み（2026-11-14）**：最新公開sourceは`d3822cbeded2bae7329ddd72b4984cf6e8970db0`。同sourceの最終MP4を再制作し、21画像の目視・境界・全編デコード・全30ファイルhashの検査で、見切れ・字幕の重なり・切替途中のCanvasがないことを確認した。[修正と最終納品先](VIDEO_FRAMING_FIX.md)。以下は初回UI公開`dc0a95f`のアプリ・D1保存・旧動画の固定記録。旧動画の目視合格は撤回済みで、投稿には修正版を使う。
 
 2026-11-14 JST。[U2〜U6](design/ARENA_IMPLEMENTATION_PLAN.md)の確認記録。
 実装PR [#187](https://github.com/ayutaz/voxelshogi/pull/187)は必須8件・関連CI成功、最新main・CodeQL重大0を確認して通常squash mergeした。

@@ -1,8 +1,8 @@
 # デモ動画制作計画：冒頭3秒で立体将棋を伝える
 
-**再制作中（2026-11-14の再確認）**：`dc0a95f`動画の見切れと字幕重なりが判明し、目視合格を撤回した。[修正・完了条件](VIDEO_FRAMING_FIX.md)。以下の完成記録は修正前の形式・hashの履歴として保持する。
+**修正版完成（2026-11-14）**：公開source `d3822cb`から再制作し、21画像の目視と境界・全編デコード・全hashを確認した。[修正と納品先](VIDEO_FRAMING_FIX.md)・[最終制作記録](experiments/video-framing-final-20261114.md)。以下の`dc0a95f`／`c878c6d`版は旧動画の履歴であり、投稿には新しい修正版を使う。
 
-**新UI版も完成**：[実装計画U6](design/ARENA_IMPLEMENTATION_PLAN.md#u6動画更新)の15秒本編・3秒2案・ポスター／OGPを公開source `dc0a95f`で制作した。[最終制作記録・hash・形式](experiments/arena-video-final-20261114.md)・[公開版一致と確認範囲](ARENA_RELEASE_VALIDATION.md)。以下のc878c6d版は旧UIの完成履歴として保持する。実スマホ再生・拡散数は未確認、X投稿は未送信。
+**初回の新UI動画（修正前）**：[実装計画U6](design/ARENA_IMPLEMENTATION_PLAN.md#u6動画更新)の15秒本編・3秒2案・ポスター／OGPを公開source `dc0a95f`で制作した。[旧制作記録・hash・形式](experiments/arena-video-final-20261114.md)は保持するが、後続確認で見切れを認め、目視合格は撤回した。実スマホ再生・拡散数は未確認、X投稿は未送信。
 
 2026-11-13 JST。[公開準備計画](PUBLIC_LAUNCH_PLAN.md)の**フェーズ5（L5）**。
 2026-11-14、[収録・編集スクリプト](../scripts/demo-video.mjs)をLinux CIで実行し、main `c878c6d`の最終版を生成した。
