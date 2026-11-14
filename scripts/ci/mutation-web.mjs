@@ -259,7 +259,7 @@ function main() {
   try {
     mkdirSync(copy, { recursive: true });
     assert.ok(existsSync(join(web, 'src/wasm/pkg/voxelshogi_wasm_bg.wasm')), 'Build WASM before running web mutations');
-    for (const path of ['src', 'tests', 'public', 'migrations', 'vite.config.ts', 'package.json']) cpSync(join(web, path), join(copy, path), { recursive: true });
+    for (const path of ['src', 'tests', 'public', 'migrations', 'vite.config.ts', 'playwright.config.ts', 'package.json']) cpSync(join(web, path), join(copy, path), { recursive: true });
     const fixtures = join(work, 'crates/voxelshogi-wasm/tests/fixtures');
     mkdirSync(fixtures, { recursive: true });
     cpSync(join(root, 'crates/voxelshogi-wasm/tests/fixtures/search.json'), join(fixtures, 'search.json'));
