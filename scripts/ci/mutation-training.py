@@ -3088,14 +3088,14 @@ MUTATIONS = [
     (
         "training-shard-policy-evidence",
         "scripts/ci/mutation-training.py",
-        "        shutil.copy2(evidence, destination)\n",
+        "        shutil.copy2(source, destination)\n",
         "        pass\n",
         "test_mutation_harness.py",
     ),
     (
         "training-shard-policy-evidence-bytes",
         "scripts/ci/mutation-training.py",
-        "        shutil.copy2(evidence, destination)\n",
+        "        shutil.copy2(source, destination)\n",
         '        destination.write_bytes(b"{}\\n")\n',
         "test_mutation_harness.py",
     ),
@@ -6269,6 +6269,14 @@ def classify_result(returncode, report, *, name):
     )
 
 
+def stage_metadata_evidence(work, evidence):
+    """Copy only the two reviewed records needed by budget and S publication tests."""
+    for source in (evidence, ROOT / "docs/experiments/m6-portable-release.json"):
+        destination = Path(work) / source.resolve().relative_to(ROOT.resolve())
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+
+
 def main(argv=None):
     import argparse
 
@@ -6302,9 +6310,7 @@ def main(argv=None):
         # Read the metadata-only policy to retain its actual reviewed path,
         # without copying all documentation into every mutation shard.
         evidence = runpy.run_path(str(ROOT / "training/research_budget.py"))["EVIDENCE"]
-        destination = work / evidence.relative_to(ROOT)
-        destination.parent.mkdir(parents=True)
-        shutil.copy2(evidence, destination)
+        stage_metadata_evidence(work, evidence)
         (work / "scripts/ci").mkdir(parents=True)
         shutil.copy2(Path(__file__), work / "scripts/ci/mutation-training.py")
         prepare_baseline_checkout(work)
@@ -6351,7 +6357,9 @@ def main(argv=None):
             if args.shards is not None
             else ()
         )
-        assert run("baseline", baseline_tests) == "passed"
+        assert run("baseline", baseline_tests) == "passed", (
+            output / "baseline.log"
+        ).read_text()[-6000:]
         for name, file, before, after, tests in selected:
             path = work / file
             original = path.read_text()

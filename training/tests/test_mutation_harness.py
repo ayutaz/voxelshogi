@@ -154,6 +154,9 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
     evidence_path = "docs/experiments/p53-budget-extension-2026-11-04.json"
     (root / "docs/experiments").mkdir(parents=True)
     (root / evidence_path).write_bytes(evidence)
+    inference_evidence = b'{"fixture":"public-s-release"}\n'
+    inference_path = "docs/experiments/m6-portable-release.json"
+    (root / inference_path).write_bytes(inference_evidence)
     source_root = Path(__file__).resolve().parents[2]
     (root / "training/research_budget.py").write_text(
         (source_root / "training/research_budget.py").read_text()
@@ -167,6 +170,7 @@ def test_shard_cli_executes_only_its_baseline_files_and_real_tiny_assertion_fail
         "assert Path('.github/workflows/vast-deadline.yml').read_text() == "
         f"{workflow!r}\n"
         f"assert Path({evidence_path!r}).is_file()\n"
+        f"assert Path({inference_path!r}).read_bytes() == {inference_evidence!r}\n"
         "import runpy\n"
         "policy=runpy.run_path('training/research_budget.py')\n"
         "assert policy['extension_record']()['evidence_sha256'] == "

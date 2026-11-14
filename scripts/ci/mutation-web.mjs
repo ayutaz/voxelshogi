@@ -30,7 +30,7 @@ const mutations = [
   { name: 'human-return-live', file: 'App.tsx', before: "if (mode !== 'r-r' && ply === snap.moveCount", after: "if (false && mode !== 'r-r' && ply === snap.moveCount", test: 'app-launch', extension: 'tsx' },
   { name: 'branch-confirm', file: 'App.tsx', before: "if (!window.confirm('この局面から", after: "if (false && !window.confirm('この局面から", test: 'app-launch', extension: 'tsx' },
   { name: 'human-selection-follow', file: 'App.tsx', before: 'if (!humanTurn) return;\n    setSlice(slice); setLayers(layers);', after: 'if (!humanTurn) return;\n    manualView();', test: 'app-launch', extension: 'tsx' },
-  { name: 'human-first-model-seat', file: 'App.tsx', before: "if (draftOpponent === 'model' && !library.choices[side])", after: 'if (false)', test: 'app-models', extension: 'tsx' },
+  { name: 'human-first-model-seat', file: 'App.tsx', before: "if (draftOpponent === 'model') {", after: 'if (false) {', test: 'app-models', extension: 'tsx' },
   { name: 'automatic-branch-prefix', file: 'collection/automatic-client.ts', before: 'if (candidate.record.moves.length <= g.minimumMoves) return;', after: '', test: 'automatic-client' },
   { name: 'automatic-metadata-recovery', file: 'collection/automatic-client.ts', before: 'if (this.disposed || attempt === 3) return;', after: 'if (true) return;', test: 'automatic-client' },
   { name: 'white-first-record-labels', file: 'components/Panels.tsx', before: "const initialSide = snap.ply % 2 === 0 ? snap.side : snap.side === 'b' ? 'w' : 'b';", after: "const initialSide = 'b';", test: 'panels-side', extension: 'tsx' },
