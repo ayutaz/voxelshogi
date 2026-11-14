@@ -1,5 +1,7 @@
 # 申請不要の学習済みS：公開確認
 
+本書はsource `7b364c9`時点の公開・動画の固定記録。後続のWeb SEと現在の公開確認は[SE検証記録](WEB_SOUND_VALIDATION.md)を参照する。モデルの固定版は維持している。
+
 2026-11-15 JST。**公開・最終動画・確認を完了。** 実装[#192](https://github.com/ayutaz/voxelshogi/pull/192)、検証修正[#193](https://github.com/ayutaz/voxelshogi/pull/193)、同一origin配信[#194](https://github.com/ayutaz/voxelshogi/pull/194)、隔離コピー修正[#195](https://github.com/ayutaz/voxelshogi/pull/195)を必須8件・関連CI成功後に通常mergeした。公開sourceは`7b364c9ad693c35d00ca8edf1c428f19658b8d04`。
 
 ## HFと実モデル
