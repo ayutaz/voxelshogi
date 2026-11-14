@@ -84,9 +84,9 @@ export function resultText(r: ResultInfo): string {
   return `${SIDE[r.winner]}の勝ち（${why}）`;
 }
 
-export function MoveList({ snap, onGoto }: { snap: Snapshot; onGoto: (ply: number) => void }) {
+export function MoveList({ snap, onGoto, testId = 'move-list' }: { snap: Snapshot; onGoto: (ply: number) => void; testId?: string }) {
   return (
-    <ol className="move-list" data-testid="move-list">
+    <ol className="move-list" data-testid={testId}>
       <li className={snap.ply === 0 ? 'current' : ''}>
         <button type="button" onClick={() => onGoto(0)}>
           開始局面

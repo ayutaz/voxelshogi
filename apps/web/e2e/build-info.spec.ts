@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from './test';
 
 test('serves the tested build commit', async ({ request }) => {
   const commit = process.env.E2E_COMMIT;

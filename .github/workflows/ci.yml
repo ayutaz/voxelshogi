@@ -555,7 +555,9 @@ jobs:
         if: needs.scope.outputs.deep == 'true' && needs.scope.outputs.web == 'true' && success()
         with:
           name: launch-layout-evidence
-          path: apps/web/test-results/launch-*/attachments/*.png
+          path: |
+            apps/web/test-results/launch-*/attachments/*.png
+            apps/web/test-results/redesign-*/attachments/*.png
           retention-days: 2
           if-no-files-found: error
       - name: Repeat search and camera regression without retries

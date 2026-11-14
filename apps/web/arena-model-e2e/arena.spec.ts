@@ -1,4 +1,6 @@
-import { test, expect, type BrowserContext, type Page } from '@playwright/test';
+import { closeSheet, display, openRecords, selectSetting, sliceAt } from '../e2e/arena-controls';
+import { test, expect } from '../e2e/test';
+import { type BrowserContext, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadWasm } from '../tests/loadWasm';
@@ -21,14 +23,18 @@ test.afterEach(async ({ page }, info) => {
 async function prepare(page: Page, context: BrowserContext, folder = 'model') {
   await context.route('**/models/m6/catalog.json', route => route.fulfill({ json: catalog }));
   await page.goto('/');
+  await page.getByRole('button', { name: 'モデル', exact: true }).click();
   await page.getByRole('button', { name: '学習済みモデルを読み込む', exact: true }).click();
   await page.getByTestId('model-folder').setInputFiles(resolve(fixture, folder));
   await expect(page.getByText(/フォルダーを追加しました/)).toBeVisible();
   for (const side of ['b', 'w']) await page.getByTestId(`difficulty-${side}`).selectOption('model');
+  await closeSheet(page);
 }
 async function saved(page: Page) {
   const downloading = page.waitForEvent('download');
+  await openRecords(page);
   await page.getByTestId('export-ai-record').click();
+  await closeSheet(page);
   const download = await downloading;
   const json = Buffer.concat(await (await download.createReadStream()).toArray()).toString('utf8');
   return JSON.parse(json) as { applicationCommit: string; record: { moves: string[] }; viewCursor: number; observationsThroughCursor: AiObservation[];
@@ -41,8 +47,8 @@ for (const [black, white] of [['fp32', 'fp16'], ['fp16', 'int8'], ['int8', 'fp32
     page.on('pageerror', error => errors.push(error.message));
     context.on('request', request => { if (request.url().includes('/models/m3/models/')) modelDownloads.push(request.url()); });
     await prepare(page, context);
-    await page.getByTestId('precision-b').selectOption(black);
-    await page.getByTestId('precision-w').selectOption(white);
+    await selectSetting(page, 'precision-b', black);
+    await selectSetting(page, 'precision-w', white);
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 60_000 });
     await page.getByTestId('ai-step').click();
@@ -91,7 +97,7 @@ for (const [black, white] of [['fp32', 'fp16'], ['fp16', 'int8'], ['int8', 'fp32
 test('model preparation keeps 3D controls responsive and cancellation prevents a late move', async ({ page, context }) => {
   await installInteractionProbe(page);
   await prepare(page, context);
-  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+  await display(page, 'both');
   await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
   // Hold first module loading, not an inference reply: this measures preparation
   // responsiveness/cancellation, never simultaneous kernel/GPU performance.
@@ -101,7 +107,7 @@ test('model preparation keeps 3D controls responsive and cancellation prevents a
   const pattern = '**/assets/policy.worker-*.js';
   await context.route(pattern, async route => { reached(); await gate; await route.continue().catch(() => {}); });
   await page.getByTestId('ai-step').click(); await arrival;
-  await page.getByTestId('slice-index').fill('5');
+  await sliceAt(page, '5');
   await expect(page.getByTestId('slice-index')).toHaveValue('5');
   await page.getByTestId('move-delay').fill('100');
   await expect(page.getByTestId('ai-phase')).toHaveText(/モデル準備・思考中/);
@@ -114,9 +120,9 @@ test('model preparation keeps 3D controls responsive and cancellation prevents a
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
   expect((await readInteractionProbe(page)).camera).toMatchObject({ pending: true, trusted: true });
   release(); await context.unroute(pattern);
-  await page.getByRole('button', { name: '2D', exact: true }).click();
+  await display(page, '2d');
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-  await page.getByTestId('precision-b').selectOption('int8');
+  await selectSetting(page, 'precision-b', 'int8');
   await page.getByTestId('ai-step').click();
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 60_000 });
 });
@@ -135,12 +141,12 @@ test('an unavailable GPU is explicit and the chosen WASM model can play human ve
     await route.fulfill({ status: 200, contentType: 'text/javascript', body: 'Object.defineProperty(navigator,"gpu",{value:undefined});\n' + await response.text() });
   });
   await prepare(page, context);
-  await page.getByTestId('backend-b').selectOption('webgpu');
+  await selectSetting(page, 'backend-b', 'webgpu');
   await page.getByTestId('ai-step').click();
   await expect(page.getByTestId('ai-error')).toContainText('WebGPU is not available', { timeout: 60_000 });
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-  await page.getByTestId('backend-b').selectOption('wasm');
-  await page.getByTestId('mode').selectOption('r-h');
+  await selectSetting(page, 'backend-b', 'wasm');
+  await selectSetting(page, 'mode', 'r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 60_000 });
   await expect(page.getByTestId('ai-phase')).toHaveText('人間の手番');
   await expect(page.getByTestId('ai-step')).toBeDisabled();

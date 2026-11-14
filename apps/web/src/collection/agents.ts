@@ -1,7 +1,7 @@
 import type { ArenaOptions } from '../ai/arena-controller';
 import type { CollectionAgent } from './contract';
 
-/** Selected settings at submission, not a claim about every earlier move. */
+/** Normalizes settings; the automatic collector freezes these at the first real move. */
 export function collectionAgents(options: ArenaOptions): { b: CollectionAgent; w: CollectionAgent } {
   const agent = (side: 'b' | 'w'): CollectionAgent => {
     if ((side === 'b' && options.mode === 'h-r') || (side === 'w' && options.mode === 'r-h')) return { kind: 'human' };

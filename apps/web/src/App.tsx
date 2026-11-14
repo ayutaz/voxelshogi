@@ -3,7 +3,7 @@ import { Board2D } from './components/Board2D';
 import { Hands, MoveList, PromotionDialog, resultText } from './components/Panels';
 import type { LayerView } from './renderer/Board3D';
 import { clickHand, clickSquare, NO_SELECTION, type ClickResult, type Selection } from './game/interaction';
-import { coordsOf, formatMove, type Color, type HandKind, type Slice } from './game/model';
+import { coordsOf, formatMove, parseMove, type Color, type HandKind, type Slice } from './game/model';
 import { followView, layerTargets } from './game/spectator';
 import { GameStore, MAX_IMPORT_BYTES } from './game/store';
 import { ArenaController, DEFAULT_AI_OPTIONS, type AiStatus, type ArenaDifficulty } from './ai/arena-controller';
@@ -11,7 +11,9 @@ import { addModel, chooseModel, modelSeat, removeModel, type LoadedModel, type M
 import { arenaConditions } from './ai/arena-record';
 import { ARENA_LINKS } from './navigation';
 import { fp16WeightOnly } from './inference/manifest';
-import { GameCollectionPanel } from './collection/GameCollectionPanel';
+import { BoardFrame } from './components/BoardFrame';
+import { Sheet } from './components/Sheet';
+import { AutomaticCollection } from './collection/automatic-client';
 import { collectionAgents } from './collection/agents';
 
 const Board3D = lazy(() => import('./renderer/Board3D').then((module) => ({ default: module.Board3D })));
@@ -37,19 +39,21 @@ export function App() {
   const [difficulty, setDifficulty] = useState<Record<Color, ArenaDifficulty>>({ b: 'normal', w: 'normal' });
   const [library, setLibrary] = useState<ModelLibrary>({ entries: [], choices: {} });
   const [showModels, setShowModels] = useState(false);
-  const [collectionSession, setCollectionSession] = useState(0);
-  const [importedRecord, setImportedRecord] = useState(false);
   const ownedRecord = useRef(true);
+  const collection = useRef<AutomaticCollection | null>(null);
   const sourceSequence = useRef(0);
   const [budgetMs, setBudgetMs] = useState(1000);
   const [aiStatus, setAiStatus] = useState<AiStatus>({ phase: 'paused', error: null, last: null });
   const [delay, setDelay] = useState(400);
-  const [view, setView] = useState<'3d' | '2d' | 'both'>('2d');
+  const [view, setView] = useState<'3d' | '2d' | 'both'>('both');
   const [rawSlice, setSlice] = useState<Slice>({ axis: 'z', index: 4 });
-  const [rawLayers, setLayers] = useState<LayerView>({ mode: 'focus', z: 4, dim: 0.18 });
+  const [rawLayers, setLayers] = useState<LayerView>({ mode: 'focus', z: 4, dim: 0.4 });
   const [follow, setFollow] = useState(true);
   const [trail, setTrail] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(() => typeof matchMedia !== 'function' || !matchMedia('(max-width: 1100px)').matches);
+  const [sheet, setSheet] = useState<'match' | 'settings' | 'record' | 'display' | 'models' | 'research' | null>(null);
+  const [matchKind, setMatchKind] = useState<'watch' | 'human'>('human');
+  const [draftMode, setDraftMode] = useState<Mode>('h-r');
+  const [draftOpponent, setDraftOpponent] = useState<ArenaDifficulty>('normal');
   const { slice, layers } = followView(snap.lastMove, follow && selection.type === 'none', rawSlice, rawLayers);
   const targetCounts = layerTargets(selection.type === 'none' ? [] : selection.targets.keys());
   const manualView = () => { setSlice(slice); setLayers(layers); setFollow(false); };
@@ -58,11 +62,28 @@ export function App() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const controller: Controller = MODES[mode][snap.side];
-  const humanTurn = controller === 'human' && !snap.finished;
+  const humanTurn = controller === 'human' && !snap.finished && snap.ply === snap.moveCount;
   const stepBusy = aiStatus.phase === 'thinking' || aiStatus.phase === 'waiting';
   const aiOptions = useMemo(() => ({ ...DEFAULT_AI_OPTIONS, mode, running, delayMs: delay,
     bDifficulty: difficulty.b, wDifficulty: difficulty.w, bModel: modelSeat(library, 'b'), wModel: modelSeat(library, 'w'),
     limits: { ...DEFAULT_AI_OPTIONS.limits, maxTimeMs: budgetMs } }), [mode, running, delay, difficulty, budgetMs, library]);
+  const currentOptions = useRef(aiOptions);
+  useEffect(() => { currentOptions.current = aiOptions; }, [aiOptions]);
+  useEffect(() => {
+    const instance = new AutomaticCollection(); collection.current = instance;
+    const capture = () => {
+      try {
+        if (!ownedRecord.current) throw new Error('imported record');
+        const options = currentOptions.current;
+        instance.observe(store.exportRecord(), { mode: options.mode, selectedAgents: collectionAgents(options) });
+      } catch { /* Saving never interrupts the game. */ }
+    };
+    const unsubscribe = store.subscribe(capture); capture();
+    const flush = () => instance.flush();
+    const visibility = () => { if (document.visibilityState === 'hidden') flush(); };
+    window.addEventListener('pagehide', flush); document.addEventListener('visibilitychange', visibility);
+    return () => { unsubscribe(); window.removeEventListener('pagehide', flush); document.removeEventListener('visibilitychange', visibility); instance.dispose(); collection.current = null; };
+  }, [store]);
 
   useEffect(() => {
     const ai = new ArenaController(store);
@@ -90,16 +111,21 @@ export function App() {
     setRunning(false);
     setSelection(NO_SELECTION);
     setPromotion(null);
+    collection.current?.flush();
   };
   const loadedModel = (packet: Omit<LoadedModel, 'sourceId'>) => {
     const next = addModel(library, { ...packet, sourceId: `local-${++sourceSequence.current}` });
+    if (snap.moveCount > 0 && (difficulty.b === 'model' || difficulty.w === 'model') && !reset()) return;
     pause(); setLibrary(next);
   };
   const choose = (side: Color, choice: ModelChoice) => {
     const next = chooseModel(library, side, choice);
+    if (snap.moveCount > 0 && difficulty[side] === 'model' && !reset()) return;
     pause(); setLibrary(next);
   };
   const selectDifficulty = (side: Color, value: ArenaDifficulty) => {
+    if (value === difficulty[side]) return;
+    if (snap.moveCount > 0 && !reset()) return;
     pause();
     if (value === 'model' && !library.choices[side]) {
       const first = library.entries[0];
@@ -127,18 +153,20 @@ export function App() {
 
   const allowReplacement = () => snap.moveCount === 0 || window.confirm('現在の対局を置き換えます。必要なら先に棋譜を保存してください。続けますか？');
   const reset = (m: Mode = mode) => {
-    if (!allowReplacement()) return;
+    if (!allowReplacement()) return false;
     pause();
     setFollow(true); setSlice({ axis: 'z', index: 4 }); setLayers({ ...rawLayers, z: 4 });
+    if (m !== 'r-r') setView('2d');
     aiRef.current?.journal.clear();
+    collection.current?.begin(true);
     ownedRecord.current = true;
     store.newGame();
-    setCollectionSession(value => value + 1); setImportedRecord(false);
     setMode(m);
     setRunning(m !== 'r-r');
     setSelection(NO_SELECTION);
     setPromotion(null);
     setMessage(null);
+    return true;
   };
 
   const downloadRecord = (text: string, suffix = '') => {
@@ -155,6 +183,7 @@ export function App() {
     // Freeze game and observations before the asynchronous build-info request.
     const recordJson = store.exportRecord(), current = store.snapshot();
     const selectedAgents = arenaConditions(aiOptions);
+    const automaticGameId = ownedRecord.current ? collection.current?.gameId : null;
     const snapshot = { schema: 1, kind: 'voxelshogi-arena-record', record: JSON.parse(recordJson) as unknown,
       viewCursor: current.ply, positionHash: current.hash, observationsThroughCursor: aiRef.current?.journal.snapshot(recordJson, current.ply) ?? [] };
     try {
@@ -162,7 +191,8 @@ export function App() {
       if (!response.ok) throw new Error('実装バージョンを取得できません');
       const build = await response.json() as { commit?: unknown };
       if (typeof build.commit !== 'string' || !/^[0-9a-f]{40}$/.test(build.commit)) throw new Error('実装バージョンが不正です');
-      downloadRecord(JSON.stringify({ ...snapshot, selectedAgents, applicationCommit: build.commit }, null, 2), '-with-ai');
+      downloadRecord(JSON.stringify({ ...snapshot, selectedAgents, applicationCommit: build.commit,
+        automaticGameId }, null, 2), '-with-ai');
     } catch (error) { setMessage(`保存できません: ${String(error)}`); }
   };
   const importRecord = async (file: File) => {
@@ -185,8 +215,8 @@ export function App() {
       const r = store.importRecord(text);
       if (!r.ok) ownedRecord.current = previousOwnership;
       if (r.ok) {
+        collection.current?.begin(false);
         aiRef.current?.journal.clear();
-        setCollectionSession(value => value + 1); setImportedRecord(true);
       }
       setMessage(r.ok ? '棋譜を読み込みました' : `読み込めません: ${r.error}`);
     } catch (error) {
@@ -204,52 +234,93 @@ export function App() {
 
   const sideHands = (c: Color) => <Hands snap={snap} color={c} selection={selection} onHand={onHand} />;
 
-  return (
-    <div className="app">
-      <header>
-        <h1>VoxelShogi Arena</h1>
-        <span className="subtitle">9×9×9 三次元将棋</span>
-        {ARENA_LINKS.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}
-        <span className="status" data-testid="status">
-          {status}
-        </span>
-      </header>
+  const openMatch = (kind: 'watch' | 'human') => {
+    setMatchKind(kind); setDraftMode(mode === 'r-r' ? 'h-r' : mode);
+    setDraftOpponent(difficulty[mode === 'r-h' ? 'b' : 'w']); setSheet('match');
+  };
+  const startMatch = () => {
+    const nextMode = matchKind === 'watch' ? 'r-r' : draftMode;
+    if (!reset(nextMode)) return;
+    if (nextMode !== 'r-r') setDifficulty(previous => ({ ...previous, [nextMode === 'h-r' ? 'w' : 'b']: draftOpponent }));
+    setView(nextMode === 'r-r' ? 'both' : '2d'); setRunning(true); setSheet(null);
+  };
+  const goto = (ply: number) => { pause(); store.goto(ply); };
+  const branchGame = () => {
+    pause();
+    try {
+      const source = JSON.parse(store.exportRecord());
+      collection.current?.begin(ownedRecord.current);
+      const result = store.importRecord(JSON.stringify({ ...source, moves: source.moves.slice(0,snap.ply), result: null, termination: null }));
+      if (!result.ok) { setMessage(`分岐できません: ${result.error}`); return false; }
+      aiRef.current?.journal.clear();
+      setRunning(mode !== 'r-r'); return true;
+    } catch { setMessage('棋譜を分岐できません'); return false; }
+  };
+  const stepOnce = () => {
+    if (stepBusy) return;
+    if (snap.ply < snap.moveCount && !branchGame()) return;
+    aiRef.current?.step();
+  };
+  const previousMove = snap.lastMove ? parseMove(snap.lastMove) : null;
+  const seatName = (side: Color) => MODES[mode][side] === 'human' ? 'あなた' : difficulty[side] === 'easy' ? 'Easy · ランダム' : difficulty[side] === 'normal' ? 'Normal · 探索' : modelSeat(library, side)?.selection.modelId ?? '学習済みS';
+  const terminalResult = snap.terminalResult ?? snap.result;
+  const terminalFinished = snap.terminalFinished ?? snap.finished;
 
-      <aside className="panel left">
-        <details open={settingsOpen} onToggle={event => setSettingsOpen(event.currentTarget.open)}><summary>対局・AI設定</summary>
-        <section>
-          <h2>対局</h2>
-          <label>
-            モード
-            <select value={mode} onChange={(e) => reset(e.target.value as Mode)} data-testid="mode">
-              {Object.entries(MODES).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v.label}
-                </option>
-              ))}
-            </select>
-          </label>
+  return <div className="app arena-app">
+    <header className="masthead"><h1>VoxelShogi <span>9×9×9</span></h1>
+      <nav aria-label="メニュー"><button type="button" onClick={() => setSheet('models')}>モデル</button><button type="button" onClick={() => setSheet('record')}>棋譜</button><button type="button" onClick={() => setSheet('settings')}>対局設定</button></nav>
+    </header>
+    <nav className="entry-tabs" aria-label="遊び方"><button type="button" aria-pressed={mode === 'r-r'} onClick={() => { if (mode !== 'r-r') openMatch('watch'); }}>AIを観戦</button><button type="button" aria-pressed={mode !== 'r-r'} onClick={() => openMatch('human')}>AIと対戦</button></nav>
+    <section className="intro" aria-label="このデモについて"><div><h2>次の一手は、別の層へ。</h2><p>9層の将棋。相手の玉を詰ませると勝ちです。</p></div>
+      <div className="seats" aria-label="対戦するAIとプレイヤー">{(['b','w'] as const).map(side => <button type="button" className={`seat seat-${side}`} key={side} onClick={() => setSheet('research')}><b>{side === 'b' ? '☗先手' : '☖後手'}</b><span>{seatName(side)}</span></button>)}</div>
+    </section>
+    <main className="arena-main">
+      <section className="arena-board" aria-label="盤と観戦操作">
+        <div className="stage-heading"><div className="view-switch" role="group" aria-label="盤面の表示"><button type="button" aria-pressed={view !== '2d'} onClick={() => setView('both')}>立体で眺める</button><button type="button" aria-pressed={view === '2d'} onClick={() => setView('2d')}>断面を読む</button><button type="button" className="ghost" onClick={() => setSheet('display')}>表示設定</button></div><label className="mobile-layer"><span className="sr-only">層</span><select aria-label="表示する層" value={layers.z} onChange={e => { const z=Number(e.target.value); manualView(); setSlice({ axis: 'z', index:z }); setLayers({ ...layers,z }); }}>{ROMAN.map((label,z) => <option key={label} value={z}>{label}層</option>)}</select></label></div>
+        <div className="move-banner"><p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p><span className="status" data-testid="status" role="status">{status}</span><p data-testid="ai-phase">{phaseText}</p></div>
+        {message && <div className="message" role="alert">{message}</div>}
+        {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button><button type="button" onClick={() => openMatch(mode === 'r-r' ? 'watch' : 'human')}>別のAIで新規対局</button></div>}
+        <div className={`views views-${view}`}>
+          {view !== '2d' && <BoardFrame on2D={() => setView('2d')}><Suspense fallback={<p className="board3d-loading">3D盤面を読み込み中…<button type="button" onClick={() => setView('2d')}>2Dで続ける</button></p>}><Board3D snap={snap} selection={selection} view={layers} showTrail={trail} onSquare={onSquare} /></Suspense></BoardFrame>}
+          {view !== '3d' && <div className="slice-board">{sideHands('w')}<Board2D snap={snap} slice={slice} selection={selection} interactive={humanTurn} onSquare={onSquare} />{sideHands('b')}</div>}
+        </div>
+        <div className="layer-rail" style={{ gridRow: 4 }} role="group" aria-label="注目する層">{ROMAN.map((label,z) => {
+          const from = previousMove?.from !== null && previousMove?.from !== undefined && coordsOf(previousMove.from).z === z;
+          const to = previousMove !== null && coordsOf(previousMove.to).z === z;
+          return <button key={z} type="button" aria-label={`${label}層を見る${from ? '、移動元' : ''}${to ? '、移動先' : ''}`} aria-pressed={layers.z === z} className={`${from ? 'layer-from' : ''} ${to ? 'layer-to' : ''}`} onClick={() => { manualView(); setSlice({ axis: 'z', index: z }); setLayers({ ...layers, z }); }}><span>{label}</span><small>{to ? '着地' : from ? '元' : targetCounts[z] ? `${targetCounts[z]}候補` : '層'}</small></button>;
+        })}</div>
+        <div className="mobile-layer-labels" style={{ gridRow: 4 }} aria-label="9層の位置">{ROMAN.map((label,z) => <span key={label} className={layers.z===z ? 'selected' : ''}>{label}</span>)}</div>
+        <section className="watch playback" aria-label="観戦操作">
           <div className="row">
-            <button type="button" onClick={() => reset()}>
-              新規対局
-            </button>
-            <button type="button" onClick={() => { pause(); store.resign(); }} disabled={!humanTurn}>
-              投了
-            </button>
+            <button type="button" data-testid="undo" onClick={() => goto(Math.max(0,snap.ply-1))} disabled={snap.ply === 0}>◀ 1手戻る</button>
+            <button type="button" onClick={() => { if (running) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); if (!terminalFinished) setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>{running ? '一時停止' : snap.ply < snap.moveCount ? terminalFinished ? '終局位置へ' : '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}</button>
+            <button type="button" data-testid="ai-step" disabled={running || snap.finished || humanTurn || !!aiStatus.error} aria-disabled={stepBusy} onClick={stepOnce}>{snap.ply < snap.moveCount ? 'ここからAIで分岐' : '1手指す'}</button>
+            <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'} onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
+            <button type="button" data-testid="redo" onClick={() => goto(Math.min(snap.moveCount,snap.ply+1))} disabled={snap.ply === snap.moveCount}>1手進む ▶</button>
           </div>
-          <div className="row">
-            <button type="button" onClick={() => { pause(); store.undo(); }} disabled={snap.ply === 0} data-testid="undo">
-              ◀ 1手戻る
-            </button>
-            <button type="button" onClick={() => { pause(); store.redo(); }} disabled={snap.ply === snap.moveCount} data-testid="redo">
-              1手進む ▶
-            </button>
-          </div>
+          <div className="row playback-options"><label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} /> {follow ? '直前手の層を追う' : '手動表示・追従OFF'}</label><label>着手間の待ち時間 {delay}ms（思考時間は別）<input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={e => setDelay(Number(e.target.value))} /></label></div>
+          <p className="muted follow-explanation">{follow ? '着手先の層へ自動で切り替えます。' : '手動表示中。追従をONにすると着手先へ戻ります。'}</p>
+          {snap.ply < snap.moveCount && <p className="history-position">履歴 {snap.ply} / {snap.moveCount}手{terminalFinished && <span> · {terminalResult ? resultText(terminalResult) : '中断した対局'}</span>}<button type="button" onClick={() => goto(snap.moveCount)}>末尾へ戻る</button>{mode !== 'r-r' && <button type="button" onClick={branchGame}>この局面から対戦を分岐</button>}</p>}
+        </section>
+        {terminalFinished && snap.ply === snap.moveCount && <section className="game-result" aria-label="対局結果"><h2>{terminalResult ? resultText(terminalResult) : '対局中断'}</h2><div className="row"><button type="button" onClick={() => reset()}>同じ設定でもう一局</button><button type="button" onClick={() => goto(0)}>最初から振り返る</button><button type="button" onClick={exportRecord}>棋譜を保存</button></div></section>}
+      </section>
+      <aside className="match-detail" aria-label="局面の詳細"><h2>棋譜をたどる</h2><MoveList snap={snap} onGoto={goto} /><button type="button" onClick={() => setSheet('research')}>AIの詳細を見る</button><button type="button" onClick={() => setSheet('record')}>棋譜を保存・読み込み</button></aside>
+    </main>
+    <Sheet title={sheet === 'match' ? matchKind === 'human' ? 'AIと対戦' : 'AIを観戦' : sheet === 'display' ? '表示・操作の設定' : sheet === 'record' ? '棋譜' : sheet === 'models' ? 'モデル・研究' : sheet === 'research' ? 'AIの詳細' : '対局・AI設定'} open={sheet !== null} onClose={() => setSheet(null)}>
+      <section hidden={sheet !== 'match'}>
+        {matchKind === 'human' && <><label>あなたの先後<select value={draftMode} onChange={e => setDraftMode(e.target.value as Mode)}><option value="h-r">先手（最初に指す）</option><option value="r-h">後手（AIが先に指す）</option></select></label><label>相手のAI<select value={draftOpponent} onChange={e => setDraftOpponent(e.target.value as ArenaDifficulty)}><option value="easy">Easy（ランダム）</option><option value="normal">Normal（探索）</option><option value="model" disabled={!library.entries.length}>学習済みS</option></select></label></>}
+        {matchKind === 'watch' && <p>現在の先後AI設定で、新しい観戦を始めます。</p>}
+        <button type="button" className="primary" onClick={startMatch}>{matchKind === 'human' ? '対戦をはじめる' : '観戦をはじめる'}</button>
+      </section>
+      <section className="panel left" hidden={sheet !== 'settings' && sheet !== 'models'}>
+        <label>モード<select value={mode} onChange={e => reset(e.target.value as Mode)} data-testid="mode">{Object.entries(MODES).map(([key,value]) => <option key={key} value={key}>{value.label}</option>)}</select></label>
+        <div className="row"><button type="button" onClick={() => reset()}>新規対局</button><button type="button" onClick={() => { pause(); store.resign(); }} disabled={!humanTurn}>投了</button></div>
           <button type="button" onClick={() => setShowModels(!showModels)}>{showModels ? 'モデル読み込みを閉じる' : '学習済みモデルを読み込む'}</button>
           {showModels && <Suspense fallback={<p>読み込み中…</p>}><ModelLibraryPanel onLoaded={loadedModel} /></Suspense>}
           {library.entries.map(entry => <p className="muted model-source" key={entry.sourceId}>
             {entry.release.id}<br />SHA-256: {entry.release.manifest.sha256}<br />
             <button type="button" aria-label="モデルを外す" onClick={() => {
+              if (snap.moveCount > 0 && ((library.choices.b?.sourceId === entry.sourceId && difficulty.b === 'model') || (library.choices.w?.sourceId === entry.sourceId && difficulty.w === 'model')) && !reset()) return;
               pause();
               setDifficulty({ b: difficulty.b === 'model' && library.choices.b?.sourceId === entry.sourceId ? 'normal' : difficulty.b, w: difficulty.w === 'model' && library.choices.w?.sourceId === entry.sourceId ? 'normal' : difficulty.w });
               setLibrary(removeModel(library, entry.sourceId));
@@ -279,15 +350,15 @@ export function App() {
           </fieldset>}
           </div>)}
           <label>Normalの思考上限
-            <select value={budgetMs} data-testid="thinking-budget" onChange={(e) => { pause(); setBudgetMs(Number(e.target.value)); }}>
+            <select value={budgetMs} data-testid="thinking-budget" onChange={(e) => { if (snap.moveCount > 0 && !reset()) return; pause(); setBudgetMs(Number(e.target.value)); }}>
               <option value={100}>0.1秒</option><option value={1000}>約1秒</option><option value={3000}>約3秒</option>
             </select>
           </label>
           <p className="muted">Normalは最大6手先・50,000ノード。<a href="/build-info.json" target="_blank" rel="noreferrer">実装バージョン</a></p>
 
-        </section>
-        <section>
-          <h2>棋譜</h2>
+      </section>
+      <section hidden={sheet !== 'record'}>
+          <MoveList snap={snap} testId="record-move-list" onGoto={ply => { goto(ply); setSheet(null); }} />
           <p className="muted">「保存」は端末へのJSONダウンロードです。</p>
           <div className="row">
             <button type="button" onClick={exportRecord}>
@@ -310,85 +381,9 @@ export function App() {
               }}
             />
           </div>
-          <MoveList
-            snap={snap}
-            onGoto={(p) => {
-              pause();
-              store.goto(p);
-              setSelection(NO_SELECTION);
-            }}
-          />
-        </section>
-        </details>
-      </aside>
 
-      <main>
-        <section className="intro" aria-label="このデモについて">
-          <p className="eyebrow">9層の将棋を、AIが指す。</p>
-          <p>AI同士の対局を眺める研究用Alpha。駒は層をまたいで動き、相手の玉を詰ませると勝ちです。</p>
-          <p className="muted">Easy／Normalはモデル取得なしで遊べます。学習済みSは任意の追加機能です。</p>
-        </section>
-        <div className="watch playback" aria-label="観戦操作">
-          <div className="row">
-            <button type="button" onClick={() => { if (running) pause(); else { if (snap.ply < snap.moveCount) store.goto(snap.moveCount); setRunning(true); } }} className="primary" data-testid="toggle-run" disabled={snap.finished}>
-              {running ? '一時停止' : snap.ply < snap.moveCount ? '最新局面から再開' : snap.moveCount === 0 && mode === 'r-r' ? '観戦を開始' : '再開'}
-            </button>
-            <button
-              type="button"
-              data-testid="ai-step"
-              disabled={running || snap.finished || humanTurn || !!aiStatus.error}
-              aria-disabled={stepBusy}
-              onClick={() => { if (!stepBusy) aiRef.current?.step(); }}
-            >
-              1手指す
-            </button>
-            <button type="button" data-testid="cancel-search" aria-disabled={aiStatus.phase !== 'thinking'}
-              onClick={() => { if (aiStatus.phase === 'thinking') pause(); }}>思考を中断</button>
-          </div>
-          <label>
-            着手間の待ち時間 {delay}ms（思考時間は別）
-            <input data-testid="move-delay" type="range" min={50} max={2000} step={50} value={delay} onChange={(e) => setDelay(Number(e.target.value))} />
-          </label>
-          <p data-testid="ai-phase">{phaseText}</p>
-          <p data-testid="last-move" role="status">{snap.lastMove ? `直前手：${snap.ply % 2 === 1 ? '☗先手' : '☖後手'} ${formatMove(snap.lastMove)}` : '開始局面：観戦を始めると、ここに着手を表示します。'}</p>
-          {aiStatus.error && <div role="alert" data-testid="ai-error">{aiStatus.error}<button type="button" data-testid="ai-retry" onClick={() => aiRef.current?.retry()}>再試行</button></div>}
-          {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
-            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
-            {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />
-            Value {aiStatus.last.result.value?.toFixed(3) ?? '未算出'}（直前のAIの視点）<br />
-            推論{Math.round(aiStatus.last.inferenceMs)}ms・往復{Math.round(aiStatus.last.roundTripMs)}ms
-          </p> : aiStatus.last && <p className="muted" data-testid="ai-analysis">
-            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.difficulty === 'easy' ? 'Easy・ランダム着手（探索なし）' : `Normal・深さ${aiStatus.last.result.completedDepth}${aiStatus.last.result.completedDepth === 0 ? '・合法な代替手' : ''}`}<br />
-            {aiStatus.last.result.score === null ? '評価は未算出' : Math.abs(aiStatus.last.result.score) === 1_000_000 ? `終局評価：${aiStatus.last.result.score > 0 ? '勝ち' : '負け'}` : `駒得 ${aiStatus.last.result.score >= 0 ? '+' : ''}${aiStatus.last.result.score}（歩=100、直前のAIの視点）`}<br />
-            {aiStatus.last.result.nodes}ノード・往復{Math.round(aiStatus.last.roundTripMs)}ms・停止理由 {aiStatus.last.result.stopReason}
-          </p>}
-        </div>
-        <div className="row" role="group" aria-label="盤面の表示">
-          {(['2d', '3d', 'both'] as const).map(v => <button type="button" key={v} aria-pressed={view === v} onClick={() => setView(v)}>{{ '2d': '2D断面', '3d': '立体で見る', both: '立体と断面' }[v]}</button>)}
-        </div>
-        {message ? (
-          <div className="message" role="alert">
-            {message}
-          </div>
-        ) : null}
-        {sideHands('w')}
-        <div className={`views views-${view}`}>
-          {view !== '2d' ? <Suspense fallback={<p>3D盤面を読み込み中…</p>}><Board3D snap={snap} selection={selection} view={layers} showTrail={trail} onSquare={onSquare} /></Suspense> : null}
-          {view !== '3d' ? <Board2D snap={snap} slice={slice} selection={selection} onSquare={onSquare} /> : null}
-        </div>
-        {sideHands('b')}
-        <section className="move-focus" aria-label="表示中の着手">
-          <label className="check"><input type="checkbox" data-testid="follow-move" checked={follow} onChange={event => { setSlice(slice); setLayers(layers); setFollow(event.target.checked); }} />直前手の層を追う</label>
-          <p className="muted">{follow ? '着手先の層へ自動で切り替えます。層を手動で変えると追従をOFFにします。' : '手動表示中。追従をONにすると表示中の着手先へ戻ります。'}</p>
-          {selection.type !== 'none' && <div className="row" aria-label="層ごとの移動先">{targetCounts.map((count, z) => count > 0 && <button type="button" key={z} onClick={() => { manualView(); setSlice({ axis: 'z', index: z }); setLayers({ ...layers, z }); }}>{ROMAN[z]}層：{count}マス</button>)}</div>}
-        </section>
-        <GameCollectionPanel key={collectionSession} mode={mode} selectedAgents={collectionAgents(aiOptions)}
-          getRecord={() => { if (!ownedRecord.current) throw new Error('imported record'); return store.exportRecord(); }} finished={snap.finished && !!snap.result && snap.ply === snap.moveCount}
-          canAbort={!snap.finished && snap.ply > 0 && snap.ply === snap.moveCount} imported={importedRecord} onAbort={pause} />
-      </main>
-
-      <aside className="panel right">
-        <details open={settingsOpen}><summary>表示・操作の設定</summary>
+      </section>
+      <section className="panel right" hidden={sheet !== 'display'}>
         <section>
           <h2>表示</h2>
           <div className="row" role="group" aria-label="表示モード">
@@ -476,18 +471,22 @@ export function App() {
             ルール: <a href="https://shogitter.com/rule/三次元将棋">将棋ったー「三次元将棋」</a>準拠（ruleset voxelshogi-standard-v1）
           </p>
         </section>
-        </details>
-      </aside>
 
-      {promotion ? (
-        <PromotionDialog
-          onChoose={(p) => play(p ? promotion.promote : promotion.plain)}
-          onCancel={() => {
-            setPromotion(null);
-            setSelection(NO_SELECTION);
-          }}
-        />
-      ) : null}
-    </div>
-  );
+      </section>
+      <section hidden={sheet !== 'research' && sheet !== 'models'}><p>Easy／Normalはモデル取得なしで遊べます。学習済みSは任意の追加機能です。</p>
+          {aiStatus.last?.kind === 'model-result' ? <p className="muted" data-testid="ai-analysis">
+            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.model.selection.modelId}<br />
+            {aiStatus.last.model.selection.precision.toUpperCase()}・{aiStatus.last.model.selection.backend === 'webgpu' ? 'WebGPU' : 'WASM'}<br />
+            Value {aiStatus.last.result.value?.toFixed(3) ?? '未算出'}（直前のAIの視点）<br />
+            推論{Math.round(aiStatus.last.inferenceMs)}ms・往復{Math.round(aiStatus.last.roundTripMs)}ms
+          </p> : aiStatus.last && <p className="muted" data-testid="ai-analysis">
+            直前の{aiStatus.last.side === 'b' ? '☗先手' : '☖後手'}AI：{aiStatus.last.difficulty === 'easy' ? 'Easy・ランダム着手（探索なし）' : `Normal・深さ${aiStatus.last.result.completedDepth}${aiStatus.last.result.completedDepth === 0 ? '・合法な代替手' : ''}`}<br />
+            {aiStatus.last.result.score === null ? '評価は未算出' : Math.abs(aiStatus.last.result.score) === 1_000_000 ? `終局評価：${aiStatus.last.result.score > 0 ? '勝ち' : '負け'}` : `駒得 ${aiStatus.last.result.score >= 0 ? '+' : ''}${aiStatus.last.result.score}（歩=100、直前のAIの視点）`}<br />
+            {aiStatus.last.result.nodes}ノード・往復{Math.round(aiStatus.last.roundTripMs)}ms・停止理由 {aiStatus.last.result.stopReason}
+          </p>}
+        {ARENA_LINKS.map(link => <p key={link.href}><a href={link.href}>{link.label}</a></p>)}<a href="/privacy.html">プライバシー</a>
+      </section>
+    </Sheet>
+    {promotion && <PromotionDialog onChoose={promote => play(promote ? promotion.promote : promotion.plain)} onCancel={() => { setPromotion(null); setSelection(NO_SELECTION); }} />}
+  </div>;
 }

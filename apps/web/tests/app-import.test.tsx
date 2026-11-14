@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeAll, expect, it } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 import { App } from '../src/App';
 import { loadWasm } from './loadWasm';
 
+vi.mock('../src/renderer/Board3D', () => ({ Board3D: () => null }));
 beforeAll(loadWasm);
 afterEach(cleanup);
 const fixtures = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../crates/voxelshogi-wasm/tests/fixtures/search.json'), 'utf8')) as { record: unknown }[];
@@ -19,6 +20,7 @@ it('ignores an obsolete file read but accepts a fresh import under StrictMode', 
   let finish!: (text: string) => void;
   const lateFile = { size: 1000, text: () => new Promise<string>((resolve) => { finish = resolve; }) };
   fireEvent.change(screen.getByTestId('import'), { target: { files: [lateFile] } });
+  fireEvent.click(screen.getByRole('button', { name: '対局設定' }));
   fireEvent.click(screen.getByRole('button', { name: '新規対局' }));
   await act(async () => { finish(JSON.stringify(fixtures[0]!.record)); });
   expect(pawn()).toBe('歩');

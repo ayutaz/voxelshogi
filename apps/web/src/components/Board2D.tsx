@@ -10,6 +10,7 @@ interface Props {
   slice: Slice;
   selection: Selection;
   onSquare: (index: number) => void;
+  interactive?: boolean;
 }
 
 function axisLabels(slice: Slice): { rows: string[]; cols: string[]; title: string } {
@@ -21,7 +22,7 @@ function axisLabels(slice: Slice): { rows: string[]; cols: string[]; title: stri
 }
 
 /** One 9×9 cross-section of the cube; the primary way to make precise moves. */
-export function Board2D({ snap, slice, selection, onSquare }: Props) {
+export function Board2D({ snap, slice, selection, onSquare, interactive = true }: Props) {
   const grid = sliceGrid(slice);
   const { rows, cols, title } = axisLabels(slice);
   const targets = selection.type === 'none' ? new Set<number>() : new Set(selection.targets.keys());
@@ -48,7 +49,8 @@ export function Board2D({ snap, slice, selection, onSquare }: Props) {
               const classes = ['cell'];
               if (targets.has(index)) classes.push('target');
               if (selection.type === 'square' && selection.from === index) classes.push('selected');
-              if (last && (last.to === index || last.from === index)) classes.push('last');
+              if (last?.from === index) classes.push('last', 'last-from');
+              if (last?.to === index) classes.push('last', 'last-to');
               if (checked.has(index)) classes.push('check');
               if (piece) classes.push(piece.color === 'b' ? 'black' : 'white');
               if (piece?.promoted) classes.push('promoted');
@@ -59,9 +61,10 @@ export function Board2D({ snap, slice, selection, onSquare }: Props) {
                   className={classes.join(' ')}
                   data-square={index}
                   title={displaySquare(index)}
-                  aria-label={`${displaySquare(index)} ${piece ? `${piece.color === 'b' ? '先手' : '後手'} ${piece.label}` : '空きマス'}`}
+                  aria-label={`${displaySquare(index)} ${piece ? `${piece.color === 'b' ? '先手' : '後手'} ${piece.label}` : '空きマス'}${targets.has(index) ? ' 移動候補' : ''}`}
                   aria-pressed={selection.type === 'square' && selection.from === index}
-                  onClick={() => onSquare(index)}
+                  aria-disabled={!interactive}
+                  onClick={() => { if (interactive) onSquare(index); }}
                 >
                   {piece ? <span className="piece">{piece.label}</span> : null}
                 </button>

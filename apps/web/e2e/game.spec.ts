@@ -1,4 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { display, saveRecord, selectSetting, settingsAction, sliceAt } from './arena-controls';
+import { test, expect } from './test';
+import { type Page } from '@playwright/test';
 
 // Square index = z*81 + y*9 + x (see src/game/model.ts).
 const idx = (x: number, y: number, z: number) => z * 81 + y * 9 + x;
@@ -27,16 +29,16 @@ test('shows the initial position in 2D and 3D', async ({ page }) => {
   // layer V, rank 九: black king at file 5
   await expect(cell(page, idx(4, 8, 4))).toHaveText('玉');
   await expect(cell(page, idx(4, 6, 4))).toHaveText('歩');
-  await expect(page.getByTestId('board3d')).toHaveCount(0);
-  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+  await expect(page.getByTestId('board3d')).toHaveCount(1);
+  await display(page, 'both');
   await expect(page.getByTestId('board3d').locator('canvas')).toBeVisible();
   await expect(page.getByTestId('mode')).toHaveValue('r-r');
   expect(await page.getByTestId('mode').locator('option').evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value))).toEqual(['h-r', 'r-h', 'r-r']);
 });
 
 test('human vs AI: select, see targets, move, inspect history, undo', async ({ page }) => {
-  await page.getByTestId('difficulty-w').selectOption('easy');
-  await page.getByTestId('mode').selectOption('h-r');
+  await selectSetting(page, 'difficulty-w', 'easy');
+  await selectSetting(page, 'mode', 'h-r');
   await cell(page, idx(4, 6, 4)).click();
   await expect(page.locator('.board2d .cell.target')).toHaveCount(1);
   await expect(cell(page, idx(4, 5, 4))).toHaveClass(/target/);
@@ -58,10 +60,10 @@ test('human vs AI: select, see targets, move, inspect history, undo', async ({ p
 });
 
 test('human as White: the AI opens and answers automatically', async ({ page }) => {
-  await page.getByTestId('difficulty-b').selectOption('easy');
-  await page.getByTestId('mode').selectOption('r-h');
+  await selectSetting(page, 'difficulty-b', 'easy');
+  await selectSetting(page, 'mode', 'r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番', { timeout: 5000 });
-  await page.getByTestId('slice-index').fill('4'); // the opening AI move may have followed another layer
+  await sliceAt(page, '4'); // the opening AI move may have followed another layer
   await cell(page, idx(4, 2, 4)).click();
   await cell(page, idx(4, 3, 4)).click();
   await expect(page.getByTestId('status')).toHaveText('4手目 ☖後手の番', { timeout: 5000 });
@@ -69,8 +71,8 @@ test('human as White: the AI opens and answers automatically', async ({ page }) 
 });
 
 test('AI vs AI can be watched and paused', async ({ page }) => {
-  await page.getByTestId('difficulty-b').selectOption('easy');
-  await page.getByTestId('difficulty-w').selectOption('easy');
+  await selectSetting(page, 'difficulty-b', 'easy');
+  await selectSetting(page, 'difficulty-w', 'easy');
   await page.getByTestId('toggle-run').click();
   await expect.poll(async () => page.getByTestId('move-list').locator('li').count(), { timeout: 8000 }).toBeGreaterThan(4);
   await page.getByTestId('toggle-run').click();
@@ -87,13 +89,13 @@ test('AI vs AI can be watched and paused', async ({ page }) => {
 });
 
 test('records round-trip through save and load, and invalid files are rejected', async ({ page }) => {
-  await page.getByTestId('difficulty-w').selectOption('easy');
-  await page.getByTestId('mode').selectOption('h-r');
+  await selectSetting(page, 'difficulty-w', 'easy');
+  await selectSetting(page, 'mode', 'h-r');
   await cell(page, idx(4, 6, 4)).click();
   await cell(page, idx(4, 5, 4)).click();
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: '保存' }).click();
+  await saveRecord(page);
   const download = await downloadPromise;
   const saved = await (await download.createReadStream()).toArray();
   const json = JSON.parse(Buffer.concat(saved).toString('utf8'));
@@ -101,13 +103,13 @@ test('records round-trip through save and load, and invalid files are rejected',
   expect(json.moves).toHaveLength(2);
   expect(json.moves[0]).toBe(sq(4, 6, 4) + sq(4, 5, 4));
 
-  await page.getByRole('button', { name: '新規対局' }).click();
+  await settingsAction(page, '新規対局');
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
   await page.getByTestId('import').setInputFiles({ name: 'game.json', mimeType: 'application/json', buffer: Buffer.concat(saved) });
   await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   await expect(page.getByTestId('mode')).toHaveValue('h-r');
-  await page.getByTestId('slice-index').fill('4'); // inspect the saved pawn, rather than the last AI move's layer
+  await sliceAt(page, '4'); // inspect the saved pawn, rather than the last AI move's layer
   await expect(cell(page, idx(4, 5, 4))).toHaveText('歩');
 
   // A tampered record (illegal move) is rejected and the current game is kept.

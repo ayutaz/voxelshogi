@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { display, openRecords, saveRecord, selectSetting, settingsAction, sliceAt } from './arena-controls';
+import { test, expect } from './test';
 import { loadWasm } from '../tests/loadWasm';
 import { Game } from '../src/wasm/pkg/voxelshogi_wasm.js';
 import { installInteractionProbe, readInteractionProbe } from './interaction-probe';
@@ -32,15 +33,15 @@ test('spectator starts paused with independent Normal settings and steps exactly
 for (const b of ['easy', 'normal']) for (const w of ['easy', 'normal']) {
   test(`automatic spectator progresses with ${b}/${w}`, async ({ page }) => {
     await page.goto('/');
-    await page.getByTestId('difficulty-b').selectOption(b);
-    await page.getByTestId('difficulty-w').selectOption(w);
-    await page.getByTestId('thinking-budget').selectOption('100');
+    await selectSetting(page, 'difficulty-b', b);
+    await selectSetting(page, 'difficulty-w', w);
+    await selectSetting(page, 'thinking-budget', '100');
     await page.getByTestId('toggle-run').click();
     await expect.poll(() => page.getByTestId('move-list').locator('li').count(), { timeout: 10_000 }).toBeGreaterThanOrEqual(3);
     await page.getByTestId('toggle-run').click();
     await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
     const downloading = page.waitForEvent('download');
-    await page.getByRole('button', { name: '保存', exact: true }).click();
+    await saveRecord(page);
     const download = await downloading;
     const json = Buffer.concat(await (await download.createReadStream()).toArray()).toString('utf8');
     const verified = Game.fromRecordJson(json); // Rust revalidates every move and the outcome
@@ -57,7 +58,7 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
   await installInteractionProbe(page);
   try {
     await page.goto('/');
-    await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+    await display(page, 'both');
     const canvas = page.getByTestId('board3d').locator('canvas');
     await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
     await page.waitForTimeout(1000); // allow initial layout and camera damping to settle
@@ -65,7 +66,7 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
     expect(frames).toBeGreaterThan(0);
     await page.waitForTimeout(250);
     expect((await readInteractionProbe(page)).frames).toBe(frames);
-    await page.getByTestId('thinking-budget').selectOption('3000');
+    await selectSetting(page, 'thinking-budget', '3000');
     const begin = async (reuse = false) => {
       const previousWorkers = workers.length;
       await page.getByTestId('ai-step').click();
@@ -81,7 +82,7 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
     await begin();
     await page.getByTestId('move-delay').fill('50');
     await expect(page.getByTestId('move-delay')).toHaveValue('50');
-    await page.getByTestId('slice-index').fill('5');
+    await sliceAt(page, '5');
     await expect(page.getByTestId('slice-index')).toHaveValue('5');
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
     expect(workers).toHaveLength(1); // display speed did not restart the search
@@ -90,11 +91,11 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
     await canvas.scrollIntoViewIfNeeded();
     // Warm the second real Worker before measuring camera/search overlap. This
     // avoids mistaking an in-flight module download for WASM computation.
-    await page.getByTestId('thinking-budget').selectOption('100');
+    await selectSetting(page, 'thinking-budget', '100');
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
     await page.getByTestId('undo').click();
-    await page.getByTestId('thinking-budget').selectOption('3000');
+    await selectSetting(page, 'thinking-budget', '3000');
     const beforeCamera = await canvas.screenshot();
     const box = (await canvas.boundingBox())!;
     await page.evaluate(() => window.interactionProbe.armCamera());
@@ -121,18 +122,18 @@ test('2D/3D and camera remain interactive during real search, and cancel prevent
     expect((await canvas.screenshot()).equals(beforeCamera)).toBe(false);
 
     await begin();
-    await page.getByRole('button', { name: '2D', exact: true }).click();
+    await display(page, '2d');
     await expect(page.getByTestId('board3d')).toHaveCount(0);
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
     await cancel();
     await begin();
-    await page.getByRole('button', { name: '3D+2D', exact: true }).click();
+    await display(page, 'both');
     await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
     await cancel();
     await page.waitForTimeout(3300);
     await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
-    await page.getByTestId('thinking-budget').selectOption('100');
+    await selectSetting(page, 'thinking-budget', '100');
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
     expect(workers).toHaveLength(5); // explicit cancellations recreated it
@@ -155,29 +156,29 @@ test('Worker load failures are visible and retry recreates the worker', async ({
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
 });
 
-test('2D initial load defers the 3D module until it is selected', async ({ page }) => {
-  const scripts: string[] = [];
-  page.on('response', (response) => { if (response.request().resourceType() === 'script') scripts.push(response.url()); });
+test('initial viewing shows the nine-layer renderer and the 2D reading mode stays available', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByTestId('status')).toBeVisible();
-  expect(scripts.some((url) => /Board3D-/.test(url))).toBe(false);
+  await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
+  await display(page, '2d');
+  await expect(page.locator('.board2d .cell')).toHaveCount(81);
   await expect(page.getByTestId('board3d')).toHaveCount(0);
-  await page.getByRole('button', { name: '3D+2D', exact: true }).click();
-  await expect(page.getByTestId('board3d').locator('canvas')).toBeVisible();
-  expect(scripts.some((url) => /Board3D-/.test(url))).toBe(true);
+  await display(page, 'both');
+  await expect(page.getByTestId('board3d')).toHaveAttribute('data-ready', 'true');
 });
 
 test('new game, difficulty, undo/redo, goto and import invalidate a pending search', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('thinking-budget').selectOption('100');
+  await selectSetting(page, 'thinking-budget', '100');
   for (let i = 0; i < 2; ++i) {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('status')).toHaveText(i === 0 ? '2手目 ☖後手の番' : '3手目 ☗先手の番');
   }
   const downloading = page.waitForEvent('download');
-  await page.getByRole('button', { name: '保存', exact: true }).click();
+  await saveRecord(page);
   const record = Buffer.concat(await (await (await downloading).createReadStream()).toArray());
-  await page.getByTestId('thinking-budget').selectOption('3000');
+  await selectSetting(page, 'thinking-budget', '3000');
+  await page.getByTestId('import').setInputFiles({ name: 'limits.json', mimeType: 'application/json', buffer: record });
+  await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   const begin = async () => {
     await page.getByTestId('ai-step').click();
     await expect(page.getByTestId('ai-phase')).toHaveText(/思考中/);
@@ -190,10 +191,10 @@ test('new game, difficulty, undo/redo, goto and import invalidate a pending sear
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
   await begin(); await page.getByTestId('import').setInputFiles({ name: 'saved.json', mimeType: 'application/json', buffer: record });
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
-  await begin(); await page.getByTestId('difficulty-b').selectOption('easy');
+  await begin(); await selectSetting(page, 'difficulty-b', 'easy');
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
-  await page.getByTestId('difficulty-b').selectOption('normal');
-  await begin(); await page.getByRole('button', { name: '新規対局', exact: true }).click();
+  await selectSetting(page, 'difficulty-b', 'normal');
+  await begin(); await settingsAction(page, '新規対局');
   await page.waitForTimeout(3300);
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
 });
@@ -215,7 +216,7 @@ function humanRecord(): string {
 
 test('human promotion, pawn drop and record round-trip remain available alongside AI spectator', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('mode').selectOption('h-r');
+  await selectSetting(page, 'mode', 'h-r');
   const record = humanRecord();
   const load = async () => {
     await page.getByTestId('import').setInputFiles({ name: 'human.json', mimeType: 'application/json', buffer: Buffer.from(record) });
@@ -233,7 +234,7 @@ test('human promotion, pawn drop and record round-trip remain available alongsid
   await expect(cell(3, 4)).toHaveText('歩');
   await expect(page.getByTestId('hands-b').locator('[data-hand="P"]')).toHaveCount(0);
   const downloading = page.waitForEvent('download');
-  await page.getByRole('button', { name: '保存', exact: true }).click();
+  await saveRecord(page);
   const saved = Buffer.concat(await (await (await downloading).createReadStream()).toArray()).toString('utf8');
   expect(JSON.parse(saved).moves).toEqual(['P*455']);
   const verified = Game.fromRecordJson(saved);
@@ -253,7 +254,7 @@ test('an asynchronous file read cannot replace a newer game', async ({ page }) =
   });
   await page.getByTestId('import').setInputFiles({ name: 'late.json', mimeType: 'application/json', buffer: Buffer.from(humanRecord()) });
   await expect(page.getByRole('alert')).toContainText('棋譜を読み込み中');
-  await page.getByRole('button', { name: '新規対局', exact: true }).click();
+  await settingsAction(page, '新規対局');
   await page.evaluate(() => (window as unknown as { releaseImport: () => Promise<void> }).releaseImport());
   await expect(page.locator('.board2d [data-square="382"]')).toHaveText('歩'); // initial 5七V
   await expect(page.getByRole('alert')).toHaveCount(0);
@@ -262,26 +263,26 @@ test('an asynchronous file read cannot replace a newer game', async ({ page }) =
 
 test('humans can play either color against Normal search', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('thinking-budget').selectOption('100');
-  await page.getByTestId('mode').selectOption('h-r');
+  await selectSetting(page, 'thinking-budget', '100');
+  await selectSetting(page, 'mode', 'h-r');
   const cell = (y: number) => page.locator(`.board2d [data-square="${4 * 81 + y * 9 + 4}"]`);
   await cell(6).click(); await cell(5).click();
   await expect(page.getByTestId('status')).toHaveText('3手目 ☗先手の番');
   await expect(page.getByTestId('ai-analysis')).toContainText('Normal');
-  await page.getByTestId('mode').selectOption('r-h');
+  await selectSetting(page, 'mode', 'r-h');
   await expect(page.getByTestId('status')).toHaveText('2手目 ☖後手の番');
-  await page.getByTestId('slice-index').fill('4'); // choose V explicitly after the AI's layer-following move
+  await sliceAt(page, '4'); // choose V explicitly after the AI's layer-following move
   await cell(2).click(); await cell(3).click();
   await expect(page.getByTestId('status')).toHaveText('4手目 ☖後手の番');
   await expect(page.getByTestId('ai-analysis')).toContainText('Normal');
-  await page.getByRole('button', { name: '投了', exact: true }).click();
+  await settingsAction(page, '投了');
   await expect(page.getByTestId('status')).toHaveText('☗先手の勝ち（投了）');
   await expect(page.getByTestId('ai-step')).toBeDisabled();
 });
 
 test('keyboard starts and stops viewing, saves a record, and selects or cancels promotion', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('difficulty-b').selectOption('easy'); await page.getByTestId('difficulty-w').selectOption('easy');
+  await selectSetting(page, 'difficulty-b', 'easy'); await selectSetting(page, 'difficulty-w', 'easy');
   const toggle = page.getByTestId('toggle-run'); await toggle.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByTestId('status')).not.toHaveText('1手目 ☗先手の番');
@@ -294,12 +295,13 @@ test('keyboard starts and stops viewing, saves a record, and selects or cancels 
   await expect(page.getByTestId('ai-phase')).toHaveText('一時停止中');
   await expect(step).toBeFocused();
   const downloading = page.waitForEvent('download');
+  await openRecords(page);
   await page.getByRole('button', { name: '保存', exact: true }).focus(); await page.keyboard.press('Enter');
   const saved = Buffer.concat(await (await (await downloading).createReadStream()).toArray()).toString('utf8');
   const replay = Game.fromRecordJson(saved);
   try { expect(replay.moveCount()).toBeGreaterThan(0); } finally { replay.free(); }
 
-  await page.getByTestId('mode').selectOption('h-r');
+  await selectSetting(page, 'mode', 'h-r');
   await page.getByTestId('import').setInputFiles({ name: 'keyboard.json', mimeType: 'application/json', buffer: Buffer.from(humanRecord()) });
   await expect(page.getByRole('alert')).toContainText('棋譜を読み込みました');
   const from = page.locator('.board2d [data-square="355"]'), to = page.locator('.board2d [data-square="346"]');

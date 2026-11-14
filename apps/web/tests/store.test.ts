@@ -110,3 +110,17 @@ describe('GameStore', () => {
     expect(s.snapshot().revision).toBe(current.revision + 1);
   });
 });
+
+it('retains the complete game outcome while browsing earlier positions and clears it on a new game', () => {
+  const store = new GameStore();
+  expect(store.play('577567').ok).toBe(true);
+  store.resign(); // White resigns after Black's first move.
+  store.goto(0);
+  expect(store.snapshot().result).toBeNull();
+  expect(store.snapshot().terminalResult).toEqual({ kind: 'win', winner: 'b', reason: 'Resignation' });
+  expect(store.snapshot().terminalFinished).toBe(true);
+  expect(JSON.parse(store.exportRecord()).moves).toEqual(['577567']);
+  store.newGame();
+  expect(store.snapshot().terminalResult).toBeNull();
+  expect(store.snapshot().terminalFinished).toBe(false);
+});

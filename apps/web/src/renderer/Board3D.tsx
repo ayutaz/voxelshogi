@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, type ThreeEvent } from '@react-three/fiber';
-import { OrbitControls, Line } from '@react-three/drei';
+import { OrbitControls, Line, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { coordsOf, decodePiece, parseMove } from '../game/model';
 import type { Selection } from '../game/interaction';
@@ -179,13 +179,13 @@ function MoveTrail({ move }: { move: string }) {
 }
 
 function LayerGrid({ view }: { view: LayerView }) {
-  const layers = view.mode === 'all' ? [0, 1, 2, 3, 4, 5, 6, 7, 8] : [view.z];
+  const layers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <>
       {layers.map((z) => (
         <gridHelper
           key={z}
-          args={[9 * CELL, 9, view.mode === 'all' ? '#5b6474' : '#9fb3d1', view.mode === 'all' ? '#3a4150' : '#6f7f99']}
+          args={[9 * CELL, 9, view.mode === 'all' || z === view.z ? '#9bd6cd' : '#3e6169', view.mode === 'all' || z === view.z ? '#6c9398' : '#2e4b52']}
           position={[0, (z - 4) * LAYER_GAP - 0.16, 0]}
         />
       ))}
@@ -214,10 +214,11 @@ export function Board3D({
       {!ready && <p className="board3d-loading" role="status">3D盤面を描画中…</p>}
       <Canvas camera={{ position: cameraPosition, fov: 45 }} dpr={[1, 2]} frameloop="demand">
         <RenderReady onReady={() => setReady(true)} />
-        <color attach="background" args={['#14171d']} />
-        <ambientLight intensity={0.8} />
+        <color attach="background" args={['#14282c']} />
+        <ambientLight intensity={1.15} />
         <directionalLight position={[6, 14, 10]} intensity={1.6} />
         <LayerGrid view={view} />
+        {['I','II','III','IV','V','VI','VII','VIII','IX'].map((label,z) => <Html key={label} position={[-6,(z-4)*LAYER_GAP,4.5]} style={{ pointerEvents: 'none' }}><span className="layer-label" aria-hidden="true">{label}</span></Html>)}
         <Pieces snap={snap} view={view} onSquare={onSquare} />
         <Highlights snap={snap} selection={selection} onSquare={onSquare} />
         {showTrail && snap.lastMove && <MoveTrail key={snap.lastMove} move={snap.lastMove} />}

@@ -1,5 +1,6 @@
 // Observable wrapper around the WASM engine for React (useSyncExternalStore).
 import { Game, rulesetId } from '../wasm/pkg/voxelshogi_wasm.js';
+import { recordOutcome } from './record-outcome';
 import type { Color } from './model';
 
 /** Imports larger than this are rejected before they reach the engine. */
@@ -21,6 +22,8 @@ export interface Snapshot {
   lastMove: string | null;
   result: ResultInfo | null;
   finished: boolean;
+  terminalResult?: ResultInfo | null;
+  terminalFinished?: boolean;
   inCheck: Record<Color, boolean>;
   kingSquare: Record<Color, number>;
   hash: string;
@@ -64,6 +67,7 @@ export class GameStore {
     const g = this.game;
     const board = g.board();
     const result = parseResult(g.result());
+    const recordJson = g.recordJson(), terminalResult = recordOutcome(recordJson);
     this.cached = {
       revision: this.revision,
       board,
@@ -76,6 +80,7 @@ export class GameStore {
       lastMove: g.lastMove() ?? null,
       result,
       finished: g.isFinished(),
+      terminalResult, terminalFinished: terminalResult !== null || JSON.parse(recordJson).termination != null,
       inCheck: { b: g.isInCheck(true), w: g.isInCheck(false) },
       kingSquare: { b: board.indexOf(BLACK_KING), w: board.indexOf(WHITE_KING) },
       hash: g.hash(),

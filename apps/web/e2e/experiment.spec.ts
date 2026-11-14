@@ -1,9 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test';
 
 test('public navigation keeps watching and the model lab without the retired comparison room', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'VoxelShogi Arena' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^VoxelShogi/ })).toBeVisible();
   await expect(page.getByRole('link', { name: '9王ルール比較室' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'モデル', exact: true }).click();
   await page.getByRole('link', { name: 'モデル推論ラボ' }).click();
   await expect(page.getByRole('heading', { name: 'モデル推論ラボ' })).toBeVisible();
   await expect(page.getByRole('link', { name: '9王ルール比較室' })).toHaveCount(0);
@@ -14,7 +15,7 @@ test('the legacy comparison URL opens normal watching without downloading experi
   const experimentRequests: string[] = [];
   page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/experiments/')) experimentRequests.push(request.url()); });
   await page.goto('/?experiment=1');
-  await expect(page.getByRole('heading', { name: 'VoxelShogi Arena' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^VoxelShogi/ })).toBeVisible();
   await expect(page.getByTestId('status')).toHaveText('1手目 ☗先手の番');
   await expect(page.getByRole('heading', { name: '9王ルール比較室' })).toHaveCount(0);
   expect(experimentRequests).toEqual([]);
