@@ -61,8 +61,8 @@ for (const [width,height] of [[390,844],[768,1024],[1440,900]]) {
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     const path=info.outputPath(`attachments/launch-history-${width}.png`);await page.screenshot({path,fullPage:true});await info.attach('history',{path,contentType:'image/png'});
     await load({...record,result:{Win:{winner:'White',reason:'Resignation'}},termination:'Resignation'});
-    await page.getByRole('button',{name:'メッセージを閉じる'}).click();await expect(page.getByRole('alert')).toHaveCount(0);
     await page.getByRole('button',{name:'盤面を見る',exact:true}).click();
+    await page.getByRole('button',{name:'メッセージを閉じる'}).click();await expect(page.getByRole('alert')).toHaveCount(0);
     await expect(page.getByRole('region',{name:'対局結果'})).toHaveCount(0);await expect(page.locator('.board2d .cell')).toHaveCount(81);
     const terminal=info.outputPath(`attachments/launch-terminal-${width}.png`);await page.screenshot({path:terminal,fullPage:true});await info.attach('terminal',{path:terminal,contentType:'image/png'});
   });

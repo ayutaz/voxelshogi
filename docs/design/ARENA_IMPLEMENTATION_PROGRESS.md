@@ -74,3 +74,4 @@ source `f02af61`は[候補UI](https://github.com/ayutaz/voxelshogi/actions/runs/
 [最終ソースレビュー](../reviews/claude-code-arena-final-source-20261114.md)は重大／中0。設定からAI条件を変えた直後は停止し「再開」を押す仕様が軽微として残る。
 [同sourceの7画像レビュー](../reviews/claude-code-arena-images-20261114.md)は重大0・中1で、読込メッセージが後手の持ち駒欄に残る点を指摘した。[画像の出典／hash](../experiments/arena-review-images-20261114.json)を保持する。
 メッセージだけを閉じて対局／履歴を保持する操作をREDから追加し、3サイズの履歴・終局画像を取り直す。これにより既知Web変異は210件。指摘の解消と公開はまだ確認途中。
+source `b0931c6`の品質検証は成功。画像E2Eは終局パネルの背後にあるメッセージを先に閉じようとして3サイズで失敗したため、利用者と同じ「盤面を見る」→メッセージを閉じる順へ直して再検証する。失敗を成功には数えない。
