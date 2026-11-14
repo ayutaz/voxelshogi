@@ -8,7 +8,7 @@ const fake = vi.hoisted(() => ({ configure: vi.fn(), pause: vi.fn(), publicModel
 vi.mock('../src/inference/public-model', () => ({ preparePublicModel: fake.publicModel }));
 vi.mock('../src/game/store', () => {
   const snap = { side: 'b', ply: 0, moveCount: 0, finished: false, inCheck: { b: false, w: false }, legal: [], board: [] };
-  return { MAX_IMPORT_BYTES: 4e6, GameStore: class { newGame = () => {}; subscribe = () => () => {}; snapshot = () => snap; exportRecord = () => JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: [] }); } };
+  return { MAX_IMPORT_BYTES: 4e6, GameStore: class { subscribePresentation = () => () => {}; stepForward = () => {}; newGame = () => {}; subscribe = () => () => {}; snapshot = () => snap; exportRecord = () => JSON.stringify({ initial: 'fixture', ruleset_id: 'voxelshogi-standard-v1', moves: [] }); } };
 });
 vi.mock('../src/ai/arena-controller', async original => ({ ...await original<object>(), ArenaController: class {
   subscribe = () => () => {}; snapshot = () => ({ phase: 'paused', error: null, last: null });
