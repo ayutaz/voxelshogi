@@ -260,7 +260,7 @@ function render(raw, work, startFrame, sourceRate, hookMove, timing) {
     'hook-a.txt': '将棋、9層にした。', 'hook-b.txt': 'その一手、別の階へ。',
     'watch.txt': 'AI同士の対局を、眺める。', 'step.txt': '止めて、一手ずつ追える。',
     'cta.txt': '開発したAIと、あなたが対戦。', 'url.txt': 'voxelshogi.yousan-apps.workers.dev',
-    'alpha.txt': '学習済みS・INT8（重み）／申請・ログイン不要', 'agents.txt': 'Easy vs Easy・実対局の再生',
+    'alpha.txt': '学習済みS・INT8（重み）', 'agents.txt': 'Easy vs Easy・実対局の再生',
     'cross.txt': `${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[2])-1]}層 → ${['I','II','III','IV','V','VI','VII','VIII','IX'][Number(hookMove[5])-1]}層`,
   };
   for (const [name, text] of Object.entries(lines)) writeFileSync(join(work, name), text + '\n');
