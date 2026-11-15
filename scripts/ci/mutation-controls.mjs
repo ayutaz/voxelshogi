@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const mutations = [
+  { name: 'video-cta-source-identity', file: 'scripts/revise-demo-cta.mjs', before: "assert.equal(hash,SOURCE_HASH,'use the reviewed fifteen-second BGM video');", after: '', test: 'demo-cta' },
+  { name: 'video-cta-audio-unchanged', file: 'scripts/revise-demo-cta.mjs', before: "assert.ok(before && before===after,'BGM compressed packets must stay identical');", after: '', test: 'demo-cta' },
   { name: 'public-runtime-local-hash', file: 'scripts/prepare-public-runtime.mjs', before: 'assert.equal(digest(bytes),ref.sha256);', after: '', test: 'public-runtime' },
   { name: 'video-real-s-reply', file: 'scripts/demo-video.mjs', before: "assert.equal(reply.kind, 'model-result');", after: '', test: 'demo-video' },
   { name: 'video-s-four-references', file: 'scripts/demo-video.mjs', before: 'assert.equal(reply.validation.fixtures.length, 4);', after: '', test: 'demo-video' },

@@ -1,5 +1,7 @@
 # デモ動画のBGM
 
+**現在の投稿用動画**：締めの「／申請・ログイン不要」を削除した[字幕修正版](VIDEO_CTA_FIX.md)を使う。納品先は`runs/demo-cta/final-9c3ea7d/demo-main-bgm.mp4`。本書の以下のhash・納品先は、修正元のBGM動画の固定記録として保持する。
+
 2026-11-15 JST。ユーザー指定により、確認済み15秒動画へ軽快なエレクトロのインストBGMを加える。好みの指定はなく、映像に合わせて担当側で選ぶ。WebのSEは[調査・計画](WEB_SOUND_PLAN.md)で別に管理する。
 
 後続のWeb SE実装は[検証記録](WEB_SOUND_VALIDATION.md)を参照する。本書の動画はsource `7b364c9`の映像を保持したBGM版であり、後から追加したWeb SEを再収録した動画ではない。

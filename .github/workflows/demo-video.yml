@@ -3,6 +3,10 @@ name: Demo video
 on:
   workflow_dispatch:
     inputs:
+      revise_cta_only:
+        description: Remove application/login wording from the reviewed BGM video without recapturing
+        type: boolean
+        default: false
       add_bgm_only:
         description: Add original BGM to the already verified public S video without recapturing
         type: boolean
@@ -23,7 +27,7 @@ permissions:
 
 jobs:
   record:
-    if: (github.event_name == 'workflow_dispatch' && !inputs.add_bgm_only) || (github.event.label.name == 'record-demo' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: (github.event_name == 'workflow_dispatch' && !inputs.add_bgm_only && !inputs.revise_cta_only) || (github.event.label.name == 'record-demo' && github.event.pull_request.head.repo.full_name == github.repository)
     name: Record the real arena and export the fifteen-second demo
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -145,7 +149,7 @@ jobs:
           if-no-files-found: error
 
   bgm:
-    if: github.event_name == 'workflow_dispatch' && inputs.add_bgm_only
+    if: github.event_name == 'workflow_dispatch' && inputs.add_bgm_only && !inputs.revise_cta_only
     name: Add and verify original BGM without changing the video
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -174,5 +178,39 @@ jobs:
           path: |
             ${{ runner.temp }}/demo-bgm/*-bgm.mp4
             ${{ runner.temp }}/demo-bgm/bgm-receipt.json
+          retention-days: 7
+          if-no-files-found: error
+
+  revise-cta:
+    if: github.event_name == 'workflow_dispatch' && inputs.revise_cta_only
+    name: Simplify the closing caption while keeping the reviewed footage and BGM
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: '43620484463'
+          name: demo-bgm-778cdbaa0e90ff2a77ca8250e2be447514373d75
+          path: ${{ runner.temp }}/cta-source
+      - run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk
+      - run: node --test scripts/ci/demo-cta.test.mjs
+      - run: node scripts/revise-demo-cta.mjs "$RUNNER_TEMP/cta-source" "$RUNNER_TEMP/demo-cta"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: demo-cta-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/demo-cta/demo-main-bgm.mp4
+            ${{ runner.temp }}/demo-cta/cta-receipt.json
+            ${{ runner.temp }}/demo-cta/review-*.png
           retention-days: 7
           if-no-files-found: error
