@@ -1,5 +1,7 @@
 # VoxelShogi
 
+**2026-11-15：Xでの公開をもって、この開発作業は終了しました。** 公開デモ・コード・既存モデルは引き続き利用できます。[成果物の保存先と復元方法](docs/PROJECT_CLOSEOUT.md)を参照してください。
+
 [![CI](https://github.com/ayutaz/voxelshogi/actions/workflows/ci.yml/badge.svg)](https://github.com/ayutaz/voxelshogi/actions/workflows/ci.yml)
 
 **三次元将棋のAI対局を眺め、AIを作り、比べるためのオープンソースプロジェクトです。**
