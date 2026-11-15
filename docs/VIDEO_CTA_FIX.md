@@ -18,4 +18,22 @@
 
 `Demo video` workflowの`revise_cta_only=true`で、[既存BGM](DEMO_BGM.md)のrun `43620484463`から直接取得して編集する。元映像の撮影sourceは引き続き`7b364c9`。後続のWeb SEは動画へ再収録しない。
 
-元動画のhashは`3ce3687d080040ca24c50d40d4914ac40c75bb7596ec4b31bcde560a78cb0cfc`。Linuxでの完成物と画像の確認は未完了。元動画は履歴として保持する。
+元動画のhashは`3ce3687d080040ca24c50d40d4914ac40c75bb7596ec4b31bcde560a78cb0cfc`。元動画は履歴として保持する。
+
+## 完成物と確認結果
+
+[Linux編集・検査run](https://github.com/ayutaz/voxelshogi/actions/runs/43663011178)は成功した。編集sourceは`9c3ea7ddb739daf78095937b2ba5a51afd954c4f`、実装と記録のPRは[#201](https://github.com/ayutaz/voxelshogi/pull/201)。固定Node 24で関連単体14件が成功し、元動画hashの確認と音声不変の確認を外す2変異も検出した。
+
+- 変更領域外のSSIM **0.999030**、最初11秒のSSIM **0.998772**（基準0.995以上）
+- 締め字幕帯のSSIM **0.849829**で、字幕が実際に変わったことも確認
+- 圧縮BGMのhashが完全一致：`5e10f77546c76149d2065fc21c65e07f3e26fb2a030c4d1f40b6e04966af756f`
+- 形式・450frame・15秒・音声・全編デコードと、完成8ファイルの全bytes／hashが成功
+- 0／3／10.8／10.96／11／11.2／14.9秒の7画像を目視。削除対象の文言がなく、残したモデル表記・URL・盤面・操作・見出しに見切れや編集帯の目立つ継ぎ目なし
+
+投稿には次を使う：
+
+`runs/demo-cta/final-9c3ea7d/demo-main-bgm.mp4`
+
+3,675,160 bytes、SHA-256 `f54d6dcb10fcda39beacd8b01a606c3e27272e4c1ade5503965ee5c1c2f54c3c`。動画・7画像・小さいreceiptだけをMacへ取得した。同じフォルダーの`x-post-1.txt`／`x-post-2.txt`はコピー用の文案で、投稿は未実施。
+
+artifact `14140479064`、ZIP SHA-256 `e949f29a8b36f3e88c54799d97e7f6fcbacea4765651a0a27f8a791027d8448d`。[素材・完成物のhashと独立した目視の固定記録](experiments/video-cta-final-20261115.md)を保持する。元映像の既知の21画像と棋譜再生の証拠は引き続き有効だが、新しくWebを撮り直した証拠にはしない。
